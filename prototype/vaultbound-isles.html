@@ -517,6 +517,7 @@ const SPECIALS = {
   timeEcho:     { name: "Second Hand",     cd: 15, text: m => `Echoes of your blade strike every foe within 12 m three times, each for ${m}x weapon damage.` },
   singularity:  { name: "Singularity",     cd: 14, text: m => `Hurl a void star that drags foes within 10 m together, then collapses for ${m}x weapon damage.` },
   chainStorm:   { name: "Endless Chain",   cd: 13, text: m => `Whirl a chain of dusk around you for 4 s, striking everything within 6 m sixteen times for ${(m * 0.3).toFixed(1)}x weapon damage each.` },
+  cometRain:    { name: "Comet Rain",      cd: 13, text: m => `Call three comets down in a line ahead, each bursting for ${m}x weapon damage on everything within 4 m.` },
   riptideSpiral:{ name: "Riptide Spiral",  cd: 14, text: m => `Spin a whirlpool around you for 4 s that drags foes within 8 m inward, striking eight times for ${(m * 0.45).toFixed(1)}x weapon damage each.` }
 };
 const ARM_SPECIALS = {
@@ -615,7 +616,26 @@ const WEAPON_DEFS = [
   ["leviathantrident", "Leviathan's Trident", "legendary", "trident", 0x40ffd0, 0x1a5a5a, "vortex", "The sea itself answers when it is raised."],
   ["phoenixtwin", "Phoenix Twinblade", "legendary", "twinblade", 0xffb050, 0xff5a20, "flameWave", "Both ends burn. Hold it in the middle."],
   ["krakensickle", "Kraken's Embrace", "legendary", "chainsickle", 0x8a3a5a, 0xff7aa8, "drainBurst", "Eight links for eight arms."],
-  ["tidesovereign", "Tidesovereign, the Drowned Crown", "vaulted", "trident", 0x0a3a4a, 0x40ffd0, "riptideSpiral", "Pulled from the deepest trench by someone who never came back up."]
+  ["tidesovereign", "Tidesovereign, the Drowned Crown", "vaulted", "trident", 0x0a3a4a, 0x40ffd0, "riptideSpiral", "Pulled from the deepest trench by someone who never came back up."],
+  ["peasantsword", "Peasant's Arming Sword", "common", "sword", 0xb0b4bc, 0x6a4a2a, "heavyStrike", "Plain, honest steel."],
+  ["boarspear", "Boar Spear", "common", "spear", 0xa8acb0, 0x5a3a22, "shockwave", "The crossbar stops the boar. Usually."],
+  ["stonemace", "Stone-Head Mace", "common", "mace", 0x8a8478, 0x6a4a2a, "heavyStrike", "A river stone lashed to a stick."],
+  ["huntknife", "Hunter's Knife", "common", "dagger", 0xc8ccd0, 0x4a3a2a, "bladeFan", "Skins rabbits, stabs crabs."],
+  ["saltglaive", "Saltwind Halberd", "rare", "halberd", 0xd8e8f0, 0x5ab8d8, "vortex", "Smells of the sea after a storm."],
+  ["redcap", "Redcap Cleaver", "rare", "axe", 0xc0402a, 0xffb060, "flameWave", "Its edge is always a little too warm."],
+  ["willowisp", "Will-o'-Wisp Staff", "rare", "staff", 0x5a7a4a, 0x9affb0, "chainBolt", "A little light lives in the crystal."],
+  ["ravenscythe", "Raven's Scythe", "rare", "scythe", 0x2a2a30, 0x9a9ab0, "drainBurst", "Black feathers bound to the snath."],
+  ["sunspear", "Sunspear", "epic", "spear", 0xffe0a0, 0xffb040, "meteor", "It glows hotter the higher the sun."],
+  ["nightfang", "Nightfang Twinblade", "epic", "twinblade", 0x1a1a2a, 0x8a6aff, "bladeFan", "Two moons on one handle."],
+  ["earthshaker", "Earthshaker Maul", "epic", "warhammer", 0x6a5a4a, 0xd8a050, "shockwave", "The ground flinches when you lift it."],
+  ["seafoamrapier", "Seafoam Rapier", "epic", "rapier", 0xe8fff8, 0x7af0d8, "frostNova", "Light as the foam it is named for."],
+  ["warlordaxe", "Warlord's Greataxe", "epic", "greataxe", 0x8a2a2a, 0xffd040, "whirl", "Taken from a warlord who no longer needs it."],
+  ["dawnspear", "Dawnpiercer", "legendary", "spear", 0xfff0c0, 0xffd040, "meteor", "It catches the first light of every morning."],
+  ["abyssscythe", "Abyssal Reaper", "legendary", "scythe", 0x0a0a14, 0x6a3aff, "vortex", "It harvests something other than wheat."],
+  ["galeflail", "Galewind Flail", "legendary", "flail", 0xcfeeff, 0x7ad8ff, "chainBolt", "The chain hums like wind through rigging."],
+  ["crimsonkatana", "Crimson Moon Katana", "legendary", "katana", 0xd8303a, 0xff8a8a, "bladeFan", "Drawn only under a red moon."],
+  ["kingsmace", "The King's Morningstar", "legendary", "mace", 0xffd870, 0xe8e0ff, "shockwave", "It still remembers the crown it guarded."],
+  ["cometfall", "Cometfall, the Sky-Breaker", "vaulted", "greatsword", 0x1a1a3a, 0xff9a3a, "cometRain", "Forged from the tail of a falling star."]
 ];
 // [id, name, rarity, weight, metal, cloth, accent, helm, cape, special, description]
 const ARMOUR_DEFS = [
@@ -660,7 +680,19 @@ const ARMOUR_DEFS = [
   ["stormcloak", "Stormwake Cloak", "epic", "light", 0x3a4a6a, 0x1a2a3a, 0x9ad8ff, "hood", true, null, "Rain slides off it before it can land."],
   ["krakenhide", "Krakenhide Armour", "epic", "medium", 0x6a2a4a, 0x2a1a2a, 0xff7aa8, "helm", true, null, "Ink still seeps from the seams."],
   ["leviathanscale", "Leviathan Scale Mail", "legendary", "heavy", 0x1a5a5a, 0x0a2a2a, 0x40ffd0, "crown", true, null, "Every scale is the size of a shield."],
-  ["sirenmantle", "Siren's Mantle", "legendary", "light", 0x9affe8, 0x2a5a6a, 0xd8fff8, "hood", true, null, "You can almost hear singing when the wind moves it."]
+  ["sirenmantle", "Siren's Mantle", "legendary", "light", 0x9affe8, 0x2a5a6a, 0xd8fff8, "hood", true, null, "You can almost hear singing when the wind moves it."],
+  ["fieldjack", "Fieldhand's Jerkin", "common", "light", 0x7a6a4a, 0x5a6a3a, 0, "none", false, null, "Patched elbows, stubborn stains."],
+  ["bronzecap", "Bronzecap Mail", "common", "medium", 0xb08a5a, 0x4a3a2a, 0, "helm", false, null, "The cap is the best part."],
+  ["ravenmail", "Raven Feather Mail", "rare", "light", 0x2a2a30, 0x1a1a20, 0x9a9ab0, "hood", true, null, "It rustles like wings when you run."],
+  ["ironwarden", "Ironwarden Plate", "rare", "heavy", 0x9aa0a8, 0x3a3a40, 0xd8e8ff, "visor", false, null, "Guards the gate. Guards you."],
+  ["sunscale", "Sunscale Hauberk", "rare", "medium", 0xd8b860, 0x6a4a2a, 0xffe0a0, "helm", false, null, "Polished until it blinds."],
+  ["nightstalker", "Nightstalker Garb", "epic", "light", 0x1a1a2a, 0x0a0a14, 0x8a6aff, "hood", true, null, "Shadows lean towards whoever wears it."],
+  ["emberknight", "Emberknight Plate", "epic", "heavy", 0x4a2a22, 0x2a1a18, 0xff7a3a, "horned", true, null, "Its seams glow like a banked fire."],
+  ["frostmail", "Frostweave Mail", "epic", "medium", 0xcfe8ff, 0x3a5a8a, 0x9ad8ff, "helm", true, null, "Cold to the touch, warm inside."],
+  ["dawnguard", "Dawnguard Regalia", "legendary", "heavy", 0xfff0c0, 0xd8b860, 0xffd040, "crown", true, null, "The sun rises a little earlier for its wearer."],
+  ["voidwalker", "Voidwalker Shroud", "legendary", "light", 0x1a1028, 0x0a0614, 0xb07aff, "hood", true, null, "Footsteps in it make no sound."],
+  ["thunderlord", "Thunderlord Mail", "legendary", "medium", 0x5a6a8a, 0x2a3a5a, 0x9ad8ff, "horned", true, null, "Static crackles at every movement."],
+  ["wildheart", "Wildheart Carapace", "legendary", "heavy", 0x4a6a3a, 0x2a3a1a, 0x9aff6a, "helm", false, null, "Moss and bark that never stop growing."]
 ];
 const ARM_W = { light: { hp: 0.8, def: 0.7, move: 1.05, label: "Light" }, medium: { hp: 1, def: 1, move: 1, label: "Medium" }, heavy: { hp: 1.25, def: 1.35, move: 0.92, label: "Heavy" } };
 const RAR_HP = { common: 30, rare: 80, epic: 180, legendary: 380, vaulted: 750 };
@@ -1419,10 +1451,16 @@ function poseHumanoid(R, t, move, swing, style, air, spin) {
   R.hips.position.y = 0.98 + Math.abs(Math.sin(t * 9.5)) * move * 0.04;
   R.chest.rotation.y = 0; R.chest.rotation.x = 0;
   if (air) { R.hipL.rotation.x = -0.6; R.hipR.rotation.x = 0.25; R.kneeL.rotation.x = 0.9; R.kneeR.rotation.x = 0.4; }
+  if (R.weapon && style !== "twin") R.weapon.rotation.z = 0;
   if (swing > 0) {
     const k = 1 - swing; // 0 → 1 over the swing
     if (style === "thrust") { R.shR.rotation.x = lerp(-0.6, -1.65, Math.sin(k * Math.PI)); R.elR.rotation.x = lerp(-1.4, 0, Math.sin(k * Math.PI)); R.chest.rotation.y = -0.3 * Math.sin(k * Math.PI); }
-    else if (style === "sweep") { const e2 = 1 - Math.pow(1 - k, 2); R.shR.rotation.x = -1.45; R.shR.rotation.z = lerp(-1.3, 1.15, e2); R.elR.rotation.x = -0.2; R.chest.rotation.y = lerp(1.15, -1.15, e2); }
+    else if (style === "reap") { const e2 = 1 - Math.pow(1 - k, 2); R.shR.rotation.x = lerp(-2.4, -0.45, e2); R.shR.rotation.z = lerp(-0.9, 0.55, e2); R.elR.rotation.x = -0.5; if (R.shL) { R.shL.rotation.x = lerp(-1.8, -0.6, e2); R.shL.rotation.z = lerp(0.35, 0.6, e2); R.elL.rotation.x = -1.0; } R.chest.rotation.y = lerp(0.35, -0.35, e2); R.chest.rotation.x = lerp(-0.05, 0.1, e2); }
+    else if (style === "polearm") { const e2 = 1 - Math.pow(1 - k, 2); R.shR.rotation.x = lerp(-2.1, -0.7, e2); R.shR.rotation.z = lerp(-0.6, 0.3, e2); R.elR.rotation.x = -0.6; if (R.shL) { R.shL.rotation.x = lerp(-1.6, -0.9, e2); R.elL.rotation.x = -0.9; } R.chest.rotation.y = lerp(0.3, -0.3, e2); }
+    else if (style === "flail") { R.shR.rotation.x = k < 0.35 ? lerp(-0.5, -3.0, k / 0.35) : lerp(-3.0, -0.8, (k - 0.35) / 0.65); R.shR.rotation.z = 0.2; R.elR.rotation.x = k < 0.35 ? -1.2 : lerp(-1.2, -0.1, (k - 0.35) / 0.65); R.chest.rotation.y = -0.2 * Math.sin(k * Math.PI); }
+    else if (style === "nunchaku") { const f = Math.sin(k * Math.PI * 2); R.shR.rotation.x = -1.3; R.shR.rotation.z = f * 0.7; R.elR.rotation.x = -1.3 + f * 0.9; R.chest.rotation.y = f * 0.18; }
+    else if (style === "chain") { const sn = Math.sin(k * Math.PI); R.shR.rotation.x = lerp(-1.0, -1.9, sn); R.elR.rotation.x = lerp(-1.5, 0, sn); R.shR.rotation.z = lerp(-0.4, 0.4, k); R.chest.rotation.y = -0.25 * sn; }
+    else if (style === "twin") { R.shR.rotation.x = -1.2; R.elR.rotation.x = -0.8; if (R.shL) { R.shL.rotation.x = -1.1; R.elL.rotation.x = -0.9; } if (R.weapon) R.weapon.rotation.z = k * TAU * 1.5; R.chest.rotation.y = Math.sin(k * Math.PI) * 0.15; }
     else if (style === "light" || style === "slash") { const e2 = 1 - Math.pow(1 - k, 2); R.shR.rotation.x = lerp(-2.3, -0.9, e2); R.shR.rotation.z = lerp(-1.1, 0.95, e2); R.elR.rotation.x = -0.35; R.chest.rotation.y = lerp(0.75, -0.75, e2); }
     else if (style === "heavy") { R.shR.rotation.x = k < 0.45 ? lerp(-0.4, -3.0, k / 0.45) : lerp(-3.0, -0.5, (k - 0.45) / 0.55); R.shL.rotation.x = R.shR.rotation.x * 0.8; R.elR.rotation.x = -0.3; R.elL.rotation.x = -0.5; R.chest.rotation.x = k < 0.45 ? -0.15 : 0.25; }
     else { R.shR.rotation.x = lerp(-2.6, -0.3, k); R.shR.rotation.z = lerp(-0.6, 0.5, k); R.elR.rotation.x = -0.4; R.chest.rotation.y = lerp(0.5, -0.5, k); }
@@ -2056,6 +2094,7 @@ function castSpecial() {
   const D = mult * base;
   P.swing = 1; P.swingStyle = w.weight; P.swingDur = 0.45;
   switch (w.special) {
+    case "cometRain": { for (let k = 0; k < 3; k++) later(0.25 * k, () => { const at = P.pos.clone().addScaledVector(f, 4 + k * 4.5); at.y = world.h(at.x, at.z); pillarFx(at, col, 16, 0.5); ringFx(at, 4, col, 0.5); burstFx(at.clone().add(new V3(0, 0.8, 0)), 3, 0xffc070, 0.4); for (const e of enemiesNear(at, 4)) damageEnemy(e, D, e.pos.clone().sub(at), w.kb * 1.5); }); break; }
     case "riptideSpiral": { let n = 0; const iv = () => { if (n++ >= 8 || P.dead) return; const p0 = P.pos.clone(); ringFx(p0, 8, col, 0.4); ringFx(p0, 4, 0x9affe8, 0.3); for (const e of enemiesNear(p0, 8)) { if (!e.boss && !e.dummy) e.kb.copy(p0.clone().sub(e.pos).setY(0).multiplyScalar(1.4)); damageEnemy(e, D * 0.45, null, 0); } later(0.5, iv); }; iv(); break; }
     case "chainStorm": { let n = 0; P.spinT = 0.45; const iv = () => { if (n++ >= 16 || P.dead) return; const p0 = P.pos.clone(); ringFx(p0, 6, col, 0.25); for (const e of enemiesNear(p0, 6)) damageEnemy(e, D * 0.3, e.pos.clone().sub(p0), 0.4); later(0.25, iv); }; iv(); break; }
     case "vaultCrush": { const at = pos.clone().addScaledVector(f, 5); pillarFx(at, col, 12, 0.5); ringFx(at, 5, col, 0.5); for (const e of enemiesNear(at, 5)) damageEnemy(e, D, e.pos.clone().sub(at), w.kb * 2); for (let k = 1; k <= 2; k++) later(k * 0.45, () => { ringFx(at, 5 + k * 2, col, 0.45); for (const e of enemiesNear(at, 5 + k * 2)) damageEnemy(e, D * 0.5, e.pos.clone().sub(at), w.kb); }); break; }
@@ -4431,19 +4470,28 @@ function buildRod(rd) {
 
 /* ---- the open ocean to the east and its islands ---- */
 const ISLES = [
-  { id: "gull", name: "Gull Rock", x: 255, z: 30, r: 12, h: 3, kind: "treasure" },
-  { id: "palm", name: "Palm Key", x: 300, z: -80, r: 18, h: 3.5, kind: "treasure" },
-  { id: "wreck", name: "Wreck Shoal", x: 330, z: 120, r: 16, h: 2.5, kind: "treasure", wreck: true },
-  { id: "crab", name: "Crab Atoll", x: 420, z: -160, r: 22, h: 3, kind: "guard", n: 4, guard: [["Shellback Brute", "crab", "melee", 0xa0502a, 0xffb060], ["Tidepool Lurker", "crab", "skirm", 0x5a8a8a, 0x9affe8]] },
-  { id: "lantern", name: "Lantern Isle", x: 470, z: 70, r: 18, h: 4, kind: "treasure", lighthouse: true },
-  { id: "saltfang", name: "Saltfang Rock", x: 520, z: 250, r: 20, h: 6, kind: "guard", n: 5, guard: [["Saltfang Corsair", "humanoid", "melee", 0x3a4a5a, 0xd8e8ff], ["Brine Witch", "floater", "ranged", 0x2a8a8a, 0x9affe8]] },
-  { id: "siren", name: "Siren's Cay", x: 650, z: 60, r: 16, h: 3, kind: "treasure" },
-  { id: "bone", name: "Bonecrown Isle", x: 600, z: -260, r: 24, h: 5, kind: "guard", n: 6, guard: [["Bonecrown Reaver", "humanoid", "melee", 0xd8d0b8, 0xff5a3a], ["Grave Hound", "beast", "skirm", 0x6a6a6a, 0xff7a3a]] },
-  { id: "thunder", name: "Thunder Spire", x: 690, z: 320, r: 20, h: 9, kind: "guard", n: 5, guard: [["Storm Golem", "golem", "melee", 0x4a5a7a, 0x9ad8ff], ["Thunderwing", "floater", "ranged", 0x5a7aff, 0xfff0a0]] },
-  { id: "kraken", name: "Kraken's Graveyard", x: 760, z: -330, r: 24, h: 4, kind: "guard", n: 7, guard: [["Drowned Titan", "golem", "melee", 0x2a4a4a, 0x40ffd0], ["Abyss Cultist", "humanoid", "ranged", 0x1a2a3a, 0x6ad8ff]] },
-  { id: "rift", name: "The Black Reef", x: 820, z: -40, r: 20, h: 3, kind: "portal" }
+  { id: "gull", name: "Gull Rock", x: 300, z: 40, r: 12, h: 3, kind: "treasure" },
+  { id: "palm", name: "Palm Key", x: 340, z: -110, r: 18, h: 3.5, kind: "treasure" },
+  { id: "pebble", name: "Pebble Cove", x: 380, z: 170, r: 14, h: 2.5, kind: "treasure" },
+  { id: "wreck", name: "Wreck Shoal", x: 470, z: 150, r: 16, h: 2.5, kind: "treasure", wreck: true },
+  { id: "crab", name: "Crab Atoll", x: 520, z: -210, r: 22, h: 3, kind: "guard", n: 4, guard: [["Shellback Brute", "crab", "melee", 0xa0502a, 0xffb060], ["Tidepool Lurker", "crab", "skirm", 0x5a8a8a, 0x9affe8]] },
+  { id: "turtle", name: "Turtleback Isle", x: 560, z: 30, r: 20, h: 4, kind: "treasure" },
+  { id: "lantern", name: "Lantern Isle", x: 640, z: 120, r: 18, h: 4, kind: "treasure", lighthouse: true },
+  { id: "saltfang", name: "Saltfang Rock", x: 700, z: 330, r: 20, h: 6, kind: "guard", n: 5, guard: [["Saltfang Corsair", "humanoid", "melee", 0x3a4a5a, 0xd8e8ff], ["Brine Witch", "floater", "ranged", 0x2a8a8a, 0x9affe8]] },
+  { id: "reed", name: "Reedmarsh Holm", x: 660, z: -330, r: 18, h: 2.5, kind: "guard", n: 5, guard: [["Bog Lurker", "beast", "skirm", 0x4a5a2a, 0x9aff6a], ["Marsh Witch", "floater", "ranged", 0x5a7a3a, 0xd8ff8a]] },
+  { id: "ember", name: "Ember Rock", x: 760, z: -120, r: 16, h: 5, kind: "treasure" },
+  { id: "siren", name: "Siren's Cay", x: 860, z: 60, r: 16, h: 3, kind: "treasure" },
+  { id: "bone", name: "Bonecrown Isle", x: 840, z: -420, r: 24, h: 5, kind: "guard", n: 6, guard: [["Bonecrown Reaver", "humanoid", "melee", 0xd8d0b8, 0xff5a3a], ["Grave Hound", "beast", "skirm", 0x6a6a6a, 0xff7a3a]] },
+  { id: "thunder", name: "Thunder Spire", x: 900, z: 470, r: 20, h: 9, kind: "guard", n: 5, guard: [["Storm Golem", "golem", "melee", 0x4a5a7a, 0x9ad8ff], ["Thunderwing", "floater", "ranged", 0x5a7aff, 0xfff0a0]] },
+  { id: "frost", name: "Frostfang Isle", x: 980, z: 260, r: 20, h: 6, kind: "guard", n: 6, guard: [["Iceback Brute", "golem", "melee", 0xbfe0ff, 0x9ad8ff], ["Frost Wraith", "floater", "ranged", 0xe8f4ff, 0x9ad8ff]] },
+  { id: "gilded", name: "Gilded Atoll", x: 1000, z: -250, r: 18, h: 3, kind: "treasure" },
+  { id: "kraken", name: "Kraken's Graveyard", x: 1080, z: -560, r: 24, h: 4, kind: "guard", n: 7, guard: [["Drowned Titan", "golem", "melee", 0x2a4a4a, 0x40ffd0], ["Abyss Cultist", "humanoid", "ranged", 0x1a2a3a, 0x6ad8ff]] },
+  { id: "serpent", name: "Serpent's Coil", x: 1150, z: 380, r: 22, h: 4, kind: "guard", n: 7, guard: [["Coil Serpent", "beast", "skirm", 0x1a5a4a, 0x40ffd0], ["Deep Priest", "humanoid", "ranged", 0x1a2a3a, 0x9affe8]] },
+  { id: "rift", name: "The Black Reef", x: 1220, z: -40, r: 20, h: 3, kind: "portal" },
+  { id: "titan", name: "Titan's Rest", x: 1300, z: 200, r: 26, h: 7, kind: "guard", n: 8, guard: [["Stone Titan", "golem", "melee", 0x7a7468, 0xffd070], ["Titan Wisp", "floater", "ranged", 0xffe8a0, 0xffffff]] },
+  { id: "edge", name: "World's Edge", x: 1360, z: -300, r: 16, h: 3, kind: "treasure" }
 ];
-const stormAt = (x, z) => x < 130 ? 0 : clamp((Math.hypot(x - DOCK.x, z - DOCK.z) - 60) / 560, 0, 1) * 100;
+const stormAt = (x, z) => x < 130 ? 0 : clamp((Math.hypot(x - DOCK.x, z - DOCK.z) - 90) / 1000, 0, 1) * 100;
 ISLES.forEach(i => { i.storm = stormAt(i.x, i.z); });
 function seaTerrain(x, z, y) {
   if (x > 150) { const k = smooth(150, 188, x); y = lerp(y, -12, k); }
@@ -4496,7 +4544,7 @@ function seaWorld(group) {
   world.boardItem = { x: 0, z: 0, r: 0, label: "Board your boat", act: () => boardBoat() }; world.interact.push(world.boardItem);
 }
 // the big ocean plane
-function oceanPlane(lw) { lw.geometry.dispose(); lw.geometry = new THREE.PlaneGeometry(5000, 5000, 1, 1); lw.geometry.rotateX(-Math.PI / 2); if (lw.material.normalMap) lw.material.normalMap.repeat.set(500, 500); }
+function oceanPlane(lw) { lw.geometry.dispose(); lw.geometry = new THREE.PlaneGeometry(7000, 7000, 1, 1); lw.geometry.rotateX(-Math.PI / 2); if (lw.material.normalMap) lw.material.normalMap.repeat.set(500, 500); }
 
 /* ---- sailing ---- */
 function launchBoat() {
@@ -4528,7 +4576,7 @@ function sailUpdate(dt, ix, iy) {
   sh.yaw -= turn * (0.45 + 0.6 * Math.min(1, Math.abs(sh.speed) / 8)) * dt;
   const f = new V3(Math.sin(sh.yaw), 0, Math.cos(sh.yaw)), next = sh.pos.clone().addScaledVector(f, sh.speed * dt);
   const bow = next.clone().addScaledVector(f, Math.sign(sh.speed || 1) * sh.mesh.userData.len * 0.5);
-  if (world.h(bow.x, bow.z) > SEA - 0.9 || Math.hypot(next.x, next.z) > 1060 || (bow.x < 168 && Math.abs(bow.z) < 4)) { sh.speed *= -0.25; }
+  if (world.h(bow.x, bow.z) > SEA - 0.9 || Math.hypot(next.x, next.z) > 1560 || (bow.x < 168 && Math.abs(bow.z) < 4)) { sh.speed *= -0.25; }
   else sh.pos.copy(next);
   if (stormLevel > 50) sh.pos.addScaledVector(new V3(Math.sin(worldT * 0.3), 0, Math.cos(worldT * 0.27)), stormLevel * 0.006 * dt);
   const wave = 0.08 + stormLevel * 0.006;
@@ -4645,7 +4693,7 @@ function seaTick(dt) {
   if (!world || world.kind !== "lobby") { stormLevel = 0; return; }
   const ref = sailing && !sailing.anchored ? sailing.pos : P.pos;
   stormLevel = stormAt(ref.x, ref.z);
-  world.radius = (sailing || P.pos.x > 120) ? 1100 : 290;
+  world.radius = (sailing || P.pos.x > 120) ? 1600 : 290;
   // breath
   P.breathMax = 12; if (P.breath === undefined) P.breath = P.breathMax;
   if (P.swimming && !P.dead) { P.breath -= dt; if (P.breath < 0) { P.breath = 0; P.hp -= ST.maxHp * 0.14 * dt; if (Math.random() < dt * 2) floatText(P.pos, "Drowning", "#9ad8ff"); if (P.hp <= 0) heroDown(); } }
@@ -4845,7 +4893,8 @@ function townInfill(group) {
    SWING TRAILS, THE BOAT DEALER, FLORA AND FAUNA, AND THE WORLD MAP
    ===================================================================== */
 /* ---- a trail that follows the weapon's own edge ---- */
-const swingStyleFor = w => ["rapier", "spear"].includes(w.type) ? "thrust" : ["scythe", "flail", "nunchaku", "chainsickle", "halberd", "twinblade"].includes(w.type) ? "sweep" : w.weight === "heavy" ? "heavy" : "slash";
+const SWING_BY_TYPE = { rapier: "thrust", spear: "thrust", trident: "thrust", scythe: "reap", halberd: "polearm", flail: "flail", nunchaku: "nunchaku", chainsickle: "chain", twinblade: "twin" };
+const swingStyleFor = w => SWING_BY_TYPE[w.type] || (w.weight === "heavy" ? "heavy" : "slash");
 const TRAIL = (() => {
   const N = 18, pos = new Float32Array(N * 2 * 3), col = new Float32Array(N * 2 * 3), idx = [];
   for (let i = 0; i < N - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
@@ -4965,11 +5014,11 @@ function mapPlaces() {
   return L;
 }
 let mapView = "town", waypoint = null, mapTimer = null;
-const MAPV = { town: [-215, -215, 430, 430], world: [-240, -440, 1150, 880] };
+const MAPV = { town: [-215, -215, 430, 430], world: [-240, -720, 1680, 1440] };
 function renderWorldMap() {
   const v = MAPV[mapView], places = mapPlaces(), sc = mapView === "town" ? 1 : 2.2;
   const kc = { town: "#ffe2a0", service: "#cfeeff", place: "#f4ead2", treasure: "#ffd166", guard: "#ff8a7a", portal: "#c08aff" };
-  const storms = [[20, "Calm"], [40, "Breezy"], [60, "Rough"], [80, "Stormy"]].map(([s, n]) => [60 + s / 100 * 560, n]);
+  const storms = [[20, "Calm"], [40, "Breezy"], [60, "Rough"], [80, "Stormy"]].map(([s, n]) => [90 + s / 100 * 1000, n]);
   const svg = `<svg viewBox="${v.join(" ")}" role="img" aria-label="World map">
     <rect x="-2000" y="-2000" width="4000" height="4000" fill="#1d4f6e"/>
     <rect x="-2000" y="-2000" width="2161" height="4000" fill="#4a6e3a"/>
