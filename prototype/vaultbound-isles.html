@@ -2903,6 +2903,18 @@ $("menuBody").addEventListener("click", e => {
 });
 
 /* ---- the lobby: forge, new buildings, more trees and townsfolk ---- */
+function markSprite(ch, col) { // a round quest badge that reads from across the plaza
+  const k = "mark" + ch + col; let mat = MC[k];
+  if (!mat) {
+    const c = document.createElement("canvas"); c.width = c.height = 128; const x = c.getContext("2d");
+    x.fillStyle = "rgba(12,14,22,0.82)"; x.beginPath(); x.arc(64, 64, 56, 0, TAU); x.fill();
+    x.lineWidth = 9; x.strokeStyle = col; x.stroke();
+    x.font = "900 86px Arial Black, Arial, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillStyle = col; x.fillText(ch, 64, 70);
+    const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.userData = { keep: true };
+    mat = new THREE.SpriteMaterial({ map: t, depthWrite: false, transparent: true }); mat.userData.keep = true; MC[k] = mat;
+  }
+  const s = new THREE.Sprite(mat); s.scale.set(0.85, 0.85, 1); return s;
+}
 function lobbyExtras(group, h) {
   const place = (x, z, rotY) => { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; group.add(g); return g; };
   const facing = (x, z) => Math.atan2(-x, -z);
@@ -3015,7 +3027,7 @@ function lobbyExtras(group, h) {
   world.npcs = [];
   QUEST_NPCS.forEach(def => {
     const [x, z] = def.pos, o = mk(def, x, z, def.face);
-    const marks = { offer: textSprite("!", "#ffd166", 2.4, "rgba(0,0,0,0)"), ready: textSprite("?", "#7fd69a", 2.4, "rgba(0,0,0,0)") };
+    const marks = { offer: markSprite("!", "#ffd166"), ready: markSprite("?", "#7fd69a") };
     for (const m of Object.values(marks)) { m.position.set(x, 3.15, z); group.add(m); m.visible = false; }
     const n = { def, ...o, x, z, marks, quest: true }; world.npcs.push(n); addCircle(x, z, 0.5, 2);
     world.interact.push({ x, z, r: 2.8, label: `Talk to ${def.name}`, act: () => openDialog(def) });
@@ -3030,7 +3042,7 @@ function lobbyExtras(group, h) {
     const dt = lastT === null ? 0 : Math.min(0.1, t - lastT); lastT = t;
     const paused = isPaused();
     for (const n of world.npcs) {
-      if (n.quest) { const st = npcStatus(n.def); n.marks.offer.visible = st === "offer"; n.marks.ready.visible = st === "ready"; const bob = 3.15 + Math.sin(t * 2.4) * 0.1; n.marks.offer.position.y = n.marks.ready.position.y = bob;
+      if (n.quest) { const st = npcStatus(n.def); n.marks.offer.visible = st === "offer"; n.marks.ready.visible = st === "ready"; const bob = 3.25 + Math.sin(t * 2.4) * 0.12; n.marks.offer.position.y = n.marks.ready.position.y = bob;
         const dx = P.pos.x - n.x, dz = P.pos.z - n.z, near = Math.hypot(dx, dz) < 6; const want = near ? Math.atan2(dx, dz) : n.def.face; let d = want - n.R.g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); n.R.g.rotation.y += d * Math.min(1, dt * 4);
         poseHumanoid(n.R, t + n.x, 0, 0, "normal", false); continue; }
       if (!paused) {
@@ -3339,7 +3351,7 @@ function frame(now) {
 }
 $("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; if (coarse || usedTouch) $("joyHint").hidden = false; });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
