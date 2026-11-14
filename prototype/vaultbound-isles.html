@@ -277,8 +277,8 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <label class="mpRow"><input type="checkbox" id="mpOn"> Music on <span class="mpKey">M</span></label>
   <label class="mpRow">Volume <input type="range" id="mpVol" min="0" max="100" value="70"></label>
   <div class="mpLbl">Listen to each piece</div>
-  <div class="mpBtns"><button data-prev="lobby">Lobby</button><button data-prev="battle">Battle</button><button data-prev="boss">Boss</button><button data-prev="victory">Victory</button><button data-prev="defeat">Defeat</button></div>
-  <p class="mpNote">Composed live as you play. Battle music builds as more enemies close in, every island has its own key and melody, and the sound muffles when your health runs low.</p>
+  <div class="mpBtns"><button data-prev="lobby">Lobby</button><button data-prev="portal">Portal</button><button data-prev="battle">Battle</button><button data-prev="boss">Boss</button><button data-prev="victory">Victory</button><button data-prev="defeat">Defeat</button></div>
+  <p class="mpNote">Composed live as you play. Battle music builds as more enemies close in, every island has its own key and melody, portals hum when you step on them, and the sound muffles when your health runs low.</p>
 </div>
 <div id="banner"><b id="bnT"></b><span id="bnS"></span></div>
 <div id="toasts" aria-live="polite"></div>
@@ -1750,7 +1750,7 @@ function hurtHero(target, amount, from) {
   }
 }
 function heroDown() {
-  P.dead = true; P.hp = 0; MUSIC.sting("defeat");
+  P.dead = true; P.hp = 0; MUSIC.setMode("defeat", 0, "Fallen: defeat theme");
   showResult("Defeated", "Your party was driven back", "You keep everything you found. Train up, change your gear, and try again.", "var(--bad)");
 }
 const fwd = () => new V3(Math.sin(P.face), 0, Math.cos(P.face));
@@ -2365,13 +2365,14 @@ function islandPath(i) {
 }
 function openMap(portalIdx) {
   mapPortal = portalIdx; $("mapModal").hidden = false; keys.clear();
+  if (!run) MUSIC.setMode("portal", 0, "Through the Portal");
   mapSel = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true));
   mapStage = firstOpenStage(mapSel);
   renderMap();
 }
 function firstOpenStage(i) { const p = S.prog[i]; return !p.normal ? 0 : !p.hard ? 1 : 2; }
 function stageUnlocked(i, s) { if (!islandUnlocked(i)) return false; const p = S.prog[i]; return s === 0 || (s === 1 && p.normal) || (s === 2 && p.hard); }
-function closeMap() { $("mapModal").hidden = true; }
+function closeMap() { $("mapModal").hidden = true; if (!run) MUSIC.setMode("lobby", 0, "Harbour of Portals"); }
 $("mapClose").addEventListener("click", closeMap);
 function renderMap() {
   $("mapPortal").textContent = `Portal ${["I", "II", "III", "IV"][mapPortal]} · party of up to 4`;
@@ -2740,17 +2741,26 @@ const MUSIC = (() => {
   const snare = (t, v) => { noise(t, { ft: "bandpass", cut: 1900, q: 0.8, vol: 0.22 * v, rel: 0.16, verb: 0.3 }); drum(t, 220, 160, 0.09, 0.12 * v, 0.1); };
   const hat = (t, v, pan) => noise(t, { cut: 7500, vol: 0.05 * v, rel: 0.035, pan: pan || 0.25 });
   const crash = (t, v) => noise(t, { cut: 4200, vol: 0.13 * (v || 1), rel: 1.8, verb: 0.5, pan: -0.2 });
+  function swoosh(t, dur, up) { // a filtered rush of air, rising or falling
+    const s = ctx.createBufferSource(); s.buffer = noiseBuf;
+    const fl = ctx.createBiquadFilter(); fl.type = "bandpass"; fl.Q.value = 6;
+    fl.frequency.setValueAtTime(up ? 300 : 4000, t); fl.frequency.exponentialRampToValueAtTime(up ? 4500 : 250, t + dur);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.12, t + dur * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(fl); fl.connect(g); s.start(t, Math.random()); s.stop(t + dur + 0.05); out(g, up ? -0.3 : 0.3, 0.6);
+  }
   const bell = (t, m, v) => { [1, 2.76, 5.4].forEach((r, i) => synth(t, hz(m) * r, { type: "sine", vol: (v || 0.12) / (i + 1), rel: 3 - i * 0.8, verb: 0.6 })); };
 
   /* ---- harmony and melody ---- */
   let key = { root: 38, sc: SCALES.aeo }, prog = [], motif = [], bpm = 140, kind = "silent";
-  const deg = (d, base) => { const o = Math.floor(d / 7), i = ((d % 7) + 7) % 7; return base + key.root + o * 12 + key.sc[i]; };
+  const deg = (d, base) => { const n = key.sc.length, o = Math.floor(d / n), i = ((d % n) + n) % n; return base + key.root + o * 12 + key.sc[i]; };
   function seeded(n) { let s = n * 9301 + 49297; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
   function compose(m, idx) {
     kind = m;
     if (m === "lobby") { key = { root: 41, sc: SCALES.lyd }; bpm = 84; prog = [[0, 4, 5, 3], [0, 4, 3, 4]]; }
     else if (m === "battle") { const k = ISLE_KEYS[idx % 12]; key = { root: k[0], sc: SCALES[k[1]] }; bpm = 136 + (idx % 4) * 3; prog = [[0, 5, 2, 6], [0, 3, 5, 4]]; }
     else if (m === "boss") { const k = ISLE_KEYS[idx % 12]; key = { root: k[0] - 2, sc: SCALES.harm }; bpm = 150; prog = [[0, 5, 3, 4], [0, 0, 5, 4]]; }
+    else if (m === "portal") { key = { root: 45, sc: [0, 2, 4, 6, 8, 10] }; bpm = 76; prog = [[0, 1, 3, 2], [0, 4, 3, 1]]; } // whole-tone: floating, magical
+    else if (m === "defeat") { key = { root: 38, sc: SCALES.phr }; bpm = 58; prog = [[0, 5, 3, 1], [0, 3, 5, 0]]; }
     // a two-bar motif built from chord tones, unique to each island
     const r = seeded(idx * 7 + (m === "boss" ? 101 : m === "lobby" ? 55 : 13));
     const rhythms = [[1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0], [1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0], [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0]];
@@ -2774,6 +2784,29 @@ const MUSIC = (() => {
       if (sec === "B" && motif[st] != null && st % 2 === 0) synth(t, hz(deg(motif[st], 24 + 12)), { type: "sine", vol: 0.04, a: 0.04, rel: 0.9, verb: 0.7, vib: 8 });
       if (st === 8 && b % 4 === 3) bell(t, deg(ch + 4, 36), 0.05);
       if (st % 4 === 2) hat(t, 0.5, -0.3);
+      return;
+    }
+    if (kind === "portal") {
+      if (st === 0) {
+        synth(t, hz(deg(ch, -24)), { type: "sine", a: 0.6, hold: 2.4, rel: 1.2, vol: 0.13 });
+        [0, 2, 4].forEach((k, j) => synth(t, hz(deg(ch + k, 12)), { type: "triangle", det: [-12, 12], a: 1.2, hold: 1.6, rel: 1.8, vol: 0.03, cut: 2400, vib: 9, verb: 0.75, pan: (j - 1) * 0.6 }));
+        if (b % 2 === 0) swoosh(t, 2.4, true);
+      }
+      const arp = [0, 2, 4, 6, 8, 6, 4, 2, 1, 3, 5, 7, 9, 7, 5, 3][st]; // crystals spiralling up and down
+      synth(t, hz(deg(ch + arp, 36)), { type: "sine", vol: 0.035, rel: 0.6, verb: 0.8, pan: Math.sin(s * 0.45) * 0.8 });
+      if (st === 8 && b % 4 === 1) bell(t, deg(ch + 4, 24), 0.06);
+      if (sec === "B" && motif[st] != null && st % 4 === 0) synth(t, hz(deg(motif[st], 24)), { type: "sine", det: [0, 1200], vol: 0.03, a: 0.08, hold: 0.3, rel: 1.2, verb: 0.8, vib: 14 });
+      if (st % 8 === 4) noise(t, { ft: "bandpass", cut: 9000, q: 2, vol: 0.025, rel: 0.4, verb: 0.6, pan: -0.5 });
+      return;
+    }
+    if (kind === "defeat") {
+      if (st === 0) {
+        drum(t, 70, 30, 1.4, 0.35, 0.6);
+        [0, 2, 4].forEach((k, j) => synth(t, hz(deg(ch + k, 0)), { formant: true, det: [-10, 10], a: 0.8, hold: 2.6, rel: 1.6, vol: 0.04, cut: 2400, verb: 0.7, pan: (j - 1) * 0.5 }));
+        synth(t, hz(deg(ch, -12)), { det: [-6, 6], a: 0.5, hold: 3, rel: 1, vol: 0.07, cut: 500 });
+      }
+      if (motif[st] != null && st % 4 === 0) { const m = 9 - (motif[st] % 5) - (b % 4); synth(t, hz(deg(m, 12)), { det: [-4, 4], cut: 1400, a: 0.15, hold: 0.7, rel: 0.9, vol: 0.05, vib: 9, verb: 0.65, pan: -0.2 }); } // a lone, falling violin line
+      if (st === 8 && b % 2 === 1) bell(t, deg(ch, 24), 0.04);
       return;
     }
     const boss = kind === "boss", hot = boss ? 1 : i;
@@ -2817,6 +2850,11 @@ const MUSIC = (() => {
       drum(t + 2.2, 100, 40, 1.2, 0.6, 0.5); crash(t + 2.2, 1.4); bell(t + 2.2, deg(14, 24), 0.08);
     } else {
       key = { root: 38, sc: SCALES.phr };
+      defeatIntro(t);
+    }
+  }
+  function defeatIntro(t) {
+    {
       drum(t, 80, 30, 1.6, 0.7, 0.6);
       [[7, 0, 0.6], [5, 0.6, 0.6], [3, 1.2, 0.6], [1, 1.8, 2.2]].forEach(([d, at, len]) => synth(t + at, hz(deg(d, 0)), { det: [-8, 0, 8], cut: 900, a: 0.08, hold: len, rel: 0.9, vol: 0.06, verb: 0.6, vib: 6 }));
       [0, 3, 7].forEach(d => synth(t + 1.8, hz(deg(d, -12)), { formant: true, det: [-10, 10], a: 0.5, hold: 1.8, rel: 1.5, vol: 0.05, cut: 2500, verb: 0.7 }));
@@ -2834,6 +2872,8 @@ const MUSIC = (() => {
       compose(m, idx);
       if (m === "boss") { drum(nextT, 70, 28, 2, 0.75, 0.6); crash(nextT, 1.5); bell(nextT, key.root + 24, 0.1); nextT += 60 / bpm; }
       if (m === "battle") crash(nextT, 0.7);
+      if (m === "portal") { swoosh(nextT, 1.6, true); bell(nextT + 0.2, key.root + 24, 0.08); bell(nextT + 0.5, key.root + 28, 0.06); }
+      if (m === "defeat") { const k0 = key; key = { root: 38, sc: SCALES.phr }; defeatIntro(nextT); key = k0; nextT += 3.9; }
     }
     notify();
   }
@@ -2843,9 +2883,9 @@ const MUSIC = (() => {
   function preview(m) {
     init(); if (!ctx) return; previewing = true;
     const idx = real.m === "battle" || real.m === "boss" ? real.idx : 0;
-    if (m === "victory" || m === "defeat") { sting(m); return; }
+    if (m === "victory") { sting(m); return; }
     inten = intenT = m === "battle" ? 0.85 : 0;
-    curIdx = -1; apply(m, idx, m === "lobby" ? "Harbour of Portals (preview)" : m === "boss" ? "Boss theme (preview)" : "Battle theme at full intensity (preview)");
+    curIdx = -1; apply(m, idx, ({ lobby: "Harbour of Portals (preview)", portal: "Through the Portal (preview)", boss: "Boss theme (preview)", defeat: "Fallen: defeat theme (preview)", battle: "Battle theme at full intensity (preview)" })[m]);
   }
   function endPreview() { if (!previewing) return; previewing = false; curIdx = -1; cur = null; apply(real.m, real.idx, real.label); }
   function update(dt, alive, hp, menus) {
@@ -2891,7 +2931,7 @@ function frame(now) {
   if (!paused) update(dt);
   animate(dt, paused);
   updateHud();
-  MUSIC.update(Math.min(0.05, dt / (timeScale || 1)), run ? enemies.reduce((n, e) => n + (e.dead ? 0 : 1), 0) : 0, Math.max(0, P.hp / ST.maxHp), paused);
+  MUSIC.update(Math.min(0.05, dt / (timeScale || 1)), run ? enemies.reduce((n, e) => n + (e.dead ? 0 : 1), 0) : 0, Math.max(0, P.hp / ST.maxHp), !$("menu").hidden);
   renderer.render(scene, camera);
   saveT += dt; if (saveT > 6) { saveT = 0; save(); }
   requestAnimationFrame(frame);
