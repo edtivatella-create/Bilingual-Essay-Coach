@@ -1716,7 +1716,7 @@ function buildLobby() {
   for (let k = 0; k < 70; k++) { const a = r3() * TAU, d = 100 + r3() * 90, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z) || onPath(x, z, 2) || inZone(x, z, 3) || Math.abs(baseH(x, z)) > 2) continue; const t = makeTree(r3() < 0.6 ? "oak" : "pine", r3); t.position.set(x, h(x, z), z); t.scale.setScalar(0.9 + r3() * 0.6); t.rotation.y = r3() * TAU; group.add(t); }
   for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + TAU / 16, x = Math.cos(a) * 25, z = Math.sin(a) * 25; M(G.cyl(0.06, 0.08), std(0x2a2a30, { m: 0.8, r: 0.4 }), x, 1.6, z, group, 1, 3.2, 1).castShadow = true; M(G.sph(), std(0xffe0a0, { e: 0xffc060, ei: 2.5 }), x, 3.3, z, group, 0.16); const lg = glowSprite(0xffb050, 2.2, 0.75); lg.position.set(x, 3.3, z); group.add(lg); addCircle(x, z, 0.3, 3); }
   const lampL = new THREE.PointLight(0xffc070, 0.8, 14, 2); lampL.position.set(0, 4, 0); group.add(lampL); world.nightLights = [{ l: lampL, b: 0.8 }];
-  frontier(group, h);
+  frontier(group, h); townInfill(group);
   grassField(group, coarse ? 7000 : 20000, 0x6a9a3a, () => { let x = 0, z = 0; for (let k = 0; k < 8; k++) { const a = rand(0, TAU), d = rand(27.6, 95); x = Math.cos(a) * d; z = Math.sin(a) * d; if (!onPath(x, z, 0.4)) break; } return [x, h(x, z), z]; });
   for (let k = 0; k < 30; k++) { const a = r3() * TAU, d = 30 + r3() * 40, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z) || onPath(x, z, 1)) continue; makeRock(group, x, h(x, z), z, 0.4 + r3() * 1.4, 0x8a8680, r3); }
   world.clouds = addClouds(group, 0xffffff);
@@ -3238,7 +3238,7 @@ function lobbyExtras(group, h) {
   const mk = (def, x, z, face) => {
     const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null });
     const gy0 = world.h(x, z); R.g.position.set(x, gy0, z); R.g.rotation.y = face; group.add(R.g); shadows(R.g, true, false);
-    const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, gy0 + 2.45, z); lbl.userData.far = 42; group.add(lbl); world.labels.push(lbl);
+    const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, gy0 + 2.45, z); lbl.userData.far = 34; group.add(lbl); world.labels.push(lbl);
     return { R, lbl };
   };
   world.npcs = [];
@@ -3259,7 +3259,7 @@ function lobbyExtras(group, h) {
     const dt = lastT === null ? 0 : Math.min(0.1, t - lastT); lastT = t;
     const paused = isPaused();
     for (const n of world.npcs) {
-      const far = Math.hypot(P.pos.x - n.x, P.pos.z - n.z) > 52; n.R.g.visible = !far;
+      const far = Math.hypot(P.pos.x - n.x, P.pos.z - n.z) > 40; n.R.g.visible = !far;
       if (far) { if (n.marks) n.marks.offer.visible = n.marks.ready.visible = false; continue; }
       if (n.quest) { const st = npcStatus(n.def); n.marks.offer.visible = st === "offer"; n.marks.ready.visible = st === "ready"; const bob = world.h(n.x, n.z) + 3.25 + Math.sin(t * 2.4) * 0.12; n.marks.offer.position.y = n.marks.ready.position.y = bob;
         const dx = P.pos.x - n.x, dz = P.pos.z - n.z, near = Math.hypot(dx, dz) < 6; const want = near ? Math.atan2(dx, dz) : n.def.face; let d = want - n.R.g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); n.R.g.rotation.y += d * Math.min(1, dt * 4);
@@ -4678,6 +4678,118 @@ QUEST_NPCS.push({ id: "hale", name: "Shipwright Hale", role: "Shipwright's Yard"
     { id: "w3", title: "Into the Rift", ask: "Clear any stage on a rift island, beyond the black portal far out at sea.", stat: "riftClears", n: 1, reward: { coins: 15000, items: { voidglass: 1 } } }
   ] });
 VILLAGERS.push({ name: "Corra", role: "Treasure diver", home: [158, 8], rad: 3, look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0x2a6a8a, cloth2: 0x1a2a3a }, lines: ["Every island out there has a chest. The far ones are guarded.", "Do not fall in during a storm. You will not last long.", "They say a black portal sits on a reef at the edge of the world."] });
+
+/* =====================================================================
+   A FULLER TOWN: NEIGHBOURHOODS BETWEEN THE ROADS AND A CROWD OF TOWNSFOLK
+   ===================================================================== */
+function townhouse(parent, x, z, rotY, r) { // tall and narrow, three storeys
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; parent.add(g);
+  const W = 4.4 + r() * 1.2, D = 5, H = 9 + r() * 2, wall = std([0xc8a890, 0xd8c0a0, 0xb89a80, 0xe0d0c0][Math.floor(r() * 4)], { r: 0.92, map: "plaster", bump: "plasterB", bs: 1.2, rep: 2 }), beam = MAT.bark(0x4a3222), win = WIN_MAT();
+  M(G.box(), wall, 0, H / 2, 0, g, W, H, D); M(G.box(), MAT.rock(0x7a756c), 0, 0.4, 0, g, W + 0.1, 0.8, D + 0.1);
+  for (const y of [H / 3, H * 2 / 3]) M(G.box(), beam, 0, y, D / 2 + 0.03, g, W, 0.22, 0.08);
+  for (const y of [1.9, H / 3 + 1.6, H * 2 / 3 + 1.4]) for (const s of [-1, 1]) { if (y < 2 && s > 0) continue; M(G.box(), win, s * W * 0.25, y, D / 2 + 0.05, g, 0.8, 1.1, 0.05); }
+  M(G.box(), std(0x3a2618, { r: 0.7 }), W * 0.25, 1.1, D / 2 + 0.05, g, 1, 2.2, 0.1);
+  const rf = M(G.cone(4), std([0x5a4a62, 0x8a4a3a, 0x4a5a6a][Math.floor(r() * 3)], { r: 0.8, map: "roof", bump: "roof", bs: 1.5, rep: 3, flat: true }), 0, H + 1.8, 0, g, W * 0.78, 3.6, D * 0.85); rf.rotation.y = Math.PI / 4;
+  M(G.box(), MAT.rock(0x6a625a), W * 0.3, H + 2.4, 0, g, 0.5, 2, 0.5);
+  return Math.max(W, D) * 0.6;
+}
+function shopfront(parent, x, z, rotY, r, sign) { // a shop with a striped awning and goods outside
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; parent.add(g);
+  const W = 7, D = 5.5, H = 5, cols = [0xc0402a, 0x3a6aa8, 0xd8a83a, 0x4a8a4a, 0x8a4aa8], col = cols[Math.floor(r() * cols.length)];
+  M(G.box(), std(0xe0d4bc, { r: 0.92, map: "plaster", bump: "plasterB", bs: 1.2, rep: 2 }), 0, H / 2, 0, g, W, H, D);
+  M(G.box(), WIN_MAT(), 0, 1.6, D / 2 + 0.05, g, W * 0.7, 1.6, 0.05); M(G.box(), std(0x3a2618), W * 0.38, 1.1, D / 2 + 0.06, g, 1, 2.2, 0.08);
+  for (let k = 0; k < 6; k++) { const a = M(G.box(), std(k % 2 ? 0xf4f0e8 : col, { r: 0.9, map: "fabric" }), -W / 2 + 0.6 + k * (W - 1.2) / 5, 3.1, D / 2 + 0.9, g, (W - 1.2) / 6 + 0.02, 0.06, 1.8); a.rotation.x = 0.35; }
+  const rf = M(G.cone(4), std(0x6a5a4a, { r: 0.8, map: "roof", flat: true, rep: 2 }), 0, H + 1.4, 0, g, W * 0.78, 2.8, D * 0.86); rf.rotation.y = Math.PI / 4;
+  for (let k = 0; k < 3; k++) M(G.box(), MAT.bark(0x8a6a42), -2 + k * 1.1, 0.35, D / 2 + 1.4, g, 0.7, 0.7, 0.7).rotation.y = r();
+  if (sign) M(G.box(), std(0x5a3a22, { r: 0.8 }), 0, 4.2, D / 2 + 0.08, g, 3, 0.7, 0.08);
+  return Math.max(W, D) * 0.62;
+}
+function rowhouses(parent, x, z, rotY, r) { // three homes joined in a terrace
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; parent.add(g);
+  const unit = 4.2, D = 5.5, H = 5.4, beam = MAT.bark(0x4a3222), win = WIN_MAT();
+  for (let k = 0; k < 3; k++) { const ox = (k - 1) * unit, wall = std([0xd8cbb0, 0xc8b8a0, 0xe2d8c6][k], { r: 0.92, map: "plaster", bump: "plasterB", bs: 1.2, rep: 2 });
+    M(G.box(), wall, ox, H / 2, 0, g, unit, H, D); M(G.box(), beam, ox + unit / 2, H / 2, D / 2 + 0.03, g, 0.2, H, 0.08);
+    M(G.box(), std(0x3a2618), ox - 0.8, 1.1, D / 2 + 0.05, g, 0.9, 2.2, 0.08); M(G.box(), win, ox + 0.8, 1.6, D / 2 + 0.05, g, 0.8, 0.9, 0.05); M(G.box(), win, ox, 3.9, D / 2 + 0.05, g, 1.4, 0.9, 0.05);
+    M(G.box(), MAT.rock(0x6a625a), ox + 1, H + 2, -1, g, 0.45, 1.8, 0.45); }
+  const rf = M(G.box(), std(0x8a4a3a, { r: 0.8, map: "roof", bump: "roof", bs: 1.5, rep: [4, 2] }), 0, H + 0.9, D * 0.24, g, unit * 3 + 0.4, 0.25, D * 0.62); rf.rotation.x = -0.55;
+  const rf2 = M(G.box(), std(0x8a4a3a, { r: 0.8, map: "roof", bump: "roof", bs: 1.5, rep: [4, 2] }), 0, H + 0.9, -D * 0.24, g, unit * 3 + 0.4, 0.25, D * 0.62); rf2.rotation.x = 0.55;
+  return unit * 1.6;
+}
+function roundhouse(parent, x, z, rotY, r) { // a round stone home with a pointed roof
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; parent.add(g);
+  const R0 = 2.6 + r() * 0.8, H = 5 + r() * 2;
+  M(G.cyl(R0, R0 + 0.2, 16), std(0x9a948a, { r: 0.85, map: "rock", bump: "rockB", bs: 0.5, rep: 2 }), 0, H / 2, 0, g, 1, H, 1);
+  M(G.cone(16), std([0x6a3a2a, 0x3a4a6a, 0x5a5a3a][Math.floor(r() * 3)], { r: 0.8, map: "roof", flat: true }), 0, H + 2, 0, g, R0 + 0.6, 4, R0 + 0.6);
+  M(G.box(), std(0x3a2618), 0, 1.1, R0 + 0.1, g, 1, 2.2, 0.1); for (const a of [0.9, -0.9, 2.4]) { const w = M(G.box(), WIN_MAT(), Math.sin(a) * (R0 + 0.12), H * 0.6, Math.cos(a) * (R0 + 0.12), g, 0.7, 0.8, 0.05); w.rotation.y = a; }
+  return R0 + 0.4;
+}
+// landmark buildings with names
+const LANDMARKS = [
+  { name: "Inn of the Eight Roads", kind: "inn" }, { name: "Bakery", kind: "shop" }, { name: "Schoolhouse", kind: "school" }, { name: "Bank of the Isles", kind: "bank" },
+  { name: "Clock Tower", kind: "clock" }, { name: "Bathhouse", kind: "bath" }, { name: "Apothecary", kind: "shop" }, { name: "Cartographer's Shop", kind: "shop" },
+  { name: "Tailor", kind: "shop" }, { name: "Town Hall", kind: "hall" }, { name: "Stables", kind: "stables" }, { name: "Toy Maker", kind: "shop" }
+];
+function landmark(parent, x, z, rotY, r, L, group, clockHands) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; parent.add(g);
+  const stone = std(0x9a948a, { r: 0.85, map: "rock", bump: "rockB", bs: 0.5, rep: 2 }), wall = std(0xe0d4bc, { r: 0.92, map: "plaster", bump: "plasterB", bs: 1.2, rep: 3 }), win = WIN_MAT();
+  let rad = 5, top = 8;
+  if (L.kind === "inn") { M(G.box(), wall, 0, 4, 0, g, 12, 8, 8); for (const s of [-1, 1]) for (const y of [2, 5.6]) M(G.box(), win, s * 3.5, y, 4.03, g, 1.4, 1.2, 0.05); M(G.box(), std(0x3a2618), 0, 1.3, 4.05, g, 2, 2.6, 0.1); const rf = M(G.cone(4), std(0x6a3a2a, { r: 0.8, map: "roof", flat: true, rep: 4 }), 0, 10, 0, g, 9.6, 4, 6.8); rf.rotation.y = Math.PI / 4; rad = 7; top = 13; }
+  else if (L.kind === "school") { M(G.box(), std(0xc05a3a, { r: 0.9, map: "rock", rep: 3 }), 0, 3, 0, g, 11, 6, 7); for (let k = -2; k <= 2; k++) M(G.box(), win, k * 2, 3.4, 3.53, g, 1.2, 1.8, 0.05); const rf = M(G.cone(4), std(0x3a3a4a, { r: 0.8, map: "roof", flat: true, rep: 4 }), 0, 7.6, 0, g, 8.6, 3.2, 6); rf.rotation.y = Math.PI / 4; M(G.box(), wall, 0, 8.8, 1, g, 1.4, 2.4, 1.4); M(G.cone(4), std(0x3a3a4a), 0, 10.6, 1, g, 1.2, 1.4, 1.2).rotation.y = Math.PI / 4; M(G.cone(12), MAT.metal(0xc89a40, 0.3), 0, 9.2, 1, g, 0.4, 0.5, 0.4); rad = 6.5; top = 12; }
+  else if (L.kind === "bank") { M(G.box(), stone, 0, 3.5, 0, g, 10, 7, 8); for (let k = -2; k <= 2; k++) M(G.cyl(0.35, 0.4, 12), std(0xe8e4dc, { r: 0.6 }), k * 2, 3, 4.6, g, 1, 6, 1); M(G.box(), std(0xe8e4dc, { r: 0.6 }), 0, 6.4, 4.6, g, 10.6, 0.8, 1.2); const pd = M(G.cone(3), std(0xe8e4dc, { r: 0.6 }), 0, 7.6, 4.6, g, 6.4, 1.8, 0.6); pd.rotation.z = 0; M(G.box(), std(0xd8b860, { m: 0.9, r: 0.25 }), 0, 7.6, 5.0, g, 1.2, 0.8, 0.05); M(G.box(), std(0x3a2618), 0, 1.4, 4.05, g, 2, 2.8, 0.1); rad = 6.5; top = 11; }
+  else if (L.kind === "clock") { M(G.box(), stone, 0, 8, 0, g, 4.6, 16, 4.6); for (const [ox, oz, ry] of [[0, 2.32, 0], [0, -2.32, Math.PI], [2.32, 0, Math.PI / 2], [-2.32, 0, -Math.PI / 2]]) { const f = M(G.cyl(1.5, 1.5, 24), std(0xf4f0e4, { r: 0.6 }), ox, 13, oz, g, 1, 0.08, 1); f.rotation.x = Math.PI / 2; f.rotation.z = ry; const hg = new THREE.Group(); hg.position.set(ox * 1.02, 13, oz * 1.02); hg.rotation.y = ry; g.add(hg); hg.userData.dyn = true; const hh = new THREE.Group(), mh = new THREE.Group(); hg.add(hh, mh); M(G.box(), std(0x1a1a1a), 0, 0.4, 0.08, hh, 0.1, 0.9, 0.03); M(G.box(), std(0x1a1a1a), 0, 0.6, 0.1, mh, 0.07, 1.3, 0.03); clockHands.push({ hh, mh }); }
+    const rf = M(G.cone(4), std(0x2a3a5a, { r: 0.7, flat: true }), 0, 18.6, 0, g, 3.6, 5, 3.6); rf.rotation.y = Math.PI / 4; rad = 3.4; top = 22; }
+  else if (L.kind === "bath") { M(G.box(), stone, 0, 3, 0, g, 12, 6, 9); M(G.sph(), std(0x7a9aa8, { r: 0.4, m: 0.4 }), 0, 6, 0, g, 4.5, 3, 4.5); for (const s of [-1, 1]) M(G.cyl(0.4, 0.45, 12), std(0xe8e4dc), s * 3, 3, 4.7, g, 1, 6, 1); M(G.box(), std(0x3a2618), 0, 1.4, 4.55, g, 2.2, 2.8, 0.1); const st = glowSprite(0xe8f0ff, 5, 0.25); st.position.set(x, 9.5, z); group.add(st); rad = 7.5; top = 10; }
+  else if (L.kind === "hall") { M(G.box(), stone, 0, 4.5, 0, g, 14, 9, 10); for (let k = -3; k <= 3; k++) M(G.box(), win, k * 1.9, 5, 5.03, g, 1, 2.6, 0.05); M(G.box(), std(0x3a2618), 0, 1.6, 5.05, g, 2.6, 3.2, 0.1); const rf = M(G.cone(4), std(0x2a3a5a, { r: 0.8, map: "roof", flat: true, rep: 4 }), 0, 11.5, 0, g, 11, 4.4, 8); rf.rotation.y = Math.PI / 4; M(G.cyl(0.08, 0.1), MAT.bark(0x4a3222), 0, 15, 0, g, 1, 4, 1); M(G.box(), std(0x2a4a8a, { r: 0.9, map: "fabric" }), 0.7, 16.2, 0, g, 1.4, 0.9, 0.04); rad = 8.5; top = 18; }
+  else if (L.kind === "stables") { M(G.box(), MAT.bark(0x7a5a3a), 0, 2, 0, g, 12, 4, 6); const rf = M(G.box(), std(0x6a4a3a, { r: 0.85, map: "roof", rep: [4, 2] }), 0, 4.4, 0.5, g, 12.6, 0.25, 7.2); rf.rotation.x = -0.18; for (let k = -2; k <= 2; k++) M(G.box(), std(0x3a2618), k * 2.3, 1.2, 3.03, g, 1.6, 1.4, 0.08);
+    for (let k = 0; k < 2; k++) { const hx = -2 + k * 4, horse = new THREE.Group(); horse.position.set(hx, 0, 5); g.add(horse); const hc = std([0x6a4a2a, 0xe8e0d0][k], { r: 0.7, map: "fur" }); M(G.sph(), hc, 0, 1.35, 0, horse, 0.42, 0.42, 0.9); for (const [lx, lz] of [[-0.25, 0.5], [0.25, 0.5], [-0.25, -0.5], [0.25, -0.5]]) M(G.cyl(0.07, 0.06), hc, lx, 0.6, lz, horse, 1, 1.2, 1); const nk = M(G.cyl(0.14, 0.2), hc, 0, 1.8, 0.75, horse, 1, 0.9, 1); nk.rotation.x = 0.6; M(G.box(), hc, 0, 2.1, 1.15, horse, 0.24, 0.26, 0.55); M(G.box(), std(0x1a1410), 0, 2.0, 0.6, horse, 0.06, 0.5, 0.5); }
+    rad = 7; top = 7; }
+  else { const sr = shopfront(g, 0, 0, 0, r, true); rad = sr; top = 8; }
+  const lb = textSprite(L.name, "#ffe2a0", 1.15); lb.position.set(x, top + 1.5, z); group.add(lb); world.labels.push(lb); lb.userData.far = 120;
+  return rad;
+}
+function townInfill(group) {
+  const town = new THREE.Group(); group.add(town);
+  const r = seeded(2026), clockHands = []; let li = 0, placed = 0;
+  const free = (x, z, rad) => !blocked(x, z, rad + 1.8) && !onPath(x, z, rad + 1) && !inZone(x, z, rad) && Math.hypot(x, z) > 30 + rad && Math.abs(world.hBase(x, z)) < 0.4 && Math.abs(world.hBase(x + rad, z + rad)) < 0.6;
+  // lanes fan out between the roads; buildings line both sides of each lane
+  for (let w = 0; w < 8; w++) {
+    const a = (w * 45 + 22.5) * Math.PI / 180;
+    for (let t = 40; t <= 128; t += 11) for (const s of [-1, 1]) {
+      const spread = Math.min(t * 0.32, 20), off = s * (6 + r() * (spread - 6 > 0 ? spread - 6 : 1)), x = Math.cos(a) * t - Math.sin(a) * off, z = Math.sin(a) * t + Math.cos(a) * off;
+      const face = Math.atan2(-x, -z) + (r() - 0.5) * 0.5, roll = r();
+      const want = li < LANDMARKS.length && roll < 0.22 ? 9 : roll < 0.45 ? 4 : roll < 0.65 ? 7 : roll < 0.82 ? 3.4 : 5;
+      if (!free(x, z, want)) continue;
+      let rad;
+      if (want === 9) { rad = landmark(town, x, z, face, r, LANDMARKS[li++], group, clockHands); }
+      else if (roll < 0.45) rad = townhouse(town, x, z, face, r);
+      else if (roll < 0.65) rad = rowhouses(town, x, z, face, r);
+      else if (roll < 0.82) rad = roundhouse(town, x, z, face, r);
+      else rad = makeHouse(town, x, z, face, r);
+      addCircle(x, z, rad, 12); placed++;
+      if (r() < 0.3) { const lx = x + Math.cos(face) * (rad + 1.5), lz = z - Math.sin(face) * (rad + 1.5); if (free(lx, lz, 0.5)) { M(G.cyl(0.06, 0.08), std(0x2a2a30, { m: 0.8, r: 0.4 }), lx, 1.6, lz, town, 1, 3.2, 1); M(G.sph(), std(0xffe0a0, { e: 0xffc060, ei: 2.5 }), lx, 3.3, lz, town, 0.16); const lg = glowSprite(0xffb050, 2, 0.6); lg.position.set(lx, 3.3, lz); group.add(lg); addCircle(lx, lz, 0.25, 3); } }
+    }
+  }
+  shadows(town, true, true); mergeStatic(town);
+  if (clockHands.length) world.animated.push(() => { const hrs = DAY.hours || 0; for (const c of clockHands) { c.hh.rotation.z = -(hrs % 12) / 12 * TAU; c.mh.rotation.z = -((hrs % 1) * TAU); } });
+  world.infillCount = placed;
+}
+// a crowd of townsfolk on every road
+{
+  const first = ["Ada", "Bryn", "Cass", "Dov", "Elsie", "Finn", "Greta", "Hugo", "Ines", "Jory", "Kit", "Lark", "Moss", "Nia", "Otto", "Pip", "Quin", "Rosa", "Sol", "Tess", "Ulla", "Vik", "Wynn", "Yara", "Zeb", "Mabel", "Rufus", "Della", "Ike", "Juno"];
+  const roles = ["Baker", "Weaver", "Carpenter", "Student", "Grocer", "Mason", "Lamplighter", "Gardener", "Messenger", "Potter", "Cobbler", "Fishwife", "Tinker", "Scribe", "Washerwoman", "Musician", "Painter", "Beekeeper", "Clockmaker", "Teacher"];
+  const lines = ["Lovely weather for an adventure, isn't it?", "Have you tried the daily chest? Free loot, every day!", "The Archmage's stair goes round once. Mind your step.", "My cousin sailed past the storm line and came back with a sea serpent tooth.", "Snow in winter, petals in spring. This town never gets boring.",
+    "The duellists in the Grand Arena block your swings. Watch for their red glow, then parry!", "I heard the black portal leads to islands that are not on any map.", "The forge can turn plain iron into steel. Brannoc never stops hammering.", "Fish bite better at night. Everybody knows that.", "Ten million coins for Vaulted armour. Imagine that.",
+    "Blessing cards after every wave. I always pick Bloodthirst.", "The clock tower is always right. Mostly.", "Lantern Row glows like a hundred little suns after dark.", "If your boat sinks, swim for land fast. Your breath will not last.", "Sergeant Kael says the dummies never hit back. The dummies disagree."];
+  const r = seeded(777), skins = [0xf0d0b0, 0xe8c0a0, 0xd0a080, 0xc99a74, 0xb07a52, 0x8a5a3a, 0x6a4a32], hairs = [0x1a1a1a, 0x3a2a1a, 0x5a3a1a, 0x8a6a3a, 0xd8b860, 0xb8401a, 0xd8d8d8, 0x6a2a8a], cloths = [0xa83a3a, 0x3a6aa8, 0x4a8a4a, 0xd8a83a, 0x8a4aa8, 0x3a8a8a, 0xc87a3a, 0x6a6a7a, 0xe8e0d0, 0x5a3a2a];
+  for (let k = 0; k < 30; k++) {
+    const c = COMPASS[k % 8], t = 34 + r() * (c.len - 60), off = (r() - 0.5) * 2;
+    const home = k < 8 ? [Math.cos(k / 8 * TAU + 0.2) * 16, Math.sin(k / 8 * TAU + 0.2) * 16] : [Math.cos(c.a) * t - Math.sin(c.a) * off, Math.sin(c.a) * t + Math.cos(c.a) * off];
+    const pickL = () => lines[Math.floor(r() * lines.length)];
+    VILLAGERS.push({ name: first[k % first.length], role: roles[Math.floor(r() * roles.length)], home, rad: k < 8 ? 9 : 10,
+      look: { skin: skins[Math.floor(r() * skins.length)], hair: hairs[Math.floor(r() * hairs.length)], cloth: cloths[Math.floor(r() * cloths.length)], cloth2: cloths[Math.floor(r() * cloths.length)] },
+      lines: [pickL(), pickL(), pickL()] });
+  }
+}
 
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
