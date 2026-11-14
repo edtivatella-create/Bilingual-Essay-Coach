@@ -102,14 +102,14 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 #joyHint { position: fixed; z-index: 4; left: calc(26px + env(safe-area-inset-left, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); width: 112px; height: 112px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.2); display: grid; place-items: center; color: rgba(255,255,255,0.5); font-size: 12px; text-align: center; pointer-events: none; }
 
 /* action buttons */
-#actions { position: fixed; z-index: 6; right: calc(12px + env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: repeat(3, auto); grid-template-areas: "potion armspec special" "jump dash attack"; gap: 8px; align-items: end; justify-items: center; touch-action: none; }
+#actions { position: fixed; z-index: 6; right: calc(12px + env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: repeat(4, auto); grid-template-areas: "block potion armspec special" ". jump dash attack"; gap: 8px; align-items: end; justify-items: center; touch-action: none; }
 .act { position: relative; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); background: rgba(16,20,30,0.72); font-weight: 800; font-size: 12px; display: grid; place-items: center; overflow: hidden; touch-action: none; line-height: 1.05; text-align: center; padding: 0 4px; }
 .act.on { background: rgba(230,184,92,0.45); }
 .act.big { width: 86px; height: 86px; font-size: 15px; grid-area: attack; border-color: var(--accent); }
 .act.mid { width: 64px; height: 64px; font-size: 9.5px; }
 .act.mid > span { padding: 0; }
 .act.small { width: 54px; height: 54px; font-size: 10.5px; }
-#bDash { grid-area: dash; } #bJump { grid-area: jump; } #bSpecial { grid-area: special; } #bArmSpec { grid-area: armspec; border-color: var(--r-vaulted); } #bPotion { grid-area: potion; }
+#bBlock { grid-area: block; border-color: rgba(154,216,255,0.6); } #bDash { grid-area: dash; } #bJump { grid-area: jump; } #bSpecial { grid-area: special; } #bArmSpec { grid-area: armspec; border-color: var(--r-vaulted); } #bPotion { grid-area: potion; }
 .act .cd { position: absolute; inset: auto 0 0 0; background: rgba(0,0,0,0.6); height: 0; pointer-events: none; }
 .act > span { position: relative; z-index: 1; padding: 0 3px; line-height: 1.05; text-align: center; letter-spacing: -0.01em; }
 .pips { position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%); display: flex; gap: 3px; z-index: 1; }
@@ -235,6 +235,10 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 
 /* reveal / results */
 .reveal-card { max-height: 100%; overflow-y: auto; width: min(440px, 100%); text-align: center; border-radius: 14px; padding: 24px 22px; display: grid; gap: 10px; background: var(--panel-solid); border: 2px solid var(--c); box-shadow: 0 0 60px -8px var(--c); }
+#dpsMeter { position: fixed; z-index: 6; left: 50%; transform: translateX(-50%); top: calc(118px + env(safe-area-inset-top, 0px)); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; font-size: 13.5px; pointer-events: none; white-space: nowrap; } #dpsMeter b { color: var(--accent); font-family: var(--f-data); }
+@media (max-width: 640px) { #dpsMeter { top: auto; bottom: calc(190px + env(safe-area-inset-bottom, 0px)); font-size: 12px; white-space: normal; width: max-content; max-width: calc(100vw - 24px); } }
+.duels { display: grid; gap: 6px; } .duel { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-left: 3px solid var(--c); border-radius: 10px; padding: 8px 10px; }
+.duel > span:first-child { display: grid; } .duel b { color: var(--c); font-family: var(--f-display); } .duel small { color: var(--muted); font-size: 12px; } .duel .qrew { grid-column: 1; font-size: 12.5px; } .duel button { grid-row: 1 / span 2; grid-column: 2; }
 .dlg { width: min(520px, 100%); max-height: 100%; overflow-y: auto; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 12px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
 .dlg-who { display: grid; gap: 2px; } .dlg-who b { font-family: var(--f-display); font-size: 22px; } .dlg-who span { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
 .dlg p { margin: 0; font-size: 16px; line-height: 1.5; }
@@ -282,6 +286,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 </div>
 <div class="hud" id="hudTR">
   <div class="money"><span class="chip gold" id="hCoins">0</span><span class="chip die" id="hDice">Dice 0</span></div>
+  <div class="money"><span class="chip" id="hClock">Day 08:00</span><span class="chip" id="hFace">Facing N</span></div>
   <button class="hbtn warn" id="bLeave" hidden>Leave island</button>
 </div>
 <div id="menuBar">
@@ -299,9 +304,11 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 <div id="banner"><b id="bnT"></b><span id="bnS"></span></div>
 <div id="toasts" aria-live="polite"></div>
 <div id="prompt" hidden></div>
+<div id="dpsMeter" hidden></div>
 <div id="joyHint" hidden>Drag here<br>to move</div>
 <div id="joyBase" hidden><div id="joyKnob"></div></div>
 <div id="actions">
+  <button class="act small" id="bBlock" aria-label="Block, tap just before a hit to parry"><span>Block</span></button>
   <button class="act small" id="bPotion" aria-label="Drink potion"><span>Potion</span><i class="cd" id="cdPotion"></i></button>
   <button class="act small" id="bArmSpec" aria-label="Armour special" hidden><span id="tArmSpec">Armour</span><i class="cd" id="cdArm"></i></button>
   <button class="act mid" id="bSpecial" aria-label="Weapon special"><span id="tSpecial">Special</span><i class="cd" id="cdSpecial"></i></button>
@@ -309,7 +316,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <button class="act mid" id="bDash" aria-label="Dash"><span>Dash</span><div class="pips" id="dashPips"></div></button>
   <button class="act big" id="bAttack" aria-label="Attack"><span>Attack</span></button>
 </div>
-<div class="keys">WASD move · drag to look · Space jump · Shift dash · J or click attack · K special · R armour special · Q potion · E use</div>
+<div class="keys">WASD move · drag to look · Space jump · Shift dash · J or click attack · K special · R armour special · F or right-click block (just before a hit to parry) · Q potion · E use</div>
 <div id="floaters"></div>
 
 <div class="modal" id="menu" hidden>
@@ -416,7 +423,7 @@ const TYPES = {
   greataxe: { name: "Greataxe", w: "heavy", reach: 3.1 }, halberd: { name: "Halberd", w: "heavy", reach: 3.8 }
 };
 const RAR_DMG = { common: 10, rare: 22, epic: 46, legendary: 96, vaulted: 185 };
-const SPEC_MULT = { common: 2.2, rare: 2.7, epic: 3.4, legendary: 4.3, vaulted: 5.6 };
+const SPEC_MULT = { common: 3.3, rare: 4.1, epic: 5.1, legendary: 6.5, vaulted: 8.4 }; // specials hit 50% harder
 
 const SPECIALS = {
   heavyStrike:  { name: "Crushing Blow",   cd: 5,  text: m => `One heavy blow for ${m}x weapon damage, with big knockback.` },
@@ -439,7 +446,10 @@ const SPECIALS = {
   riftCollapse: { name: "Rift Collapse",   cd: 15, text: m => `Tear rifts under up to 6 foes that pull in their neighbours and implode for ${m}x weapon damage.` },
   dragonBreath: { name: "Wyrmfire",        cd: 12, text: m => `Breathe dragonfire for 2.5 s, hitting foes ahead for ${m}x weapon damage per second.` },
   timeHalt:     { name: "Stopped Hour",    cd: 18, text: m => `Freeze every foe within 20 m for 6 s, then shatter them for ${m}x weapon damage.` },
-  glacier:      { name: "Frozen Choir",    cd: 12, text: m => `Freeze foes within 7 m for 2 s and fire eight ice shards for ${m}x weapon damage each.` }
+  glacier:      { name: "Frozen Choir",    cd: 12, text: m => `Freeze foes within 7 m for 2 s and fire eight ice shards for ${m}x weapon damage each.` },
+  vaultCrush:   { name: "Vault Door",      cd: 13, text: m => `Slam a phantom vault door down 5 m ahead for ${m}x weapon damage, then two aftershocks for half that.` },
+  timeEcho:     { name: "Second Hand",     cd: 15, text: m => `Echoes of your blade strike every foe within 12 m three times, each for ${m}x weapon damage.` },
+  singularity:  { name: "Singularity",     cd: 14, text: m => `Hurl a void star that drags foes within 10 m together, then collapses for ${m}x weapon damage.` }
 };
 const ARM_SPECIALS = {
   sunburst:     { name: "Undying Sun",   cd: 20, text: "Burst of sunlight for 4x weapon damage. Heal 25% and take 50% less damage for 3 s." },
@@ -449,7 +459,9 @@ const ARM_SPECIALS = {
   frostBastion: { name: "Frost Bastion", cd: 20, text: "Freeze foes within 8 m for 3 s and take 40% less damage for 4 s." },
   phoenix:      { name: "Ashen Rebirth", cd: 22, text: "A ring of fire for 3x weapon damage, then heal 40% over 4 s." },
   wraithveil:   { name: "Wraithveil",    cd: 18, text: "Become untouchable for 3 s. Dashing through foes cuts them for 2x weapon damage." },
-  titanShell:   { name: "Titan Shell",   cd: 20, text: "Slam for 3x weapon damage. Take 60% less damage and ignore knockback for 4 s." }
+  titanShell:   { name: "Titan Shell",   cd: 20, text: "Slam for 3x weapon damage. Take 60% less damage and ignore knockback for 4 s." },
+  vaultWard:    { name: "Vault Ward",    cd: 20, text: "Seal yourself in the Vault: take no damage for 2.5 s, then burst for 4x weapon damage." },
+  chronoShift:  { name: "Chronoshift",   cd: 18, text: "Slow every foe within 15 m by 60% for 4 s and refill all your dashes." }
 };
 
 // [id, name, rarity, type, blade colour, accent colour, special, description]
@@ -496,7 +508,22 @@ const WEAPON_DEFS = [
   ["voidweaver", "Voidweaver's Spindle", "vaulted", "staff", 0x14141f, 0xc040ff, "riftCollapse", "It spins thread from the dark between the stars."],
   ["wyrmking", "Wyrmking's Cleaver", "vaulted", "greataxe", 0x6a2a1a, 0xff8a20, "dragonBreath", "Taken from the last dragon king, who wanted it back."],
   ["hourglass", "Hourglass Verdict", "vaulted", "sword", 0xd8c8a0, 0x40e0ff, "timeHalt", "The sand inside the hilt falls upward."],
-  ["glacius", "Glacius, the Frozen Choir", "vaulted", "spear", 0xd8f8ff, 0x7ae8ff, "glacier", "When it strikes, you can hear distant singing."]
+  ["glacius", "Glacius, the Frozen Choir", "vaulted", "spear", 0xd8f8ff, 0x7ae8ff, "glacier", "When it strikes, you can hear distant singing."],
+  ["fieldscythe", "Fieldhand's Scythe", "common", "scythe", 0xa8a8a0, 0x6a4a2a, "whirl", "Cut more wheat than foes, until the portals opened."],
+  ["tinspear", "Tinwork Spear", "common", "spear", 0xc8ccd0, 0x7a5a3a, "heavyStrike", "Light, cheap and surprisingly pointy."],
+  ["driftstaff", "Driftwood Staff", "common", "staff", 0x9a8a6a, 0x6ad8ff, "chainBolt", "Washed up on the harbour steps with a spark still in it."],
+  ["ambersting", "Ambersting Rapier", "rare", "rapier", 0xf0b040, 0xffd070, "bladeFan", "A fly sleeps in the amber pommel. It has seen many duels."],
+  ["obsidianmaul", "Obsidian Maul", "rare", "warhammer", 0x2a2430, 0xb070ff, "shockwave", "Volcanic glass, knapped into something very heavy."],
+  ["pearlwake", "Pearlwake Katana", "rare", "katana", 0xe8f4ff, 0x7ae0ff, "frostNova", "Its edge shimmers like the inside of a shell."],
+  ["cinderwake", "Cinderwake Reaper", "epic", "scythe", 0x4a2a20, 0xff7a30, "flameWave", "The blade is always warm to the touch."],
+  ["tidesilkglaive", "Tidesilk Glaive", "epic", "halberd", 0x9ae0e8, 0x30c0d0, "vortex", "Silk from the deep sea binds the head to the haft."],
+  ["wyvernfang", "Wyvernfang Greataxe", "epic", "greataxe", 0xd8d0b8, 0x8aff8a, "meteor", "Carved from a single wyvern's tooth."],
+  ["aetherbrand", "Aetherbrand", "legendary", "sword", 0xc8e8ff, 0x9a7aff, "chainBolt", "The air hums wherever it is drawn."],
+  ["phoenixquill", "Phoenix Quill Staff", "legendary", "staff", 0xffb050, 0xff5a20, "meteor", "A single plume, still smouldering after a hundred years."],
+  ["thornqueen", "Thornqueen's Halberd", "legendary", "halberd", 0x4a7a3a, 0xd8ff6a, "drainBurst", "Briars grow along the haft and drink what it cuts."],
+  ["vaultkeeper", "Vaultkeeper's Oath", "vaulted", "greatsword", 0xf0e0b0, 0xffd040, "vaultCrush", "Sworn by the guardian of the First Vault. The door still answers."],
+  ["chronoedge", "Chronoedge, the Second Hand", "vaulted", "katana", 0xd8e8ff, 0x7ad8ff, "timeEcho", "It strikes now, and then again a moment ago."],
+  ["voidpiercer", "Voidpiercer Lance", "vaulted", "spear", 0x1a1028, 0xc070ff, "singularity", "Its tip is a hole in the world, shaped like a star."]
 ];
 // [id, name, rarity, weight, metal, cloth, accent, helm, cape, special, description]
 const ARMOUR_DEFS = [
@@ -523,19 +550,40 @@ const ARMOUR_DEFS = [
   ["frostwarden", "Frostwarden's Bastion", "vaulted", "heavy", 0xe0f4ff, 0x5a8ab8, 0x9ae8ff, "crown", false, "frostBastion", "The frozen north kneels to whoever wears it."],
   ["phoenixguard", "Phoenix Ashguard", "vaulted", "medium", 0x8a2a1a, 0x3a1a10, 0xff8a20, "horned", true, "phoenix", "It has burned down and grown back eleven times."],
   ["wraithveil", "Wraithveil Shroud", "vaulted", "light", 0x2a2a30, 0x101014, 0x9affd8, "hood", true, "wraithveil", "You are never quite where it says you are."],
-  ["titanshell", "Verdant Titan Shell", "vaulted", "heavy", 0x4a6a3a, 0x2a3a1a, 0x9aff6a, "helm", false, "titanShell", "Shed by a walking mountain of moss and stone."]
+  ["titanshell", "Verdant Titan Shell", "vaulted", "heavy", 0x4a6a3a, 0x2a3a1a, 0x9aff6a, "helm", false, "titanShell", "Shed by a walking mountain of moss and stone."],
+  ["stitchedhide", "Stitched Hide Vest", "common", "light", 0x7a5a3a, 0x5a4a32, 0, "none", false, null, "Patched so often it is mostly patches."],
+  ["tinmail", "Tinmail Hauberk", "common", "medium", 0xb8bcc0, 0x4a4a52, 0, "helm", false, null, "Rings of tin. Shiny, if not strong."],
+  ["bronzescale", "Bronzescale Hauberk", "rare", "medium", 0xc88a4a, 0x3a4a5a, 0xffb060, "helm", false, null, "Overlapping scales that ring like a bell when struck."],
+  ["ambershroud", "Amberglass Shroud", "rare", "light", 0xd8902a, 0x4a3020, 0xffd070, "hood", true, null, "Light catches in the amber beads sewn into the hem."],
+  ["wyvernmail", "Wyvernscale Mail", "epic", "medium", 0x5a8a5a, 0x2a3a2a, 0x8aff8a, "horned", true, null, "Each scale was shed by a living wyvern. Probably."],
+  ["obsidianbulwark", "Obsidian Bulwark", "epic", "heavy", 0x2a2430, 0x1a141e, 0xb070ff, "visor", false, null, "Black glass plates that drink the light."],
+  ["aetherplate", "Aetherwoven Plate", "legendary", "heavy", 0xd8e8ff, 0x4a5a8a, 0x9a7aff, "crown", true, null, "Woven from metal and something that is not quite there."],
+  ["plumeguard", "Phoenix Plume Mantle", "legendary", "light", 0xd8602a, 0x5a1a10, 0xffb040, "hood", true, null, "Feathers that refuse to stop glowing."],
+  ["vaultwarden", "Vaultwarden's Regalia", "vaulted", "heavy", 0xf0dca0, 0x3a2a5a, 0xffd040, "crown", true, "vaultWard", "Worn by those who keep the Vault shut. Nothing gets through."],
+  ["chronomantle", "Chronomantle", "vaulted", "light", 0xa8c8e8, 0x1a2a4a, 0x7ad8ff, "hood", true, "chronoShift", "Its owner is always a few seconds ahead of everyone else."]
 ];
 const ARM_W = { light: { hp: 0.8, def: 0.7, move: 1.05, label: "Light" }, medium: { hp: 1, def: 1, move: 1, label: "Medium" }, heavy: { hp: 1.25, def: 1.35, move: 0.92, label: "Heavy" } };
 const RAR_HP = { common: 30, rare: 80, epic: 180, legendary: 380, vaulted: 750 };
 const RAR_DEF = { common: 6, rare: 16, epic: 34, legendary: 70, vaulted: 140 };
 const POTIONS = [["minor", "Minor Healing Draught", "common", 0.25], ["draught", "Healing Draught", "rare", 0.4], ["greater", "Greater Healing Draught", "epic", 0.6], ["phoenixtear", "Phoenix Tear", "legendary", 1.0]];
-const MATERIALS = [
-  ["copper", "Copper Ore", "common", "Streaked green and orange."], ["ironore", "Iron Ore", "common", "Heavy, rusty, everywhere."],
-  ["oakplank", "Oak Plank", "common", "Sturdy and straight."], ["claybrick", "Clay Brick", "common", "Fired red. Stacks nicely."],
-  ["silver", "Silver Ore", "rare", "Bright seams in black rock."], ["steel", "Steel Ingot", "rare", "Folded and quenched."],
-  ["glasspane", "Glass Pane", "rare", "Clear and unbroken, which is the rare part."], ["gold", "Gold Ore", "epic", "Small nuggets, very heavy for their size."],
-  ["moonsilver", "Moonsilver Ingot", "epic", "Only shines when nobody is looking at it."], ["ironwoodlog", "Ironwood Log", "epic", "Sinks in water. Blunts axes."],
-  ["starsteel", "Starsteel Ore", "legendary", "Fell from the sky. Rings like a bell when struck."], ["skygirder", "Skyforged Girder", "legendary", "Forged in the clouds and lowered on chains."]
+const MATERIALS = [ // [id, name, rarity, description, shape, colour]
+  ["copper", "Copper Ore", "common", "Streaked green and orange.", "ore", 0xc8743a], ["ironore", "Iron Ore", "common", "Heavy, rusty, everywhere.", "ore", 0x9a8a7a],
+  ["oakplank", "Oak Plank", "common", "Sturdy and straight.", "plank", 0xb08a5a], ["claybrick", "Clay Brick", "common", "Fired red. Stacks nicely.", "brick", 0xb85a3a],
+  ["tin", "Tin Ore", "common", "Soft and silvery. Makes good bronze.", "ore", 0xc8ccd0], ["flint", "Flint Nodule", "common", "Strike it on steel for sparks.", "gem", 0x5a5a62],
+  ["hemp", "Hemp Rope", "common", "Coiled tight. Smells of the harbour.", "rope", 0xc8a870], ["hide", "Rough Hide", "common", "Scraped and dried, still a little stiff.", "hide", 0x8a6a4a],
+  ["limestone", "Limestone Block", "common", "Pale stone for walls and wells.", "brick", 0xd8d0c0],
+  ["silver", "Silver Ore", "rare", "Bright seams in black rock.", "ore", 0xd8dce4], ["steel", "Steel Ingot", "rare", "Folded and quenched.", "ingot", 0xb8c0c8],
+  ["glasspane", "Glass Pane", "rare", "Clear and unbroken, which is the rare part.", "pane", 0xcfe8ff], ["bronze", "Bronze Ingot", "rare", "Copper and tin, married in fire.", "ingot", 0xc88a4a],
+  ["amber", "Amber Chunk", "rare", "Something tiny is trapped inside.", "gem", 0xf0a030], ["obsidian", "Obsidian Shard", "rare", "Volcanic glass, sharper than any blade.", "gem", 0x2a2430],
+  ["saltpearl", "Salt Pearl", "rare", "Grown in the brine pools of Saltspray Atoll.", "pearl", 0xf0f4ff],
+  ["gold", "Gold Ore", "epic", "Small nuggets, very heavy for their size.", "ore", 0xf2c044], ["moonsilver", "Moonsilver Ingot", "epic", "Only shines when nobody is looking at it.", "ingot", 0xbfd8ff],
+  ["ironwoodlog", "Ironwood Log", "epic", "Sinks in water. Blunts axes.", "log", 0x5a4a3a], ["emberstone", "Emberstone", "epic", "Warm in your hand, hot in a forge.", "gem", 0xff6a2a],
+  ["tidesilk", "Tidesilk Thread", "epic", "Spun by something that lives in the deep.", "rope", 0x30c0d0], ["wyvernscale", "Wyvern Scale", "epic", "Harder than steel and lighter than leather.", "scale", 0x6aaa6a],
+  ["starsteel", "Starsteel Ore", "legendary", "Fell from the sky. Rings like a bell when struck.", "ore", 0x8ac8ff], ["skygirder", "Skyforged Girder", "legendary", "Forged in the clouds and lowered on chains.", "girder", 0x9ac8e8],
+  ["aethercrystal", "Aether Crystal", "legendary", "It floats a finger's width above your palm.", "gem", 0x9a7aff], ["phoenixplume", "Phoenix Plume", "legendary", "It has burned for a hundred years and never gone out.", "feather", 0xff8a30],
+  ["sunforged", "Sunforged Ingot", "legendary", "Smelted at noon on the longest day.", "ingot", 0xffd060],
+  ["vaultheart", "Heart of the Vault", "vaulted", "It beats, slowly, as if it is waiting for something.", "core", 0xffd040], ["chronoshard", "Chronoshard", "vaulted", "Look into it and you see a few seconds into the past.", "gem", 0x7ad8ff],
+  ["voidglass", "Voidglass Core", "vaulted", "A sphere of nothing, held together by a cage of gold.", "core", 0xc070ff], ["starmote", "Fallen Star Fragment", "vaulted", "Still warm from the sky.", "gem", 0xfff4c0]
 ];
 const BASE_VALUE = { common: 12, rare: 90, epic: 420, legendary: 1800, vaulted: 15000 };
 
@@ -554,7 +602,7 @@ for (const [id, name, rarity, weight, metal, cloth, accent, helm, cape, special,
     hp: Math.round(RAR_HP[rarity] * W.hp), def: Math.round(RAR_DEF[rarity] * W.def), move: W.move });
 }
 for (const [id, name, rarity, heal] of POTIONS) addItem({ id, name, rarity, cat: "potion", heal, desc: `Restores ${Math.round(heal * 100)}% of your health.` });
-for (const [id, name, rarity, desc] of MATERIALS) addItem({ id, name, rarity, cat: "material", desc });
+for (const [id, name, rarity, desc, shape, col] of MATERIALS) addItem({ id, name, rarity, cat: "material", desc, shape, col });
 addItem({ id: "die", name: "Fortune Die", rarity: "legendary", cat: "special", desc: "Twenty faces, each a different crest. Roll it at the Class Altar to be called to a new class." });
 for (const it of ITEMS) it.value = Math.round(BASE_VALUE[it.rarity] * ((it.cat === "weapon" || it.cat === "armour") ? 1.5 : 1) * (0.85 + (hash(it.id) % 31) / 100));
 const CAT_LABEL = { weapon: "Weapon", armour: "Armour", potion: "Potion", material: "Material", special: "Relic" };
@@ -664,7 +712,7 @@ function fresh() {
   return { coins: 150, cls: "wanderer", level: 1, xp: 0, unspent: 0, pts: { speed: 0, damage: 0, defence: 0, power: 0 },
     inv: { ironwood: 1, padded: 1, minor: 3 }, seen: { ironwood: 1, padded: 1, minor: 1 }, equip: { weapon: "ironwood", armour: "padded" },
     prog: ISLANDS.map(() => ({ normal: false, hard: false, nightmare: false })), allies: [], rolls: 0,
-    chests: [], stats: { kills: 0, bosses: 0, clears: 0, chests: 0, crafts: 0 }, quests: {} };
+    chests: [], stats: { kills: 0, bosses: 0, clears: 0, chests: 0, crafts: 0, parries: 0, duels: 0, dummy: 0, specials: 0, sold: 0, hardClears: 0, nightmareClears: 0 }, quests: {}, duelWins: {} };
 }
 let S = fresh();
 try {
@@ -780,6 +828,7 @@ function setSky(top, horizon, bottom, fogCol, fogNear, fogFar, sunCol, sunInt, h
   envRT = pmrem.fromScene(envScene, 0.035);
   scene.environment = envRT.texture;
   dg.dispose(); sunBall.geometry.dispose();
+  dayCapture(sunCol, sunInt, hemiInt);
 }
 
 /* ---------- procedural textures (tileable) ---------- */
@@ -1458,8 +1507,8 @@ function blockedLobby(x, z) { return world.circles.some(c => Math.hypot(x - c.x,
 function buildLobby() {
   clearWorld();
   const group = new THREE.Group(); scene.add(group);
-  const h = (x, z) => { const d = Math.hypot(x, z); return d < 60 ? 0 : smooth(60, 120, d) * 14 * (0.6 + noise2(3)(x * 0.02, z * 0.02) * 0.8); };
-  world = { kind: "lobby", group, h, radius: 52, circles: [], portals: [], interact: [], animated: [] };
+  const lobbyN = noise2(3), h = (x, z) => { const d = Math.hypot(x, z); return d < 96 ? 0 : smooth(96, 150, d) * 16 * (0.6 + lobbyN(x * 0.02, z * 0.02) * 0.8); };
+  world = { kind: "lobby", group, h, radius: 94, circles: [], portals: [], interact: [], animated: [] };
   setSky(0x3f7fcf, 0xd8e8f4, 0x6a7a5a, 0xd8e8f4, 60, 260, 0xfff0d8, 2.3, 0.55);
   const n = noise2(5);
   group.add(terrainMesh(320, 160, h, (x, z, y, c) => { const d = Math.hypot(x, z); c.set(0x5a8a3a).lerp(new THREE.Color(0x4a7a2e), n(x * 0.05, z * 0.05)); if (y > 4) c.lerp(new THREE.Color(0x7a7a6a), smooth(4, 12, y)); if (d < 30) c.set(0x8a7a5a); }, 60));
@@ -1489,25 +1538,6 @@ function buildLobby() {
     const pgl = glowSprite(0x5ab8ff, 7, 0.35); pgl.position.y = 0.6; pg.add(pgl);
     world.portals.push({ x, z, r: 2.2, disc, pts: pp, i });
   });
-  // houses
-  const r2 = seeded(11);
-  for (let k = 0; k < 9; k++) {
-    const a = (k / 9) * TAU + 0.35, d = 38 + r2() * 6, x = Math.cos(a) * d, z = Math.sin(a) * d;
-    const hg = new THREE.Group(); hg.position.set(x, 0, z); hg.rotation.y = -a - Math.PI / 2; group.add(hg);
-    const W = 6 + r2() * 3, D = 5 + r2() * 2, H = 4 + r2() * 2;
-    M(G.box(), std(0xd8cbb0, { r: 0.92, map: "plaster", bump: "plasterB", bs: 1.2, rep: 2 }), 0, H / 2, 0, hg, W, H, D);
-    M(G.box(), MAT.rock(0x7a756c), 0, 0.35, 0, hg, W + 0.12, 0.7, D + 0.12);
-    for (const s2 of [-1, 1]) M(G.box(), MAT.bark(0x4a3222), (W / 2 - 0.15) * s2, H / 2, -D / 2 - 0.02, hg, 0.3, H, 0.1);
-    M(G.box(), MAT.bark(0x4a3222), 0, H * 0.55, D / 2 + 0.03, hg, W, 0.2, 0.08);
-    const ch = M(G.box(), MAT.rock(0x6a625a), W * 0.28, H + 2.2, -D * 0.15, hg, 0.6, 2.2, 0.6);
-    for (const s of [-1, 1]) M(G.box(), std(0x4a3222, { r: 0.8, map: "bark" }), (W / 2 - 0.15) * s, H / 2, D / 2 + 0.02, hg, 0.3, H, 0.1);
-    M(G.box(), std(0x4a3222, { r: 0.8, map: "bark" }), 0, H - 0.15, D / 2 + 0.02, hg, W, 0.3, 0.1);
-    const roof = M(G.cone(4), std([0xd88a70, 0x8aa0c8, 0xb89070][k % 3], { r: 0.8, map: "roof", bump: "roof", bs: 1.5, rep: 3, flat: true }), 0, H + 1.6, 0, hg, W * 0.8, 3.2, D * 0.88); roof.rotation.y = Math.PI / 4;
-    M(G.box(), std(0x3a2618, { r: 0.7 }), 0, 1.1, D / 2 + 0.05, hg, 1.2, 2.2, 0.1);
-    for (const s of [-1, 1]) { M(G.box(), std(0xffd890, { e: 0xffb050, ei: 1.4 }), 2 * s, H * 0.72, D / 2 + 0.05, hg, 0.9, 0.9, 0.05); M(G.box(), MAT.bark(0x3a2618), 2 * s, H * 0.72, D / 2 + 0.07, hg, 0.06, 0.9, 0.04); M(G.box(), MAT.bark(0x3a2618), 2 * s, H * 0.72, D / 2 + 0.07, hg, 0.9, 0.06, 0.04); const wg = glowSprite(0xffb050, 1.8, 0.35); wg.position.set(2 * s, H * 0.72, D / 2 + 0.3); hg.add(wg); }
-    shadows(hg, true, true);
-    addCircle(x, z, Math.max(W, D) * 0.55, 8);
-  }
   // class altar, armoury rack, merchant
   const altar = new THREE.Group(); altar.position.set(-9, 0, -9); group.add(altar);
   M(G.cyl(1.3, 1.5, 8), std(0x8a8494, { r: 0.6, map: "rock" }), 0, 0.3, 0, altar, 1, 0.6, 1);
@@ -1540,13 +1570,14 @@ function buildLobby() {
   shadows(stone); addCircle(-9, 9, 1, 2);
   world.interact.push({ x: -9, z: 9, r: 3, label: "Spend stat points", act: () => openMenu("stats") });
   lobbyExtras(group, h);
+  townLayout(group, h); townLamps(group); townTrees(group, h);
   // trees and lamps
   const r3 = seeded(21);
-  for (let k = 0; k < 70; k++) { const a = r3() * TAU, d = 50 + r3() * 45, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z)) continue; const t = makeTree(r3() < 0.6 ? "oak" : "pine", r3); t.position.set(x, h(x, z), z); t.scale.setScalar(0.9 + r3() * 0.6); t.rotation.y = r3() * TAU; group.add(t); }
+  for (let k = 0; k < 70; k++) { const a = r3() * TAU, d = 98 + r3() * 50, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z)) continue; const t = makeTree(r3() < 0.6 ? "oak" : "pine", r3); t.position.set(x, h(x, z), z); t.scale.setScalar(0.9 + r3() * 0.6); t.rotation.y = r3() * TAU; group.add(t); }
   for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + TAU / 16, x = Math.cos(a) * 25, z = Math.sin(a) * 25; M(G.cyl(0.06, 0.08), std(0x2a2a30, { m: 0.8, r: 0.4 }), x, 1.6, z, group, 1, 3.2, 1).castShadow = true; M(G.sph(), std(0xffe0a0, { e: 0xffc060, ei: 2.5 }), x, 3.3, z, group, 0.16); const lg = glowSprite(0xffb050, 2.2, 0.75); lg.position.set(x, 3.3, z); group.add(lg); addCircle(x, z, 0.3, 3); }
-  const lampL = new THREE.PointLight(0xffc070, 0.8, 14, 2); lampL.position.set(0, 4, 0); group.add(lampL);
-  grassField(group, coarse ? 5000 : 15000, 0x6a9a3a, () => { const a = rand(0, TAU), d = rand(27.6, 80); const x = Math.cos(a) * d, z = Math.sin(a) * d; return [x, h(x, z), z]; });
-  for (let k = 0; k < 30; k++) { const a = r3() * TAU, d = 30 + r3() * 40, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z)) continue; makeRock(group, x, h(x, z), z, 0.4 + r3() * 1.4, 0x8a8680, r3); }
+  const lampL = new THREE.PointLight(0xffc070, 0.8, 14, 2); lampL.position.set(0, 4, 0); group.add(lampL); world.nightLights = [{ l: lampL, b: 0.8 }];
+  grassField(group, coarse ? 7000 : 20000, 0x6a9a3a, () => { let x = 0, z = 0; for (let k = 0; k < 8; k++) { const a = rand(0, TAU), d = rand(27.6, 95); x = Math.cos(a) * d; z = Math.sin(a) * d; if (!onPath(x, z, 0.4)) break; } return [x, h(x, z), z]; });
+  for (let k = 0; k < 30; k++) { const a = r3() * TAU, d = 30 + r3() * 40, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z) || onPath(x, z, 1)) continue; makeRock(group, x, h(x, z), z, 0.4 + r3() * 1.4, 0x8a8680, r3); }
   world.clouds = addClouds(group, 0xffffff);
   // distant mountains
   for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 230, s = 40 + (k % 4) * 15; const m = M(G.cone(7), std(0x5a6a7a, { flat: true, r: 0.9 }), Math.cos(a) * d, s * 0.45, Math.sin(a) * d, group, s, s * 1.1, s); M(G.cone(7), std(0xf0f4ff, { flat: true, r: 0.7 }), Math.cos(a) * d, s * 0.82, Math.sin(a) * d, group, s * 0.35, s * 0.35, s * 0.35); }
@@ -1720,13 +1751,15 @@ function damageEnemy(e, amount, dir, kb, o = {}) {
   if (o.canCrit !== false && Math.random() < ST.crit) { dmg *= 1.75; crit = true; }
   if (S.cls === "berserker") dmg *= 1 + 0.5 * (1 - P.hp / ST.maxHp);
   if (e.frozen && e.frozen > worldT && o.shatter) dmg *= 1.5;
+  if (e.dummy) { dummyHit(e, dmg, crit, o); return; }
+  if (e.duelist && e.guard > worldT) { dmg *= 0.3; if (!o.silent) floatText(e.pos, "Blocked", "#a1abc4"); }
   e.hp -= dmg; e.flash = 0.12;
   if (!o.silent) floatText(e.pos, Math.round(dmg) + (crit ? "!" : ""), o.color || (crit ? "#ffd166" : "#fff2c8"), crit);
   if (dir && kb && !e.boss) { const d = dir.clone().setY(0); if (d.lengthSq() > 0) e.kb.copy(d.normalize().multiplyScalar(kb * 5)); }
   if (dir && kb && e.boss) { const d = dir.clone().setY(0); if (d.lengthSq() > 0) e.kb.copy(d.normalize().multiplyScalar(kb * 0.8)); }
   if (P.buffs.drain > worldT) heal(dmg * 0.3, true);
   if (crit && S.cls === "archangel" && !o.noProc) later(0.15, () => { if (!e.dead) { pillarFx(e.pos, 0xfff0a0, 10, 0.4); damageEnemy(e, ST.hit * 0.4, null, 0, { noProc: true, canCrit: false, color: "#fff0a0" }); } });
-  if (e.hp <= 0) killEnemy(e);
+  if (e.hp <= 0) { if (e.duelist) duelEnd(true); else killEnemy(e); }
 }
 function killEnemy(e) {
   e.dead = true; e.hp = 0;
@@ -1752,9 +1785,10 @@ function addXp(x) {
   while (S.xp >= xpNeed(S.level) && S.level < 100) { S.xp -= xpNeed(S.level); S.level++; S.unspent++; up++; }
   if (up) { computeStats(); P.hp = ST.maxHp; banner(`Level ${S.level}`, `+${up} stat point${up > 1 ? "s" : ""}. Spend ${up > 1 ? "them" : "it"} on the Stats page.`); ringFx(P.pos, 3, 0x6fc3ff, 0.8); save(); }
 }
-function hurtHero(target, amount, from) {
+function hurtHero(target, amount, from, src) {
   if (target.isHero) {
     if (P.dead || P.invuln > 0 || P.buffs.veil > worldT) return;
+    if (P.blocking) { if (worldT - P.blockStart <= PARRY_WINDOW) { parryHit(src); return; } amount *= 0.3; P.kb.multiplyScalar(0.3); }
     let dr = ST.dr;
     if (P.buffs.shield > worldT) dr = 1 - (1 - dr) * (1 - P.buffs.shieldAmt);
     const dmg = amount * (1 - dr);
@@ -1773,6 +1807,7 @@ function hurtHero(target, amount, from) {
   }
 }
 function heroDown() {
+  if (duel) { duelEnd(false); return; }
   P.dead = true; P.hp = 0; MUSIC.setMode("defeat", 0, "Fallen: defeat theme");
   showResult("Defeated", "Your party was driven back", "You keep everything you found. Train up, change your gear, and try again.", "var(--bad)");
 }
@@ -1819,18 +1854,21 @@ function shoot(from, to, color, dmg, kb, side, o = {}) {
   const m = new THREE.Mesh(G.sph(), glowMat(color, 1)); m.scale.setScalar(o.size || 0.16); m.position.copy(from); scene.add(m);
   const tail = new THREE.Mesh(G.sph(), glowMat(color, 0.35)); tail.scale.set(0.12, 0.12, 0.5); m.add(tail); tail.position.z = -2;
   m.lookAt(from.clone().add(dir));
-  projectiles.push({ m, pos: from.clone(), vel: dir.multiplyScalar(o.speed || 24), dmg, kb, side, life: o.life || 1.2, r: o.r || 0.6, pierce: !!o.pierce, hit: new Set(), homing: o.homing || null, color });
+  projectiles.push({ m, pos: from.clone(), vel: dir.multiplyScalar(o.speed || 24), dmg, kb, side, life: o.life || 1.2, r: o.r || 0.6, pierce: !!o.pierce, hit: new Set(), homing: o.homing || null, color, src: o.src || null });
 }
 
 /* weapon specials */
 function castSpecial() {
   if (P.specT > 0 || P.dead) return;
   const w = ITEM[S.equip.weapon], sp = SPECIALS[w.special];
-  P.specT = sp.cd * ST.specCd;
+  P.specT = sp.cd * ST.specCd; bumpStat("specials");
   const mult = w.specMult * (1 + ST.power), base = ST.hit, f = fwd(), pos = P.pos.clone(), col = w.accent;
   const D = mult * base;
   P.swing = 1; P.swingStyle = w.weight; P.swingDur = 0.45;
   switch (w.special) {
+    case "vaultCrush": { const at = pos.clone().addScaledVector(f, 5); pillarFx(at, col, 12, 0.5); ringFx(at, 5, col, 0.5); for (const e of enemiesNear(at, 5)) damageEnemy(e, D, e.pos.clone().sub(at), w.kb * 2); for (let k = 1; k <= 2; k++) later(k * 0.45, () => { ringFx(at, 5 + k * 2, col, 0.45); for (const e of enemiesNear(at, 5 + k * 2)) damageEnemy(e, D * 0.5, e.pos.clone().sub(at), w.kb); }); break; }
+    case "timeEcho": { const targets = enemiesNear(pos, 12); ringFx(pos, 12, col, 0.8); for (let k = 0; k < 3; k++) later(0.25 * k, () => { for (const e of targets) if (!e.dead) { boltFx(e.pos.clone().add(new V3(0, 3, 0)), e.pos.clone().add(new V3(0, 0.8, 0)), col, 0.2); damageEnemy(e, D, null, 0, { color: "#9ad8ff" }); } }); break; }
+    case "singularity": { const at = pos.clone().addScaledVector(f, 7); burstFx(at.clone().add(new V3(0, 1, 0)), 2, col, 1.2); ringFx(at, 10, col, 1.2); for (const e of enemiesNear(at, 10)) { if (e.dummy) continue; e.kb.copy(at.clone().sub(e.pos).setY(0).multiplyScalar(2.2)); e.slow = worldT + 1.5; } later(1.0, () => { burstFx(at.clone().add(new V3(0, 1, 0)), 5, col, 0.5); for (const e of enemiesNear(at, 5)) damageEnemy(e, D, e.pos.clone().sub(at), w.kb * 2); }); break; }
     case "heavyStrike": { const e = nearestEnemy(pos, ST.reach + 1.5, f, -0.2); if (e) { P.face = Math.atan2(e.pos.x - pos.x, e.pos.z - pos.z); damageEnemy(e, D, e.pos.clone().sub(pos), w.kb * 3); burstFx(e.pos.clone().add(new V3(0, 1, 0)), 1.6, col); } else ringFx(pos.clone().addScaledVector(f, 2), 1.5, col); break; }
     case "whirl": P.spinT = 0.45; for (const e of enemiesNear(pos, 4)) damageEnemy(e, D, e.pos.clone().sub(pos), w.kb * 1.5); ringFx(pos, 4.2, col); break;
     case "flameWave": for (const e of enemiesNear(pos, 7)) { const to = e.pos.clone().sub(pos).setY(0).normalize(); if (to.dot(f) > 0.4) { damageEnemy(e, D, to, w.kb, { color: "#ffa060" }); e.burn = worldT + 4; e.burnDps = base * 0.5; } } for (let k = 1; k <= 3; k++) later(k * 0.06, () => burstFx(pos.clone().addScaledVector(f, k * 1.8).add(new V3(0, 0.8, 0)), 1.6 + k * 0.4, 0xff6a2a, 0.35)); break;
@@ -1878,6 +1916,8 @@ function castArmourSpecial() {
   const sp = ARM_SPECIALS[a.special]; P.armT = sp.cd * ST.specCd;
   const D = ST.hit * (1 + ST.power), pos = P.pos.clone(), col = a.accent;
   switch (a.special) {
+    case "vaultWard": P.buffs.shield = worldT + 2.5; P.buffs.shieldAmt = 1; ringFx(pos, 2.5, 0xffd870, 0.6); floatText(pos, "Vault Ward", "#ffd870"); later(2.5, () => { const p2 = P.pos.clone(); ringFx(p2, 7, 0xffd870, 0.6); for (const e of enemiesNear(p2, 7)) damageEnemy(e, D * 4, e.pos.clone().sub(p2), 3, { color: "#ffe9a0" }); }); break;
+    case "chronoShift": for (const e of enemiesNear(pos, 15)) e.slow = worldT + 4; P.dashQ = []; ringFx(pos, 15, 0x9ad8ff, 0.9); floatText(pos, "Time slows", "#9ad8ff"); break;
     case "sunburst": for (const e of enemiesNear(pos, 7)) damageEnemy(e, D * 4, e.pos.clone().sub(pos), 2, { color: "#ffe090" }); heal(ST.maxHp * 0.25); P.buffs.shield = worldT + 3; P.buffs.shieldAmt = 0.5; burstFx(pos.clone().add(new V3(0, 1, 0)), 7, 0xffc840, 0.6); pillarFx(pos, 0xffe8a0, 20, 0.8); break;
     case "stormmantle": { let n = 0; const iv = () => { if (n++ >= 12 || P.dead) return; const e = nearestEnemy(P.pos, 12); if (e) { boltFx(e.pos.clone().add(new V3(0, 14, 0)), e.pos.clone().add(new V3(0, 1, 0)), 0x9ad8ff, 0.25); damageEnemy(e, D * 1.5, null, 0, { color: "#9ad8ff" }); } later(0.5, iv); }; iv(); break; }
     case "abyssTide": for (const e of enemiesNear(pos, 9)) damageEnemy(e, D * 4, e.pos.clone().sub(pos), 6, { color: "#40ffd0" }); ringFx(pos, 9, 0x20ffd0, 0.7); ringFx(pos, 6, 0x0a6a8a, 0.5); break;
@@ -1939,7 +1979,7 @@ function spawnEnemy(def, role, boss, scaleBoost = 1) {
 }
 function blocked(x, z, pad) { for (const c of world.circles) if (Math.hypot(x - c.x, z - c.z) < c.r + pad) return true; return false; }
 function startRun(idx, stageIdx, allyIds) {
-  closeAllModals();
+  closeAllModals(); duel = null; P.blocking = false;
   enemies.forEach(e => { scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar); });
   enemies = []; projectiles.forEach(p => scene.remove(p.m)); projectiles = []; telegraphs.forEach(t => scene.remove(t.mesh)); telegraphs = []; timers = [];
   allies.forEach(a => { scene.remove(a.R.g); scene.remove(a.lbl); }); allies = [];
@@ -2000,7 +2040,7 @@ function stageComplete(xp) {
   S.coins += bonus;
   let text = `+${fmt(xp)} exp and ${fmt(bonus)} coins.`;
   if (first) { gain(ITEM.die, null, 1, true); text += " First clear: you earned a Fortune Die."; }
-  grantChest(run.stage, run.idx); bumpStat("clears");
+  grantChest(run.stage, run.idx); bumpStat("clears"); if (run.stage >= 1) bumpStat("hardClears"); if (run.stage === 2) bumpStat("nightmareClears");
   text += ` You received ${article(CHEST_TIERS[run.stage].name)} ${CHEST_TIERS[run.stage].name}. Open it from Chests.`;
   const next = run.idx + 1;
   if (first && next < ISLANDS.length && prog.normal && prog.hard && (st.id === "normal" || st.id === "hard")) text += ` ${ISLANDS[next].name} has been discovered on the map.`;
@@ -2013,7 +2053,7 @@ function showResult(eyebrow, title, text, col) {
 }
 $("rsBtn").addEventListener("click", () => { $("result").hidden = true; goLobby(); });
 function goLobby() {
-  closeAllModals();
+  closeAllModals(); duel = null;
   enemies.forEach(e => { scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar); });
   enemies = []; projectiles.forEach(p => scene.remove(p.m)); projectiles = []; telegraphs.forEach(t => scene.remove(t.mesh)); telegraphs = []; timers = [];
   allies.forEach(a => { scene.remove(a.R.g); scene.remove(a.lbl); }); allies = [];
@@ -2052,7 +2092,7 @@ function bossAttack(e) {
     const at = tgt.pos.clone(); at.y = world.h(at.x, at.z); const r = 4 + st;
     ringTelegraph(at, r, 0, 1.1 * speedUp, false);
     e.atkAnim = 1;
-    later(1.1 * speedUp, () => { if (e.dead) return; ringFx(at, r, 0xff6a3a, 0.4); burstFx(at.clone().add(new V3(0, 0.5, 0)), r * 0.8, 0xff5a3a, 0.35); for (const t of heroTargets()) if (t.pos.distanceTo(at) < r) hurtHero(t, e.dmg * 2.2, at); });
+    later(1.1 * speedUp, () => { if (e.dead) return; ringFx(at, r, 0xff6a3a, 0.4); burstFx(at.clone().add(new V3(0, 0.5, 0)), r * 0.8, 0xff5a3a, 0.35); for (const t of heroTargets()) if (t.pos.distanceTo(at) < r) hurtHero(t, e.dmg * 2.2, at, e); });
   } else if (roll < 0.7) {
     const dir = tgt.pos.clone().sub(e.pos).setY(0).normalize(); const L = 16;
     const g = new THREE.Group(); const plane = new THREE.Mesh(G.box(), new THREE.MeshBasicMaterial({ color: lin(0xff2a3a), transparent: true, opacity: 0.3, depthWrite: false }));
@@ -2061,8 +2101,8 @@ function bossAttack(e) {
     e.charging = { dir, until: 0, start: worldT + 0.9 * speedUp, hit: new Set() };
   } else {
     const n = 10 + st * 4, from = e.pos.clone().add(new V3(0, 1.4 * e.scale / 2.3 + 0.6, 0));
-    for (let k = 0; k < n; k++) { const d = new V3(Math.cos(k * TAU / n), 0, Math.sin(k * TAU / n)); shoot(from, from.clone().addScaledVector(d, 10), e.accent, e.dmg * 1.1, 1.5, "enemy", { speed: 11, life: 2.6, size: 0.3 }); }
-    if (st >= 1) for (const t of targets) shoot(from, t.pos.clone().add(new V3(0, 1, 0)), 0xff5a5a, e.dmg * 1.2, 1.5, "enemy", { speed: 15, life: 2, size: 0.25 });
+    for (let k = 0; k < n; k++) { const d = new V3(Math.cos(k * TAU / n), 0, Math.sin(k * TAU / n)); shoot(from, from.clone().addScaledVector(d, 10), e.accent, e.dmg * 1.1, 1.5, "enemy", { src: e, speed: 11, life: 2.6, size: 0.3 }); }
+    if (st >= 1) for (const t of targets) shoot(from, t.pos.clone().add(new V3(0, 1, 0)), 0xff5a5a, e.dmg * 1.2, 1.5, "enemy", { src: e, speed: 15, life: 2, size: 0.25 });
     e.atkAnim = 1;
   }
 }
@@ -2130,11 +2170,12 @@ holdBtn("bDash", () => edge.dash = true);
 holdBtn("bSpecial", () => edge.special = true);
 holdBtn("bArmSpec", () => edge.arm = true);
 holdBtn("bPotion", () => edge.potion = true);
+holdBtn("bBlock", () => blockHeld = true, () => blockHeld = false);
 const padPrev = {};
 function readPad() {
   const gp = navigator.getGamepads ? Array.from(navigator.getGamepads()).find(p => p && p.connected) : null; if (!gp) return null;
   const dz = v => Math.abs(v) < 0.18 ? 0 : v, btn = i => !!(gp.buttons[i] && gp.buttons[i].pressed), pr = i => { const n = btn(i), w = padPrev[i]; padPrev[i] = n; return n && !w; };
-  return { mx: dz(gp.axes[0] || 0), my: dz(gp.axes[1] || 0), cx: dz(gp.axes[2] || 0), cy: dz(gp.axes[3] || 0), jump: pr(0), jumpHeld: btn(0), attack: btn(2) || btn(7), dash: pr(1) || pr(6), special: pr(3), arm: pr(5), potion: pr(4), use: pr(12), menu: pr(9) };
+  return { mx: dz(gp.axes[0] || 0), my: dz(gp.axes[1] || 0), cx: dz(gp.axes[2] || 0), cy: dz(gp.axes[3] || 0), jump: pr(0), jumpHeld: btn(0), attack: btn(2) || btn(7), dash: pr(1), block: btn(6) || btn(10), special: pr(3), arm: pr(5), potion: pr(4), use: pr(12), menu: pr(9) };
 }
 
 /* =====================================================================
@@ -2179,7 +2220,7 @@ function previewModel(kind, id) {
     const it = ITEM[id], g = new THREE.Group();
     if (it.cat === "potion") { const c = { common: 0xe0505f, rare: 0xff6a8a, epic: 0xb37cf4, legendary: 0xffb040 }[it.rarity]; M(G.sph(), std(0xdff4ff, { r: 0.05, m: 0, op: 0.45 }), 0, 0, 0, g, 0.5); M(G.sph(), std(c, { e: c, ei: 0.6, r: 0.2 }), 0, -0.05, 0, g, 0.42); M(G.cyl(0.14, 0.18), std(0xdff4ff, { r: 0.05, op: 0.5 }), 0, 0.55, 0, g, 1, 0.4, 1); M(G.cyl(0.16, 0.13), std(0x7a5536, { r: 0.8 }), 0, 0.8, 0, g, 1, 0.16, 1); }
     else if (it.cat === "special") { M(G.ico(), std(0xf2b744, { m: 0.9, r: 0.2, e: 0x8a5a10, ei: 0.4, flat: true }), 0, 0, 0, g, 0.6); }
-    else { const c = { common: 0x9a8a7a, rare: 0xc8d0d8, epic: 0xf2c044, legendary: 0x8ac8ff }[it.rarity]; if (/plank|log|girder/.test(it.id)) M(G.box(), std(c, { r: 0.6, map: "bark" }), 0, 0, 0, g, 1.4, 0.3, 0.4).rotation.z = 0.3; else if (/brick|glass/.test(it.id)) M(G.box(), std(c, { r: 0.4, op: it.id === "glasspane" ? 0.6 : undefined }), 0, 0, 0, g, 0.9, 0.5, 0.3); else { M(G.dode(), std(0x6a6660, { flat: true, r: 0.9, map: "rock" }), 0, 0, 0, g, 0.6); for (let k = 0; k < 5; k++) M(G.oct(), std(c, { m: 0.9, r: 0.2, e: RANK[it.rarity] >= 2 ? c : 0, ei: 0.3 }), Math.cos(k * 1.3) * 0.45, Math.sin(k * 2.1) * 0.35, Math.sin(k * 1.3) * 0.45, g, 0.14, 0.22, 0.14); } }
+    else matModel(it, g);
     return g;
   }
   return new THREE.Group();
@@ -2368,9 +2409,9 @@ $("menuBody").addEventListener("click", e => {
   else if (d.sell || d.sellall) {
     const id = d.sell || d.sellall, it = ITEM[id], eq = S.equip.weapon === id || S.equip.armour === id;
     const can = S.inv[id] - (eq ? 1 : 0), n = d.sellall ? can : 1;
-    if (can >= 1 && n >= 1) { take(id, n); S.coins += n * sellPrice(it); toast(`Sold ${n} <b>${esc(it.name)}</b> for ${fmt(n * sellPrice(it))} coins`, it.rarity); save(); }
+    if (can >= 1 && n >= 1) { take(id, n); S.coins += n * sellPrice(it); bumpStat("sold", n); toast(`Sold ${n} <b>${esc(it.name)}</b> for ${fmt(n * sellPrice(it))} coins`, it.rarity); save(); }
   }
-  else if (d.sellcommon) { let total = 0, count = 0; for (const id of Object.keys(S.inv)) { const it = ITEM[id]; if (it.rarity === "common" && it.cat === "material") { total += sellPrice(it) * S.inv[id]; count += S.inv[id]; delete S.inv[id]; } } S.coins += total; if (count) toast(`Sold ${count} materials for <b>${fmt(total)}</b> coins`, "common"); save(); }
+  else if (d.sellcommon) { let total = 0, count = 0; for (const id of Object.keys(S.inv)) { const it = ITEM[id]; if (it.rarity === "common" && it.cat === "material") { total += sellPrice(it) * S.inv[id]; count += S.inv[id]; delete S.inv[id]; } } S.coins += total; if (count) bumpStat("sold", count); if (count) toast(`Sold ${count} materials for <b>${fmt(total)}</b> coins`, "common"); save(); }
   else if (d.buy) { const pr = +d.price; if (S.coins >= pr) { S.coins -= pr; S.inv[d.buy] = (S.inv[d.buy] || 0) + 1; S.seen[d.buy] = S.seen[d.buy] || 1; toast(`Bought <b>${esc(ITEM[d.buy].name)}</b>`, ITEM[d.buy].rarity); save(); } }
   else if (d.cls) { selClass = d.cls; rollResult = null; }
   else if (d.roll) {
@@ -2493,8 +2534,10 @@ function update(dt) {
   const cf = new V3(-Math.sin(cam.yaw), 0, -Math.cos(cam.yaw)), cr = new V3(Math.cos(cam.yaw), 0, -Math.sin(cam.yaw));
   const move = new V3().addScaledVector(cf, -iy).addScaledVector(cr, ix); if (move.lengthSq() > 1e-4) move.normalize().multiplyScalar(mag);
   const jumpPressed = edge.jump || (gp && gp.jump), jumpDown = jumpHeld || keys.has(" ") || (gp && gp.jumpHeld);
+  const blockDown = !P.dead && (keys.has("f") || blockHeld || !!(gp && gp.block));
+  if (blockDown && !P.blocking) { P.blocking = true; P.blockStart = worldT; } if (!blockDown) P.blocking = false;
   if (!P.dead) {
-    if (attackHeld || keys.has("j") || attackTap || (gp && gp.attack)) attack();
+    if (!P.blocking && (attackHeld || keys.has("j") || attackTap || (gp && gp.attack))) attack();
     if (edge.dash || (gp && gp.dash)) dash(move);
     if (edge.special || (gp && gp.special)) castSpecial();
     if (edge.arm || (gp && gp.arm)) castArmourSpecial();
@@ -2515,7 +2558,7 @@ function update(dt) {
       if (S.cls === "samurai" || P.buffs.veil > worldT) for (const e of enemiesNear(P.pos, 1.6)) if (!P.dashHit.has(e)) { P.dashHit.add(e); damageEnemy(e, ST.hit * (P.buffs.veil > worldT ? 2 : 0.5), P.dashDir, 1, { color: "#cfefff" }); }
       if (Math.random() < 0.5) ghostFx(hero);
     } else {
-      P.pos.addScaledVector(move, ST.move * (P.onGround ? 1 : 0.9) * (P.atkT > 0 && ITEM[S.equip.weapon].weight === "heavy" ? 0.6 : 1) * dt);
+      P.pos.addScaledVector(move, ST.move * (P.blocking ? 0.45 : 1) * (P.onGround ? 1 : 0.9) * (P.atkT > 0 && ITEM[S.equip.weapon].weight === "heavy" ? 0.6 : 1) * dt);
       if (mag > 0.05 && P.swing <= 0) { const tgt = Math.atan2(move.x, move.z); let d = tgt - P.face; d = Math.atan2(Math.sin(d), Math.cos(d)); P.face += d * Math.min(1, dt * 12); }
     }
     P.pos.addScaledVector(P.kb, dt); P.kb.multiplyScalar(Math.exp(-7 * dt));
@@ -2557,8 +2600,10 @@ function update(dt) {
   const heroes = heroTargets();
   for (const e of enemies) {
     if (e.dead) continue;
+    if (e.dummy) { e.t += dt; e.wob *= Math.exp(-3.5 * dt); e.pivot.rotation.x = Math.sin(e.t * 13) * e.wob * 0.3; e.kb.set(0, 0, 0); continue; }
+    if (e.duelist) { duelistUpdate(e, dt); continue; }
     e.t += dt;
-    const frozen = e.frozen > worldT;
+    const frozen = e.frozen > worldT || e.stunUntil > worldT;
     if (e.burn > worldT) damageEnemy(e, e.burnDps * dt, null, 0, { silent: true, canCrit: false });
     if (e.dead) continue;
     e.pos.addScaledVector(e.kb, dt); e.kb.multiplyScalar(Math.exp(-6 * dt));
@@ -2568,19 +2613,19 @@ function update(dt) {
       const spd = e.spd * (e.slow > worldT ? 0.4 : 1);
       if (e.charging && worldT >= e.charging.start) {
         if (!e.charging.until) e.charging.until = worldT + 0.55;
-        if (worldT < e.charging.until) { e.pos.addScaledVector(e.charging.dir, 26 * dt); for (const h of heroTargets()) if (!e.charging.hit.has(h.ent) && h.pos.distanceTo(e.pos) < 1.8 * e.scale / 2.3 + 0.8) { e.charging.hit.add(h.ent); hurtHero(h, e.dmg * 2, e.pos); } moving = 1; }
+        if (worldT < e.charging.until) { e.pos.addScaledVector(e.charging.dir, 26 * dt); for (const h of heroTargets()) if (!e.charging.hit.has(h.ent) && h.pos.distanceTo(e.pos) < 1.8 * e.scale / 2.3 + 0.8) { e.charging.hit.add(h.ent); hurtHero(h, e.dmg * 2, e.pos, e); } moving = 1; }
         else e.charging = null;
       } else if (!e.charging) {
         const toT = tgt.pos.clone().sub(e.pos).setY(0); const dist = toT.length(); toT.normalize();
         e.R.g.rotation.y = Math.atan2(toT.x, toT.z);
         if (e.role === "ranged") {
           if (dist > 9) { e.pos.addScaledVector(toT, spd * dt); moving = 1; } else if (dist < 6) { e.pos.addScaledVector(toT, -spd * 0.7 * dt); moving = 1; }
-          e.atkT -= dt; if (e.atkT <= 0 && dist < 14) { e.atkT = e.base.cd; e.atkAnim = 1; shoot(e.pos.clone().add(new V3(0, 1.4 * e.scale, 0)), tgt.pos.clone().add(new V3(0, 1, 0)), e.accent, e.dmg, 1, "enemy", { speed: 13, life: 1.6, size: 0.2 }); }
+          e.atkT -= dt; if (e.atkT <= 0 && dist < 14) { e.atkT = e.base.cd; e.atkAnim = 1; shoot(e.pos.clone().add(new V3(0, 1.4 * e.scale, 0)), tgt.pos.clone().add(new V3(0, 1, 0)), e.accent, e.dmg, 1, "enemy", { src: e, speed: 13, life: 1.6, size: 0.2 }); }
         } else {
           const reach = e.base.range * (e.boss ? e.scale / 2.3 : 1) + e.radius * 0.5;
           if (dist > reach * 0.85) { e.pos.addScaledVector(toT, spd * dt); moving = 1; }
           e.atkT -= dt;
-          if (dist < reach && e.atkT <= 0) { e.atkT = e.base.cd; e.atkAnim = 1; const hitT = tgt; later(0.18, () => { if (!e.dead && hitT.pos.distanceTo(e.pos) < reach + 0.4) hurtHero(hitT, e.dmg, e.pos); }); }
+          if (dist < reach && e.atkT <= 0) { e.atkT = e.base.cd; e.atkAnim = 1; const hitT = tgt; tellFx(e, 0.34); later(0.34, () => { if (!e.dead && !(e.stunUntil > worldT) && hitT.pos.distanceTo(e.pos) < reach + 0.6) hurtHero(hitT, e.dmg, e.pos, e); }); }
           if (e.boss) { e.bossT -= dt; if (e.bossT <= 0) { e.bossT = [3.6, 3.0, 2.4][run.stage] * rand(0.85, 1.15); bossAttack(e); } }
         }
       }
@@ -2602,7 +2647,7 @@ function update(dt) {
     p.pos.addScaledVector(p.vel, dt); p.m.position.copy(p.pos); p.m.lookAt(p.pos.clone().add(p.vel));
     let done = p.life <= 0 || p.pos.y < world.h(p.pos.x, p.pos.z) - 0.2;
     if (!done) {
-      if (p.side === "enemy") { for (const h of heroTargets()) if (h.pos.clone().add(new V3(0, 1, 0)).distanceTo(p.pos) < p.r + 0.4) { hurtHero(h, p.dmg, p.pos); done = true; break; } }
+      if (p.side === "enemy") { for (const h of heroTargets()) if (h.pos.clone().add(new V3(0, 1, 0)).distanceTo(p.pos) < p.r + 0.4) { hurtHero(h, p.dmg, p.pos, p.src); done = true; break; } }
       else for (const e of enemies) { if (e.dead || p.hit.has(e)) continue; if (e.pos.clone().add(new V3(0, e.scale, 0)).distanceTo(p.pos) < p.r + e.radius + 0.3) { p.hit.add(e); damageEnemy(e, p.dmg, p.vel, p.kb, { canCrit: p.side === "hero" }); if (p.side === "hero" && !p.pierce) onHeroHit(); if (!p.pierce) { done = true; break; } } }
     }
     if (done) { scene.remove(p.m); projectiles.splice(i, 1); }
@@ -2616,10 +2661,12 @@ function nearestInteract() {
 }
 function animate(dt, paused) {
   const t = performance.now() / 1000;
+  dayTick();
   const moving = !paused && !P.dead && P.onGround && P.dashT <= 0 && (Math.abs(touchMove.x) + Math.abs(touchMove.y) > 0.1 || ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].some(k => keys.has(k)));
   P.walk = lerp(P.walk, moving ? 1 : 0, 1 - Math.exp(-10 * dt));
   hero.g.position.copy(P.pos); hero.g.rotation.y = P.face;
   poseHumanoid(hero, t, P.walk, P.swing, P.swingStyle, !P.onGround, P.spinT > 0 ? (1 - P.spinT / 0.45) * TAU : 0);
+  if (P.blocking && !P.dead) { hero.shR.rotation.x = -1.35; hero.shR.rotation.z = 0.7; hero.elR.rotation.x = -1.3; if (hero.shL) hero.shL.rotation.x = -0.9; }
   hero.g.visible = !(P.buffs.veil > worldT && Math.floor(t * 12) % 2 === 0);
   for (const a of allies) { a.R.g.position.copy(a.pos); if (a.down) a.R.g.position.y += 0.3; a.R.g.rotation.y = a.face; if (!a.down) poseHumanoid(a.R, t + allies.indexOf(a), a.moving || 0, a.swing, "normal", false); a.lbl.position.copy(a.pos).add(new V3(0, 2.35, 0)); }
   for (const e of enemies) if (!e.dead) {
@@ -2637,7 +2684,7 @@ function animate(dt, paused) {
   if (world.portals) for (const p of world.portals) { p.disc.material.uniforms.t.value = t; p.pts.rotation.y = t * 0.4; const pa = p.pts.geometry.attributes.position; for (let k = 0; k < pa.count; k++) { let y = pa.getY(k) + dt * 0.8; if (y > 3) y = 0; pa.setY(k, y); } pa.needsUpdate = true; }
   for (const fn of world.animated) fn(t);
   WIND.value = t;
-  if (world.labels) for (const l of world.labels) { const d = l.getWorldPosition(new V3()).distanceTo(camera.position); l.visible = d > 7; }
+  if (world.labels) for (const l of world.labels) { const d = l.getWorldPosition(new V3()).distanceTo(camera.position); l.visible = d > 7 && d < (l.userData.far || 1e9); }
   if (world.water && world.water.userData.water) { world.water.userData.water.offset.set(t * 0.012, t * 0.008); }
   if (world.water && world.water.material.map && world.water.material.emissiveIntensity > 0.5) world.water.material.map.offset.set(t * 0.004, t * 0.003);
   if (world.fountain) world.fountain.userData.water.offset.set(t * 0.05, t * 0.03);
@@ -2707,7 +2754,7 @@ function openChest(index) {
   const T = CHEST_TIERS[c.t], table = dropTable(c.i, c.t, true), got = [];
   const add = (it, n = 1) => { gain(it, null, n, true); const g = got.find(x => x.it === it); if (g) g.n += n; else got.push({ it, n }); };
   const nm = T.mats[0] + Math.floor(Math.random() * (T.mats[1] - T.mats[0] + 1));
-  for (let k = 0; k < nm; k++) { let r = rollRarity(table); if (r === "vaulted") r = "legendary"; add(rollOfCats(r, ["material"])); }
+  for (let k = 0; k < nm; k++) add(rollOfCats(rollRarity(table), ["material"]));
   const ng = T.gear + (Math.random() < T.extra ? 1 : 0);
   for (let k = 0; k < ng; k++) add(rollOfCats(rollRarity(table), ["weapon", "armour"]));
   if (Math.random() < T.potion) { let r = rollRarity(table); if (r === "vaulted") r = "legendary"; add(rollOfCats(r, ["potion"])); }
@@ -2799,7 +2846,7 @@ const VILLAGERS = [
   { name: "Wren", role: "Courier", look: { skin: 0xf0d8c0, hair: 0x8a2a1a, cloth: 0x7a2a3a, cloth2: 0x2a1a22 }, lines: ["Sage Ilvara wants to know what is in your chests. Everyone does.", "Four portals, twelve islands, one very tired courier.", "Heard the Forge can make a Fortune Die, if you bring enough starsteel."] }
 ];
 const questOf = npc => npc.quests.find(q => !(S.quests[q.id] && S.quests[q.id].s === "done"));
-const questProg = q => { const st = S.quests[q.id]; return st && st.s === "active" ? Math.min(q.n, (S.stats[q.stat] || 0) - st.base) : 0; };
+const questProg = q => { const st = S.quests[q.id]; if (!st || st.s !== "active") return 0; if (q.deliver) return Object.entries(q.deliver).every(([id, n]) => (S.inv[id] || 0) >= n) ? q.n : 0; if (q.check) return Math.min(q.n, q.check()); return Math.min(q.n, (S.stats[q.stat] || 0) - st.base); };
 function npcStatus(npc) { const q = questOf(npc); if (!q) return "done"; const st = S.quests[q.id]; if (!st) return "offer"; return questProg(q) >= q.n ? "ready" : "active"; }
 function bumpStat(k, n = 1) {
   const before = QUEST_NPCS.map(npcStatus);
@@ -2831,6 +2878,7 @@ function openDialog(npc, line) {
     else if (st === "active") { text = "Still working on it? I will be right here."; quest = questBox(q, "In progress"); }
     else { text = "You did it! Here is what I promised."; quest = questBox(q, "Ready to hand in"); btns = `<button class="btn primary" data-dlg="turnin">Collect reward</button>`; }
     if (npc.forge) btns += `<button class="btn" data-dlg="forge">Use the forge</button>`;
+    if (npc.duel) btns += `<button class="btn" data-dlg="duels">Challenge a rival</button>`;
     btns += `<button class="btn" data-dlg="close">${st === "offer" ? "Not now" : "Farewell"}</button>`;
   }
   $("dlgText").textContent = text; $("dlgQuest").innerHTML = quest; $("dlgBtns").innerHTML = btns;
@@ -2839,7 +2887,7 @@ function openDialog(npc, line) {
 function questBox(q, tag) {
   const p = questProg(q), active = S.quests[q.id] && S.quests[q.id].s === "active";
   return `<div class="qbox"><span class="qtag">${tag}</span><b>${esc(q.title)}</b><span>${esc(q.ask)}</span>
-    ${active ? `<div class="bar xp" style="height:8px"><i style="width:${100 * p / q.n}%"></i></div><span class="muted num">${p} / ${q.n}</span>` : ""}
+    ${q.deliver ? deliverHtml(q) : active ? `<div class="bar xp" style="height:8px"><i style="width:${100 * p / q.n}%"></i></div><span class="muted num">${p} / ${q.n}</span>` : ""}
     <span class="qrew">Reward: ${esc(rewardText(q.reward))}</span></div>`;
 }
 $("dialog").addEventListener("click", e => {
@@ -2847,9 +2895,10 @@ $("dialog").addEventListener("click", e => {
   const a = b.dataset.dlg, npc = dlgNpc;
   if (a === "close") { $("dialog").hidden = true; return; }
   if (a === "forge") { $("dialog").hidden = true; openMenu("forge"); return; }
+  if (a === "duels") { openDuelBoard(); return; }
   const q = questOf(npc); if (!q) return;
   if (a === "accept") { S.quests[q.id] = { s: "active", base: S.stats[q.stat] || 0 }; toast(`<b>Quest accepted:</b> ${esc(q.title)}`, "rare"); save(); openDialog(npc); }
-  if (a === "turnin" && npcStatus(npc) === "ready") { S.quests[q.id] = { s: "done" }; giveReward(q.reward); banner("Quest complete", q.title); save(); openDialog(npc); }
+  if (a === "turnin" && npcStatus(npc) === "ready") { if (q.deliver) for (const [id, n] of Object.entries(q.deliver)) { S.inv[id] -= n; if (S.inv[id] <= 0) delete S.inv[id]; } S.quests[q.id] = { s: "done" }; giveReward(q.reward); banner("Quest complete", q.title); save(); openDialog(npc); }
 });
 
 /* ---- menu tabs: chests, forge, quests ---- */
@@ -2893,7 +2942,7 @@ function renderQuests(B) {
       return `<div class="qcard"><div class="row" style="justify-content:space-between"><span><b>${esc(npc.name)}</b> <span class="muted">${esc(npc.role)}</span></span><span class="muted num">${done} / ${npc.quests.length} done</span></div>
       ${st === "done" ? `<span class="muted">All quests complete. ${esc(npc.bye)}</span>` : questBox(q, { offer: "Available, talk to " + npc.name.split(" ").pop(), active: "In progress", ready: "Ready to hand in" }[st])}</div>`; }).join("")}
     <h3 class="sec">Your record</h3>
-    <div class="derived">${[["Foes defeated", S.stats.kills], ["Bosses defeated", S.stats.bosses], ["Stages cleared", S.stats.clears], ["Chests opened", S.stats.chests], ["Items crafted", S.stats.crafts]].map(([a, b]) => `<div><small>${a}</small><b>${fmt(b || 0)}</b></div>`).join("")}</div></div>`;
+    <div class="derived">${[["Foes defeated", S.stats.kills], ["Bosses defeated", S.stats.bosses], ["Stages cleared", S.stats.clears], ["Chests opened", S.stats.chests], ["Items crafted", S.stats.crafts], ["Attacks parried", S.stats.parries], ["Duels won", S.stats.duels], ["Dummy damage", Math.round(S.stats.dummy || 0)]].map(([a, b]) => `<div><small>${a}</small><b>${fmt(b || 0)}</b></div>`).join("")}</div></div>`;
 }
 $("menuBody").addEventListener("click", e => {
   const oc = e.target.closest("[data-openchest]"); if (oc) { openMany([+oc.dataset.openchest]); return; }
@@ -2923,7 +2972,7 @@ function lobbyExtras(group, h) {
   const wood = MAT.bark(0x5a3a24), ironM = MAT.metal(0x3a3a40, 0.45);
   /* the forge */
   {
-    const fx = -21, fz = 21, f = place(fx, fz, facing(fx, fz));
+    const fx = Math.cos(1.9635) * 29, fz = Math.sin(1.9635) * 29, f = place(fx, fz, facing(fx, fz));
     M(G.box(), darkStone, 0, 0.2, 0, f, 9, 0.4, 6.5);
     M(G.box(), stoneM, 0, 2.4, -3, f, 9, 4.4, 0.6);
     for (const s of [-1, 1]) M(G.box(), stoneM, 4.2 * s, 1.6, -1, f, 0.6, 2.8, 4);
@@ -2953,9 +3002,10 @@ function lobbyExtras(group, h) {
     addCircle(...toW(f, 0, -1.6), 4.4, 6);
     const [ax, az] = toW(f, 1.2, 1.2); addCircle(ax, az, 0.6, 2);
     world.interact.push({ x: ax, z: az, r: 3.2, label: "Use the forge", act: () => openMenu("forge") });
+    { const b = QUEST_NPCS.find(n => n.id === "brannoc"); const [bx2, bz2] = toW(f, 3.0, 2.4); b.pos = [bx2, bz2]; b.face = f.rotation.y; }
   }
   /* new landmark buildings in the gaps between houses */
-  const spots = [0.699, 2.095 + 0.35, 3.49, 4.89].map(a => [Math.cos(a) * 49, Math.sin(a) * 49]);
+  const spots = [-1.9635, 1.1781, 0.3927, -0.3927].map(a => [Math.cos(a) * 50, Math.sin(a) * 50]);
   // bell tower
   { const [x, z] = spots[0], g = place(x, z, facing(x, z));
     M(G.box(), stoneM, 0, 6, 0, g, 4.2, 12, 4.2); M(G.box(), darkStone, 0, 0.4, 0, g, 4.6, 0.8, 4.6);
@@ -3002,7 +3052,7 @@ function lobbyExtras(group, h) {
     const l = textSprite("Windmill", "#ffe2a0", 1.2); l.position.set(x, 13.2, z); group.add(l); world.labels.push(l); }
   /* benches and flower beds around the plaza */
   for (let k = 0; k < 8; k++) {
-    const a = k / 8 * TAU, x = Math.cos(a) * 22, z = Math.sin(a) * 22;
+    const a = k / 8 * TAU + TAU / 16, x = Math.cos(a) * 20, z = Math.sin(a) * 20;
     if (LOBBY_PORTALS.some(([px, pz]) => Math.hypot(px - x, pz - z) < 5) || QUEST_NPCS.some(n => Math.hypot(n.pos[0] - x, n.pos[1] - z) < 3) || Math.hypot(x + 21, z - 21) < 7) continue;
     const b = place(x, z, facing(x, z) + Math.PI);
     M(G.box(), wood, 0, 0.45, 0, b, 2, 0.1, 0.5); M(G.box(), wood, 0, 0.8, -0.24, b, 2, 0.5, 0.08);
@@ -3014,14 +3064,14 @@ function lobbyExtras(group, h) {
   const rt = seeded(77);
   for (let k = 0; k < 40; k++) {
     const a = rt() * TAU, d = 29.5 + rt() * 6, x = Math.cos(a) * d, z = Math.sin(a) * d;
-    if (blockedLobby(x, z) || Math.hypot(x + 21, z - 21) < 8) continue;
+    if (blockedLobby(x, z) || onPath(x, z, 1.5)) continue;
     const t = makeTree(rt() < 0.7 ? "oak" : "pine", rt); t.position.set(x, h(x, z), z); t.scale.setScalar(0.65 + rt() * 0.35); t.rotation.y = rt() * TAU; group.add(t); addCircle(x, z, 0.5, 6);
   }
   /* townsfolk */
   const mk = (def, x, z, face) => {
     const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null });
     R.g.position.set(x, 0, z); R.g.rotation.y = face; group.add(R.g); shadows(R.g, true, false);
-    const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, 2.45, z); group.add(lbl); world.labels.push(lbl);
+    const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, 2.45, z); lbl.userData.far = 42; group.add(lbl); world.labels.push(lbl);
     return { R, lbl };
   };
   world.npcs = [];
@@ -3033,7 +3083,7 @@ function lobbyExtras(group, h) {
     world.interact.push({ x, z, r: 2.8, label: `Talk to ${def.name}`, act: () => openDialog(def) });
   });
   VILLAGERS.forEach((def, k) => {
-    const a = k / VILLAGERS.length * TAU + 0.4, x = Math.cos(a) * 18, z = Math.sin(a) * 18, o = mk(def, x, z, 0);
+    const a = k / VILLAGERS.length * TAU + 0.4, x = def.home ? def.home[0] : Math.cos(a) * 18, z = def.home ? def.home[1] : Math.sin(a) * 18, o = mk(def, x, z, 0);
     const n = { def, ...o, x, z, ang: a, rad: 18, tgt: null, wait: 1 + k, walk: 0, rng: seeded(300 + k) }; world.npcs.push(n);
     const it = { x, z, r: 2.4, label: `Talk to ${def.name}`, act: () => { n.wait = 4; openDialog(def); } }; n.it = it; world.interact.push(it);
   });
@@ -3042,16 +3092,18 @@ function lobbyExtras(group, h) {
     const dt = lastT === null ? 0 : Math.min(0.1, t - lastT); lastT = t;
     const paused = isPaused();
     for (const n of world.npcs) {
+      const far = Math.hypot(P.pos.x - n.x, P.pos.z - n.z) > 52; n.R.g.visible = !far;
+      if (far) { if (n.marks) n.marks.offer.visible = n.marks.ready.visible = false; continue; }
       if (n.quest) { const st = npcStatus(n.def); n.marks.offer.visible = st === "offer"; n.marks.ready.visible = st === "ready"; const bob = 3.25 + Math.sin(t * 2.4) * 0.12; n.marks.offer.position.y = n.marks.ready.position.y = bob;
         const dx = P.pos.x - n.x, dz = P.pos.z - n.z, near = Math.hypot(dx, dz) < 6; const want = near ? Math.atan2(dx, dz) : n.def.face; let d = want - n.R.g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); n.R.g.rotation.y += d * Math.min(1, dt * 4);
         poseHumanoid(n.R, t + n.x, 0, 0, "normal", false); continue; }
       if (!paused) {
         if (n.wait > 0) n.wait -= dt;
-        else if (!n.tgt) { const a = n.ang + (n.rng() - 0.5) * 1.6, r = 9 + n.rng() * 14; n.tgt = [Math.cos(a) * r, Math.sin(a) * r]; }
+        else if (!n.tgt) { if (n.def.home) { const a = n.rng() * TAU, r = n.rng() * n.def.rad; n.tgt = [n.def.home[0] + Math.cos(a) * r, n.def.home[1] + Math.sin(a) * r]; } else { const a = n.ang + (n.rng() - 0.5) * 1.6, r = 9 + n.rng() * 14; n.tgt = [Math.cos(a) * r, Math.sin(a) * r]; } }
         if (n.tgt && n.wait <= 0) {
           const dx = n.tgt[0] - n.x, dz = n.tgt[1] - n.z, d = Math.hypot(dx, dz);
           if (d < 0.3) { n.tgt = null; n.wait = 2 + n.rng() * 5; }
-          else { const sp = 1.3 * dt; let nx = n.x + dx / d * sp, nz = n.z + dz / d * sp; if (Math.hypot(nx, nz) < 6.5 || LOBBY_PORTALS.some(([px, pz]) => Math.hypot(px - nx, pz - nz) < 3.2)) { n.tgt = null; n.wait = 0.5; } else { n.x = nx; n.z = nz; n.ang = Math.atan2(nz, nx); }
+          else { const sp = 1.3 * dt; let nx = n.x + dx / d * sp, nz = n.z + dz / d * sp; if (Math.hypot(nx, nz) < 6.5 || LOBBY_PORTALS.some(([px, pz]) => Math.hypot(px - nx, pz - nz) < 3.2) || blocked(nx, nz, 0.35)) { n.tgt = null; n.wait = 0.5; } else { n.x = nx; n.z = nz; n.ang = Math.atan2(nz, nx); }
             let want = Math.atan2(dx, dz), dd = want - n.R.g.rotation.y; dd = Math.atan2(Math.sin(dd), Math.cos(dd)); n.R.g.rotation.y += dd * Math.min(1, dt * 6); }
         }
       }
@@ -3061,6 +3113,502 @@ function lobbyExtras(group, h) {
     }
   });
 }
+
+/* =====================================================================
+   TOWN OF EIGHT ROADS, DAY AND NIGHT, BLOCKING, DUMMIES AND DUELS
+   ===================================================================== */
+// north is -z. a = atan2(z, x)
+const COMPASS = [
+  { k: "E", name: "East", deg: 0, dest: "Lantern Row", len: 92 },
+  { k: "SE", name: "South-east", deg: 45, dest: "Mirror Pond", len: 70 },
+  { k: "S", name: "South", deg: 90, dest: "Market Square", len: 92 },
+  { k: "SW", name: "South-west", deg: 135, dest: "Adventurers' Guild", len: 72 },
+  { k: "W", name: "West", deg: 180, dest: "Chapel of Dawn", len: 74 },
+  { k: "NW", name: "North-west", deg: 225, dest: "Barracks", len: 72 },
+  { k: "N", name: "North", deg: 270, dest: "Training Grounds and Duel Arena", len: 92 },
+  { k: "NE", name: "North-east", deg: 315, dest: "Highfield Farm", len: 68 }
+].map(c => Object.assign(c, { a: c.deg * Math.PI / 180, w: c.k.length === 1 ? 6 : 4.4 }));
+function onPath(x, z, pad = 0) {
+  for (const c of COMPASS) {
+    const cx = Math.cos(c.a), cz = Math.sin(c.a), t = x * cx + z * cz;
+    if (t < 25 || t > c.len + 2) continue;
+    if (Math.abs(-x * cz + z * cx) < c.w / 2 + pad) return true;
+  }
+  return false;
+}
+// bake a group of static meshes into one mesh per material, so a whole town costs a few draw calls
+function mergeStatic(root) {
+  root.updateMatrixWorld(true);
+  const buckets = new Map(), meshes = [];
+  const walk = o => { if (o.userData.dyn) return; if (o.isMesh && !Array.isArray(o.material)) meshes.push(o); o.children.forEach(walk); }; root.children.forEach(walk);
+  for (const m of meshes) {
+    const g = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone()); g.applyMatrix4(m.matrixWorld);
+    if (!buckets.has(m.material)) buckets.set(m.material, { geos: [], cast: false });
+    const b = buckets.get(m.material); b.geos.push(g); b.cast = b.cast || m.castShadow;
+    m.parent.remove(m);
+  }
+  const keep = []; root.traverse(o => { if (o !== root && !o.isMesh && !o.isSprite && !o.isPoints && o.children.length === 0) keep.push(o); }); keep.forEach(o => o.parent && o.parent.remove(o));
+  for (const [mat, b] of buckets) {
+    const n = b.geos.reduce((s, g) => s + g.attributes.position.count, 0);
+    const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2); let o = 0;
+    for (const g of b.geos) { pos.set(g.attributes.position.array, o * 3); if (g.attributes.normal) nor.set(g.attributes.normal.array, o * 3); if (g.attributes.uv) uv.set(g.attributes.uv.array, o * 2); o += g.attributes.position.count; g.dispose(); }
+    const mg = new THREE.BufferGeometry(); mg.setAttribute("position", new THREE.BufferAttribute(pos, 3)); mg.setAttribute("normal", new THREE.BufferAttribute(nor, 3)); mg.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); mg.computeBoundingSphere();
+    const mesh = new THREE.Mesh(mg, mat); mesh.castShadow = b.cast; mesh.receiveShadow = true; root.add(mesh);
+  }
+}
+const WIN_MAT = () => std(0xffd890, { e: 0xffb050, ei: 1.4 });
+function makeHouse(parent, x, z, rotY, r) {
+  const hg = new THREE.Group(); hg.position.set(x, 0, z); hg.rotation.y = rotY; parent.add(hg);
+  const W = 6 + r() * 3, D = 5 + r() * 1.6, two = r() < 0.35, H = two ? 7 + r() : 4 + r() * 1.6;
+  const plaster = std([0xd8cbb0, 0xe2d8c6, 0xcab8a0, 0xd8c4b4][Math.floor(r() * 4)], { r: 0.92, map: "plaster", bump: "plasterB", bs: 1.2, rep: 2 });
+  const beam = MAT.bark(0x4a3222), win = WIN_MAT();
+  M(G.box(), plaster, 0, H / 2, 0, hg, W, H, D);
+  M(G.box(), MAT.rock(0x7a756c), 0, 0.35, 0, hg, W + 0.12, 0.7, D + 0.12);
+  for (const s of [-1, 1]) for (const zz of [D / 2 + 0.02, -D / 2 - 0.02]) M(G.box(), beam, (W / 2 - 0.15) * s, H / 2, zz, hg, 0.3, H, 0.1);
+  M(G.box(), beam, 0, H - 0.15, D / 2 + 0.02, hg, W, 0.3, 0.1);
+  if (two) M(G.box(), beam, 0, H * 0.5, D / 2 + 0.03, hg, W, 0.25, 0.1);
+  M(G.box(), MAT.rock(0x6a625a), W * 0.28, H + 2.2, -D * 0.15, hg, 0.6, 2.4, 0.6);
+  const roof = M(G.cone(4), std([0xd88a70, 0x8aa0c8, 0xb89070, 0x7a8a5a, 0x9a5a4a][Math.floor(r() * 5)], { r: 0.8, map: "roof", bump: "roof", bs: 1.5, rep: 3, flat: true }), 0, H + 1.6, 0, hg, W * 0.8, 3.2, D * 0.88); roof.rotation.y = Math.PI / 4;
+  M(G.box(), std(0x3a2618, { r: 0.7 }), 0, 1.1, D / 2 + 0.05, hg, 1.2, 2.2, 0.1);
+  for (const yy of two ? [1.9, H * 0.76] : [H * 0.62]) for (const s of [-1, 1]) { M(G.box(), win, 2 * s, yy, D / 2 + 0.05, hg, 0.9, 0.9, 0.05); M(G.box(), beam, 2 * s, yy, D / 2 + 0.07, hg, 0.06, 0.9, 0.04); M(G.box(), beam, 2 * s, yy, D / 2 + 0.07, hg, 0.9, 0.06, 0.04); }
+  if (r() < 0.5) { M(G.box(), MAT.bark(0x5a3a24), 2, 0.5 + (two ? 1.4 : H * 0.62 - 1.1), D / 2 + 0.25, hg, 1.0, 0.25, 0.3); for (let j = 0; j < 4; j++) M(G.sph(), std([0xe85a7a, 0xf2c744, 0xb37cf4, 0xffffff][j], { r: 0.6 }), 1.65 + j * 0.23, 0.72 + (two ? 1.4 : H * 0.62 - 1.1), D / 2 + 0.25, hg, 0.11); }
+  return Math.max(W, D) * 0.58;
+}
+function makeDummy(parent, x, z, rotY) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; parent.add(g);
+  const wood = MAT.bark(0x5a3a24), sack = std(0xc8a870, { r: 0.95, map: "fabric", rep: 2 }), rope = std(0x6a5a3a, { r: 0.9 });
+  M(G.cyl(0.09, 0.11), wood, 0, 0.6, 0, g, 1, 1.2, 1);
+  const pivot = new THREE.Group(); pivot.position.y = 0.9; g.add(pivot);
+  M(G.cyl(0.32, 0.36, 12), sack, 0, 0.5, 0, pivot, 1, 1.1, 1);
+  M(G.sph(), sack, 0, 1.3, 0, pivot, 0.27);
+  M(G.cyl(0.06, 0.06), wood, 0, 0.75, 0, pivot, 1, 1.5, 1).rotation.z = Math.PI / 2;
+  for (const yy of [0.2, 0.8]) M(G.cyl(0.335, 0.335, 12), rope, 0, yy, 0, pivot, 1, 0.06, 1);
+  const tgt = M(G.cyl(0.16, 0.16, 16), std(0xc03a2a, { r: 0.7 }), 0, 0.55, 0.33, pivot, 1, 0.03, 1); tgt.rotation.x = Math.PI / 2;
+  M(G.cyl(0.08, 0.08, 16), std(0xf0e8d0, { r: 0.7 }), 0, 0.55, 0.345, pivot, 1, 0.03, 1).rotation.x = Math.PI / 2;
+  shadows(g, true, false);
+  const e = { R: { g }, name: "Training Dummy", role: "dummy", dummy: true, boss: false, base: { xp: 0, coins: 0, range: 0, cd: 99 }, pos: new V3(x, 0, z), kb: new V3(), hp: 1e9, maxHp: 1e9, dmg: 0, spd: 0,
+    atkT: 1e9, dead: false, flash: 0, accent: 0xc8a870, scale: 1, radius: 0.5, t: 0, atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, bossT: 1e9, pivot, wob: 0, log: [] };
+  enemies.push(e); addCircle(x, z, 0.45, 3);
+  return e;
+}
+let dpsInfo = null;
+function dummyHit(e, dmg, crit, o) {
+  if (!o.silent) floatText(e.pos, Math.round(dmg) + (crit ? "!" : ""), o.color || (crit ? "#ffd166" : "#fff2c8"), crit);
+  e.wob = Math.min(1.4, e.wob + 0.5); e.flash = 0.12;
+  e.log.push([worldT, dmg]); e.log = e.log.filter(l => worldT - l[0] < 5);
+  const total = e.log.reduce((s, l) => s + l[1], 0), span = Math.max(1, Math.min(5, worldT - e.log[0][0] + 0.6));
+  dpsInfo = { at: worldT, dps: total / span, hit: dmg, sum: total };
+  S.stats.dummy = (S.stats.dummy || 0) + dmg;
+}
+
+/* ---- the town ---- */
+function townLayout(group, h) {
+  const town = new THREE.Group(); group.add(town);
+  const r = seeded(91), tiles = std(0xa89a84, { r: 0.9, map: "tiles", rep: [10, 1] }), curb = std(0x8a8478, { r: 0.8, map: "rock" });
+  const wood = MAT.bark(0x5a3a24), stoneM = std(0x8a8478, { r: 0.85, map: "rock", bump: "rockB", bs: 0.6, rep: 2 }), darkStone = std(0x5a564e, { r: 0.85, map: "rock" });
+  const place = (x, z, rotY, parent = town) => { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; parent.add(g); return g; };
+  const lbl = (text, x, y, z, col = "#ffe2a0", size = 1.2) => { const l = textSprite(text, col, size); l.position.set(x, y, z); group.add(l); world.labels.push(l); return l; };
+  // the eight roads, with a signpost where each leaves the plaza
+  for (const c of COMPASS) {
+    const cx = Math.cos(c.a), cz = Math.sin(c.a), len = c.len - 26, mid = 26 + len / 2;
+    const p = M(G.box(), tiles, cx * mid, 0.03, cz * mid, town, len, 0.06, c.w); p.rotation.y = -c.a;
+    for (const s of [-1, 1]) { const k = M(G.box(), curb, cx * mid - cz * s * (c.w / 2 + 0.15), 0.08, cz * mid + cx * s * (c.w / 2 + 0.15), town, len, 0.16, 0.3); k.rotation.y = -c.a; }
+    const sx = cx * 29.5 - cz * (c.w / 2 + 1.2), sz = cz * 29.5 + cx * (c.w / 2 + 1.2);
+    M(G.cyl(0.09, 0.11), wood, sx, 1.3, sz, town, 1, 2.6, 1);
+    const board = M(G.box(), MAT.bark(0x7a5536), sx, 2.3, sz, town, 1.6, 0.42, 0.08); board.rotation.y = -c.a + Math.PI / 2;
+    addCircle(sx, sz, 0.25, 3);
+    lbl(`${c.k} · ${c.dest}`, sx, 3.15, sz, "#f4ead2", 0.9);
+  }
+  // the compass rose painted into the plaza
+  for (const [k, deg] of [["N", 270], ["E", 0], ["S", 90], ["W", 180]]) {
+    const a = deg * Math.PI / 180, cv = document.createElement("canvas"); cv.width = cv.height = 128; const x = cv.getContext("2d");
+    x.font = "700 96px Cinzel, Georgia, serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillStyle = "#5a4a38"; x.fillText(k, 64, 70);
+    const tx = new THREE.CanvasTexture(cv); tx.encoding = THREE.sRGBEncoding;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), new THREE.MeshStandardMaterial({ map: tx, transparent: true, roughness: 0.9, depthWrite: false }));
+    m.rotation.x = -Math.PI / 2; m.rotation.z = -a - Math.PI / 2; m.position.set(Math.cos(a) * 24.2, 0.04, Math.sin(a) * 24.2); m.userData.dyn = true; group.add(m);
+  }
+  /* north: training grounds and the duel arena */
+  {
+    const fence = (x0, z0, x1, z1) => { const n = Math.max(1, Math.round(Math.hypot(x1 - x0, z1 - z0) / 2.5)); for (let i = 0; i <= n; i++) { const x = lerp(x0, x1, i / n), z = lerp(z0, z1, i / n); if (onPath(x, z, 0.6)) continue; M(G.box(), wood, x, 0.6, z, town, 0.18, 1.2, 0.18); } const rail = M(G.box(), wood, (x0 + x1) / 2, 0.85, (z0 + z1) / 2, town, Math.hypot(x1 - x0, z1 - z0), 0.1, 0.08); rail.rotation.y = -Math.atan2(z1 - z0, x1 - x0); };
+    fence(-17, -58, -17, -72); fence(17, -58, 17, -72); fence(-17, -58, -4, -58); fence(4, -58, 17, -58);
+    M(G.box(), std(0xb8a07a, { r: 0.95, map: "groundB" }), -10.5, 0.02, -65, town, 12, 0.04, 13); M(G.box(), std(0xb8a07a, { r: 0.95, map: "groundB" }), 10.5, 0.02, -65, town, 12, 0.04, 13);
+    const dummies = new THREE.Group(); group.add(dummies);
+    for (const [x, z] of [[-13, -62], [-8, -62], [8, -62], [13, -62], [-10.5, -68], [10.5, -68]]) makeDummy(dummies, x, z, x < 0 ? Math.PI / 2 : -Math.PI / 2);
+    for (const s of [-1, 1]) { const rk = place(15.5 * s, -66, s < 0 ? Math.PI / 2 : -Math.PI / 2); M(G.box(), wood, 0, 1.6, 0, rk, 3, 0.15, 0.3); for (const q of [-1, 1]) M(G.box(), wood, 1.45 * q, 0.85, 0, rk, 0.15, 1.7, 0.3); ["militia", "ironwood", "woodsman"].forEach((id, k) => { const w = buildWeapon(ITEM[id]); w.position.set(-0.8 + k * 0.8, 0.2, 0.2); rk.add(w); }); }
+    lbl("Training Grounds", 0, 4.4, -60.5);
+    // arena
+    const ax = 0, az = -82, ar = 9.5;
+    M(G.cyl(ar, ar, 40), std(0xd8c49a, { r: 0.98, map: "groundB", rep: 4 }), ax, 0.05, az, town, 1, 0.08, 1);
+    const segs = 28; for (let i = 0; i < segs; i++) { const a = i / segs * TAU; if (Math.abs(Math.atan2(Math.sin(a - Math.PI / 2), Math.cos(a - Math.PI / 2))) < 0.25) continue; const x = ax + Math.cos(a) * (ar + 0.4), z = az + Math.sin(a) * (ar + 0.4); const b = M(G.box(), stoneM, x, 0.55, z, town, 2.25, 1.1, 0.7); b.rotation.y = -a + Math.PI / 2; }
+    for (let i = 0; i < 6; i++) { const a = i / 6 * TAU + 0.3, x = ax + Math.cos(a) * (ar + 1.6), z = az + Math.sin(a) * (ar + 1.6); M(G.cyl(0.1, 0.12), wood, x, 2.2, z, town, 1, 4.4, 1); const fl = M(G.box(), std([0xc0402a, 0x3a5aa8][i % 2], { r: 0.9, map: "fabric" }), x, 3.5, z, town, 0.05, 1.6, 0.9); fl.rotation.y = -a; }
+    for (let i = 0; i < segs; i++) { const a = i / segs * TAU; if (Math.abs(Math.atan2(Math.sin(a - Math.PI / 2), Math.cos(a - Math.PI / 2))) < 0.6) continue; addCircle(ax + Math.cos(a) * (ar + 0.4), az + Math.sin(a) * (ar + 0.4), 1.1, 2); }
+    lbl("Duel Arena · 1v1", ax, 5.2, az - ar - 1.5, "#ffd0a0", 1.5);
+    const board = place(5.5, -71.6, 0); M(G.box(), MAT.bark(0x7a5536), 0, 1.8, 0, board, 2.4, 1.5, 0.12); for (const q of [-1, 1]) M(G.cyl(0.08, 0.1), wood, 1.1 * q, 1.2, 0, board, 1, 2.4, 1);
+    for (let k = 0; k < 4; k++) M(G.box(), std(0xf0e6cc, { r: 0.9 }), -0.75 + k * 0.5, 1.85 + (k % 2) * 0.15, 0.08, board, 0.38, 0.5, 0.01);
+    addCircle(5.5, -71.6, 0.8, 2);
+    world.interact.push({ x: 5.5, z: -70.6, r: 3, label: "Challenge a rival to a duel", act: () => openDuelBoard() });
+    lbl("Duel board", 5.5, 3.2, -71.6, "#f4ead2", 0.9);
+    world.arena = { x: ax, z: az, r: ar };
+  }
+  /* north-east: Highfield Farm */
+  {
+    const fx = 60, fz = -60;
+    for (let p = 0; p < 4; p++) { const ox = fx - 8 + (p % 2) * 13, oz = fz - 4 + Math.floor(p / 2) * 11; const crop = [0x7aa83a, 0xd8b84a, 0x5a8a2a, 0xc8a040][p];
+      M(G.box(), std(0x5a4030, { r: 1, map: "groundB" }), ox, 0.02, oz, town, 10, 0.05, 8);
+      for (let j = 0; j < 7; j++) M(G.box(), std(crop, { r: 0.9, map: "fabric" }), ox, 0.28, oz - 3.3 + j * 1.1, town, 9.4, 0.5, 0.45); addCircle(ox, oz, 4.6, 1); }
+    const barn = place(fx + 16, fz + 16, -2.4); M(G.box(), std(0x9a3a2a, { r: 0.9, map: "plaster", bump: "plasterB", bs: 1, rep: 3 }), 0, 3, 0, barn, 9, 6, 7);
+    const br = M(G.cone(4), std(0x5a4a42, { r: 0.85, map: "roof", flat: true, rep: 3 }), 0, 7.6, 0, barn, 7.4, 3.4, 5.8); br.rotation.y = Math.PI / 4;
+    M(G.box(), std(0xf0e8d8, { r: 0.8 }), 0, 2, 3.52, barn, 3.6, 4, 0.06); M(G.box(), MAT.bark(0x4a2a1a), 0, 2, 3.56, barn, 3.2, 0.25, 0.04).rotation.z = 0.85; M(G.box(), MAT.bark(0x4a2a1a), 0, 2, 3.56, barn, 3.2, 0.25, 0.04).rotation.z = -0.85;
+    addCircle(fx + 16, fz + 16, 5.4, 8);
+    const sc = place(fx + 1, fz + 1, 0.4); M(G.cyl(0.06, 0.06), wood, 0, 1.2, 0, sc, 1, 2.4, 1); M(G.cyl(0.05, 0.05), wood, 0, 1.7, 0, sc, 1, 1.6, 1).rotation.z = Math.PI / 2; M(G.box(), std(0x4a6a8a, { r: 0.9, map: "fabric" }), 0, 1.45, 0, sc, 0.7, 0.8, 0.3); M(G.sph(), std(0xd8b880, { r: 0.9, map: "fabric" }), 0, 2.15, 0, sc, 0.22); M(G.cone(10), std(0xc8a050, { r: 0.9 }), 0, 2.42, 0, sc, 0.45, 0.25, 0.45);
+    for (let k = 0; k < 6; k++) M(G.cyl(0.45, 0.45, 12), std(0xd8b85a, { r: 0.95, map: "fabric" }), fx - 16 + (k % 3) * 1.1, 0.45, fz + 2 + Math.floor(k / 3) * 1.1, town, 1, 0.9, 1).rotation.z = Math.PI / 2;
+    lbl("Highfield Farm", fx, 4.5, fz + 9);
+  }
+  /* east: Lantern Row's well */
+  { const wx = 70, wz = 9; M(G.cyl(1.1, 1.2, 14), stoneM, wx, 0.5, wz, town, 1, 1, 1); M(G.cyl(0.95, 0.95, 14), std(0x1a2a3a, { r: 0.1, m: 0.3 }), wx, 0.98, wz, town, 1, 0.04, 1);
+    for (const s of [-1, 1]) M(G.box(), wood, wx + s * 1.0, 1.6, wz, town, 0.15, 2.2, 0.15); const rf = M(G.cone(4), std(0x7a4a3a, { r: 0.8, map: "roof", flat: true }), wx, 3.0, wz, town, 1.8, 0.9, 1.4); rf.rotation.y = Math.PI / 4;
+    addCircle(wx, wz, 1.3, 2); lbl("Lantern Row", 80, 6.5, 0); }
+  /* south-east: Mirror Pond */
+  { const px = 59, pz = 59, pr = 10;
+    const pond = waterPlane(0x2f6a88, 0.07); pond.geometry = new THREE.CircleGeometry(pr, 48); pond.geometry.rotateX(-Math.PI / 2); pond.position.x = px; pond.position.z = pz; pond.material.normalMap && pond.material.normalMap.repeat.set(3, 3); group.add(pond);
+    world.animated.push(t => { if (pond.userData.water) pond.userData.water.offset.set(t * 0.02, t * 0.013); });
+    for (let k = 0; k < 22; k++) { const a = k / 22 * TAU; makeRock(town, px + Math.cos(a) * (pr + 0.3), 0.05, pz + Math.sin(a) * (pr + 0.3), 0.5 + (k % 3) * 0.25, 0x8a8680, r); }
+    const pier = place(px - 6.4, pz - 6.4, Math.PI / 4 + Math.PI); for (let k = 0; k < 8; k++) M(G.box(), MAT.bark(0x7a5a3a), 0, 0.25, -k * 0.62, pier, 1.8, 0.1, 0.55); for (const s of [-1, 1]) for (let k = 0; k < 3; k++) M(G.cyl(0.08, 0.08), wood, 0.85 * s, 0, -k * 2, pier, 1, 0.9, 1);
+    const boat = place(px + 2, pz + 1.5, 0.6); M(G.box(), MAT.bark(0x6a4a2a), 0, 0.2, 0, boat, 1.3, 0.35, 3.2); M(G.box(), MAT.bark(0x5a3a22), 0, 0.42, 0, boat, 1.1, 0.06, 0.4);
+    world.animated.push(t => { boat.position.y = Math.sin(t * 1.4) * 0.04; boat.rotation.z = Math.sin(t * 1.1) * 0.03; }); boat.userData.dyn = true;
+    for (let k = 0; k < 18; k++) { const a = r() * TAU, d = pr + 1 + r() * 2; M(G.cyl(0.03, 0.04), std(0x6a8a3a, { r: 0.8 }), px + Math.cos(a) * d, 0.6, pz + Math.sin(a) * d, town, 1, 1.2, 1); }
+    addCircle(px, pz, pr, 1); lbl("Mirror Pond", px, 3.5, pz - pr - 1); }
+  /* south: Market Square */
+  { const mx = 0, mz = 75;
+    M(G.cyl(11, 11, 40), std(0xb8ac94, { r: 0.9, map: "tiles", rep: 5 }), mx, 0.04, mz, town, 1, 0.06, 1);
+    const cols = [0xc0402a, 0x3a6aa8, 0xd8a83a, 0x4a8a4a, 0x8a4aa8, 0xd8703a];
+    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + Math.PI / 6, x = mx + Math.cos(a) * 7.5, z = mz + Math.sin(a) * 7.5; if (Math.abs(x) < 4.5 && z < mz) continue;
+      const st = place(x, z, Math.atan2(mx - x, mz - z));
+      M(G.box(), MAT.bark(0x7a5536), 0, 0.55, 0, st, 2.6, 1.1, 1.1); const cv = M(G.box(), std(cols[k], { r: 0.85, map: "fabric" }), 0, 2.5, -0.1, st, 3, 0.08, 1.8); cv.rotation.x = 0.22;
+      for (const s of [-1, 1]) M(G.cyl(0.05, 0.05), wood, 1.3 * s, 1.25, 0.5, st, 1, 2.5, 1);
+      for (let j = 0; j < 4; j++) M(G.sph(), std([0xe85a3a, 0xf2c744, 0x8ad84a, 0xb37cf4][(j + k) % 4], { r: 0.6 }), -0.9 + j * 0.6, 1.2, 0.1, st, 0.17);
+      addCircle(x, z, 1.5, 2); }
+    for (let k = 0; k < 7; k++) { const x = mx - 9 + r() * 18, z = mz + 3 + r() * 6; if (blocked(x, z, 0.6) || onPath(x, z, 0.5)) continue; M(G.box(), MAT.bark(0x8a6a42), x, 0.4, z, town, 0.8, 0.8, 0.8).rotation.y = r(); addCircle(x, z, 0.5, 1); }
+    lbl("Market Square", mx, 4.6, mz + 11.5); }
+  /* south-west: the Adventurers' Guild */
+  { const gx = -57, gz = 57, g = place(gx, gz, Math.atan2(-gx, -gz));
+    M(G.box(), std(0xcabca4, { r: 0.92, map: "plaster", bump: "plasterB", bs: 1.2, rep: 3 }), 0, 4.5, 0, g, 14, 9, 9); M(G.box(), darkStone, 0, 0.5, 0, g, 14.4, 1, 9.4);
+    for (const xx of [-6.8, -2.3, 2.3, 6.8]) M(G.box(), MAT.bark(0x4a3222), xx, 4.5, 4.52, g, 0.35, 9, 0.12);
+    M(G.box(), MAT.bark(0x4a3222), 0, 4.6, 4.53, g, 14, 0.3, 0.12);
+    const rf = M(G.cone(4), std(0x3a4a6a, { r: 0.8, map: "roof", bump: "roof", bs: 1.5, rep: 4, flat: true }), 0, 11.2, 0, g, 11.5, 4.4, 7.8); rf.rotation.y = Math.PI / 4;
+    M(G.box(), std(0x3a2618, { r: 0.7 }), 0, 1.6, 4.55, g, 2.4, 3.2, 0.12);
+    for (const s of [-1, 1]) for (const yy of [2.2, 6.4]) M(G.box(), WIN_MAT(), 4.6 * s, yy, 4.56, g, 1.4, 1.3, 0.05);
+    for (const s of [-1, 1]) { M(G.cyl(0.08, 0.08), wood, 1.8 * s, 6.4, 4.9, g, 1, 0.1, 1); M(G.box(), std(s < 0 ? 0x2a4a8a : 0xa83a2a, { r: 0.9, map: "fabric" }), 1.8 * s, 5.6, 4.75, g, 1.1, 2.2, 0.05); }
+    addCircle(gx, gz, 7.6, 12); lbl("Adventurers' Guild", gx, 14.8, gz, "#ffe2a0", 1.4); }
+  /* west: Chapel of Dawn */
+  { const cx0 = -84, cz0 = 0, g = place(cx0, cz0, Math.PI / 2);
+    M(G.box(), stoneM, 0, 4, 0, g, 9, 8, 16); M(G.box(), darkStone, 0, 0.4, 0, g, 9.4, 0.8, 16.4);
+    const rf = M(G.box(), std(0x4a4a5a, { r: 0.8, map: "roof", bump: "roof", bs: 1.4, rep: [4, 6] }), 2.4, 9.4, 0, g, 6.4, 0.3, 16.6); rf.rotation.z = -0.62;
+    const rf2 = M(G.box(), std(0x4a4a5a, { r: 0.8, map: "roof", bump: "roof", bs: 1.4, rep: [4, 6] }), -2.4, 9.4, 0, g, 6.4, 0.3, 16.6); rf2.rotation.z = 0.62;
+    M(G.box(), stoneM, 0, 8, -6.5, g, 4, 16, 4); const sp = M(G.cone(4), std(0x3a3a4a, { r: 0.7, flat: true }), 0, 18.5, -6.5, g, 3.2, 5, 3.2); sp.rotation.y = Math.PI / 4;
+    M(G.sph(), MAT.metal(0xd8b860, 0.3), 0, 21.3, -6.5, g, 0.3);
+    M(G.box(), std(0x3a2618, { r: 0.7 }), 0, 1.6, 8.05, g, 2.2, 3.2, 0.1);
+    const glass = [0xff5a5a, 0x5aa0ff, 0xffd05a, 0x9a5aff]; for (let k = 0; k < 4; k++) for (const s of [-1, 1]) M(G.box(), std(glass[k], { e: glass[k], ei: 0.9, r: 0.2 }), 4.53 * s, 4.4, -4.5 + k * 3.2, g, 0.05, 2.6, 1.1);
+    M(G.cyl(1.4, 1.4, 24), std(0xffd890, { e: 0xffb050, ei: 1.2 }), 0, 6.2, 8.03, g, 1, 0.05, 1).rotation.x = Math.PI / 2;
+    for (let k = 0; k < 9; k++) { const x = cx0 + 8 + (k % 3) * 2.2, z = cz0 + 11 + Math.floor(k / 3) * 2.4; M(G.box(), std(0x8a8890, { r: 0.8, map: "rock" }), x, 0.5, z, town, 0.7, 1, 0.18); addCircle(x, z, 0.4, 1); }
+    addCircle(cx0, cz0, 8.4, 16); addCircle(cx0, cz0 - 6.5, 2.6, 16); lbl("Chapel of Dawn", cx0, 24, cz0); }
+  /* north-west: Barracks */
+  { const bx = -55, bz = -55;
+    const tw = place(bx - 6, bz - 6, 0.8); for (const [x, z] of [[-1.3, -1.3], [1.3, -1.3], [-1.3, 1.3], [1.3, 1.3]]) M(G.box(), wood, x, 5, z, tw, 0.3, 10, 0.3);
+    M(G.box(), MAT.bark(0x7a5536), 0, 10, 0, tw, 3.6, 0.3, 3.6); for (const s of [-1, 1]) { M(G.box(), wood, 1.7 * s, 10.6, 0, tw, 0.12, 1, 3.6); M(G.box(), wood, 0, 10.6, 1.7 * s, tw, 3.6, 1, 0.12); }
+    const tr = M(G.cone(4), std(0x6a3a2a, { r: 0.8, map: "roof", flat: true }), 0, 12.6, 0, tw, 3.4, 2.2, 3.4); tr.rotation.y = Math.PI / 4;
+    for (const [x, z] of [[-1.3, -1.3], [1.3, -1.3], [-1.3, 1.3], [1.3, 1.3]]) M(G.box(), wood, x, 11.2, z, tw, 0.18, 1.6, 0.18);
+    addCircle(bx - 6, bz - 6, 2.4, 12);
+    for (let k = 0; k < 3; k++) { const x = bx + 4 + k * 4.6, z = bz - 5 - k * 1.5; const tent = M(G.cone(4), std([0xd8ccb0, 0xb8a888, 0xc8b898][k], { r: 0.95, map: "fabric", flat: true }), x, 1.5, z, town, 2.4, 3, 2.4); tent.rotation.y = Math.PI / 4 + 0.3; addCircle(x, z, 1.8, 3); }
+    const rk = place(bx - 4, bz + 8, 0.8); M(G.box(), wood, 0, 1.6, 0, rk, 3, 0.15, 0.3); for (const q of [-1, 1]) M(G.box(), wood, 1.45 * q, 0.85, 0, rk, 0.15, 1.7, 0.3); ["copperhorn", "militia", "ironoath"].forEach((id, k) => { const w = buildWeapon(ITEM[id]); w.position.set(-0.8 + k * 0.8, 0.2, 0.2); rk.add(w); }); addCircle(bx - 4, bz + 8, 1.6, 2);
+    const flag = place(bx - 8, bz + 2, 0); M(G.cyl(0.08, 0.1), wood, 0, 4, 0, flag, 1, 8, 1); M(G.box(), std(0x2a4a8a, { r: 0.9, map: "fabric" }), 0.9, 7, 0, flag, 1.8, 1.2, 0.05); addCircle(bx - 8, bz + 2, 0.3, 4);
+    lbl("Barracks", bx, 15, bz - 6); }
+  // houses along every road
+  const homeRing = { E: [36, 47, 64, 75, 86], SE: [36, 47], S: [36, 47], SW: [36, 47], W: [36, 47], NW: [36, 47], N: [36, 47], NE: [36, 47] };
+  for (const c of COMPASS) {
+    const cx = Math.cos(c.a), cz = Math.sin(c.a);
+    for (const t of homeRing[c.k]) for (const s of [-1, 1]) {
+      const off = c.w / 2 + 1.6 + 3, x = cx * t - cz * s * off, z = cz * t + cx * s * off;
+      if (blocked(x, z, 3.2) || onPath(x, z, 3)) continue;
+      const rr = makeHouse(town, x, z, Math.atan2(s * cz, -s * cx), r);
+      addCircle(x, z, rr, 8);
+    }
+  }
+  shadows(town, true, true);
+  mergeStatic(town);
+}
+
+/* ---- duels against rival duellists ---- */
+const RIVALS = [
+  { id: "tamsin", name: "Tamsin Reed", rank: "Bronze", rarity: "common", look: { skin: 0xf0d0b0, hair: 0xd8a040, cloth: 0x4a7a3a, cloth2: 0x3a3022 }, weapon: "galewhisper", armour: "leather", ttk: 9, hit: 0.07, spd: 4.2, cd: 1.6, guard: 0.15, special: false, reward: { coins: 250, xp: 60 } },
+  { id: "corvin", name: "Corvin Ash", rank: "Silver", rarity: "rare", look: { skin: 0xc99a74, hair: 0x1a1a1a, cloth: 0x5a5a6a, cloth2: 0x2a2a30 }, weapon: "thornbark", armour: "saltscale", ttk: 13, hit: 0.09, spd: 4.5, cd: 1.35, guard: 0.25, special: true, reward: { coins: 600, xp: 140 } },
+  { id: "sable", name: "Sable Venn", rank: "Gold", rarity: "epic", look: { skin: 0x8a5a3a, hair: 0xe8e0ff, cloth: 0x3a2a6a, cloth2: 0x1e1a40 }, weapon: "frostbite", armour: "duskweave", ttk: 17, hit: 0.11, spd: 5, cd: 1.15, guard: 0.35, special: true, reward: { coins: 1500, xp: 320, items: { emberstone: 1 } } },
+  { id: "valka", name: "Valka Stormborn", rank: "Legendary", rarity: "legendary", look: { skin: 0xf0d8c0, hair: 0xb8401a, cloth: 0x2a4a7a, cloth2: 0x1a2a3a }, weapon: "tempestreaver", armour: "tidecrown", ttk: 23, hit: 0.13, spd: 5.2, cd: 1.0, guard: 0.45, special: true, reward: { coins: 4000, xp: 800, items: { aethercrystal: 1 } } },
+  { id: "nameless", name: "The Nameless Duellist", rank: "Vaulted", rarity: "vaulted", look: { skin: 0x9a9aa8, hair: 0x101014, cloth: 0x1a1a22, cloth2: 0x0a0a10 }, weapon: "nyxfall", armour: "wraithveil", ttk: 32, hit: 0.15, spd: 5.6, cd: 0.9, guard: 0.55, special: true, reward: { coins: 12000, xp: 2000, items: { chronoshard: 1 } } }
+].filter(r => ITEM[r.weapon] && ITEM[r.armour]);
+let duel = null;
+function openDuelBoard() {
+  if (run || !world || world.kind !== "lobby") return;
+  dlgNpc = null; keys.clear(); attackHeld = false;
+  $("dlgName").textContent = "Duel Arena"; $("dlgRole").textContent = "1v1 against rival duellists";
+  $("dlgText").textContent = "Pick a rival. Each one fights like a player: they dash, block your swings and wind up big hits you can parry. Win to climb the ranks.";
+  $("dlgQuest").innerHTML = `<div class="duels">${RIVALS.map((r, i) => `<div class="duel" style="--c:${rc(r.rarity)}"><span><b>${esc(r.name)}</b><small>${r.rank} rank · ${esc(ITEM[r.weapon].name)}</small><small class="num">Wins: ${(S.duelWins || {})[r.id] || 0}</small></span>
+    <span class="qrew">${fmt(r.reward.coins)} coins${r.reward.items ? " + " + Object.keys(r.reward.items).map(id => esc(ITEM[id].name)).join(", ") : ""}</span><button class="btn primary" data-duel="${i}">Challenge</button></div>`).join("")}</div>`;
+  $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Not now</button>`;
+  $("dialog").hidden = false;
+}
+$("dialog").addEventListener("click", e => { const b = e.target.closest("[data-duel]"); if (b) { $("dialog").hidden = true; startDuel(+b.dataset.duel); } });
+function startDuel(i) {
+  const def = RIVALS[i]; if (!def || duel || run || !world.arena) return;
+  const A = world.arena;
+  P.pos.set(A.x, 0, A.z + 5); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.hp = ST.maxHp; P.dead = false; P.buffs = {}; P.dashQ = []; P.kb.set(0, 0, 0);
+  const R = buildHumanoid({ look: def.look, armour: def.armour, weapon: def.weapon }); scene.add(R.g); shadows(R.g, true, false);
+  const tell = glowSprite(0xff3a4a, 1.6, 0.9); tell.visible = false; R.g.add(tell); tell.position.y = 2.2;
+  const w = ITEM[def.weapon];
+  const e = { R, name: def.name, role: "duelist", duelist: true, def, boss: false, base: { xp: 0, coins: 0, range: 2.2, cd: def.cd }, pos: new V3(A.x, 0, A.z - 5), kb: new V3(),
+    hp: Math.max(ST.maxHp, ST.dps * def.ttk), dmg: ST.maxHp * def.hit / Math.max(0.15, 1 - ST.dr), spd: def.spd, atkT: 0, dead: false, flash: 0, accent: w.accent, scale: 1, radius: 0.5, t: 0, atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0,
+    face: 0, swing: 0, nextAtk: worldT + 3.6, dashAt: worldT + 5, specAt: worldT + 9, guard: 0, guardCd: 0, windup: null, tell, style: w.weight };
+  e.maxHp = e.hp;
+  e.label = textSprite(`${def.name} · ${def.rank}`, rc(def.rarity), 0.95); scene.add(e.label);
+  const bar = new THREE.Group(); M(G.box(), new THREE.MeshBasicMaterial({ color: 0x1a0a10 }), 0, 0, 0, bar, 1.1, 0.09, 0.01); e.fg = M(G.box(), new THREE.MeshBasicMaterial({ color: 0xe0505f }), 0, 0, 0.01, bar, 1.1, 0.09, 0.01); scene.add(bar); e.bar = bar;
+  enemies.push(e);
+  duel = { def, e, phase: "count", until: worldT + 3 };
+  banner(`Duel: ${def.name}`, `${def.rank} rank. Fight in 3`);
+  later(1, () => duel && banner(`Duel: ${def.name}`, "2")); later(2, () => duel && banner(`Duel: ${def.name}`, "1"));
+  later(3, () => { if (duel && duel.e === e) { duel.phase = "fight"; banner("Fight!", "Block with F or right-click. Tap it just before a hit to parry."); } });
+  MUSIC.setMode("boss", RIVALS.indexOf(def) + 2, `Duel: ${def.name}`);
+}
+function duelistUpdate(e, dt) {
+  const d = duel; if (!d || d.e !== e) return;
+  const A = world.arena;
+  e.t += dt; e.flash = Math.max(0, e.flash - dt); e.swing = Math.max(0, e.swing - dt * 2.6);
+  e.pos.addScaledVector(e.kb, dt); e.kb.multiplyScalar(Math.exp(-6 * dt));
+  const stunned = e.stunUntil > worldT || e.frozen > worldT;
+  const toP = P.pos.clone().sub(e.pos).setY(0), dist = toP.length(); if (dist > 1e-3) toP.multiplyScalar(1 / dist);
+  let walk = 0;
+  if (stunned) { e.windup = null; e.tell.visible = false; }
+  if (d.phase === "fight" && !stunned && !P.dead) {
+    let want = Math.atan2(toP.x, toP.z), df = want - e.face; df = Math.atan2(Math.sin(df), Math.cos(df)); e.face += df * Math.min(1, dt * 10);
+    if (P.swing > 0.55 && dist < 4 && !e.windup && worldT > e.guardCd) { if (Math.random() < e.def.guard) e.guard = worldT + 0.7; e.guardCd = worldT + 1.1; }
+    const slowK = e.slow > worldT ? 0.4 : 1;
+    if (worldT > e.dashAt && !e.windup) { e.dashAt = worldT + rand(2.6, 4.6); const side = Math.random() < 0.5 ? -1 : 1; e.dashV = dist > 5 ? toP.clone().multiplyScalar(15) : new V3(-toP.z * side, 0, toP.x * side).multiplyScalar(13); e.dashUntil = worldT + 0.24; ghostFx(e.R); }
+    if (e.dashUntil > worldT) { e.pos.addScaledVector(e.dashV, dt * slowK); walk = 1; }
+    else if (e.windup) {
+      if (worldT >= e.windup.at) { e.windup = null; e.tell.visible = false; e.swing = 1; if (P.pos.distanceTo(e.pos) < 2.9) hurtHero(heroTargets()[0], e.dmg * (e.def.rank === "Bronze" ? 1 : rand(0.9, 1.15)), e.pos, e); }
+    } else if (dist > 2.0) { e.pos.addScaledVector(toP, e.spd * slowK * (e.guard > worldT ? 0.45 : 1) * dt); walk = 1; }
+    else if (worldT > e.nextAtk) { e.windup = { at: worldT + 0.45 }; e.nextAtk = worldT + e.def.cd * rand(0.85, 1.2); e.tell.visible = true; }
+    if (e.def.special && worldT > e.specAt && !e.windup) {
+      e.specAt = worldT + rand(8, 11); const at = P.pos.clone(); at.y = 0; ringTelegraph(at, 3.2, 0xff4a5a, 1.1);
+      later(1.1, () => { if (!duel || duel.e !== e) return; ringFx(at, 3.4, e.accent, 0.5); burstFx(at.clone().add(new V3(0, 0.6, 0)), 3, e.accent); if (Math.hypot(P.pos.x - at.x, P.pos.z - at.z) < 3.2) hurtHero(heroTargets()[0], e.dmg * 1.8, at, e); });
+    }
+  }
+  // keep both fighters in the ring
+  const ex = e.pos.x - A.x, ez = e.pos.z - A.z, er = Math.hypot(ex, ez); if (er > A.r - 0.8) { e.pos.x = A.x + ex / er * (A.r - 0.8); e.pos.z = A.z + ez / er * (A.r - 0.8); }
+  if (d.phase === "fight" && Math.hypot(P.pos.x - A.x, P.pos.z - A.z) > A.r + 2.5) { duelEnd(false, "You left the arena, so the duel is forfeit."); return; }
+  e.pos.y = 0; e.R.g.position.copy(e.pos); e.R.g.rotation.y = e.face;
+  poseHumanoid(e.R, e.t, walk, e.swing, e.style, false);
+  if (e.windup) { e.R.shR.rotation.x = -2.7; e.R.elR.rotation.x = -0.5; }
+  else if (e.guard > worldT) { e.R.shR.rotation.x = -1.35; e.R.shR.rotation.z = 0.7; e.R.elR.rotation.x = -1.3; }
+  if (stunned) e.R.g.rotation.z = Math.sin(e.t * 18) * 0.06; else e.R.g.rotation.z = 0;
+}
+function duelEnd(won, why) {
+  const d = duel; if (!d) return; duel = null;
+  const e = d.e; e.dead = true; scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar);
+  enemies = enemies.filter(x => x !== e);
+  P.dead = false; P.hp = ST.maxHp;
+  if (won) {
+    const rw = d.def.reward; S.coins += rw.coins; addXp(rw.xp); for (const [id, n] of Object.entries(rw.items || {})) gain(ITEM[id], null, n);
+    S.duelWins = S.duelWins || {}; S.duelWins[d.def.id] = (S.duelWins[d.def.id] || 0) + 1; bumpStat("duels");
+    banner("Victory!", `You defeated ${d.def.name} and earned ${fmt(rw.coins)} coins.`); ringFx(P.pos, 4, 0xffd166, 0.8); pillarFx(P.pos, 0xffd166, 10, 0.8);
+  } else banner("Defeated", why || `${d.def.name} wins this time. Train on the dummies and try again.`);
+  MUSIC.setMode("lobby", 0, "Harbour of Portals"); save();
+}
+
+/* ---- blocking and parrying ---- */
+const PARRY_WINDOW = 0.3;
+let blockHeld = false;
+function parryHit(src) {
+  floatText(P.pos, "Parry!", "#ffd166", true); ringFx(P.pos, 1.8, 0xffd166, 0.35); burstFx(P.pos.clone().add(new V3(0, 1.2, 0)), 1.2, 0xffd166, 0.25);
+  if (src && !src.dead && !src.dummy) { src.stunUntil = worldT + 1; src.atkT = Math.max(src.atkT || 0, 1); src.windup = null; src.charging = null; if (src.tell) src.tell.visible = false; floatText(src.pos, "Stunned", "#ffd166"); }
+  bumpStat("parries"); P.invuln = 0.15; P.parryFlash = 0.3; P.blockStart = -99;
+}
+function tellFx(e, dur) {
+  const s = glowSprite(0xff3040, 1.1 * Math.max(1, e.scale * 0.6), 0.85); scene.add(s);
+  addFx(s, dur, (o, k) => { o.position.copy(e.pos).add(new V3(0, 1.8 * e.scale, 0)); o.scale.setScalar((0.6 + k * 0.7) * Math.max(1, e.scale * 0.6)); });
+}
+const guardFx = glowSprite(0x9ad8ff, 1.6, 0.55); guardFx.material = guardFx.material.clone(); guardFx.visible = false; scene.add(guardFx); guardFx.userData.keep = true;
+
+/* ---- day and night ---- */
+const DAY = { cycle: 480, offset: 0.12, base: null, day: 1, hours: 8, exp0: renderer.toneMappingExposure, night: { top: new THREE.Color(0x060b1c), horizon: new THREE.Color(0x1c2a48), bottom: new THREE.Color(0x0a0c14), fog: lin(0x121a2e) }, moon: lin(0x8aa8ff), dusk: new THREE.Color(0xff8a4a), lastLbl: "" };
+function dayCapture(sunCol, sunInt, hemiInt) {
+  DAY.base = { top: skyUniforms.top.value.clone(), horizon: skyUniforms.horizon.value.clone(), bottom: skyUniforms.bottom.value.clone(), fog: scene.fog.color.clone(), sunCol: sun.color.clone(), sunRaw: skyUniforms.sunCol.value.clone(), sunInt, hemiInt };
+}
+const stars = (() => {
+  const n = 1400, arr = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) { const u = Math.random() * TAU, v = Math.random() * 0.95 + 0.05, r = 520; const c = Math.sqrt(1 - v * v); arr[i * 3] = Math.cos(u) * c * r; arr[i * 3 + 1] = v * r; arr[i * 3 + 2] = Math.sin(u) * c * r; }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(arr, 3));
+  const m = new THREE.PointsMaterial({ color: 0xffffff, size: 2, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false, fog: false });
+  const p = new THREE.Points(g, m); p.userData.keep = true; p.renderOrder = -1; scene.add(p); return p;
+})();
+function dayTick() {
+  if (!DAY.base || !scene.fog) return;
+  const p = ((performance.now() / 1000) / DAY.cycle + DAY.offset) % 1;
+  const elev = Math.sin(p * TAU), day = smooth(-0.12, 0.3, elev), B = DAY.base, N = DAY.night;
+  DAY.day = day; DAY.hours = (6 + p * 24) % 24;
+  const dusk = Math.max(0, 1 - Math.abs(elev) / 0.28) * 0.5;
+  skyUniforms.top.value.copy(N.top).lerp(B.top, day);
+  skyUniforms.horizon.value.copy(N.horizon).lerp(B.horizon, day).lerp(DAY.dusk, dusk);
+  skyUniforms.bottom.value.copy(N.bottom).lerp(B.bottom, day);
+  scene.fog.color.copy(N.fog).lerp(B.fog, day);
+  const az = p * TAU, dir = new V3(Math.cos(az) * 0.8, Math.max(0.05, elev), 0.35).normalize();
+  skyUniforms.sunDir.value.copy(dir); skyUniforms.sunCol.value.copy(B.sunRaw).multiplyScalar(day);
+  const light = elev >= 0 ? dir : new V3(-Math.cos(az) * 0.8, Math.max(0.4, -elev), -0.35).normalize();
+  SUN_OFF.copy(light).multiplyScalar(70); SUN_OFF.y = Math.max(SUN_OFF.y, 26);
+  sun.intensity = B.sunInt * day + 0.38 * (1 - day); sun.color.copy(DAY.moon).lerp(B.sunCol, day);
+  hemi.intensity = B.hemiInt * (0.45 + 0.55 * day);
+  renderer.toneMappingExposure = DAY.exp0 * (0.66 + 0.34 * day);
+  stars.position.copy(camera.position); stars.material.opacity = Math.max(0, 1 - day * 1.4) * 0.9; stars.visible = stars.material.opacity > 0.01;
+  WIN_MAT().emissiveIntensity = 1.0 + 2.4 * (1 - day);
+  if (world && world.nightLights) for (const nl of world.nightLights) nl.l.intensity = nl.b * (0.35 + 1.9 * (1 - day));
+  const hh = Math.floor(DAY.hours), mm = Math.floor((DAY.hours - hh) * 60 / 10) * 10;
+  const lbl = `${hh >= 5 && hh < 8 ? "Dawn" : hh >= 8 && hh < 17 ? "Day" : hh >= 17 && hh < 20 ? "Dusk" : "Night"} ${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+  if (lbl !== DAY.lastLbl) { DAY.lastLbl = lbl; $("hClock").textContent = lbl; }
+  const fx = -Math.sin(cam.yaw), fz = -Math.cos(cam.yaw), hd = (Math.atan2(fx, -fz) * 180 / Math.PI + 360) % 360;
+  const face = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Math.round(hd / 45) % 8];
+  if (face !== DAY.lastFace) { DAY.lastFace = face; $("hFace").textContent = `Facing ${face}`; }
+  // guard glow and the dummy damage meter
+  guardFx.visible = P.blocking && !P.dead;
+  if (guardFx.visible) { const f = new V3(Math.sin(P.face), 0, Math.cos(P.face)); guardFx.position.copy(P.pos).addScaledVector(f, 0.6).add(new V3(0, 1.2, 0)); const parry = worldT - P.blockStart <= PARRY_WINDOW; guardFx.material.color.copy(lin(parry ? 0xffd166 : 0x9ad8ff)); guardFx.material.opacity = parry ? 0.9 : 0.5; }
+  const dm = $("dpsMeter");
+  if (dpsInfo && worldT - dpsInfo.at < 3.5 && world && world.kind === "lobby") { dm.hidden = false; dm.innerHTML = `Training dummy · <b>${fmt(dpsInfo.dps)}</b> damage per second · last hit ${fmt(dpsInfo.hit)}`; } else if (!dm.hidden) dm.hidden = true;
+}
+
+/* ---- new recipes, quests and townsfolk ---- */
+[
+  { g: "Refining", out: "bronze", mats: { copper: 2, tin: 1 }, coins: 40 },
+  { g: "Refining", out: "emberstone", mats: { obsidian: 3, gold: 1 }, coins: 300 },
+  { g: "Refining", out: "aethercrystal", mats: { emberstone: 2, moonsilver: 2, amber: 1 }, coins: 900 },
+  { g: "Refining", out: "sunforged", mats: { gold: 4, starsteel: 1, emberstone: 1 }, coins: 1200 },
+  { g: "Weapons", out: "tinspear", mats: { tin: 4, oakplank: 2 }, coins: 40 },
+  { g: "Weapons", out: "ambersting", mats: { amber: 3, steel: 2, bronze: 2 }, coins: 260 },
+  { g: "Weapons", out: "obsidianmaul", mats: { obsidian: 4, steel: 3, oakplank: 2 }, coins: 300 },
+  { g: "Weapons", out: "wyvernfang", mats: { wyvernscale: 3, steel: 4, ironwoodlog: 2 }, coins: 1300 },
+  { g: "Weapons", out: "aetherbrand", mats: { aethercrystal: 2, starsteel: 2, moonsilver: 2 }, coins: 5000 },
+  { g: "Weapons", out: "vaultkeeper", mats: { vaultheart: 1, starsteel: 4, skygirder: 3, sunforged: 2 }, coins: 30000 },
+  { g: "Armour", out: "stitchedhide", mats: { hide: 4, hemp: 2 }, coins: 30 },
+  { g: "Armour", out: "bronzescale", mats: { bronze: 5, hemp: 2 }, coins: 280 },
+  { g: "Armour", out: "wyvernmail", mats: { wyvernscale: 4, tidesilk: 2, steel: 3 }, coins: 1400 },
+  { g: "Armour", out: "plumeguard", mats: { phoenixplume: 2, tidesilk: 3, gold: 3 }, coins: 5200 },
+  { g: "Armour", out: "chronomantle", mats: { chronoshard: 1, tidesilk: 4, aethercrystal: 2, phoenixplume: 2 }, coins: 30000 }
+].filter(r => ITEM[r.out] && Object.keys(r.mats).every(m => ITEM[m])).forEach(r => RECIPES.push(r));
+RECIPES.sort((a, b) => ["Refining", "Potions", "Weapons", "Armour", "Relics"].indexOf(a.g) - ["Refining", "Potions", "Weapons", "Armour", "Relics"].indexOf(b.g) || RANK[ITEM[a.out].rarity] - RANK[ITEM[b.out].rarity]);
+const islandsUnlocked = () => ISLANDS.filter((_, i) => islandUnlocked(i)).length;
+const islandsConquered = () => S.prog.filter(p => p.normal && p.hard).length;
+QUEST_NPCS.push(
+  { id: "kael", name: "Sergeant Kael", role: "Drill Instructor", pos: [-5.5, -55], face: Math.PI / 2, duel: true,
+    look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0x6a2a2a, cloth2: 0x2a1a1a }, armour: "bronzeguard", weapon: "ironoath",
+    hello: "Feet apart, blade up! The dummies never hit back, but the duellists in the arena will. Learn to parry before you need to.",
+    bye: "You are the finest blade this yard has trained. The arena is yours.",
+    quests: [
+      { id: "k1", title: "Dummy Drills", ask: "Deal 5,000 damage to the training dummies. Watch the meter and find your best rhythm.", stat: "dummy", n: 5000, reward: { coins: 400, items: { steel: 2, bronze: 2 } } },
+      { id: "k2", title: "Steel Wall", ask: "Parry 10 attacks. Raise your guard just before a blow lands and the attacker is stunned for a second.", stat: "parries", n: 10, reward: { coins: 700, chest: 1 } },
+      { id: "k3", title: "Arena Champion", ask: "Win 5 duels in the arena. Any rival counts.", stat: "duels", n: 5, reward: { coins: 3000, items: { aethercrystal: 2 } } }
+    ] },
+  { id: "lysa", name: "Lysa", role: "Travelling Trader", pos: [4.5, 58], face: -Math.PI / 2,
+    look: { skin: 0xf0d0b0, hair: 0x5a2a12, cloth: 0xa83a5a, cloth2: 0x3a1a2a }, armour: "ambershroud", weapon: "emberfang",
+    hello: "Coin moves, the world moves. Sell me what you do not need and bring me rare goods from the islands.",
+    bye: "My stalls have never been so full. You have a merchant's nose, friend.",
+    quests: [
+      { id: "l1", title: "Clear the Shelves", ask: "Sell 10 items to any merchant.", stat: "sold", n: 10, reward: { coins: 300, items: { hemp: 3 } } },
+      { id: "l2", title: "Rare Goods", ask: "Bring me 3 Amber Chunks and 2 Salt Pearls.", deliver: { amber: 3, saltpearl: 2 }, n: 1, reward: { coins: 600, items: { greater: 2 } } },
+      { id: "l3", title: "Merchant Prince", ask: "Sell 60 items in total. The market will never forget you.", stat: "sold", n: 60, reward: { coins: 5000, chest: 2 } }
+    ] },
+  { id: "mae", name: "Granny Mae", role: "Lantern Row Elder", pos: [58, -4.5], face: 0,
+    look: { skin: 0xe8c0a0, hair: 0xe0e0e0, cloth: 0x6a5a8a, cloth2: 0x3a3a4a }, armour: "padded", weapon: "apprentice",
+    hello: "The row needs mending after every storm, dear. These old hands could use some young ones.",
+    bye: "Every lantern on the row is lit because of you. Come by for tea whenever you like.",
+    quests: [
+      { id: "g1", title: "Mend the Roofs", ask: "Bring me 6 Oak Planks and 4 Clay Bricks.", deliver: { oakplank: 6, claybrick: 4 }, n: 1, reward: { coins: 250, items: { minor: 3 } } },
+      { id: "g2", title: "A Warm Winter", ask: "Bring me 4 Rough Hides and 4 Hemp Ropes for blankets.", deliver: { hide: 4, hemp: 4 }, n: 1, reward: { coins: 400, items: { draught: 2 } } },
+      { id: "g3", title: "Glass for the Lanterns", ask: "Bring me 5 Glass Panes so the lanterns burn bright again.", deliver: { glasspane: 5 }, n: 1, reward: { coins: 1200, chest: 1 } }
+    ] },
+  { id: "aurel", name: "Sister Aurel", role: "Keeper of the Chapel", pos: [-58, 4.5], face: Math.PI,
+    look: { skin: 0xf0d8c0, hair: 0xd8b860, cloth: 0xe8e0d0, cloth2: 0xb8a878 }, armour: "vesperwing", weapon: "duskwillow",
+    hello: "The chapel bell rings for each soul who walks the portals. Prove your focus, and the dawn will bless you.",
+    bye: "Go with the dawn. The chapel doors are always open to you.",
+    quests: [
+      { id: "a1", title: "Trial of Focus", ask: "Use your weapon special 15 times.", stat: "specials", n: 15, reward: { coins: 500, items: { saltpearl: 2 } } },
+      { id: "a2", title: "Trial of Hardship", ask: "Clear 2 Hard stages on any islands.", stat: "hardClears", n: 2, reward: { coins: 900, chest: 1 } },
+      { id: "a3", title: "Trial of the Night", ask: "Clear a Nightmare stage.", stat: "nightmareClears", n: 1, reward: { coins: 3000, items: { phoenixplume: 1 } } }
+    ] },
+  { id: "odo", name: "Farmer Odo", role: "Highfield Farm", pos: [43.8, -38.2], face: -2.356,
+    look: { skin: 0xd0a080, hair: 0x8a6a3a, cloth: 0x7a6a3a, cloth2: 0x4a3a22 }, armour: "stitchedhide", weapon: "fieldscythe",
+    hello: "Boars in the barley, sprites in the scarecrow. Anything you can do helps, neighbour.",
+    bye: "Best harvest in years. Take some bread on your way out.",
+    quests: [
+      { id: "o1", title: "Pest Control", ask: "Defeat 40 foes on any island.", stat: "kills", n: 40, reward: { coins: 300, items: { hemp: 4, hide: 2 } } },
+      { id: "o2", title: "New Fence Posts", ask: "Bring me 8 Oak Planks and 4 Iron Ore.", deliver: { oakplank: 8, ironore: 4 }, n: 1, reward: { coins: 500, chest: 0 } },
+      { id: "o3", title: "Harvest Festival", ask: "Bring me 2 Emberstones to light the festival bonfire.", deliver: { emberstone: 2 }, n: 1, reward: { coins: 2000, items: { tidesilk: 2 } } }
+    ] },
+  { id: "holt", name: "Warden Holt", role: "Captain of the Barracks", pos: [-38.2, -43.8], face: -0.785,
+    look: { skin: 0xb07a52, hair: 0x3a2a1a, cloth: 0x2a4a8a, cloth2: 0x1a2a4a }, armour: "chainshirt", weapon: "copperhorn",
+    hello: "The barracks keep watch over every road. If you can hold a line, I have work for you.",
+    bye: "If you ever want a commission, the barracks will have you.",
+    quests: [
+      { id: "h1", title: "Watch Duty", ask: "Defeat 5 bosses.", stat: "bosses", n: 5, reward: { coins: 800, items: { obsidian: 2 } } },
+      { id: "h2", title: "Iron Discipline", ask: "Parry 30 attacks, in the arena or on the islands.", stat: "parries", n: 30, reward: { items: { wyvernscale: 3 }, coins: 600 } },
+      { id: "h3", title: "Nightmare Watch", ask: "Clear 3 Nightmare stages.", stat: "nightmareClears", n: 3, reward: { coins: 6000, items: { vaultheart: 1 } } }
+    ] },
+  { id: "rhea", name: "Guildmaster Rhea", role: "Adventurers' Guild", pos: [-43.8, 38.2], face: 0.785,
+    look: { skin: 0xc99a74, hair: 0x2a1a10, cloth: 0x3a4a6a, cloth2: 0x2a2a3a }, armour: "windrunner", weapon: "moonshard",
+    hello: "Every adventurer starts somewhere. Let us see how far you go.",
+    bye: "Your name is first on the guild's honour board. Well earned.",
+    quests: [
+      { id: "r1", title: "Explorer", ask: "Discover 3 islands on the portal map.", check: islandsUnlocked, n: 3, reward: { coins: 1000, items: { amber: 2 } } },
+      { id: "r2", title: "Seasoned", ask: "Reach level 15.", check: () => S.level, n: 15, reward: { coins: 2000, items: { die: 1 } } },
+      { id: "r3", title: "Isle Conqueror", ask: "Clear both Normal and Hard on 6 islands.", check: islandsConquered, n: 6, reward: { coins: 10000, chest: 2 } }
+    ] }
+);
+VILLAGERS.push(
+  { name: "Nell", role: "Fruit seller", home: [0, 74], rad: 7, look: { skin: 0xf0d8c0, hair: 0x2a1a10, cloth: 0xd8703a, cloth2: 0x3a2a1a }, lines: ["Apples, pears and one very suspicious melon!", "Lysa buys anything shiny. I mostly buy apples.", "Business is best at dawn, before the portals get busy."] },
+  { name: "Pim", role: "Farmhand", home: [56, -46], rad: 5, look: { skin: 0xd0a080, hair: 0xd8b860, cloth: 0x4a6a2a, cloth2: 0x3a3022 }, lines: ["The scarecrow scares nothing. I have checked.", "Odo says the barley grows faster when heroes walk past.", "Mind the mud by the barn."] },
+  { name: "Bram", role: "Gate guard", home: [-58, -52], rad: 6, look: { skin: 0xb07a52, hair: 0x3a2a1a, cloth: 0x2a4a8a, cloth2: 0x1a2a4a }, armour: "chainshirt", weapon: "militia", lines: ["Halt! Oh, it is you. Carry on.", "Warden Holt says parrying is half of every fight.", "Quiet night. I like quiet nights."] },
+  { name: "Ada", role: "Lamplighter", home: [74, 0], rad: 10, look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0x3a3a5a, cloth2: 0x2a2a3a }, lines: ["I light every lantern on the row when the sun goes down.", "At night the windows glow like a hundred small suns.", "Granny Mae always has tea on."] }
+);
+
+/* material models: each material has a shape and a colour */
+function matModel(it, g) {
+  const c = it.col ?? 0x9a8a7a, rk = RANK[it.rarity], sh = it.shape || "ore", gl = rk >= 2 ? { e: c, ei: 0.15 + rk * 0.12 } : {};
+  if (sh === "plank" || sh === "log") M(G.box(), std(c, { r: 0.6, map: "bark" }), 0, 0, 0, g, 1.4, sh === "log" ? 0.42 : 0.3, 0.42).rotation.z = 0.3;
+  else if (sh === "girder") { M(G.box(), std(c, { m: 0.9, r: 0.3, ...gl }), 0, 0, 0, g, 1.5, 0.12, 0.42).rotation.z = 0.3; M(G.box(), std(c, { m: 0.9, r: 0.3, ...gl }), 0, 0, 0, g, 1.5, 0.42, 0.1).rotation.z = 0.3; }
+  else if (sh === "brick") M(G.box(), std(c, { r: 0.85, map: "rock" }), 0, 0, 0, g, 0.9, 0.45, 0.42);
+  else if (sh === "pane") M(G.box(), std(c, { r: 0.08, op: 0.6 }), 0, 0, 0, g, 0.9, 0.75, 0.06);
+  else if (sh === "ingot") { const m = std(c, { m: 0.9, r: 0.25, ...gl }); M(G.box(), m, 0, -0.12, 0, g, 0.95, 0.26, 0.4); M(G.box(), m, 0.1, 0.16, 0.02, g, 0.95, 0.26, 0.4).rotation.y = 0.5; }
+  else if (sh === "gem") { const m = std(c, { m: 0.15, r: 0.08, flat: true, e: c, ei: 0.25 + rk * 0.25 }); M(G.oct(), m, 0, 0.05, 0, g, 0.38, 0.66, 0.38); for (let k = 0; k < 3; k++) M(G.oct(), m, Math.cos(k * 2.1) * 0.42, -0.25, Math.sin(k * 2.1) * 0.42, g, 0.16, 0.28, 0.16); }
+  else if (sh === "pearl") { M(G.sph(), std(0xc8b8a8, { r: 0.5, map: "rock" }), 0, -0.22, 0, g, 0.75, 0.16, 0.62); M(G.sph(), std(c, { m: 0.3, r: 0.12 }), 0, 0.05, 0, g, 0.32); }
+  else if (sh === "rope") { const m = std(c, { r: 0.9, map: "fabric", ...gl }); for (let k = 0; k < 3; k++) M(G.tor(0.42 - k * 0.04, 0.08), m, 0, -0.18 + k * 0.17, 0, g).rotation.x = Math.PI / 2; }
+  else if (sh === "hide") { const h = M(G.sph(), std(c, { r: 0.95, map: "fur" }), 0, 0, 0, g, 0.75, 0.07, 0.55); h.rotation.z = 0.25; }
+  else if (sh === "scale") { const m = std(c, { m: 0.6, r: 0.3, ...gl }); for (let k = 0; k < 5; k++) { const s = M(G.sph(), m, (k - 2) * 0.22, Math.abs(k - 2) * -0.06, (k % 2) * 0.12, g, 0.26, 0.05, 0.34); s.rotation.x = 0.5; } }
+  else if (sh === "feather") { M(G.cone(10), std(c, { r: 0.6, ...gl }), 0, 0.1, 0, g, 0.16, 1.2, 0.05).rotation.z = 0.5; M(G.cyl(0.015, 0.015), std(0xf0e0c0), -0.3, -0.42, 0, g, 1, 0.5, 1).rotation.z = 0.5; }
+  else if (sh === "core") { M(G.ico1(), std(c, { e: c, ei: 1.3, m: 0.3, r: 0.2, flat: true }), 0, 0, 0, g, 0.36); const ring = std(0xd8c070, { m: 1, r: 0.2 }); M(G.tor(0.56, 0.035), ring, 0, 0, 0, g).rotation.x = 1.2; M(G.tor(0.56, 0.035), ring, 0, 0, 0, g).rotation.y = 1.2; }
+  else { M(G.dode(), std(0x6a6660, { flat: true, r: 0.9, map: "rock" }), 0, 0, 0, g, 0.6); for (let k = 0; k < 5; k++) M(G.oct(), std(c, { m: 0.9, r: 0.2, e: rk >= 2 ? c : 0, ei: 0.3 }), Math.cos(k * 1.3) * 0.45, Math.sin(k * 2.1) * 0.35, Math.sin(k * 1.3) * 0.45, g, 0.14, 0.22, 0.14); }
+}
+function deliverHtml(q) { return `<div class="reqs">${Object.entries(q.deliver).map(([id, n]) => { const h = S.inv[id] || 0; return `<span class="${h >= n ? "has" : "lack"}">${esc(ITEM[id].name)} <b class="num">${Math.min(h, n)}/${n}</b></span>`; }).join("")}</div>`; }
+function townLamps(group) {
+  const post = std(0x2a2a30, { m: 0.8, r: 0.4 }), bulb = std(0xffe0a0, { e: 0xffc060, ei: 2.5 }), g = new THREE.Group(); group.add(g);
+  for (const c of COMPASS) for (const t of [41, 58, 75]) { if (t > c.len - 2) continue; const cx = Math.cos(c.a), cz = Math.sin(c.a), off = c.w / 2 + 0.9, x = cx * t + cz * off, z = cz * t - cx * off;
+    if (blocked(x, z, 0.2)) continue; M(G.cyl(0.06, 0.08), post, x, 1.6, z, g, 1, 3.2, 1); M(G.sph(), bulb, x, 3.3, z, g, 0.16); const lg = glowSprite(0xffb050, 2.2, 0.7); lg.position.set(x, 3.3, z); group.add(lg); addCircle(x, z, 0.25, 3); }
+  shadows(g, true, false); mergeStatic(g);
+}
+function townTrees(group, h) {
+  const rt = seeded(133);
+  for (let k = 0; k < 70; k++) { const a = rt() * TAU, d = 52 + rt() * 40, x = Math.cos(a) * d, z = Math.sin(a) * d;
+    if (blocked(x, z, 2.5) || onPath(x, z, 2.5)) continue;
+    const t = makeTree(rt() < 0.6 ? "oak" : "pine", rt); t.position.set(x, h(x, z), z); t.scale.setScalar(0.75 + rt() * 0.45); t.rotation.y = rt() * TAU; group.add(t); addCircle(x, z, 0.5, 6); }
+}
+stage.addEventListener("pointerdown", e => { if (e.button === 2) blockHeld = true; });
+window.addEventListener("pointerup", e => { if (e.button === 2) blockHeld = false; });
+stage.addEventListener("contextmenu", e => e.preventDefault());
 
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
@@ -3351,7 +3899,7 @@ function frame(now) {
 }
 $("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; if (coarse || usedTouch) $("joyHint").hidden = false; });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
