@@ -276,6 +276,14 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 #flash { position: fixed; inset: 0; z-index: 4; background: #e8f0ff; opacity: 0; pointer-events: none; } #flash.on { animation: flash 0.7s ease-out; }
 @keyframes flash { 0% { opacity: 0.75; } 15% { opacity: 0.1; } 25% { opacity: 0.5; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { #flash.on { animation: none; } }
+.wmsheet { width: min(1240px, 100%); height: min(880px, 100%); } .wmsheet header .row { gap: 6px; } #wmTown.on, #wmWorld.on { border-color: var(--accent); color: var(--accent); }
+.wmbody { display: grid; grid-template-columns: minmax(0, 1fr) 270px; min-height: 0; }
+@media (max-width: 760px) { .wmbody { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 34%; } }
+.wmmap { min-height: 0; background: #12364c; } .wmmap svg { width: 100%; height: 100%; display: block; font-family: var(--f-body); } .wmmap .mp { cursor: pointer; } .wmmap .mp:hover circle, .wmmap .mp:focus circle { stroke: #fff; stroke-width: 2.5; }
+.wmside { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 8px; padding: 10px; border-left: 1px solid var(--line); min-height: 0; } .wmside p { margin: 0; font-size: 13px; }
+.wmlist { overflow-y: auto; display: grid; gap: 3px; align-content: start; } .wmi { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 8px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; text-align: left; font-size: 13px; color: var(--fg); }
+.wmi span { width: 10px; height: 10px; border-radius: 50%; background: var(--c); } .wmi small { color: var(--muted); } .wmi:hover { border-color: var(--accent); }
+#wpChip { color: var(--accent); } #wpChip i { display: inline-block; font-style: normal; font-weight: 900; }
 .dlg { width: min(520px, 100%); max-height: 100%; overflow-y: auto; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 12px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
 .dlg-who { display: grid; gap: 2px; } .dlg-who b { font-family: var(--f-display); font-size: 22px; } .dlg-who span { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
 .dlg p { margin: 0; font-size: 16px; line-height: 1.5; }
@@ -325,11 +333,12 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 </div>
 <div class="hud" id="hudTR">
   <div class="money"><span class="chip gold" id="hCoins">0</span><span class="chip die" id="hDice">Dice 0</span></div>
+  <span class="chip" id="wpChip" hidden></span>
   <div class="money"><span class="chip" id="hClock">Day 08:00</span><span class="chip" id="hFace">Facing N</span></div>
   <button class="hbtn warn" id="bLeave" hidden>Leave island</button>
 </div>
 <div id="menuBar">
-  <button id="mbDaily">Daily</button><button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
+  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
 <div id="musicPanel" hidden role="dialog" aria-label="Music">
   <div class="mpHead"><b>Music</b><button class="hbtn" id="mpClose">Close</button></div>
@@ -375,6 +384,10 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 </div>
 <div class="modal" id="dialog" hidden>
   <div class="dlg" role="dialog" aria-labelledby="dlgName"><div class="dlg-who"><b id="dlgName"></b><span id="dlgRole"></span></div><p id="dlgText"></p><div id="dlgQuest"></div><div class="row" id="dlgBtns" style="justify-content:center"></div></div>
+</div>
+<div class="modal" id="worldMap" hidden>
+  <div class="sheet wmsheet" role="dialog" aria-labelledby="wmH"><header><h2 id="wmH">World map</h2><div class="row"><button class="btn" id="wmTown">Town</button><button class="btn" id="wmWorld">Whole world</button><button class="btn" id="wmClear">Clear waypoint</button><button class="btn" id="wmClose">Close</button></div></header>
+    <div class="wmbody"><div class="wmmap" id="wmSvg"></div><div class="wmside"><p class="muted" id="wmWp"></p><div class="wmlist" id="wmList"></div></div></div></div>
 </div>
 <div class="modal" id="daily" hidden>
   <div class="sheet small dailysheet" role="dialog" aria-labelledby="dailyH"><header><h2 id="dailyH">Daily reward</h2><button class="btn" id="dailyClose">Close</button></header>
@@ -472,7 +485,8 @@ const TYPES = {
   greatsword: { name: "Greatsword", w: "heavy", reach: 3.3 }, warhammer: { name: "Warhammer", w: "heavy", reach: 3.0 },
   greataxe: { name: "Greataxe", w: "heavy", reach: 3.1 }, halberd: { name: "Halberd", w: "heavy", reach: 3.8 },
   mace: { name: "Mace", w: "normal", reach: 2.6 }, club: { name: "Club", w: "heavy", reach: 2.8 }, nunchaku: { name: "Nunchaku", w: "light", reach: 2.4 },
-  flail: { name: "Flail", w: "normal", reach: 3.0 }, chainsickle: { name: "Chain Sickle", w: "light", reach: 3.4 }
+  flail: { name: "Flail", w: "normal", reach: 3.0 }, chainsickle: { name: "Chain Sickle", w: "light", reach: 3.4 },
+  trident: { name: "Trident", w: "normal", reach: 3.4 }, twinblade: { name: "Twinblade", w: "light", reach: 2.9 }
 };
 const RAR_DMG = { common: 10, rare: 22, epic: 46, legendary: 96, vaulted: 185 };
 const SPEC_MULT = { common: 3.3, rare: 4.1, epic: 5.1, legendary: 6.5, vaulted: 8.4 }; // specials hit 50% harder
@@ -502,7 +516,8 @@ const SPECIALS = {
   vaultCrush:   { name: "Vault Door",      cd: 13, text: m => `Slam a phantom vault door down 5 m ahead for ${m}x weapon damage, then two aftershocks for half that.` },
   timeEcho:     { name: "Second Hand",     cd: 15, text: m => `Echoes of your blade strike every foe within 12 m three times, each for ${m}x weapon damage.` },
   singularity:  { name: "Singularity",     cd: 14, text: m => `Hurl a void star that drags foes within 10 m together, then collapses for ${m}x weapon damage.` },
-  chainStorm:   { name: "Endless Chain",   cd: 13, text: m => `Whirl a chain of dusk around you for 4 s, striking everything within 6 m sixteen times for ${(m * 0.3).toFixed(1)}x weapon damage each.` }
+  chainStorm:   { name: "Endless Chain",   cd: 13, text: m => `Whirl a chain of dusk around you for 4 s, striking everything within 6 m sixteen times for ${(m * 0.3).toFixed(1)}x weapon damage each.` },
+  riptideSpiral:{ name: "Riptide Spiral",  cd: 14, text: m => `Spin a whirlpool around you for 4 s that drags foes within 8 m inward, striking eight times for ${(m * 0.45).toFixed(1)}x weapon damage each.` }
 };
 const ARM_SPECIALS = {
   sunburst:     { name: "Undying Sun",   cd: 20, text: "Burst of sunlight for 4x weapon damage. Heal 25% and take 50% less damage for 3 s." },
@@ -588,7 +603,19 @@ const WEAPON_DEFS = [
   ["moonchain", "Moonchain Sickle", "epic", "chainsickle", 0xd8e8ff, 0x9ab8ff, "frostNova", "A sickle and a silver chain, forged under a full moon."],
   ["morningstar", "Sunburst Morningstar", "legendary", "mace", 0xffd870, 0xfff0a0, "meteor", "Every spike catches the light like a tiny sun."],
   ["twindragon", "Twin Dragon Nunchaku", "legendary", "nunchaku", 0xd84a2a, 0xffb040, "flameWave", "One dragon breathes fire. The other is just angry."],
-  ["eventide", "Eventide, the Endless Chain", "vaulted", "flail", 0x1a1028, 0xb07aff, "chainStorm", "A chain of dusk that never quite ends."]
+  ["eventide", "Eventide, the Endless Chain", "vaulted", "flail", 0x1a1028, 0xb07aff, "chainStorm", "A chain of dusk that never quite ends."],
+  ["fishtrident", "Fisher's Trident", "common", "trident", 0xb8bcc0, 0x6a4a2a, "heavyStrike", "Meant for fish. Works on crabs too."],
+  ["reedtwin", "Reedcutter Twinblade", "common", "twinblade", 0xc8ccd0, 0x5a4a32, "whirl", "Two blades, twice the chores."],
+  ["tidetrident", "Tidecaller Trident", "rare", "trident", 0x9ae0e8, 0x30c0d0, "frostNova", "It hums like a seashell held to your ear."],
+  ["dusktwin", "Dusk Twinblade", "rare", "twinblade", 0x5a4a7a, 0xb08aff, "bladeFan", "Spins like a wheel of twilight."],
+  ["krakenclub", "Kraken Knocker", "rare", "club", 0x4a2a3a, 0xff6a8a, "shockwave", "Carved from a tentacle that kept moving."],
+  ["sirenflail", "Siren's Lament", "epic", "flail", 0x9affe8, 0x40ffd0, "frostNova", "The ball sings as it swings."],
+  ["stormtwin", "Stormsplitter Twinblade", "epic", "twinblade", 0x5a7aff, 0x9ad8ff, "chainBolt", "Lightning jumps from one blade to the other."],
+  ["coralmace", "Coralcrown Mace", "epic", "mace", 0xff8a7a, 0xffd0c0, "meteor", "Grown, not forged, on the floor of the sea."],
+  ["leviathantrident", "Leviathan's Trident", "legendary", "trident", 0x40ffd0, 0x1a5a5a, "vortex", "The sea itself answers when it is raised."],
+  ["phoenixtwin", "Phoenix Twinblade", "legendary", "twinblade", 0xffb050, 0xff5a20, "flameWave", "Both ends burn. Hold it in the middle."],
+  ["krakensickle", "Kraken's Embrace", "legendary", "chainsickle", 0x8a3a5a, 0xff7aa8, "drainBurst", "Eight links for eight arms."],
+  ["tidesovereign", "Tidesovereign, the Drowned Crown", "vaulted", "trident", 0x0a3a4a, 0x40ffd0, "riptideSpiral", "Pulled from the deepest trench by someone who never came back up."]
 ];
 // [id, name, rarity, weight, metal, cloth, accent, helm, cape, special, description]
 const ARMOUR_DEFS = [
@@ -625,7 +652,15 @@ const ARMOUR_DEFS = [
   ["aetherplate", "Aetherwoven Plate", "legendary", "heavy", 0xd8e8ff, 0x4a5a8a, 0x9a7aff, "crown", true, null, "Woven from metal and something that is not quite there."],
   ["plumeguard", "Phoenix Plume Mantle", "legendary", "light", 0xd8602a, 0x5a1a10, 0xffb040, "hood", true, null, "Feathers that refuse to stop glowing."],
   ["vaultwarden", "Vaultwarden's Regalia", "vaulted", "heavy", 0xf0dca0, 0x3a2a5a, 0xffd040, "crown", true, "vaultWard", "Worn by those who keep the Vault shut. Nothing gets through."],
-  ["chronomantle", "Chronomantle", "vaulted", "light", 0xa8c8e8, 0x1a2a4a, 0x7ad8ff, "hood", true, "chronoShift", "Its owner is always a few seconds ahead of everyone else."]
+  ["chronomantle", "Chronomantle", "vaulted", "light", 0xa8c8e8, 0x1a2a4a, 0x7ad8ff, "hood", true, "chronoShift", "Its owner is always a few seconds ahead of everyone else."],
+  ["sailorcoat", "Sailor's Oilcoat", "common", "light", 0x3a4a5a, 0xd8c060, 0, "none", false, null, "Keeps the spray off. Mostly."],
+  ["shellmail", "Shellmail Vest", "common", "medium", 0xd8c8b0, 0x5a7a8a, 0, "helm", false, null, "Hundreds of shells, stitched by patient hands."],
+  ["coralplate", "Coralplate", "rare", "heavy", 0xff8a7a, 0x3a2a2a, 0xffd0c0, "horned", false, null, "Living coral that slowly heals its own cracks."],
+  ["deepdiver", "Deepdiver's Harness", "rare", "medium", 0x8a7a4a, 0x2a3a4a, 0x9ad8ff, "visor", false, null, "The visor never fogs, even in a storm."],
+  ["stormcloak", "Stormwake Cloak", "epic", "light", 0x3a4a6a, 0x1a2a3a, 0x9ad8ff, "hood", true, null, "Rain slides off it before it can land."],
+  ["krakenhide", "Krakenhide Armour", "epic", "medium", 0x6a2a4a, 0x2a1a2a, 0xff7aa8, "helm", true, null, "Ink still seeps from the seams."],
+  ["leviathanscale", "Leviathan Scale Mail", "legendary", "heavy", 0x1a5a5a, 0x0a2a2a, 0x40ffd0, "crown", true, null, "Every scale is the size of a shield."],
+  ["sirenmantle", "Siren's Mantle", "legendary", "light", 0x9affe8, 0x2a5a6a, 0xd8fff8, "hood", true, null, "You can almost hear singing when the wind moves it."]
 ];
 const ARM_W = { light: { hp: 0.8, def: 0.7, move: 1.05, label: "Light" }, medium: { hp: 1, def: 1, move: 1, label: "Medium" }, heavy: { hp: 1.25, def: 1.35, move: 0.92, label: "Heavy" } };
 const RAR_HP = { common: 30, rare: 80, epic: 180, legendary: 380, vaulted: 750 };
@@ -648,7 +683,11 @@ const MATERIALS = [ // [id, name, rarity, description, shape, colour]
   ["aethercrystal", "Aether Crystal", "legendary", "It floats a finger's width above your palm.", "gem", 0x9a7aff], ["phoenixplume", "Phoenix Plume", "legendary", "It has burned for a hundred years and never gone out.", "feather", 0xff8a30],
   ["sunforged", "Sunforged Ingot", "legendary", "Smelted at noon on the longest day.", "ingot", 0xffd060],
   ["vaultheart", "Heart of the Vault", "vaulted", "It beats, slowly, as if it is waiting for something.", "core", 0xffd040], ["chronoshard", "Chronoshard", "vaulted", "Look into it and you see a few seconds into the past.", "gem", 0x7ad8ff],
-  ["voidglass", "Voidglass Core", "vaulted", "A sphere of nothing, held together by a cage of gold.", "core", 0xc070ff], ["starmote", "Fallen Star Fragment", "vaulted", "Still warm from the sky.", "gem", 0xfff4c0]
+  ["voidglass", "Voidglass Core", "vaulted", "A sphere of nothing, held together by a cage of gold.", "core", 0xc070ff], ["starmote", "Fallen Star Fragment", "vaulted", "Still warm from the sky.", "gem", 0xfff4c0],
+  ["seashell", "Seashell", "common", "Pink inside, sandy outside.", "pearl", 0xf0d8c8], ["driftwood", "Driftwood", "common", "Bleached by sun and salt.", "log", 0xc8b8a0],
+  ["pineresin", "Pine Resin", "common", "Sticky, golden and smells wonderful.", "gem", 0xd8a040], ["coralbranch", "Coral Branch", "rare", "Bright and brittle.", "gem", 0xff8a7a],
+  ["krakenink", "Kraken Ink", "epic", "Black as midnight, cold as the deep.", "pearl", 0x1a1028], ["stormglass", "Storm Glass", "epic", "Lightning trapped in a bead of sand.", "pane", 0x9ad8ff],
+  ["sirenscale", "Siren Scale", "legendary", "It sings faintly when held to the ear.", "scale", 0x9affe8], ["thunderpearl", "Thunder Pearl", "legendary", "It crackles when it rolls.", "pearl", 0xfff0a0]
 ];
 const BASE_VALUE = { common: 12, rare: 90, epic: 420, legendary: 1800, vaulted: 15000 };
 
@@ -1150,6 +1189,11 @@ function buildWeapon(it) {
     if (t === "flail") { M(G.sph(), blade, px + 0.06, py + 0.08, 0, g, 0.1); for (let k = 0; k < 10; k++) { const a = k * 2.399, el = Math.acos(1 - 2 * (k + 0.5) / 10); const d = new V3(Math.sin(el) * Math.cos(a), Math.cos(el), Math.sin(el) * Math.sin(a)); const sp = M(G.cone(5), blade, px + 0.06 + d.x * 0.11, py + 0.08 + d.y * 0.11, d.z * 0.11, g, 0.022, 0.08, 0.022); sp.quaternion.setFromUnitVectors(new V3(0, 1, 0), d); } if (rune) M(G.sph(), rune, px + 0.06, py + 0.08, 0, g, 0.12); g.userData.tip = py + 0.2; }
     else { M(G.sph(), MAT.metal(0x6a6a72, 0.3), px, py, 0, g, 0.05); const s = new THREE.Shape(); s.moveTo(0, 0); s.quadraticCurveTo(0.22, 0.2, 0.42, 0.05); s.quadraticCurveTo(0.2, 0.08, 0, -0.04); s.lineTo(0, 0); const b = new THREE.Mesh(extrude(s, 0.012, 0.004), blade); b.position.set(0, L - 0.02, 0); b.rotation.z = 0.9; g.add(b); if (rune) { const r2 = new THREE.Mesh(extrude(s, 0.002, 0.001), rune); r2.position.set(0, L - 0.02, 0.008); r2.rotation.z = 0.9; r2.scale.set(0.85, 0.5, 1); g.add(r2); } g.userData.tip = L + 0.35; }
   }
+  if (t === "trident") { const L = 1.9; M(G.cyl(0.022, 0.026), wood, 0, L / 2 - 0.25, 0, g, 1, L, 1); M(G.box(), accent, 0, L - 0.28, 0, g, 0.28, 0.045, 0.045); M(G.cyl(0.03, 0.03), accent, 0, L - 0.36, 0, g, 1, 0.1, 1);
+    for (const x of [-0.13, 0, 0.13]) { M(G.cyl(0.012, 0.015), blade, x, L - 0.1, 0, g, 1, x ? 0.3 : 0.38, 1); const tp = M(G.cone(4), blade, x, L + (x ? 0.08 : 0.12), 0, g, 0.035, 0.14, 0.035); if (x) { const barb = M(G.cone(3), blade, x * 1.25, L - 0.02, 0, g, 0.02, 0.07, 0.01); barb.rotation.z = x > 0 ? -2.4 : 2.4; } }
+    if (rune) M(G.box(), rune, 0, L - 0.28, 0.025, g, 0.22, 0.012, 0.004); g.userData.tip = L + 0.16; }
+  if (t === "twinblade") { M(G.cyl(0.024, 0.024), grip, 0, 0, 0, g, 1, 0.42, 1); for (const s2 of [-1, 1]) { const bm = new THREE.Mesh(extrude(bladeShape(0.6, 0.06, 0.12, 0.03, 0.88), 0.014, 0.005), blade); bm.position.y = s2 * 0.21; if (s2 < 0) bm.rotation.z = Math.PI; g.add(bm); M(G.box(), accent, 0, s2 * 0.21, 0, g, 0.16, 0.03, 0.045); if (rune) M(G.box(), rune, 0, s2 * 0.5, 0.012, g, 0.008, 0.36, 0.004); }
+    for (let k = 0; k < 4; k++) M(G.tor(0.026, 0.005), accent, 0, -0.15 + k * 0.1, 0, g).rotation.x = Math.PI / 2; g.userData.tip = 0.81; }
   // details that make every weapon its own: guard shapes, pommels, wraps, serrations, tassels
   {
     const hv = hash(it.id + "deco");
@@ -1377,7 +1421,9 @@ function poseHumanoid(R, t, move, swing, style, air, spin) {
   if (air) { R.hipL.rotation.x = -0.6; R.hipR.rotation.x = 0.25; R.kneeL.rotation.x = 0.9; R.kneeR.rotation.x = 0.4; }
   if (swing > 0) {
     const k = 1 - swing; // 0 → 1 over the swing
-    if (style === "light") { R.shR.rotation.x = lerp(-0.6, -1.65, Math.sin(k * Math.PI)); R.elR.rotation.x = lerp(-1.4, 0, Math.sin(k * Math.PI)); R.chest.rotation.y = -0.3 * Math.sin(k * Math.PI); }
+    if (style === "thrust") { R.shR.rotation.x = lerp(-0.6, -1.65, Math.sin(k * Math.PI)); R.elR.rotation.x = lerp(-1.4, 0, Math.sin(k * Math.PI)); R.chest.rotation.y = -0.3 * Math.sin(k * Math.PI); }
+    else if (style === "sweep") { const e2 = 1 - Math.pow(1 - k, 2); R.shR.rotation.x = -1.45; R.shR.rotation.z = lerp(-1.3, 1.15, e2); R.elR.rotation.x = -0.2; R.chest.rotation.y = lerp(1.15, -1.15, e2); }
+    else if (style === "light" || style === "slash") { const e2 = 1 - Math.pow(1 - k, 2); R.shR.rotation.x = lerp(-2.3, -0.9, e2); R.shR.rotation.z = lerp(-1.1, 0.95, e2); R.elR.rotation.x = -0.35; R.chest.rotation.y = lerp(0.75, -0.75, e2); }
     else if (style === "heavy") { R.shR.rotation.x = k < 0.45 ? lerp(-0.4, -3.0, k / 0.45) : lerp(-3.0, -0.5, (k - 0.45) / 0.55); R.shL.rotation.x = R.shR.rotation.x * 0.8; R.elR.rotation.x = -0.3; R.elL.rotation.x = -0.5; R.chest.rotation.x = k < 0.45 ? -0.15 : 0.25; }
     else { R.shR.rotation.x = lerp(-2.6, -0.3, k); R.shR.rotation.z = lerp(-0.6, 0.5, k); R.elR.rotation.x = -0.4; R.chest.rotation.y = lerp(0.5, -0.5, k); }
   } else {
@@ -1722,7 +1768,7 @@ function buildLobby() {
   world.clouds = addClouds(group, 0xffffff);
   // distant mountains
   for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 380, s = 80 + (k % 4) * 28; if (Math.cos(a) > 0.2) continue; const m = M(G.cone(7), std(0x5a6a7a, { flat: true, r: 0.9 }), Math.cos(a) * d, s * 0.45, Math.sin(a) * d, group, s, s * 1.1, s); M(G.cone(7), std(0xf0f4ff, { flat: true, r: 0.7 }), Math.cos(a) * d, s * 0.82, Math.sin(a) * d, group, s * 0.35, s * 0.35, s * 0.35); }
-  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); seaWorld(group);
+  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); seaWorld(group); boatDealer(group); floraFauna(group);
 }
 
 function buildIsland(idx) {
@@ -1969,7 +2015,7 @@ function nearestEnemy(pos, r, dirV, cone) {
 function attack() {
   if (P.atkT > 0 || P.dead || P.dashT > 0) return;
   const w = ITEM[S.equip.weapon];
-  P.atkT = 1 / ST.atkSpd; P.swing = 1; P.swingStyle = w.weight; P.swingDur = Math.min(0.55, 0.9 / ST.atkSpd); swingFx(w); MUSIC.sfx("swing", { w });
+  P.atkT = 1 / ST.atkSpd; P.swing = 1; P.swingStyle = swingStyleFor(w); P.swingDur = Math.min(0.55, 0.9 / ST.atkSpd); swingFx(w); MUSIC.sfx("swing", { w });
   const t = nearestEnemy(P.pos, ST.reach + 2.5);
   if (t) P.face = Math.atan2(t.pos.x - P.pos.x, t.pos.z - P.pos.z);
   const f = fwd();
@@ -2010,6 +2056,7 @@ function castSpecial() {
   const D = mult * base;
   P.swing = 1; P.swingStyle = w.weight; P.swingDur = 0.45;
   switch (w.special) {
+    case "riptideSpiral": { let n = 0; const iv = () => { if (n++ >= 8 || P.dead) return; const p0 = P.pos.clone(); ringFx(p0, 8, col, 0.4); ringFx(p0, 4, 0x9affe8, 0.3); for (const e of enemiesNear(p0, 8)) { if (!e.boss && !e.dummy) e.kb.copy(p0.clone().sub(e.pos).setY(0).multiplyScalar(1.4)); damageEnemy(e, D * 0.45, null, 0); } later(0.5, iv); }; iv(); break; }
     case "chainStorm": { let n = 0; P.spinT = 0.45; const iv = () => { if (n++ >= 16 || P.dead) return; const p0 = P.pos.clone(); ringFx(p0, 6, col, 0.25); for (const e of enemiesNear(p0, 6)) damageEnemy(e, D * 0.3, e.pos.clone().sub(p0), 0.4); later(0.25, iv); }; iv(); break; }
     case "vaultCrush": { const at = pos.clone().addScaledVector(f, 5); pillarFx(at, col, 12, 0.5); ringFx(at, 5, col, 0.5); for (const e of enemiesNear(at, 5)) damageEnemy(e, D, e.pos.clone().sub(at), w.kb * 2); for (let k = 1; k <= 2; k++) later(k * 0.45, () => { ringFx(at, 5 + k * 2, col, 0.45); for (const e of enemiesNear(at, 5 + k * 2)) damageEnemy(e, D * 0.5, e.pos.clone().sub(at), w.kb); }); break; }
     case "timeEcho": { const targets = enemiesNear(pos, 12); ringFx(pos, 12, col, 0.8); for (let k = 0; k < 3; k++) later(0.25 * k, () => { for (const e of targets) if (!e.dead) { boltFx(e.pos.clone().add(new V3(0, 3, 0)), e.pos.clone().add(new V3(0, 0.8, 0)), col, 0.2); damageEnemy(e, D, null, 0, { color: "#9ad8ff" }); } }); break; }
@@ -2411,7 +2458,7 @@ function thumb(id) {
    ===================================================================== */
 let menuTab = "weapons", selItem = { weapon: null, armour: null, items: null }, selClass = null, rollResult = null;
 const MENU_TABS = [["weapons", "Weapons"], ["armour", "Armour"], ["items", "Potions and materials"], ["chests", "Chests"], ["forge", "Forge"], ["fishing", "Fishing"], ["enchant", "Enchant"], ["auction", "Vault Auction"], ["boats", "Boats"], ["quests", "Quests"], ["classes", "Classes"], ["stats", "Stats"], ["shop", "Shop"]];
-const isPaused = () => !$("intro").hidden || !$("dialog").hidden || !$("daily").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
+const isPaused = () => !$("intro").hidden || !$("dialog").hidden || !$("daily").hidden || !$("worldMap").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
 function openMenu(tab) { menuTab = tab; rollResult = null; lastLoot = null; if (prevCanvas.parentNode && ["chests", "forge", "quests", "fishing", "enchant", "auction", "boats"].includes(tab)) prevCanvas.remove(); $("menu").hidden = false; keys.clear(); attackHeld = false; renderMenu(); }
 function closeMenu() { $("menu").hidden = true; if (prevCanvas.parentNode) prevCanvas.remove(); }
 function closeAllModals() { closeMenu(); $("dialog").hidden = true; $("mapModal").hidden = true; $("confirmLeave").hidden = true; }
@@ -2828,6 +2875,7 @@ function animate(dt, paused) {
   hero.g.position.copy(P.pos); hero.g.rotation.y = P.face;
   poseHumanoid(hero, t, P.walk, P.swing, P.swingStyle, !P.onGround, P.spinT > 0 ? (1 - P.spinT / 0.45) * TAU : 0);
   if (P.blocking && !P.dead) { hero.shR.rotation.x = -1.35; hero.shR.rotation.z = 0.7; hero.elR.rotation.x = -1.3; if (hero.shL) hero.shL.rotation.x = -0.9; }
+  trailTick(Math.min(0.05, dt)); waypointTick();
   hero.g.visible = !(P.buffs.veil > worldT && Math.floor(t * 12) % 2 === 0);
   for (const a of allies) { a.R.g.position.copy(a.pos); if (a.down) a.R.g.position.y += 0.3; a.R.g.rotation.y = a.face; if (!a.down) poseHumanoid(a.R, t + allies.indexOf(a), a.moving || 0, a.swing, "normal", false); a.lbl.position.copy(a.pos).add(new V3(0, 2.35, 0)); }
   for (const e of enemies) if (!e.dead) {
@@ -3286,7 +3334,7 @@ function lobbyExtras(group, h) {
    ===================================================================== */
 // north is -z. a = atan2(z, x)
 const COMPASS = [
-  { k: "E", name: "East", deg: 0, dest: "The Docks and the Open Sea", len: 134 },
+  { k: "E", name: "East", deg: 0, dest: "The Docks, the Boat Dealer and the Open Sea", len: 147 },
   { k: "SE", name: "South-east", deg: 45, dest: "Hermit's Grove", len: 150 },
   { k: "S", name: "South", deg: 90, dest: "Port Saltreach", len: 165 },
   { k: "SW", name: "South-west", deg: 135, dest: "Skyhold Castle", len: 199 },
@@ -3751,7 +3799,7 @@ stage.addEventListener("contextmenu", e => e.preventDefault());
    THE FAR ROADS: TERRAIN, DESTINATIONS, CARDS, ENCHANTING, FISHING, AUCTION
    ===================================================================== */
 const MOUNT = { x: -150, z: 150, top: 40, flat: 16, foot: 95 };
-const LAKE = { x: 178, z: 0, r: 30, depth: 7 };
+const LAKE = { x: 178, z: 0, r: 30, depth: 0 };
 const SPIRE = { x: 117.4, z: -117.4, ri: 5, ro: 8.2, H: 22, a0: 0, span: Math.PI * 1.85 };
 SPIRE.a0 = Math.atan2(-SPIRE.z, -SPIRE.x) - 0.1; // the stair starts on the side facing the road
 const PLATFORMS = [
@@ -4398,7 +4446,7 @@ const ISLES = [
 const stormAt = (x, z) => x < 130 ? 0 : clamp((Math.hypot(x - DOCK.x, z - DOCK.z) - 60) / 560, 0, 1) * 100;
 ISLES.forEach(i => { i.storm = stormAt(i.x, i.z); });
 function seaTerrain(x, z, y) {
-  if (x > 132) { const k = smooth(132, 172, x); y = lerp(y, -12, k); }
+  if (x > 150) { const k = smooth(150, 188, x); y = lerp(y, -12, k); }
   for (const I of ISLES) { const d = Math.hypot(x - I.x, z - I.z); if (d < I.r * 1.25) { const top = I.h + Math.sin(x * 0.3) * Math.cos(z * 0.27) * 0.4; y = Math.max(y, lerp(-6, top, smooth(I.r * 1.25, I.r * 0.62, d))); } }
   return y;
 }
@@ -4575,6 +4623,7 @@ function seaBeastDie(e) {
   if (Math.random() < 0.4) grantChest(stormLevel > 80 ? 2 : stormLevel > 60 ? 1 : 0, 11);
   if (Math.random() < 0.5) gain(rollOfCats(stormLevel > 80 ? "epic" : "rare", ["material"]), e.pos);
   if (Math.random() < 0.25) gain(rollFish(1.6), e.pos);
+  if (Math.random() < 0.5) gain(ITEM[pick(stormLevel > 80 ? ["sirenscale", "thunderpearl", "krakenink", "stormglass"] : ["seashell", "coralbranch", "krakenink", "stormglass", "driftwood"])], e.pos);
   save();
 }
 
@@ -4657,6 +4706,7 @@ $("menuBody").addEventListener("click", e => {
 function swingFx(w) {
   const rk = RANK[w.rarity], col = w.accent || 0xffffff;
   if (w.ranged) { burstFx(P.pos.clone().add(new V3(Math.sin(P.face) * 0.7, 1.4, Math.cos(P.face) * 0.7)), 0.7, col, 0.25); return; }
+  return; // melee swings draw a trail behind the blade itself (see trailTick)
   const heavy = w.weight === "heavy", chain = ["flail", "nunchaku", "chainsickle"].includes(w.type), r0 = heavy ? 1.5 : 1.1, r1 = r0 + (heavy ? 1.7 : 1.1) * (w.reach / 2.7), len = heavy ? 2.5 : chain ? 3.2 : 1.9;
   const mat = new THREE.MeshBasicMaterial({ color: lin(col), transparent: true, opacity: 0.5 + rk * 0.08, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false });
   const m = new THREE.Mesh(new THREE.RingGeometry(r0, r1, 30, 1, -len / 2, len), mat); m.rotation.x = -Math.PI / 2;
@@ -4668,7 +4718,7 @@ function swingFx(w) {
 
 for (const rd of RODS) addItem({ id: "rod_" + rd.id, name: rd.name, rarity: rd.rarity, cat: "rod", rod: rd, desc: "", value: 0 });
 for (const b of BOATS) addItem({ id: "boat_" + b.id, name: b.name, rarity: b.rarity, cat: "boat", boat: b, desc: "", value: 0 });
-QUEST_NPCS.push({ id: "hale", name: "Shipwright Hale", role: "Shipwright's Yard", pos: [140, 16], face: Math.PI / 2, boats: true,
+QUEST_NPCS.push({ id: "hale", name: "Shipwright Hale", role: "Boat Dealer", pos: [156.5, 12], face: Math.PI / 2, boats: true,
   look: { skin: 0xd0a080, hair: 0x5a3a1a, cloth: 0x3a5a7a, cloth2: 0x2a2a30 }, armour: "leather", weapon: "woodsman",
   hello: "The sea is wide and it gets angrier the further out you go. Buy a sturdy boat, and come back with stories.",
   bye: "You have sailed further than anyone I know. The yard is always open to you.",
@@ -4790,6 +4840,199 @@ function townInfill(group) {
       lines: [pickL(), pickL(), pickL()] });
   }
 }
+
+/* =====================================================================
+   SWING TRAILS, THE BOAT DEALER, FLORA AND FAUNA, AND THE WORLD MAP
+   ===================================================================== */
+/* ---- a trail that follows the weapon's own edge ---- */
+const swingStyleFor = w => ["rapier", "spear"].includes(w.type) ? "thrust" : ["scythe", "flail", "nunchaku", "chainsickle", "halberd", "twinblade"].includes(w.type) ? "sweep" : w.weight === "heavy" ? "heavy" : "slash";
+const TRAIL = (() => {
+  const N = 18, pos = new Float32Array(N * 2 * 3), col = new Float32Array(N * 2 * 3), idx = [];
+  for (let i = 0; i < N - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("color", new THREE.BufferAttribute(col, 3)); g.setIndex(idx); g.setDrawRange(0, 0);
+  const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false }));
+  m.frustumCulled = false; m.userData.keep = true; scene.add(m);
+  return { N, pos, col, g, m, pts: [], c: new THREE.Color(), life: 0.2 };
+})();
+function trailTick(dt) {
+  const w = hero && hero.weapon, it = ITEM[S.equip.weapon], T = TRAIL;
+  if (w && P.swing > 0.03 && it && !it.ranged && !fishing && !P.dead) {
+    hero.g.updateMatrixWorld(true); const tip = w.userData.tip || 1;
+    T.pts.push({ a: w.localToWorld(new V3(0, tip * 0.35, 0)), b: w.localToWorld(new V3(0, tip, 0)), age: 0 });
+  }
+  for (const p of T.pts) p.age += dt; T.pts = T.pts.filter(p => p.age < T.life); if (T.pts.length > T.N) T.pts.splice(0, T.pts.length - T.N);
+  const n = T.pts.length; if (n < 2) { T.g.setDrawRange(0, 0); return; }
+  const base = T.c.set(it ? it.accent || 0xffffff : 0xffffff).convertSRGBToLinear(), rk = it ? RANK[it.rarity] : 0, strength = 0.55 + rk * 0.12;
+  T.pts.forEach((p, i) => { const f = (i / (n - 1)) * (1 - p.age / T.life) * strength; T.pos.set([p.a.x, p.a.y, p.a.z, p.b.x, p.b.y, p.b.z], i * 6); T.col.set([base.r * f * 0.25, base.g * f * 0.25, base.b * f * 0.25, base.r * f, base.g * f, base.b * f], i * 6); });
+  T.g.attributes.position.needsUpdate = true; T.g.attributes.color.needsUpdate = true; T.g.setDrawRange(0, (n - 1) * 6);
+}
+
+/* ---- the boat dealer and its showroom pier ---- */
+function boatDealer(group) {
+  const g = new THREE.Group(); g.position.set(150, 0, 18); g.rotation.y = -Math.PI / 2; group.add(g);
+  M(G.box(), std(0x3a6a8a, { r: 0.9, map: "plaster", bump: "plasterB", bs: 1, rep: 2 }), 0, 2.6, 0, g, 9, 5.2, 7);
+  const rf = M(G.cone(4), std(0xe8e0d0, { r: 0.85, map: "roof", flat: true, rep: 2 }), 0, 6.6, 0, g, 7.2, 2.8, 5.6); rf.rotation.y = Math.PI / 4;
+  M(G.box(), std(0x3a2618), 0, 1.2, 3.53, g, 1.4, 2.4, 0.08); for (const s of [-1, 1]) M(G.box(), WIN_MAT(), s * 2.8, 2.4, 3.53, g, 1.4, 1.2, 0.05);
+  M(G.box(), std(0xf0e8d8, { r: 0.8 }), 0, 4.4, 3.56, g, 5, 0.9, 0.06); const anchor = M(G.tor(0.3, 0.06), MAT.metal(0xd8b860, 0.3), 0, 4.4, 3.62, g); anchor.scale.set(1, 1, 0.5);
+  for (let k = 0; k < 4; k++) M(G.cyl(0.25, 0.3, 10), std(0x7a5a3a, { r: 0.8, map: "bark" }), -3.6 + k * 2.4, 0.45, 5.2, g, 1, 0.9, 1);
+  shadows(g, true, true); addCircle(150, 18, 5.6, 7);
+  const lb = textSprite("Boat Dealer · 10 boats for sale", "#cfeeff", 1.6); lb.position.set(150, 9.5, 18); group.add(lb); world.labels.push(lb);
+  // the showroom pier, with every boat moored along it
+  const pier = new THREE.Group(); group.add(pier); const plank = MAT.bark(0x7a5a3a), post = MAT.bark(0x5a3a24);
+  for (let z = 6.3; z < 68; z += 0.62) M(G.box(), plank, 163, 0.45, z, pier, 4, 0.1, 0.55);
+  for (let z = 8; z < 68; z += 6) for (const x of [161.2, 164.8]) M(G.cyl(0.13, 0.13), post, x, -2.2, z, pier, 1, 5.4, 1);
+  shadows(pier, true, true); mergeStatic(pier);
+  world.showroom = [];
+  BOATS.forEach((b, i) => {
+    const z = 10 + i * 6, m = buildBoat(b); m.position.set(170.5, SEA, z); m.rotation.y = Math.PI / 2; group.add(m); world.showroom.push(m);
+    const l = textSprite(`${b.name} · ${RNAME[b.rarity]} · ${fmt(b.coins)} coins`, rc(b.rarity), 0.9); l.position.set(165.5, 3.2, z); group.add(l); world.labels.push(l); l.userData.far = 40;
+    world.interact.push({ x: 163.5, z, y: 0.5, r: 2.6, label: `Look at the ${b.name}`, act: () => openMenu("boats") });
+  });
+  world.animated.push(t => world.showroom.forEach((m, i) => { m.position.y = SEA + Math.sin(t * 1.3 + i) * 0.07; m.rotation.z = Math.sin(t + i * 0.7) * 0.02; }));
+}
+
+/* ---- flowers, bushes and animals in the gaps ---- */
+function floraFauna(group) {
+  const fl = new THREE.Group(); group.add(fl); const r = seeded(4040);
+  const free = (x, z, pad) => !blocked(x, z, pad) && !onPath(x, z, pad + 0.5) && !inZone(x, z, 1) && Math.abs(world.hBase(x, z)) < 0.5 && Math.hypot(x, z) > 28;
+  const petals = [0xe85a7a, 0xf2c744, 0xb37cf4, 0xffffff, 0xff8a40, 0x7ab8ff].map(c => std(c, { r: 0.6 })), stem = std(0x4a7a2a, { r: 0.8 }), bush = std(0x3e6e2c, { r: 0.9, flat: true }), bush2 = std(0x4f7a34, { r: 0.9, flat: true });
+  bush.userData.season = "leaf"; bush2.userData.season = "leaf";
+  const flowerSpots = [];
+  for (let k = 0; k < 420 && flowerSpots.length < 150; k++) { const a = r() * TAU, d = 30 + r() * 150, x = Math.cos(a) * d, z = Math.sin(a) * d; if (!free(x, z, 1.2)) continue; flowerSpots.push([x, z]);
+    const pc = petals[Math.floor(r() * petals.length)]; for (let j = 0; j < 7; j++) { const fx = x + (r() - 0.5) * 2.2, fz = z + (r() - 0.5) * 2.2, hh = 0.25 + r() * 0.25; M(G.cyl(0.012, 0.012, 3), stem, fx, hh / 2, fz, fl, 1, hh, 1); M(G.oct(), pc, fx, hh, fz, fl, 0.08, 0.05, 0.08); } }
+  for (let k = 0; k < 600; k++) { const a = r() * TAU, d = 30 + r() * 160, x = Math.cos(a) * d, z = Math.sin(a) * d; if (!free(x, z, 1.4)) continue; const s = 0.5 + r() * 0.7; M(G.ico1(), r() < 0.5 ? bush : bush2, x, s * 0.55, z, fl, s * 1.2, s * 0.9, s * 1.1); if (k % 3 === 0) addCircle(x, z, s * 0.8, 1.2); if (fl.children.length > 1600) break; }
+  for (let k = 0; k < 60; k++) { const a = r() * TAU, d = 150 + r() * 40, x = Math.cos(a) * d, z = Math.sin(a) * d; if (!free(x, z, 0.5)) continue; for (let j = 0; j < 4; j++) { const mx = x + (r() - 0.5), mz = z + (r() - 0.5), s = 0.12 + r() * 0.12; M(G.cyl(0.03, 0.04, 6), std(0xe8e0d0), mx, s, mz, fl, 1, s * 2, 1); M(G.ico(), std([0xc0402a, 0xd8a050, 0xe8e0d0][j % 3], { r: 0.6, flat: true }), mx, s * 2, mz, fl, s * 1.2, s * 0.6, s * 1.2); } }
+  shadows(fl, false, true); mergeStatic(fl);
+  for (let k = 0; k < 30; k++) { const a = r() * TAU, d = 40 + r() * 140, x = Math.cos(a) * d, z = Math.sin(a) * d; if (!free(x, z, 2.5)) continue; const t = makeTree(r() < 0.65 ? "oak" : "pine", r); t.position.set(x, world.h(x, z), z); t.scale.setScalar(0.55 + r() * 0.35); t.rotation.y = r() * TAU; group.add(t); addCircle(x, z, 0.5, 6); }
+  // animals
+  const animals = [];
+  const mkAnimal = (kind, x, z, opts = {}) => {
+    const g = new THREE.Group(), legs = [], c = opts.col;
+    const fur = std(c, { r: 0.85, map: "fur", rep: 2 });
+    if (kind === "chicken") { M(G.sph(), fur, 0, 0.32, 0, g, 0.2, 0.2, 0.26); M(G.sph(), fur, 0, 0.52, 0.16, g, 0.11); M(G.cone(4), std(0xf2a030), 0, 0.5, 0.29, g, 0.04, 0.09, 0.04).rotation.x = Math.PI / 2; M(G.box(), std(0xd0302a), 0, 0.64, 0.16, g, 0.03, 0.07, 0.1); for (const s of [-1, 1]) legs.push(M(G.cyl(0.015, 0.015), std(0xf2a030), s * 0.06, 0.1, 0, g, 1, 0.2, 1)); }
+    else if (kind === "cat" || kind === "dog") { const big = kind === "dog" ? 1.35 : 1; M(G.sph(), fur, 0, 0.32 * big, 0, g, 0.17 * big, 0.17 * big, 0.36 * big); const hd = M(G.sph(), fur, 0, 0.47 * big, 0.36 * big, g, 0.14 * big); if (kind === "cat") for (const s of [-1, 1]) M(G.cone(4), fur, s * 0.07, 0.6, 0.36, g, 0.04, 0.08, 0.03); else { M(G.box(), fur, 0, 0.44 * big, 0.5 * big, g, 0.1, 0.09, 0.14); for (const s of [-1, 1]) M(G.box(), fur, s * 0.12, 0.52 * big, 0.36 * big, g, 0.04, 0.13, 0.08); }
+      const tl = M(G.cyl(0.02, 0.03), fur, 0, 0.42 * big, -0.38 * big, g, 1, 0.34 * big, 1); tl.rotation.x = kind === "cat" ? -0.4 : -0.9; for (const [lx, lz] of [[-0.08, 0.2], [0.08, 0.2], [-0.08, -0.2], [0.08, -0.2]]) legs.push(M(G.cyl(0.03, 0.03), fur, lx * big, 0.12 * big, lz * big, g, 1, 0.24 * big, 1)); }
+    else if (kind === "deer") { M(G.sph(), fur, 0, 1.0, 0, g, 0.28, 0.3, 0.6); const nk = M(G.cyl(0.08, 0.11), fur, 0, 1.35, 0.5, g, 1, 0.6, 1); nk.rotation.x = 0.5; M(G.sph(), fur, 0, 1.62, 0.7, g, 0.12, 0.12, 0.2); M(G.sph(), std(0xf0e8e0), 0, 1.05, -0.58, g, 0.08);
+      if (opts.antlers) for (const s of [-1, 1]) { const an = M(G.cyl(0.012, 0.018), std(0xd8c8a8), s * 0.08, 1.85, 0.66, g, 1, 0.36, 1); an.rotation.z = -s * 0.5; const b2 = M(G.cyl(0.01, 0.012), std(0xd8c8a8), s * 0.16, 1.92, 0.72, g, 1, 0.18, 1); b2.rotation.x = 0.6; }
+      for (const [lx, lz] of [[-0.14, 0.4], [0.14, 0.4], [-0.14, -0.4], [0.14, -0.4]]) legs.push(M(G.cyl(0.035, 0.03), fur, lx, 0.42, lz, g, 1, 0.84, 1)); }
+    else if (kind === "rabbit") { M(G.sph(), fur, 0, 0.18, 0, g, 0.13, 0.13, 0.18); M(G.sph(), fur, 0, 0.3, 0.14, g, 0.09); for (const s of [-1, 1]) M(G.cyl(0.02, 0.025), fur, s * 0.04, 0.45, 0.12, g, 1, 0.18, 1).rotation.x = -0.2; M(G.sph(), std(0xffffff), 0, 0.2, -0.18, g, 0.05); }
+    shadows(g, true, false); g.position.set(x, world.h(x, z), z); group.add(g);
+    const a = { kind, g, legs, x, z, home: [x, z], rad: opts.rad || 8, tgt: null, wait: r() * 3, spd: { chicken: 0.9, cat: 1.6, dog: 2.2, deer: 1.4, rabbit: 2.4 }[kind], t: r() * 10, face: r() * TAU, flee: kind === "deer" || kind === "rabbit" };
+    animals.push(a); return a;
+  };
+  const browns = [0x8a5a32, 0x6a4a2a, 0xc8a070, 0x2a2a2a, 0xe8e0d0, 0xd88a40];
+  for (let k = 0; k < 9; k++) mkAnimal("chicken", 70 + r() * 8, -52 + r() * 6, { col: [0xffffff, 0xc8803a, 0x8a5a32][k % 3], rad: 6 });
+  for (let k = 0; k < 6; k++) { const c = COMPASS[(k * 3) % 8], t = 40 + r() * 50; mkAnimal(k < 3 ? "cat" : "dog", Math.cos(c.a) * t, Math.sin(c.a) * t, { col: browns[k % browns.length], rad: 10 }); }
+  for (let k = 0; k < 7; k++) { const a = -1.2 + k * 0.4, d = 172 + r() * 12, x = Math.cos(a) * d, z = Math.sin(a) * d; if (x > 140) continue; mkAnimal("deer", -Math.abs(x), z, { col: 0x9a6a3a, antlers: k % 2 === 0, rad: 14 }); }
+  for (let k = 0; k < 10; k++) { const a = r() * TAU, d = 60 + r() * 110, x = Math.cos(a) * d, z = Math.sin(a) * d; if (!free(x, z, 0.5)) continue; mkAnimal("rabbit", x, z, { col: [0xb8b0a8, 0x8a6a4a, 0xf0ece4][k % 3], rad: 7 }); }
+  // birds wheeling over the town and gulls over the docks
+  const flocks = [];
+  for (let f = 0; f < 5; f++) { const gull = f >= 3, cx = gull ? 165 + f * 6 : (r() - 0.5) * 160, cz = gull ? (f - 3) * 20 : (r() - 0.5) * 160, birds = [];
+    for (let k = 0; k < (gull ? 4 : 6); k++) { const b = new THREE.Group(), m = std(gull ? 0xf4f4f4 : 0x2a2a30, { r: 0.7 }); M(G.sph(), m, 0, 0, 0, b, 0.08, 0.07, 0.2); const wl = new THREE.Group(), wr = new THREE.Group(); b.add(wl, wr); M(G.box(), m, -0.22, 0, 0, wl, 0.42, 0.02, 0.12); M(G.box(), m, 0.22, 0, 0, wr, 0.42, 0.02, 0.12); b.userData = { wl, wr, off: k }; b.scale.setScalar(gull ? 1.6 : 1.2); group.add(b); birds.push(b); }
+    flocks.push({ cx, cz, rad: gull ? 18 : 25 + r() * 20, h: gull ? 14 : 22 + r() * 12, sp: (gull ? 0.25 : 0.18) * (r() < 0.5 ? 1 : -1), birds }); }
+  let lastT = null;
+  world.animated.push(t => {
+    const dt = lastT === null ? 0 : Math.min(0.1, t - lastT); lastT = t; if (isPaused()) return;
+    for (const a of animals) {
+      const dP = Math.hypot(P.pos.x - a.x, P.pos.z - a.z), far = dP > 70; a.g.visible = !far; if (far) continue;
+      a.t += dt;
+      if (a.flee && dP < 9) { const ang = Math.atan2(a.x - P.pos.x, a.z - P.pos.z); a.tgt = [a.x + Math.sin(ang) * 8, a.z + Math.cos(ang) * 8]; a.wait = 0; a.run = 2.2; }
+      if (a.wait > 0) a.wait -= dt;
+      else if (!a.tgt) { const ang = r() * TAU, d = r() * a.rad; a.tgt = [a.home[0] + Math.cos(ang) * d, a.home[1] + Math.sin(ang) * d]; }
+      let moving = false;
+      if (a.tgt && a.wait <= 0) { const dx = a.tgt[0] - a.x, dz = a.tgt[1] - a.z, d = Math.hypot(dx, dz);
+        if (d < 0.3) { a.tgt = null; a.wait = 1 + r() * 4; a.run = 1; }
+        else { const sp = a.spd * (a.run || 1) * dt, nx = a.x + dx / d * sp, nz = a.z + dz / d * sp; if (blocked(nx, nz, 0.2) || world.hBase(nx, nz) < -1) { a.tgt = null; a.wait = 0.5; } else { a.x = nx; a.z = nz; moving = true; } let df = Math.atan2(dx, dz) - a.face; df = Math.atan2(Math.sin(df), Math.cos(df)); a.face += df * Math.min(1, dt * 6); } }
+      const hop = a.kind === "rabbit" && moving ? Math.abs(Math.sin(a.t * 9)) * 0.25 : 0, peck = a.kind === "chicken" && !moving ? Math.max(0, Math.sin(a.t * 3)) * 0.3 : 0;
+      a.g.position.set(a.x, world.h(a.x, a.z) + hop, a.z); a.g.rotation.y = a.face; a.g.rotation.x = peck;
+      a.legs.forEach((l, i) => { l.rotation.x = moving ? Math.sin(a.t * 10 + i * Math.PI) * 0.6 : 0; });
+    }
+    for (const f of flocks) f.birds.forEach((b, k) => { const ang = t * f.sp + k * 0.5, x = f.cx + Math.cos(ang) * (f.rad + k), z = f.cz + Math.sin(ang) * (f.rad + k); b.position.set(x, f.h + Math.sin(t * 0.7 + k) * 1.5, z); b.rotation.y = -ang + (f.sp > 0 ? 0 : Math.PI); const fl = Math.sin(t * 9 + k) * 0.6; b.userData.wl.rotation.z = fl; b.userData.wr.rotation.z = -fl; });
+  });
+}
+
+/* ---- the world map, with waypoints ---- */
+function mapPlaces() {
+  const fx = Math.cos(1.9635) * 29, fz = Math.sin(1.9635) * 29, at = a => [Math.cos(a) * 50, Math.sin(a) * 50];
+  const L = [
+    ["Plaza and portals", 0, 0, "town"], ["The Forge", fx, fz, "service"], ["Training Grounds", 0, -65, "service"], ["Grand Arena", 0, -118, "service"], ["Spire of the Archmage", SPIRE.x, SPIRE.z, "service"],
+    ["Docks", 150, 0, "service"], ["Boat Dealer", 150, 18, "service"], ["Tackle Shop", 132, -14, "service"], ["Hermit's Grove", 116, 116, "service"], ["Port Saltreach", 0, 175, "place"],
+    ["Skyhold Castle", MOUNT.x, MOUNT.z, "service"], ["Moonwell Observatory", -168, 0, "place"], ["Frontier Fort", -116.7, -116.7, "place"], ["Market Square", 0, 75, "place"], ["Highfield Farm", 74, -46, "place"],
+    ["Barracks", -41, -69, "place"], ["Chapel of Dawn", -84, -18, "place"], ["Adventurers' Guild", -68, 46, "place"], ["Mirror Pond", 47.7, 70.3, "place"], ["Lantern Row", 75, 0, "place"],
+    ["Bell Tower", ...at(-1.9635), "place"], ["The Salted Anchor", ...at(1.1781), "place"], ["Map Library", ...at(0.3927), "place"], ["Windmill", ...at(-0.3927), "place"]
+  ].map(([name, x, z, kind]) => ({ name, x, z, kind }));
+  for (const I of ISLES) L.push({ name: I.name, x: I.x, z: I.z, kind: I.kind === "portal" ? "portal" : I.kind === "guard" ? "guard" : "treasure" });
+  return L;
+}
+let mapView = "town", waypoint = null, mapTimer = null;
+const MAPV = { town: [-215, -215, 430, 430], world: [-240, -440, 1150, 880] };
+function renderWorldMap() {
+  const v = MAPV[mapView], places = mapPlaces(), sc = mapView === "town" ? 1 : 2.2;
+  const kc = { town: "#ffe2a0", service: "#cfeeff", place: "#f4ead2", treasure: "#ffd166", guard: "#ff8a7a", portal: "#c08aff" };
+  const storms = [[20, "Calm"], [40, "Breezy"], [60, "Rough"], [80, "Stormy"]].map(([s, n]) => [60 + s / 100 * 560, n]);
+  const svg = `<svg viewBox="${v.join(" ")}" role="img" aria-label="World map">
+    <rect x="-2000" y="-2000" width="4000" height="4000" fill="#1d4f6e"/>
+    <rect x="-2000" y="-2000" width="2161" height="4000" fill="#4a6e3a"/>
+    <path d="M-95,185 Q0,170 95,185 L140,2000 L-140,2000 Z" fill="#1d4f6e"/>
+    <circle cx="${MOUNT.x}" cy="${MOUNT.z}" r="${MOUNT.foot * 0.75}" fill="#6a6a5a" opacity="0.65"/><circle cx="${MOUNT.x}" cy="${MOUNT.z}" r="${MOUNT.flat}" fill="#8a8a7a"/>
+    ${storms.map(([rr, n]) => `<circle cx="${DOCK.x}" cy="${DOCK.z}" r="${rr}" fill="none" stroke="rgba(255,255,255,0.18)" stroke-dasharray="8 8" stroke-width="${1.5 * sc}"/><text x="${DOCK.x + rr * 0.72}" y="${DOCK.z - rr * 0.72}" fill="rgba(255,255,255,0.45)" font-size="${9 * sc}">${n} seas end</text>`).join("")}
+    ${COMPASS.map(c => `<line x1="${Math.cos(c.a) * 26}" y1="${Math.sin(c.a) * 26}" x2="${Math.cos(c.a) * c.len}" y2="${Math.sin(c.a) * c.len}" stroke="#c8b89a" stroke-width="${c.w * 0.9}" stroke-linecap="round"/>`).join("")}
+    <circle cx="0" cy="0" r="27" fill="#d8ccb4"/><circle cx="0" cy="0" r="4.6" fill="#6ab0d0"/>
+    ${COMPASS.map(c => `<text x="${Math.cos(c.a) * (c.len + 10 * sc)}" y="${Math.sin(c.a) * (c.len + 10 * sc) + 4}" text-anchor="middle" fill="#fff" font-weight="800" font-size="${10 * sc}">${c.k}</text>`).join("")}
+    ${ISLES.map(I => `<circle cx="${I.x}" cy="${I.z}" r="${I.r}" fill="${I.kind === "portal" ? "#1a1420" : "#d8c890"}" stroke="${kc[I.kind === "guard" ? "guard" : I.kind]}" stroke-width="${2 * sc}"/>`).join("")}
+    ${places.map((p, i) => `<g class="mp" data-mp="${i}" tabindex="0" role="button" aria-label="${esc(p.name)}"><circle cx="${p.x}" cy="${p.z}" r="${4 * sc}" fill="${kc[p.kind]}" stroke="#000" stroke-width="${0.8 * sc}"/><text x="${p.x}" y="${p.z - 6 * sc}" text-anchor="middle" fill="#fff" font-size="${(mapView === "town" ? 7 : 9) * sc}" style="paint-order:stroke;stroke:#000;stroke-width:${2.2 * sc}px">${esc(p.name)}</text></g>`).join("")}
+    ${QUEST_NPCS.filter(n => npcStatus(n) === "offer" || npcStatus(n) === "ready").map(n => `<text x="${n.pos[0]}" y="${n.pos[1] + 3 * sc}" text-anchor="middle" fill="${npcStatus(n) === "ready" ? "#7fd69a" : "#ffd166"}" font-weight="900" font-size="${9 * sc}" style="paint-order:stroke;stroke:#000;stroke-width:${2 * sc}px">${npcStatus(n) === "ready" ? "?" : "!"}</text>`).join("")}
+    ${waypoint ? `<circle cx="${waypoint.x}" cy="${waypoint.z}" r="${8 * sc}" fill="none" stroke="#ffd166" stroke-width="${2.5 * sc}"/>` : ""}
+    <g id="mapMe"><path d="M0,${-9 * sc} L${6 * sc},${7 * sc} L0,${3 * sc} L${-6 * sc},${7 * sc} Z" fill="#ff4a5a" stroke="#fff" stroke-width="${1.2 * sc}"/></g>
+  </svg>`;
+  $("wmSvg").innerHTML = svg; updateMapMe();
+  $("wmTown").classList.toggle("on", mapView === "town"); $("wmWorld").classList.toggle("on", mapView === "world");
+  $("wmList").innerHTML = places.map((p, i) => `<button class="wmi" data-mp="${i}" style="--c:${kc[p.kind]}"><span></span>${esc(p.name)}<small class="num">${fmt(Math.hypot(p.x - P.pos.x, p.z - P.pos.z))} m</small></button>`).join("");
+  $("wmWp").textContent = waypoint ? `Waypoint: ${waypoint.name}` : "Pick a place to set a waypoint. A beam of light will mark it.";
+}
+function updateMapMe() { const me = document.getElementById("mapMe"); if (!me) return; const fx = -Math.sin(cam.yaw), fz = -Math.cos(cam.yaw), ang = Math.atan2(fx, -fz) * 180 / Math.PI; me.setAttribute("transform", `translate(${P.pos.x},${P.pos.z}) rotate(${ang})`); }
+function openWorldMap() { if (run) { toast("The world map shows the lobby world. Leave the island to use it.", ""); return; } mapView = P.pos.x > 160 || Math.hypot(P.pos.x, P.pos.z) > 210 ? "world" : "town"; renderWorldMap(); $("worldMap").hidden = false; keys.clear(); clearInterval(mapTimer); mapTimer = setInterval(updateMapMe, 250); }
+function closeWorldMap() { $("worldMap").hidden = true; clearInterval(mapTimer); }
+const beacon = (() => { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 70, 12, 1, true), new THREE.MeshBasicMaterial({ color: lin(0xffd166), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); m.userData.keep = true; m.visible = false; scene.add(m); return m; })();
+function setWaypoint(p) { waypoint = p ? { name: p.name, x: p.x, z: p.z } : null; renderWorldMap(); if (p) toast(`<b>Waypoint set:</b> ${esc(p.name)}`, ""); }
+function waypointTick() {
+  const chip = $("wpChip"), show = waypoint && world && world.kind === "lobby";
+  beacon.visible = !!show; chip.hidden = !show; if (!show) return;
+  const d = Math.hypot(waypoint.x - P.pos.x, waypoint.z - P.pos.z);
+  if (d < 8) { toast(`You have reached <b>${esc(waypoint.name)}</b>.`, ""); waypoint = null; return; }
+  beacon.position.set(waypoint.x, world.h(waypoint.x, waypoint.z) + 35, waypoint.z); beacon.material.opacity = 0.25 + Math.sin(performance.now() / 300) * 0.08;
+  const want = Math.atan2(waypoint.x - P.pos.x, waypoint.z - P.pos.z), camF = Math.atan2(-Math.sin(cam.yaw), -Math.cos(cam.yaw)); let rel = want - camF; rel = Math.atan2(Math.sin(rel), Math.cos(rel));
+  chip.innerHTML = `<i style="transform:rotate(${(rel * 180 / Math.PI).toFixed(0)}deg)">&#8593;</i> ${esc(waypoint.name)} · ${fmt(d)} m`;
+}
+$("worldMap").addEventListener("click", e => {
+  const b = e.target.closest("[data-mp]"); if (b) { setWaypoint(mapPlaces()[+b.dataset.mp]); return; }
+  if (e.target.closest("#wmTown")) { mapView = "town"; renderWorldMap(); } else if (e.target.closest("#wmWorld")) { mapView = "world"; renderWorldMap(); }
+  else if (e.target.closest("#wmClear")) setWaypoint(null); else if (e.target.closest("#wmClose")) closeWorldMap();
+});
+$("mbMap").addEventListener("click", openWorldMap);
+window.addEventListener("keydown", e => { if (e.target && e.target.tagName === "INPUT") return; if (e.key.toLowerCase() === "n" && !e.repeat) { if ($("worldMap").hidden) openWorldMap(); else closeWorldMap(); } if (e.key === "Escape" && !$("worldMap").hidden) closeWorldMap(); });
+
+/* ---- more folk by the water ---- */
+VILLAGERS.push(
+  { name: "Old Bertram", role: "Fisherman", home: [146, -6], rad: 3, look: { skin: 0xd0a080, hair: 0xd8d8d8, cloth: 0x3a5a7a, cloth2: 0x2a2a30 }, lines: ["The Boat Dealer's pier has every boat ever built. Well, ten of them.", "Cast near the end of the dock. The fish are shy near the shore."] },
+  { name: "Juniper", role: "Sailor", home: [156, 30], rad: 6, look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0xe8e0d0, cloth2: 0x2a3a5a }, lines: ["I would buy the Stormrunner if I had two hundred thousand coins.", "Past the storm line the sea beasts come looking for you."] },
+  { name: "Tobias", role: "Deckhand", home: [158, 50], rad: 6, look: { skin: 0xf0d8c0, hair: 0xb8401a, cloth: 0x7a3a2a, cloth2: 0x3a2a1a }, lines: ["Every boat on this pier floats. I checked them all.", "Open the world map with the Map button. Set a waypoint and follow the light."] },
+  { name: "Marisol", role: "Shell collector", home: [140, 40], rad: 8, look: { skin: 0xc99a74, hair: 0x2a1a10, cloth: 0xd88aa8, cloth2: 0x4a3a4a }, lines: ["Seashells sell for a few coins. Coral sells for more.", "The beach is wider now. More room for shells!"] },
+  { name: "Hendrik", role: "Rope maker", home: [128, 10], rad: 6, look: { skin: 0xe8c0a0, hair: 0x5a3a1a, cloth: 0x6a5a3a, cloth2: 0x3a3022 }, lines: ["Hemp rope for every boat in the harbour.", "The road runs right onto the dock now. Much better."] },
+  { name: "Wren the Younger", role: "Child", home: [12, 20], rad: 10, look: { skin: 0xf0d0b0, hair: 0xd8b860, cloth: 0x4a8a4a, cloth2: 0x3a3a3a }, lines: ["Have you seen the cats? There are cats!", "I chased a rabbit all the way to the farm."] },
+  { name: "Ottilie", role: "Flower seller", home: [-20, 10], rad: 10, look: { skin: 0xe8c0a0, hair: 0x8a2a1a, cloth: 0xc84a7a, cloth2: 0x3a2a3a }, lines: ["Flowers everywhere this year. Spring is my favourite.", "The deer only come close if you stand very still."] },
+  { name: "Gideon", role: "Shepherd", home: [-30, -30], rad: 10, look: { skin: 0xb07a52, hair: 0x3a2a1a, cloth: 0x8a7a5a, cloth2: 0x4a3a22 }, lines: ["Lost a sheep once. Turned out to be a very fluffy rock.", "Birds circle the town every morning."] }
+);
+
+PLATFORMS.push({ x0: 161, x1: 165, z0: 6, z1: 68, y: 0.5 });
+[
+  { g: "Weapons", out: "tidetrident", mats: { coralbranch: 3, steel: 3, driftwood: 2 }, coins: 400 },
+  { g: "Weapons", out: "leviathantrident", mats: { sirenscale: 2, thunderpearl: 1, starsteel: 2 }, coins: 6000 },
+  { g: "Armour", out: "shellmail", mats: { seashell: 8, hemp: 2 }, coins: 60 },
+  { g: "Armour", out: "coralplate", mats: { coralbranch: 5, steel: 3 }, coins: 450 },
+  { g: "Armour", out: "krakenhide", mats: { krakenink: 3, tidesilk: 2, hide: 6 }, coins: 1600 }
+].filter(r => ITEM[r.out] && Object.keys(r.mats).every(m => ITEM[m])).forEach(r => RECIPES.push(r));
+RECIPES.sort((a, b) => ["Refining", "Potions", "Weapons", "Armour", "Relics"].indexOf(a.g) - ["Refining", "Potions", "Weapons", "Armour", "Relics"].indexOf(b.g) || RANK[ITEM[a.out].rarity] - RANK[ITEM[b.out].rarity]);
 
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
@@ -5108,7 +5351,7 @@ function frame(now) {
 }
 $("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; updateDailyBadge(); if (!dailyInfo().claimed) setTimeout(openDaily, 900); if (coarse || usedTouch) $("joyHint").hidden = false; });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
