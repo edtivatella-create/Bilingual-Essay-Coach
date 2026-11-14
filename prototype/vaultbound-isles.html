@@ -224,7 +224,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 @media (max-width: 900px) { .mapwrap { grid-template-columns: minmax(0, 1fr); height: auto; } .seamap { height: 44vh; } .mside { overflow: visible; } }
 
 /* reveal / results */
-.reveal-card { width: min(440px, 100%); text-align: center; border-radius: 14px; padding: 24px 22px; display: grid; gap: 10px; background: var(--panel-solid); border: 2px solid var(--c); box-shadow: 0 0 60px -8px var(--c); }
+.reveal-card { max-height: 100%; overflow-y: auto; width: min(440px, 100%); text-align: center; border-radius: 14px; padding: 24px 22px; display: grid; gap: 10px; background: var(--panel-solid); border: 2px solid var(--c); box-shadow: 0 0 60px -8px var(--c); }
 .reveal-card.vaulted { animation: glow 2.2s ease-in-out infinite alternate; }
 @keyframes glow { from { box-shadow: 0 0 40px -8px var(--r-vaulted); } to { box-shadow: 0 0 80px -4px var(--r-vaulted-2); } }
 .reveal-card .eyebrow { text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; color: var(--c); font-weight: 800; }
