@@ -239,6 +239,26 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 @media (max-width: 640px) { #dpsMeter { top: auto; bottom: calc(190px + env(safe-area-inset-bottom, 0px)); font-size: 12px; white-space: normal; width: max-content; max-width: calc(100vw - 24px); } }
 .duels { display: grid; gap: 6px; } .duel { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-left: 3px solid var(--c); border-radius: 10px; padding: 8px 10px; }
 .duel > span:first-child { display: grid; } .duel b { color: var(--c); font-family: var(--f-display); } .duel small { color: var(--muted); font-size: 12px; } .duel .qrew { grid-column: 1; font-size: 12.5px; } .duel button { grid-row: 1 / span 2; grid-column: 2; }
+.cardsheet { width: min(860px, 100%); max-height: 100%; overflow-y: auto; display: grid; gap: 10px; justify-items: center; text-align: center; }
+.cardsheet h2 { margin: 0; font-family: var(--f-display); font-size: 30px; color: #fff; } .cardsheet p { margin: 0; }
+.cardrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; width: 100%; }
+@media (max-width: 640px) { .cardrow { grid-template-columns: minmax(0, 1fr); } .bcard .glyph { width: 46px; height: 46px; font-size: 18px; } }
+.bcard { display: grid; gap: 6px; justify-items: center; align-content: start; background: linear-gradient(180deg, var(--panel-3), var(--panel-solid)); border: 2px solid var(--r); border-radius: 14px; padding: 14px 12px; color: var(--fg); text-align: center; box-shadow: 0 0 30px -10px var(--r); transition: transform 0.15s; }
+.bcard:hover, .bcard:focus-visible { transform: translateY(-4px); } .bcard .tier { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--r); font-weight: 800; }
+.bcard .glyph { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle, var(--c), transparent 70%); border: 2px solid var(--c); font-family: var(--f-display); font-weight: 800; font-size: 22px; color: #fff; text-shadow: 0 1px 3px #000; }
+.bcard b { font-family: var(--f-display); font-size: 18px; color: var(--c); } .bcard span:not(.tier):not(.glyph) { font-size: 13.5px; color: var(--fg); } .bcard small { color: var(--muted); font-size: 12px; }
+#boonBar { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; max-width: 520px; } #boonBar span { font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 999px; background: var(--panel); border: 1px solid var(--c); color: var(--c); }
+#fishPanel { position: fixed; z-index: 7; left: 50%; transform: translateX(-50%); bottom: calc(70px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 10px; align-items: center; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; max-width: calc(100vw - 24px); font-size: 14px; }
+#fishPanel.hot { border-color: var(--accent); box-shadow: 0 0 24px -4px var(--accent); animation: glow 0.4s ease-in-out infinite alternate; }
+@media (max-width: 640px) { #fishPanel { bottom: calc(200px + env(safe-area-inset-bottom, 0px)); flex-wrap: wrap; justify-content: center; } }
+.rodicon { width: 52px; height: 52px; border-radius: 10px; background: linear-gradient(135deg, transparent 46%, var(--c) 47%, var(--c) 53%, transparent 54%), var(--panel-3); }
+.ench { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-left: 3px solid var(--c); border-radius: 12px; padding: 12px; }
+.ench img { width: 96px; height: 96px; } .ench > div { display: grid; gap: 6px; min-width: 0; } .ench b { color: var(--c); font-family: var(--f-display); font-size: 18px; } .ench small { color: var(--muted); }
+.auction { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.lot { display: grid; gap: 6px; justify-items: center; text-align: center; background: var(--panel-2); border: 1px solid var(--c); border-radius: 12px; padding: 12px; box-shadow: 0 0 26px -12px var(--c); }
+.lot img { width: 110px; height: 110px; } .lot b { color: var(--c); font-family: var(--f-display); } .lot .tier { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 800; }
+.lot .price { font-family: var(--f-data); font-weight: 700; color: var(--accent); } .lot .sold { color: var(--bad); font-weight: 800; } .lot small { color: var(--muted); }
+.dlg #dlgBtns { flex-wrap: wrap; }
 .dlg { width: min(520px, 100%); max-height: 100%; overflow-y: auto; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 12px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
 .dlg-who { display: grid; gap: 2px; } .dlg-who b { font-family: var(--f-display); font-size: 22px; } .dlg-who span { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
 .dlg p { margin: 0; font-size: 16px; line-height: 1.5; }
@@ -282,6 +302,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 <div class="hud" id="hudTC">
   <div class="where" id="hWhere">The Lobby</div>
   <div class="sub" id="hSub">Step onto a portal to choose an island</div>
+  <div id="boonBar" hidden></div>
   <div id="bossBar" hidden><b id="bossName"></b><div class="bar"><i id="bossHp" style="width:100%"></i><span id="bossHpT"></span></div></div>
 </div>
 <div class="hud" id="hudTR">
@@ -305,6 +326,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 <div id="toasts" aria-live="polite"></div>
 <div id="prompt" hidden></div>
 <div id="dpsMeter" hidden></div>
+<div id="fishPanel" hidden><span id="fishText"></span><button class="btn" id="fishStop">Stop fishing</button></div>
 <div id="joyHint" hidden>Drag here<br>to move</div>
 <div id="joyBase" hidden><div id="joyKnob"></div></div>
 <div id="actions">
@@ -333,6 +355,9 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 </div>
 <div class="modal" id="dialog" hidden>
   <div class="dlg" role="dialog" aria-labelledby="dlgName"><div class="dlg-who"><b id="dlgName"></b><span id="dlgRole"></span></div><p id="dlgText"></p><div id="dlgQuest"></div><div class="row" id="dlgBtns" style="justify-content:center"></div></div>
+</div>
+<div class="modal" id="cards" hidden>
+  <div class="cardsheet" role="dialog" aria-labelledby="cardsH"><h2 id="cardsH">Choose a blessing</h2><p class="muted">Free, and yours until this island run ends. Blessings stack.</p><div class="cardrow" id="cardRow"></div></div>
 </div>
 <div class="modal" id="reveal" hidden>
   <div class="reveal-card" id="revealCard">
@@ -603,9 +628,16 @@ for (const [id, name, rarity, weight, metal, cloth, accent, helm, cape, special,
 }
 for (const [id, name, rarity, heal] of POTIONS) addItem({ id, name, rarity, cat: "potion", heal, desc: `Restores ${Math.round(heal * 100)}% of your health.` });
 for (const [id, name, rarity, desc, shape, col] of MATERIALS) addItem({ id, name, rarity, cat: "material", desc, shape, col });
+for (const [id, name, rarity, col, desc] of [
+  ["mudfin", "Mudfin", "common", 0x7a6a4a, "Tastes exactly like it sounds."], ["minnow", "Silver Minnow", "common", 0xc8d0d8, "Small, quick and everywhere."], ["perch", "River Perch", "common", 0x8aa04a, "Striped and stubborn."], ["pebblecrab", "Pebble Crab", "common", 0xc06040, "Pretends to be a rock. Badly."],
+  ["glassfin", "Glassfin Trout", "rare", 0xa8e0f0, "You can see its bones through its fins."], ["copperscale", "Copperscale Carp", "rare", 0xd8803a, "Its scales are worth a few coins each."], ["snapper", "Sunset Snapper", "rare", 0xf06a4a, "Caught at dusk, it glows like the sky."],
+  ["mooneel", "Moonlit Eel", "epic", 0x9ab8ff, "Only rises when the moon is out."], ["emberkoi", "Ember Koi", "epic", 0xff7a2a, "Warm to the touch, even out of water."], ["thunderpike", "Thunder Pike", "epic", 0xf0e05a, "Your rod buzzes when it bites."],
+  ["starmarlin", "Starfin Marlin", "legendary", 0x5a7aff, "Its fins are dusted with tiny stars."], ["phantomray", "Phantom Ray", "legendary", 0x8a5aa8, "Half of it is not quite there."], ["goldfry", "Golden Leviathan Fry", "legendary", 0xffd040, "A baby. Imagine the parent."],
+  ["crowneater", "Abyssal Crowneater", "vaulted", 0x2a1040, "It once swallowed a king's crown. It still wears it."], ["eternalkoi", "Eternal Koi", "vaulted", 0xfff0f0, "It has been swimming since before the islands rose."]
+]) addItem({ id, name, rarity, cat: "fish", desc, shape: "fish", col });
 addItem({ id: "die", name: "Fortune Die", rarity: "legendary", cat: "special", desc: "Twenty faces, each a different crest. Roll it at the Class Altar to be called to a new class." });
 for (const it of ITEMS) it.value = Math.round(BASE_VALUE[it.rarity] * ((it.cat === "weapon" || it.cat === "armour") ? 1.5 : 1) * (0.85 + (hash(it.id) % 31) / 100));
-const CAT_LABEL = { weapon: "Weapon", armour: "Armour", potion: "Potion", material: "Material", special: "Relic" };
+const CAT_LABEL = { weapon: "Weapon", armour: "Armour", potion: "Potion", material: "Material", special: "Relic", fish: "Fish" };
 
 /* ---------- classes ---------- */
 const ROLES = {
@@ -712,7 +744,7 @@ function fresh() {
   return { coins: 150, cls: "wanderer", level: 1, xp: 0, unspent: 0, pts: { speed: 0, damage: 0, defence: 0, power: 0 },
     inv: { ironwood: 1, padded: 1, minor: 3 }, seen: { ironwood: 1, padded: 1, minor: 1 }, equip: { weapon: "ironwood", armour: "padded" },
     prog: ISLANDS.map(() => ({ normal: false, hard: false, nightmare: false })), allies: [], rolls: 0,
-    chests: [], stats: { kills: 0, bosses: 0, clears: 0, chests: 0, crafts: 0, parries: 0, duels: 0, dummy: 0, specials: 0, sold: 0, hardClears: 0, nightmareClears: 0 }, quests: {}, duelWins: {} };
+    chests: [], stats: { kills: 0, bosses: 0, clears: 0, chests: 0, crafts: 0, parries: 0, duels: 0, dummy: 0, specials: 0, sold: 0, hardClears: 0, nightmareClears: 0, fish: 0, rareFish: 0, epicFish: 0, nightKills: 0, cards: 0, enchants: 0 }, quests: {}, duelWins: {}, rods: { willow: 1 }, rod: "willow", fishLog: {}, ench: {}, auction: null };
 }
 let S = fresh();
 try {
@@ -721,7 +753,7 @@ try {
     const d = JSON.parse(raw), f = fresh();
     S = Object.assign(f, d);
     S.pts = Object.assign(f.pts, d.pts || {});
-    S.stats = Object.assign(f.stats, d.stats || {}); S.quests = d.quests && typeof d.quests === "object" ? d.quests : {};
+    S.stats = Object.assign(f.stats, d.stats || {}); S.rods = Object.assign({ willow: 1 }, d.rods || {}); if (!S.rods[S.rod]) S.rod = "willow"; S.ench = d.ench || {}; S.quests = d.quests && typeof d.quests === "object" ? d.quests : {};
     S.chests = Array.isArray(d.chests) ? d.chests.filter(c => c && c.t >= 0 && c.t < 3 && c.i >= 0 && c.i < ISLANDS.length) : [];
     S.prog = ISLANDS.map((_, i) => Object.assign({ normal: false, hard: false, nightmare: false }, (d.prog || [])[i] || {}));
     for (const id of Object.keys(S.inv)) if (!ITEM[id] || S.inv[id] <= 0) delete S.inv[id];
@@ -740,11 +772,12 @@ let ST = {};
 function statsFor(weaponId, armourId, clsId) {
   const w = ITEM[weaponId], a = ITEM[armourId], c = CLASS[clsId || S.cls], role = ROLES[c.role] || {}, p = S.pts, id = c.id;
   const st = {};
-  st.maxHp = Math.round((100 + 12 * (S.level - 1) + a.hp) * (role.hp || 1) * (id === "warrior" ? 1.2 : 1));
-  st.def = (a.def + 5 * p.defence) * (id === "paladin" ? 1.3 : 1);
+  const eA = 1 + 0.07 * enchLv(armourId), eW = 1 + 0.07 * enchLv(weaponId);
+  st.maxHp = Math.round((100 + 12 * (S.level - 1) + a.hp * eA) * (role.hp || 1) * (id === "warrior" ? 1.2 : 1));
+  st.def = (a.def * eA + 5 * p.defence) * (id === "paladin" ? 1.3 : 1);
   st.dr = st.def / (st.def + 120);
   st.dmgMult = (1 + 0.04 * p.damage) * (role.dmg || 1);
-  st.hit = w.dmg * st.dmgMult;
+  st.hit = w.dmg * st.dmgMult * eW;
   st.atkSpd = w.spd * (id === "samurai" ? 1.25 : 1);
   st.dps = st.hit * st.atkSpd;
   st.move = 6.0 * w.move * a.move * (1 + 0.025 * p.speed) * (role.move || 1) * (id === "elf" ? 1.15 : 1) * (id === "stormcaller" ? 1.1 : 1);
@@ -759,6 +792,7 @@ function statsFor(weaponId, armourId, clsId) {
   st.allyDmg = (role.allyDmg || 1) * (id === "paladin" ? 1.1 : 1);
   st.wings = id === "archangel";
   st.jump = 8.4 * (id === "elf" ? 1.08 : 1);
+  applyBoons(st);
   return st;
 }
 function computeStats() { ST = statsFor(S.equip.weapon, S.equip.armour); }
@@ -1507,11 +1541,11 @@ function blockedLobby(x, z) { return world.circles.some(c => Math.hypot(x - c.x,
 function buildLobby() {
   clearWorld();
   const group = new THREE.Group(); scene.add(group);
-  const lobbyN = noise2(3), h = (x, z) => { const d = Math.hypot(x, z); return d < 96 ? 0 : smooth(96, 150, d) * 16 * (0.6 + lobbyN(x * 0.02, z * 0.02) * 0.8); };
-  world = { kind: "lobby", group, h, radius: 94, circles: [], portals: [], interact: [], animated: [] };
-  setSky(0x3f7fcf, 0xd8e8f4, 0x6a7a5a, 0xd8e8f4, 60, 260, 0xfff0d8, 2.3, 0.55);
+  const lobbyN = noise2(3), baseH = (x, z) => lobbyTerrain(x, z, lobbyN), h = (x, z) => lobbyFeatures(x, z, baseH(x, z));
+  world = { kind: "lobby", group, h, hBase: baseH, radius: 200, circles: [], portals: [], interact: [], animated: [] };
+  setSky(0x3f7fcf, 0xd8e8f4, 0x6a7a5a, 0xd8e8f4, 90, 480, 0xfff0d8, 2.3, 0.55);
   const n = noise2(5);
-  group.add(terrainMesh(320, 160, h, (x, z, y, c) => { const d = Math.hypot(x, z); c.set(0x5a8a3a).lerp(new THREE.Color(0x4a7a2e), n(x * 0.05, z * 0.05)); if (y > 4) c.lerp(new THREE.Color(0x7a7a6a), smooth(4, 12, y)); if (d < 30) c.set(0x8a7a5a); }, 60));
+  group.add(terrainMesh(640, 210, baseH, (x, z, y, c) => { const d = Math.hypot(x, z); c.set(0x5a8a3a).lerp(new THREE.Color(0x4a7a2e), n(x * 0.05, z * 0.05)); if (y > 8) c.lerp(new THREE.Color(0x7a7a6a), smooth(8, 26, y) * 0.8); if (y < -0.3) c.set(0xc8b888).lerp(new THREE.Color(0x8a7a5a), smooth(-0.3, -6, y)); if (d < 30) c.set(0x8a7a5a); }, 120));
   // plaza tiles
   const plazaTex = TEX.tiles.clone(); plazaTex.needsUpdate = true; plazaTex.repeat.set(9, 9);
   const plaza = new THREE.Mesh(new THREE.CircleGeometry(27, 64), new THREE.MeshStandardMaterial({ map: plazaTex, roughness: 0.85 })); plaza.rotation.x = -Math.PI / 2; plaza.position.y = 0.02; plaza.receiveShadow = true; group.add(plaza);
@@ -1520,10 +1554,7 @@ function buildLobby() {
   const basin = new THREE.LatheGeometry([new THREE.Vector2(0, 0), new THREE.Vector2(4.2, 0), new THREE.Vector2(4.4, 0.7), new THREE.Vector2(4.0, 0.75), new THREE.Vector2(3.9, 0.25), new THREE.Vector2(0, 0.25)], 48);
   shadows(M(basin, std(0xb8b0a0, { r: 0.7, map: "rock" }), 0, 0, 0, group), true, true);
   { const fw = waterPlane(0x3a7a98, 0.55); fw.geometry = new THREE.CircleGeometry(3.9, 40); fw.geometry.rotateX(-Math.PI / 2); fw.material.normalMap.repeat.set(2, 2); group.add(fw); world.fountain = fw; }
-  shadows(M(G.cyl(0.5, 0.7), std(0xb8b0a0, { r: 0.6, map: "rock" }), 0, 1.4, 0, group, 1, 2.8, 1));
-  const statue = buildHumanoid({ look: { skin: 0xc8c0b0, hair: 0xc8c0b0, cloth: 0xc8c0b0, cloth2: 0xc8c0b0 }, armour: "gildedaegis", weapon: "dawnbreaker" });
-  statue.g.traverse(o => { if (o.isMesh && o.material.blending !== THREE.AdditiveBlending) o.material = std(0xc8c0b0, { r: 0.55, m: 0.1, map: "rock" }); });
-  statue.g.position.y = 2.8; statue.g.scale.setScalar(1.6); statue.shR.rotation.x = -2.9; statue.elR.rotation.x = -0.2; group.add(statue.g);
+  lobbyFountain(group);
   addCircle(0, 0, 4.6, 3);
   // portals
   LOBBY_PORTALS.forEach(([x, z], i) => {
@@ -1573,14 +1604,15 @@ function buildLobby() {
   townLayout(group, h); townLamps(group); townTrees(group, h);
   // trees and lamps
   const r3 = seeded(21);
-  for (let k = 0; k < 70; k++) { const a = r3() * TAU, d = 98 + r3() * 50, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z)) continue; const t = makeTree(r3() < 0.6 ? "oak" : "pine", r3); t.position.set(x, h(x, z), z); t.scale.setScalar(0.9 + r3() * 0.6); t.rotation.y = r3() * TAU; group.add(t); }
+  for (let k = 0; k < 70; k++) { const a = r3() * TAU, d = 100 + r3() * 90, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z) || onPath(x, z, 2) || inZone(x, z, 3) || Math.abs(baseH(x, z)) > 2) continue; const t = makeTree(r3() < 0.6 ? "oak" : "pine", r3); t.position.set(x, h(x, z), z); t.scale.setScalar(0.9 + r3() * 0.6); t.rotation.y = r3() * TAU; group.add(t); }
   for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + TAU / 16, x = Math.cos(a) * 25, z = Math.sin(a) * 25; M(G.cyl(0.06, 0.08), std(0x2a2a30, { m: 0.8, r: 0.4 }), x, 1.6, z, group, 1, 3.2, 1).castShadow = true; M(G.sph(), std(0xffe0a0, { e: 0xffc060, ei: 2.5 }), x, 3.3, z, group, 0.16); const lg = glowSprite(0xffb050, 2.2, 0.75); lg.position.set(x, 3.3, z); group.add(lg); addCircle(x, z, 0.3, 3); }
   const lampL = new THREE.PointLight(0xffc070, 0.8, 14, 2); lampL.position.set(0, 4, 0); group.add(lampL); world.nightLights = [{ l: lampL, b: 0.8 }];
+  frontier(group, h);
   grassField(group, coarse ? 7000 : 20000, 0x6a9a3a, () => { let x = 0, z = 0; for (let k = 0; k < 8; k++) { const a = rand(0, TAU), d = rand(27.6, 95); x = Math.cos(a) * d; z = Math.sin(a) * d; if (!onPath(x, z, 0.4)) break; } return [x, h(x, z), z]; });
   for (let k = 0; k < 30; k++) { const a = r3() * TAU, d = 30 + r3() * 40, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z) || onPath(x, z, 1)) continue; makeRock(group, x, h(x, z), z, 0.4 + r3() * 1.4, 0x8a8680, r3); }
   world.clouds = addClouds(group, 0xffffff);
   // distant mountains
-  for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 230, s = 40 + (k % 4) * 15; const m = M(G.cone(7), std(0x5a6a7a, { flat: true, r: 0.9 }), Math.cos(a) * d, s * 0.45, Math.sin(a) * d, group, s, s * 1.1, s); M(G.cone(7), std(0xf0f4ff, { flat: true, r: 0.7 }), Math.cos(a) * d, s * 0.82, Math.sin(a) * d, group, s * 0.35, s * 0.35, s * 0.35); }
+  for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 380, s = 80 + (k % 4) * 28; const m = M(G.cone(7), std(0x5a6a7a, { flat: true, r: 0.9 }), Math.cos(a) * d, s * 0.45, Math.sin(a) * d, group, s, s * 1.1, s); M(G.cone(7), std(0xf0f4ff, { flat: true, r: 0.7 }), Math.cos(a) * d, s * 0.82, Math.sin(a) * d, group, s * 0.35, s * 0.35, s * 0.35); }
   const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw;
 }
 
@@ -1716,7 +1748,7 @@ function rollRarity(table) {
   return pickWeighted({ common: table.common, rare: table.rare, epic: table.epic, legendary: table.legendary });
 }
 function rollItemOf(rarity) {
-  if (rarity === "vaulted") { const pool = ITEMS.filter(i => i.rarity === "vaulted"); const un = pool.filter(i => !S.seen[i.id]); return pick(un.length ? un : pool); }
+  if (rarity === "vaulted") { const pool = ITEMS.filter(i => i.rarity === "vaulted" && i.cat !== "fish" && (i.cat !== "armour" || Math.random() < 0.15)); const un = pool.filter(i => !S.seen[i.id]); return pick(un.length ? un : pool); }
   const cat = pickWeighted({ weapon: 4, armour: 3, potion: 2, material: 4 });
   let pool = ITEMS.filter(i => i.rarity === rarity && i.cat === cat);
   if (!pool.length) pool = ITEMS.filter(i => i.rarity === rarity && (i.cat === "weapon" || i.cat === "armour"));
@@ -1748,12 +1780,13 @@ function heroTargets() { const t = [{ ent: P, pos: P.pos, isHero: true }]; for (
 function damageEnemy(e, amount, dir, kb, o = {}) {
   if (e.dead) return;
   let dmg = amount, crit = false;
-  if (o.canCrit !== false && Math.random() < ST.crit) { dmg *= 1.75; crit = true; }
+  if (o.canCrit !== false && Math.random() < ST.crit) { dmg *= ST.critMult || 1.75; crit = true; }
   if (S.cls === "berserker") dmg *= 1 + 0.5 * (1 - P.hp / ST.maxHp);
   if (e.frozen && e.frozen > worldT && o.shatter) dmg *= 1.5;
   if (e.dummy) { dummyHit(e, dmg, crit, o); return; }
   if (e.duelist && e.guard > worldT) { dmg *= 0.3; if (!o.silent) floatText(e.pos, "Blocked", "#a1abc4"); }
   e.hp -= dmg; e.flash = 0.12;
+  if (run && run.boons && o.canCrit !== false && !o.noProc && !e.dead) boonProcs(e, dmg);
   if (!o.silent) floatText(e.pos, Math.round(dmg) + (crit ? "!" : ""), o.color || (crit ? "#ffd166" : "#fff2c8"), crit);
   if (dir && kb && !e.boss) { const d = dir.clone().setY(0); if (d.lengthSq() > 0) e.kb.copy(d.normalize().multiplyScalar(kb * 5)); }
   if (dir && kb && e.boss) { const d = dir.clone().setY(0); if (d.lengthSq() > 0) e.kb.copy(d.normalize().multiplyScalar(kb * 0.8)); }
@@ -1769,7 +1802,7 @@ function killEnemy(e) {
   const xp = e.base.xp * Math.pow(1.3, isl) * (1 + 0.5 * si);
   const coins = Math.round(e.base.coins * Math.pow(1.35, isl) * (1 + 0.6 * si) * rand(0.8, 1.2));
   S.coins += coins; floatText(e.pos, `+${fmt(coins)}`, "#e6b85c");
-  addXp(xp); bumpStat("kills"); if (e.boss) bumpStat("bosses");
+  addXp(xp); bumpStat("kills"); if (e.boss) bumpStat("bosses"); if (DAY.day < 0.35) bumpStat("nightKills");
   if (S.cls === "reaper") heal(ST.maxHp * 0.08);
   const table = dropTable(isl, si, e.boss);
   if (e.boss) {
@@ -1793,6 +1826,7 @@ function hurtHero(target, amount, from, src) {
     if (P.buffs.shield > worldT) dr = 1 - (1 - dr) * (1 - P.buffs.shieldAmt);
     const dmg = amount * (1 - dr);
     P.hp -= dmg; floatText(P.pos, `-${Math.round(dmg)}`, "#ff7a85");
+    if (src && !src.dead && !src.dummy && run && run.boons && run.boons.thorns) damageEnemy(src, dmg * 0.3 * run.boons.thorns, null, 0, { noProc: true, canCrit: false, color: "#d8ff6a" });
     if (from && !(P.buffs.noKb > worldT) && !(S.cls === "berserker" && P.atkT > 0)) { const d = P.pos.clone().sub(from).setY(0); if (d.lengthSq() > 0) P.kb.copy(d.normalize().multiplyScalar(5 * ST.kbTaken)); }
     if (S.cls === "warrior" && !P.flags.secondWind && P.hp > 0 && P.hp < ST.maxHp * 0.3) { P.flags.secondWind = true; heal(ST.maxHp * 0.2); toast("<b>Second Wind</b> healed you.", "common"); }
     if (P.hp <= 0) {
@@ -1984,7 +2018,7 @@ function startRun(idx, stageIdx, allyIds) {
   enemies = []; projectiles.forEach(p => scene.remove(p.m)); projectiles = []; telegraphs.forEach(t => scene.remove(t.mesh)); telegraphs = []; timers = [];
   allies.forEach(a => { scene.remove(a.R.g); scene.remove(a.lbl); }); allies = [];
   buildIsland(idx);
-  run = { idx, stage: stageIdx, level: 1, wave: 0, state: "intro", party: 1 + allyIds.length, allyIds };
+  run = { idx, stage: stageIdx, level: 1, wave: 0, state: "intro", party: 1 + allyIds.length, allyIds, boons: {} }; computeStats(); renderBoonBar(); stopFishing();
   P.pos.set(0, world.h(0, 22), 22); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.dead = false; P.hp = ST.maxHp; P.flags = {}; P.buffs = {}; P.dashQ = [];
   allyIds.forEach((id, k) => spawnAlly(ALLY_POOL.find(a => a.id === id), k));
   const I = ISLANDS[idx], st = STAGES[stageIdx];
@@ -2024,7 +2058,7 @@ function checkRunProgress() {
   if (alive) return;
   enemies = enemies.filter(e => !e.dead);
   const st = STAGES[run.stage];
-  if (run.state === "waves") { if (run.wave < st.waves) { run.state = "between"; later(1.6, nextWave); } else { run.state = "between"; later(1.8, spawnBoss); } }
+  if (run.state === "waves") { offerCards(); if (run.wave < st.waves) { run.state = "between"; later(1.6, nextWave); } else { run.state = "between"; later(1.8, spawnBoss); } }
   else if (run.state === "boss") {
     run.state = "between";
     const xp = 30 * Math.pow(1.3, run.idx) * (1 + run.stage);
@@ -2057,7 +2091,7 @@ function goLobby() {
   enemies.forEach(e => { scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar); });
   enemies = []; projectiles.forEach(p => scene.remove(p.m)); projectiles = []; telegraphs.forEach(t => scene.remove(t.mesh)); telegraphs = []; timers = [];
   allies.forEach(a => { scene.remove(a.R.g); scene.remove(a.lbl); }); allies = [];
-  run = null; buildLobby();
+  run = null; computeStats(); renderBoonBar(); $("cards").hidden = true; buildLobby();
   P.pos.set(0, 0, 8); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.dead = false; P.hp = ST.maxHp; P.dashQ = []; P.buffs = {}; P.onPortal = -1;
   updateModeUi(); save(); MUSIC.setMode("lobby", 0, "Harbour of Portals");
 }
@@ -2262,9 +2296,9 @@ function thumb(id) {
    MENUS
    ===================================================================== */
 let menuTab = "weapons", selItem = { weapon: null, armour: null, items: null }, selClass = null, rollResult = null;
-const MENU_TABS = [["weapons", "Weapons"], ["armour", "Armour"], ["items", "Potions and materials"], ["chests", "Chests"], ["forge", "Forge"], ["quests", "Quests"], ["classes", "Classes"], ["stats", "Stats"], ["shop", "Shop"]];
-const isPaused = () => !$("intro").hidden || !$("dialog").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
-function openMenu(tab) { menuTab = tab; rollResult = null; lastLoot = null; if (prevCanvas.parentNode && (tab === "chests" || tab === "forge" || tab === "quests")) prevCanvas.remove(); $("menu").hidden = false; keys.clear(); attackHeld = false; renderMenu(); }
+const MENU_TABS = [["weapons", "Weapons"], ["armour", "Armour"], ["items", "Potions and materials"], ["chests", "Chests"], ["forge", "Forge"], ["fishing", "Fishing"], ["enchant", "Enchant"], ["auction", "Vault Auction"], ["quests", "Quests"], ["classes", "Classes"], ["stats", "Stats"], ["shop", "Shop"]];
+const isPaused = () => !$("intro").hidden || !$("dialog").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
+function openMenu(tab) { menuTab = tab; rollResult = null; lastLoot = null; if (prevCanvas.parentNode && ["chests", "forge", "quests", "fishing", "enchant", "auction"].includes(tab)) prevCanvas.remove(); $("menu").hidden = false; keys.clear(); attackHeld = false; renderMenu(); }
 function closeMenu() { $("menu").hidden = true; if (prevCanvas.parentNode) prevCanvas.remove(); }
 function closeAllModals() { closeMenu(); $("dialog").hidden = true; $("mapModal").hidden = true; $("confirmLeave").hidden = true; }
 $("menuClose").addEventListener("click", closeMenu);
@@ -2281,8 +2315,8 @@ function meterRow(label, val, frac, color, cmp) {
   return `<div class="statrow"><div class="t"><span>${label}</span><b>${val}${em}</b></div><div class="meter"><i style="width:${clamp(frac, 0.02, 1) * 100}%;--mc:${color}"></i></div></div>`;
 }
 function renderMenu() {
-  const tabs = $("menuTabs"); tabs.innerHTML = MENU_TABS.map(([k, n]) => `<button class="tab ${menuTab === k ? "on" : ""}" data-tab="${k}">${n}</button>`).join("");
-  const T = MENU_TABS.find(t => t[0] === menuTab); $("menuTitle").textContent = { weapons: "Armoury", armour: "Armoury", items: "Satchel", chests: "Chests", forge: "The Forge", quests: "Quests", classes: "Classes", stats: "Stats", shop: "Merchant" }[menuTab];
+  const tabs = $("menuTabs"); tabs.innerHTML = MENU_TABS.filter(([k]) => !["enchant", "auction"].includes(k) || menuTab === k).map(([k, n]) => `<button class="tab ${menuTab === k ? "on" : ""}" data-tab="${k}">${n}</button>`).join("");
+  const T = MENU_TABS.find(t => t[0] === menuTab); $("menuTitle").textContent = { weapons: "Armoury", armour: "Armoury", items: "Satchel", chests: "Chests", forge: "The Forge", fishing: "Tackle Shop", enchant: "Archmage's Enchanting", auction: "Skyhold Vault Auction", quests: "Quests", classes: "Classes", stats: "Stats", shop: "Merchant" }[menuTab];
   const B = $("menuBody");
   if (menuTab === "weapons" || menuTab === "armour" || menuTab === "items") renderInspector(B, menuTab);
   else if (menuTab === "classes") renderClasses(B);
@@ -2290,12 +2324,15 @@ function renderMenu() {
   else if (menuTab === "chests") renderChests(B);
   else if (menuTab === "forge") renderForge(B);
   else if (menuTab === "quests") renderQuests(B);
+  else if (menuTab === "fishing") renderFishing(B);
+  else if (menuTab === "enchant") renderEnchant(B);
+  else if (menuTab === "auction") renderAuction(B);
   else renderShop(B);
 }
 $("menuTabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) { menuTab = b.dataset.tab; rollResult = null; if (menuTab !== "chests") lastLoot = null; renderMenu(); } });
 function renderInspector(B, tab) {
   const cat = tab === "weapons" ? "weapon" : tab === "armour" ? "armour" : null;
-  const owned = sortByRarity(Object.keys(S.inv).map(id => ITEM[id]).filter(i => cat ? i.cat === cat : (i.cat === "potion" || i.cat === "material" || i.cat === "special")));
+  const owned = sortByRarity(Object.keys(S.inv).map(id => ITEM[id]).filter(i => cat ? i.cat === cat : (i.cat === "potion" || i.cat === "material" || i.cat === "special" || i.cat === "fish")));
   const key = tab === "weapons" ? "weapon" : tab === "armour" ? "armour" : "items";
   if (!selItem[key] || !S.inv[selItem[key]] || !owned.find(i => i.id === selItem[key])) selItem[key] = cat ? S.equip[cat] : (owned[0] && owned[0].id);
   const sel = selItem[key] ? ITEM[selItem[key]] : null;
@@ -2318,7 +2355,7 @@ function renderInspector(B, tab) {
 }
 function detailHtml(it) {
   const eq = S.equip.weapon === it.id || S.equip.armour === it.id;
-  let h = `<div class="det-name">${esc(it.name)}</div><div class="det-rar">${RNAME[it.rarity]}</div>`;
+  let h = `<div class="det-name">${esc(it.name)}${enchLv(it.id) ? ` +${enchLv(it.id)}` : ""}</div><div class="det-rar">${RNAME[it.rarity]}${enchLv(it.id) ? ` · enchanted +${enchLv(it.id) * 7}%` : ""}</div>`;
   if (it.cat === "weapon") {
     const cur = ITEM[S.equip.weapon], stNew = statsFor(it.id, S.equip.armour), stCur = ST, W = WEIGHTS[it.weight];
     const cmp = (a, b) => eq ? null : a - b;
@@ -2536,7 +2573,8 @@ function update(dt) {
   const jumpPressed = edge.jump || (gp && gp.jump), jumpDown = jumpHeld || keys.has(" ") || (gp && gp.jumpHeld);
   const blockDown = !P.dead && (keys.has("f") || blockHeld || !!(gp && gp.block));
   if (blockDown && !P.blocking) { P.blocking = true; P.blockStart = worldT; } if (!blockDown) P.blocking = false;
-  if (!P.dead) {
+  if (fishing) fishControl(mag, !!(attackHeld || attackTap || keys.has("j") || keys.has("e") || edge.use || (gp && (gp.attack || gp.use))));
+  if (!P.dead && !fishing) {
     if (!P.blocking && (attackHeld || keys.has("j") || attackTap || (gp && gp.attack))) attack();
     if (edge.dash || (gp && gp.dash)) dash(move);
     if (edge.special || (gp && gp.special)) castSpecial();
@@ -2547,6 +2585,7 @@ function update(dt) {
   attackTap = false; for (const k in edge) edge[k] = false;
   P.atkT = Math.max(0, P.atkT - dt); P.specT = Math.max(0, P.specT - dt); P.armT = Math.max(0, P.armT - dt); P.potT = Math.max(0, P.potT - dt); P.invuln = Math.max(0, P.invuln - dt);
   P.dashQ = P.dashQ.filter(t => t > worldT);
+  if (run && run.boons && run.boons.recovery && !P.dead) heal(ST.maxHp * 0.01 * run.boons.recovery * dt, true);
   if (P.swing > 0) P.swing = Math.max(0, P.swing - dt / (P.swingDur || 0.4));
   if (P.spinT > 0) P.spinT = Math.max(0, P.spinT - dt);
   if (!P.dead) {
@@ -2605,6 +2644,7 @@ function update(dt) {
     e.t += dt;
     const frozen = e.frozen > worldT || e.stunUntil > worldT;
     if (e.burn > worldT) damageEnemy(e, e.burnDps * dt, null, 0, { silent: true, canCrit: false });
+    if (e.poison > worldT && !e.dead) damageEnemy(e, e.poisonDps * dt, null, 0, { silent: true, canCrit: false, noProc: true });
     if (e.dead) continue;
     e.pos.addScaledVector(e.kb, dt); e.kb.multiplyScalar(Math.exp(-6 * dt));
     let tgt = null, td = 1e9; for (const h of heroes) { const d = h.pos.distanceTo(e.pos); if (d < td) { td = d; tgt = h; } }
@@ -2646,6 +2686,7 @@ function update(dt) {
     if (p.homing) { const tgt = p.homing === true || p.homing.dead ? nearestEnemy(p.pos, 30) : p.homing; if (tgt) { p.homing = tgt; const want = tgt.pos.clone().add(new V3(0, 1, 0)).sub(p.pos).normalize().multiplyScalar(p.vel.length()); p.vel.lerp(want, Math.min(1, dt * 4)); } }
     p.pos.addScaledVector(p.vel, dt); p.m.position.copy(p.pos); p.m.lookAt(p.pos.clone().add(p.vel));
     let done = p.life <= 0 || p.pos.y < world.h(p.pos.x, p.pos.z) - 0.2;
+    if (!done) for (const c of world.circles) { if (Math.abs(p.pos.x - c.x) > c.r || Math.abs(p.pos.z - c.z) > c.r) continue; c.y0 ??= world.h(c.x, c.z); if (p.pos.y < c.y0 || p.pos.y - c.y0 > c.h) continue; if (Math.hypot(p.pos.x - c.x, p.pos.z - c.z) < c.r) { done = true; burstFx(p.pos.clone(), 0.5, p.color || 0xffffff, 0.2); break; } }
     if (!done) {
       if (p.side === "enemy") { for (const h of heroTargets()) if (h.pos.clone().add(new V3(0, 1, 0)).distanceTo(p.pos) < p.r + 0.4) { hurtHero(h, p.dmg, p.pos, p.src); done = true; break; } }
       else for (const e of enemies) { if (e.dead || p.hit.has(e)) continue; if (e.pos.clone().add(new V3(0, e.scale, 0)).distanceTo(p.pos) < p.r + e.radius + 0.3) { p.hit.add(e); damageEnemy(e, p.dmg, p.vel, p.kb, { canCrit: p.side === "hero" }); if (p.side === "hero" && !p.pierce) onHeroHit(); if (!p.pierce) { done = true; break; } } }
@@ -2656,7 +2697,7 @@ function update(dt) {
 }
 function nearestInteract() {
   if (!world || !world.interact) return null;
-  let best = null, bd = Infinity; for (const it of world.interact) { const d = Math.hypot(it.x - P.pos.x, it.z - P.pos.z); if (d < it.r && d < bd) { best = it; bd = d; } }
+  let best = null, bd = Infinity; for (const it of world.interact) { if (it.y !== undefined && Math.abs(P.pos.y - it.y) > 3) continue; const d = Math.hypot(it.x - P.pos.x, it.z - P.pos.z); if (d < it.r && d < bd) { best = it; bd = d; } }
   return best;
 }
 function animate(dt, paused) {
@@ -2677,7 +2718,7 @@ function animate(dt, paused) {
   camTarget.lerp(new V3(P.pos.x, P.pos.y + 1.55, P.pos.z), 1 - Math.exp(-12 * dt));
   const cp = Math.cos(cam.pitch);
   camera.position.set(camTarget.x + Math.sin(cam.yaw) * cp * cam.dist, camTarget.y + Math.sin(cam.pitch) * cam.dist, camTarget.z + Math.cos(cam.yaw) * cp * cam.dist);
-  const gy = world.h(camera.position.x, camera.position.z) + 0.6; if (camera.position.y < gy) camera.position.y = gy;
+  const gy = (world.hBase || world.h)(camera.position.x, camera.position.z) + 0.6; if (camera.position.y < gy) camera.position.y = gy;
   camera.lookAt(camTarget);
   sun.position.copy(P.pos).add(SUN_OFF); sun.target.position.copy(P.pos);
   sky.position.copy(camera.position);
@@ -2744,7 +2785,7 @@ function chestSvg(t) {
 function grantChest(t, i) { S.chests.push({ t, i }); if (S.chests.length > 200) S.chests.shift(); updateChestBadge(); }
 function rollOfCats(rarity, cats) {
   const order = ["vaulted", "legendary", "epic", "rare", "common"];
-  for (let k = order.indexOf(rarity); k < order.length; k++) { const pool = ITEMS.filter(it => it.rarity === order[k] && cats.includes(it.cat) && it.id !== "die"); if (pool.length) return pick(pool); }
+  for (let k = order.indexOf(rarity); k < order.length; k++) { const pool = ITEMS.filter(it => it.rarity === order[k] && cats.includes(it.cat) && it.id !== "die" && !(order[k] === "vaulted" && it.cat === "armour" && Math.random() > 0.15)); if (pool.length) return pick(pool); }
   return ITEM.minor;
 }
 let lastLoot = null;
@@ -2879,6 +2920,10 @@ function openDialog(npc, line) {
     else { text = "You did it! Here is what I promised."; quest = questBox(q, "Ready to hand in"); btns = `<button class="btn primary" data-dlg="turnin">Collect reward</button>`; }
     if (npc.forge) btns += `<button class="btn" data-dlg="forge">Use the forge</button>`;
     if (npc.duel) btns += `<button class="btn" data-dlg="duels">Challenge a rival</button>`;
+    if (npc.enchant) btns += `<button class="btn primary" data-dlg="enchant">Enchant my gear</button>`;
+    if (npc.auction) btns += `<button class="btn primary" data-dlg="auction">See the Vault Auction</button>`;
+    if (npc.fishing) btns += `<button class="btn primary" data-dlg="fishing">Browse rods</button>`;
+    if (npc.exchange) btns += ["common:5", "rare:5", "epic:5", "legendary:10"].map(t => { const [f, n] = t.split(":"); return `<button class="btn" data-trade="${t}">${n} ${RNAME[f].toLowerCase()} materials for 1 ${RNAME[["common", "rare", "epic", "legendary", "vaulted"][["common", "rare", "epic", "legendary"].indexOf(f) + 1]].toLowerCase()}</button>`; }).join("");
     btns += `<button class="btn" data-dlg="close">${st === "offer" ? "Not now" : "Farewell"}</button>`;
   }
   $("dlgText").textContent = text; $("dlgQuest").innerHTML = quest; $("dlgBtns").innerHTML = btns;
@@ -2896,6 +2941,7 @@ $("dialog").addEventListener("click", e => {
   if (a === "close") { $("dialog").hidden = true; return; }
   if (a === "forge") { $("dialog").hidden = true; openMenu("forge"); return; }
   if (a === "duels") { openDuelBoard(); return; }
+  if (a === "enchant" || a === "auction" || a === "fishing") { $("dialog").hidden = true; openMenu(a); return; }
   const q = questOf(npc); if (!q) return;
   if (a === "accept") { S.quests[q.id] = { s: "active", base: S.stats[q.stat] || 0 }; toast(`<b>Quest accepted:</b> ${esc(q.title)}`, "rare"); save(); openDialog(npc); }
   if (a === "turnin" && npcStatus(npc) === "ready") { if (q.deliver) for (const [id, n] of Object.entries(q.deliver)) { S.inv[id] -= n; if (S.inv[id] <= 0) delete S.inv[id]; } S.quests[q.id] = { s: "done" }; giveReward(q.reward); banner("Quest complete", q.title); save(); openDialog(npc); }
@@ -3070,17 +3116,17 @@ function lobbyExtras(group, h) {
   /* townsfolk */
   const mk = (def, x, z, face) => {
     const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null });
-    R.g.position.set(x, 0, z); R.g.rotation.y = face; group.add(R.g); shadows(R.g, true, false);
-    const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, 2.45, z); lbl.userData.far = 42; group.add(lbl); world.labels.push(lbl);
+    const gy0 = world.h(x, z); R.g.position.set(x, gy0, z); R.g.rotation.y = face; group.add(R.g); shadows(R.g, true, false);
+    const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, gy0 + 2.45, z); lbl.userData.far = 42; group.add(lbl); world.labels.push(lbl);
     return { R, lbl };
   };
   world.npcs = [];
   QUEST_NPCS.forEach(def => {
     const [x, z] = def.pos, o = mk(def, x, z, def.face);
     const marks = { offer: markSprite("!", "#ffd166"), ready: markSprite("?", "#7fd69a") };
-    for (const m of Object.values(marks)) { m.position.set(x, 3.15, z); group.add(m); m.visible = false; }
+    for (const m of Object.values(marks)) { m.position.set(x, world.h(x, z) + 3.15, z); group.add(m); m.visible = false; }
     const n = { def, ...o, x, z, marks, quest: true }; world.npcs.push(n); addCircle(x, z, 0.5, 2);
-    world.interact.push({ x, z, r: 2.8, label: `Talk to ${def.name}`, act: () => openDialog(def) });
+    world.interact.push({ x, z, y: world.h(x, z), r: 2.8, label: `Talk to ${def.name}`, act: () => openDialog(def) });
   });
   VILLAGERS.forEach((def, k) => {
     const a = k / VILLAGERS.length * TAU + 0.4, x = def.home ? def.home[0] : Math.cos(a) * 18, z = def.home ? def.home[1] : Math.sin(a) * 18, o = mk(def, x, z, 0);
@@ -3094,7 +3140,7 @@ function lobbyExtras(group, h) {
     for (const n of world.npcs) {
       const far = Math.hypot(P.pos.x - n.x, P.pos.z - n.z) > 52; n.R.g.visible = !far;
       if (far) { if (n.marks) n.marks.offer.visible = n.marks.ready.visible = false; continue; }
-      if (n.quest) { const st = npcStatus(n.def); n.marks.offer.visible = st === "offer"; n.marks.ready.visible = st === "ready"; const bob = 3.25 + Math.sin(t * 2.4) * 0.12; n.marks.offer.position.y = n.marks.ready.position.y = bob;
+      if (n.quest) { const st = npcStatus(n.def); n.marks.offer.visible = st === "offer"; n.marks.ready.visible = st === "ready"; const bob = world.h(n.x, n.z) + 3.25 + Math.sin(t * 2.4) * 0.12; n.marks.offer.position.y = n.marks.ready.position.y = bob;
         const dx = P.pos.x - n.x, dz = P.pos.z - n.z, near = Math.hypot(dx, dz) < 6; const want = near ? Math.atan2(dx, dz) : n.def.face; let d = want - n.R.g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); n.R.g.rotation.y += d * Math.min(1, dt * 4);
         poseHumanoid(n.R, t + n.x, 0, 0, "normal", false); continue; }
       if (!paused) {
@@ -3108,7 +3154,7 @@ function lobbyExtras(group, h) {
         }
       }
       n.walk = lerp(n.walk, n.tgt && n.wait <= 0 && !paused ? 0.55 : 0, Math.min(1, dt * 6));
-      n.R.g.position.set(n.x, 0, n.z); n.lbl.position.set(n.x, 2.45, n.z); n.it.x = n.x; n.it.z = n.z;
+      const gyn = world.h(n.x, n.z); n.R.g.position.set(n.x, gyn, n.z); n.lbl.position.set(n.x, gyn + 2.45, n.z); n.it.x = n.x; n.it.z = n.z;
       poseHumanoid(n.R, t * 0.8 + n.x, n.walk, 0, "normal", false);
     }
   });
@@ -3119,14 +3165,14 @@ function lobbyExtras(group, h) {
    ===================================================================== */
 // north is -z. a = atan2(z, x)
 const COMPASS = [
-  { k: "E", name: "East", deg: 0, dest: "Lantern Row", len: 92 },
-  { k: "SE", name: "South-east", deg: 45, dest: "Mirror Pond", len: 70 },
-  { k: "S", name: "South", deg: 90, dest: "Market Square", len: 92 },
-  { k: "SW", name: "South-west", deg: 135, dest: "Adventurers' Guild", len: 72 },
-  { k: "W", name: "West", deg: 180, dest: "Chapel of Dawn", len: 74 },
-  { k: "NW", name: "North-west", deg: 225, dest: "Barracks", len: 72 },
-  { k: "N", name: "North", deg: 270, dest: "Training Grounds and Duel Arena", len: 92 },
-  { k: "NE", name: "North-east", deg: 315, dest: "Highfield Farm", len: 68 }
+  { k: "E", name: "East", deg: 0, dest: "Glimmerwater Lake", len: 146 },
+  { k: "SE", name: "South-east", deg: 45, dest: "Hermit's Grove", len: 150 },
+  { k: "S", name: "South", deg: 90, dest: "Port Saltreach", len: 165 },
+  { k: "SW", name: "South-west", deg: 135, dest: "Skyhold Castle", len: 199 },
+  { k: "W", name: "West", deg: 180, dest: "Moonwell Observatory", len: 152 },
+  { k: "NW", name: "North-west", deg: 225, dest: "Frontier Fort", len: 150 },
+  { k: "N", name: "North", deg: 270, dest: "Training Grounds and Grand Arena", len: 142 },
+  { k: "NE", name: "North-east", deg: 315, dest: "Spire of the Archmage", len: 150 }
 ].map(c => Object.assign(c, { a: c.deg * Math.PI / 180, w: c.k.length === 1 ? 6 : 4.4 }));
 function onPath(x, z, pad = 0) {
   for (const c of COMPASS) {
@@ -3208,11 +3254,10 @@ function townLayout(group, h) {
   const wood = MAT.bark(0x5a3a24), stoneM = std(0x8a8478, { r: 0.85, map: "rock", bump: "rockB", bs: 0.6, rep: 2 }), darkStone = std(0x5a564e, { r: 0.85, map: "rock" });
   const place = (x, z, rotY, parent = town) => { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; parent.add(g); return g; };
   const lbl = (text, x, y, z, col = "#ffe2a0", size = 1.2) => { const l = textSprite(text, col, size); l.position.set(x, y, z); group.add(l); world.labels.push(l); return l; };
+  townRoads(town, h);
   // the eight roads, with a signpost where each leaves the plaza
   for (const c of COMPASS) {
     const cx = Math.cos(c.a), cz = Math.sin(c.a), len = c.len - 26, mid = 26 + len / 2;
-    const p = M(G.box(), tiles, cx * mid, 0.03, cz * mid, town, len, 0.06, c.w); p.rotation.y = -c.a;
-    for (const s of [-1, 1]) { const k = M(G.box(), curb, cx * mid - cz * s * (c.w / 2 + 0.15), 0.08, cz * mid + cx * s * (c.w / 2 + 0.15), town, len, 0.16, 0.3); k.rotation.y = -c.a; }
     const sx = cx * 29.5 - cz * (c.w / 2 + 1.2), sz = cz * 29.5 + cx * (c.w / 2 + 1.2);
     M(G.cyl(0.09, 0.11), wood, sx, 1.3, sz, town, 1, 2.6, 1);
     const board = M(G.box(), MAT.bark(0x7a5536), sx, 2.3, sz, town, 1.6, 0.42, 0.08); board.rotation.y = -c.a + Math.PI / 2;
@@ -3227,32 +3272,9 @@ function townLayout(group, h) {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), new THREE.MeshStandardMaterial({ map: tx, transparent: true, roughness: 0.9, depthWrite: false }));
     m.rotation.x = -Math.PI / 2; m.rotation.z = -a - Math.PI / 2; m.position.set(Math.cos(a) * 24.2, 0.04, Math.sin(a) * 24.2); m.userData.dyn = true; group.add(m);
   }
-  /* north: training grounds and the duel arena */
-  {
-    const fence = (x0, z0, x1, z1) => { const n = Math.max(1, Math.round(Math.hypot(x1 - x0, z1 - z0) / 2.5)); for (let i = 0; i <= n; i++) { const x = lerp(x0, x1, i / n), z = lerp(z0, z1, i / n); if (onPath(x, z, 0.6)) continue; M(G.box(), wood, x, 0.6, z, town, 0.18, 1.2, 0.18); } const rail = M(G.box(), wood, (x0 + x1) / 2, 0.85, (z0 + z1) / 2, town, Math.hypot(x1 - x0, z1 - z0), 0.1, 0.08); rail.rotation.y = -Math.atan2(z1 - z0, x1 - x0); };
-    fence(-17, -58, -17, -72); fence(17, -58, 17, -72); fence(-17, -58, -4, -58); fence(4, -58, 17, -58);
-    M(G.box(), std(0xb8a07a, { r: 0.95, map: "groundB" }), -10.5, 0.02, -65, town, 12, 0.04, 13); M(G.box(), std(0xb8a07a, { r: 0.95, map: "groundB" }), 10.5, 0.02, -65, town, 12, 0.04, 13);
-    const dummies = new THREE.Group(); group.add(dummies);
-    for (const [x, z] of [[-13, -62], [-8, -62], [8, -62], [13, -62], [-10.5, -68], [10.5, -68]]) makeDummy(dummies, x, z, x < 0 ? Math.PI / 2 : -Math.PI / 2);
-    for (const s of [-1, 1]) { const rk = place(15.5 * s, -66, s < 0 ? Math.PI / 2 : -Math.PI / 2); M(G.box(), wood, 0, 1.6, 0, rk, 3, 0.15, 0.3); for (const q of [-1, 1]) M(G.box(), wood, 1.45 * q, 0.85, 0, rk, 0.15, 1.7, 0.3); ["militia", "ironwood", "woodsman"].forEach((id, k) => { const w = buildWeapon(ITEM[id]); w.position.set(-0.8 + k * 0.8, 0.2, 0.2); rk.add(w); }); }
-    lbl("Training Grounds", 0, 4.4, -60.5);
-    // arena
-    const ax = 0, az = -82, ar = 9.5;
-    M(G.cyl(ar, ar, 40), std(0xd8c49a, { r: 0.98, map: "groundB", rep: 4 }), ax, 0.05, az, town, 1, 0.08, 1);
-    const segs = 28; for (let i = 0; i < segs; i++) { const a = i / segs * TAU; if (Math.abs(Math.atan2(Math.sin(a - Math.PI / 2), Math.cos(a - Math.PI / 2))) < 0.25) continue; const x = ax + Math.cos(a) * (ar + 0.4), z = az + Math.sin(a) * (ar + 0.4); const b = M(G.box(), stoneM, x, 0.55, z, town, 2.25, 1.1, 0.7); b.rotation.y = -a + Math.PI / 2; }
-    for (let i = 0; i < 6; i++) { const a = i / 6 * TAU + 0.3, x = ax + Math.cos(a) * (ar + 1.6), z = az + Math.sin(a) * (ar + 1.6); M(G.cyl(0.1, 0.12), wood, x, 2.2, z, town, 1, 4.4, 1); const fl = M(G.box(), std([0xc0402a, 0x3a5aa8][i % 2], { r: 0.9, map: "fabric" }), x, 3.5, z, town, 0.05, 1.6, 0.9); fl.rotation.y = -a; }
-    for (let i = 0; i < segs; i++) { const a = i / segs * TAU; if (Math.abs(Math.atan2(Math.sin(a - Math.PI / 2), Math.cos(a - Math.PI / 2))) < 0.6) continue; addCircle(ax + Math.cos(a) * (ar + 0.4), az + Math.sin(a) * (ar + 0.4), 1.1, 2); }
-    lbl("Duel Arena · 1v1", ax, 5.2, az - ar - 1.5, "#ffd0a0", 1.5);
-    const board = place(5.5, -71.6, 0); M(G.box(), MAT.bark(0x7a5536), 0, 1.8, 0, board, 2.4, 1.5, 0.12); for (const q of [-1, 1]) M(G.cyl(0.08, 0.1), wood, 1.1 * q, 1.2, 0, board, 1, 2.4, 1);
-    for (let k = 0; k < 4; k++) M(G.box(), std(0xf0e6cc, { r: 0.9 }), -0.75 + k * 0.5, 1.85 + (k % 2) * 0.15, 0.08, board, 0.38, 0.5, 0.01);
-    addCircle(5.5, -71.6, 0.8, 2);
-    world.interact.push({ x: 5.5, z: -70.6, r: 3, label: "Challenge a rival to a duel", act: () => openDuelBoard() });
-    lbl("Duel board", 5.5, 3.2, -71.6, "#f4ead2", 0.9);
-    world.arena = { x: ax, z: az, r: ar };
-  }
   /* north-east: Highfield Farm */
   {
-    const fx = 60, fz = -60;
+    const fx = 74, fz = -46;
     for (let p = 0; p < 4; p++) { const ox = fx - 8 + (p % 2) * 13, oz = fz - 4 + Math.floor(p / 2) * 11; const crop = [0x7aa83a, 0xd8b84a, 0x5a8a2a, 0xc8a040][p];
       M(G.box(), std(0x5a4030, { r: 1, map: "groundB" }), ox, 0.02, oz, town, 10, 0.05, 8);
       for (let j = 0; j < 7; j++) M(G.box(), std(crop, { r: 0.9, map: "fabric" }), ox, 0.28, oz - 3.3 + j * 1.1, town, 9.4, 0.5, 0.45); addCircle(ox, oz, 4.6, 1); }
@@ -3269,7 +3291,7 @@ function townLayout(group, h) {
     for (const s of [-1, 1]) M(G.box(), wood, wx + s * 1.0, 1.6, wz, town, 0.15, 2.2, 0.15); const rf = M(G.cone(4), std(0x7a4a3a, { r: 0.8, map: "roof", flat: true }), wx, 3.0, wz, town, 1.8, 0.9, 1.4); rf.rotation.y = Math.PI / 4;
     addCircle(wx, wz, 1.3, 2); lbl("Lantern Row", 80, 6.5, 0); }
   /* south-east: Mirror Pond */
-  { const px = 59, pz = 59, pr = 10;
+  { const px = 47.7, pz = 70.3, pr = 10;
     const pond = waterPlane(0x2f6a88, 0.07); pond.geometry = new THREE.CircleGeometry(pr, 48); pond.geometry.rotateX(-Math.PI / 2); pond.position.x = px; pond.position.z = pz; pond.material.normalMap && pond.material.normalMap.repeat.set(3, 3); group.add(pond);
     world.animated.push(t => { if (pond.userData.water) pond.userData.water.offset.set(t * 0.02, t * 0.013); });
     for (let k = 0; k < 22; k++) { const a = k / 22 * TAU; makeRock(town, px + Math.cos(a) * (pr + 0.3), 0.05, pz + Math.sin(a) * (pr + 0.3), 0.5 + (k % 3) * 0.25, 0x8a8680, r); }
@@ -3282,7 +3304,7 @@ function townLayout(group, h) {
   { const mx = 0, mz = 75;
     M(G.cyl(11, 11, 40), std(0xb8ac94, { r: 0.9, map: "tiles", rep: 5 }), mx, 0.04, mz, town, 1, 0.06, 1);
     const cols = [0xc0402a, 0x3a6aa8, 0xd8a83a, 0x4a8a4a, 0x8a4aa8, 0xd8703a];
-    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + Math.PI / 6, x = mx + Math.cos(a) * 7.5, z = mz + Math.sin(a) * 7.5; if (Math.abs(x) < 4.5 && z < mz) continue;
+    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + Math.PI / 6, x = mx + Math.cos(a) * 7.5, z = mz + Math.sin(a) * 7.5; if (onPath(x, z, 1.6)) continue;
       const st = place(x, z, Math.atan2(mx - x, mz - z));
       M(G.box(), MAT.bark(0x7a5536), 0, 0.55, 0, st, 2.6, 1.1, 1.1); const cv = M(G.box(), std(cols[k], { r: 0.85, map: "fabric" }), 0, 2.5, -0.1, st, 3, 0.08, 1.8); cv.rotation.x = 0.22;
       for (const s of [-1, 1]) M(G.cyl(0.05, 0.05), wood, 1.3 * s, 1.25, 0.5, st, 1, 2.5, 1);
@@ -3291,7 +3313,7 @@ function townLayout(group, h) {
     for (let k = 0; k < 7; k++) { const x = mx - 9 + r() * 18, z = mz + 3 + r() * 6; if (blocked(x, z, 0.6) || onPath(x, z, 0.5)) continue; M(G.box(), MAT.bark(0x8a6a42), x, 0.4, z, town, 0.8, 0.8, 0.8).rotation.y = r(); addCircle(x, z, 0.5, 1); }
     lbl("Market Square", mx, 4.6, mz + 11.5); }
   /* south-west: the Adventurers' Guild */
-  { const gx = -57, gz = 57, g = place(gx, gz, Math.atan2(-gx, -gz));
+  { const gx = -68, gz = 46, g = place(gx, gz, Math.atan2(-gx, -gz));
     M(G.box(), std(0xcabca4, { r: 0.92, map: "plaster", bump: "plasterB", bs: 1.2, rep: 3 }), 0, 4.5, 0, g, 14, 9, 9); M(G.box(), darkStone, 0, 0.5, 0, g, 14.4, 1, 9.4);
     for (const xx of [-6.8, -2.3, 2.3, 6.8]) M(G.box(), MAT.bark(0x4a3222), xx, 4.5, 4.52, g, 0.35, 9, 0.12);
     M(G.box(), MAT.bark(0x4a3222), 0, 4.6, 4.53, g, 14, 0.3, 0.12);
@@ -3301,7 +3323,7 @@ function townLayout(group, h) {
     for (const s of [-1, 1]) { M(G.cyl(0.08, 0.08), wood, 1.8 * s, 6.4, 4.9, g, 1, 0.1, 1); M(G.box(), std(s < 0 ? 0x2a4a8a : 0xa83a2a, { r: 0.9, map: "fabric" }), 1.8 * s, 5.6, 4.75, g, 1.1, 2.2, 0.05); }
     addCircle(gx, gz, 7.6, 12); lbl("Adventurers' Guild", gx, 14.8, gz, "#ffe2a0", 1.4); }
   /* west: Chapel of Dawn */
-  { const cx0 = -84, cz0 = 0, g = place(cx0, cz0, Math.PI / 2);
+  { const cx0 = -84, cz0 = -18, g = place(cx0, cz0, 0);
     M(G.box(), stoneM, 0, 4, 0, g, 9, 8, 16); M(G.box(), darkStone, 0, 0.4, 0, g, 9.4, 0.8, 16.4);
     const rf = M(G.box(), std(0x4a4a5a, { r: 0.8, map: "roof", bump: "roof", bs: 1.4, rep: [4, 6] }), 2.4, 9.4, 0, g, 6.4, 0.3, 16.6); rf.rotation.z = -0.62;
     const rf2 = M(G.box(), std(0x4a4a5a, { r: 0.8, map: "roof", bump: "roof", bs: 1.4, rep: [4, 6] }), -2.4, 9.4, 0, g, 6.4, 0.3, 16.6); rf2.rotation.z = 0.62;
@@ -3310,10 +3332,10 @@ function townLayout(group, h) {
     M(G.box(), std(0x3a2618, { r: 0.7 }), 0, 1.6, 8.05, g, 2.2, 3.2, 0.1);
     const glass = [0xff5a5a, 0x5aa0ff, 0xffd05a, 0x9a5aff]; for (let k = 0; k < 4; k++) for (const s of [-1, 1]) M(G.box(), std(glass[k], { e: glass[k], ei: 0.9, r: 0.2 }), 4.53 * s, 4.4, -4.5 + k * 3.2, g, 0.05, 2.6, 1.1);
     M(G.cyl(1.4, 1.4, 24), std(0xffd890, { e: 0xffb050, ei: 1.2 }), 0, 6.2, 8.03, g, 1, 0.05, 1).rotation.x = Math.PI / 2;
-    for (let k = 0; k < 9; k++) { const x = cx0 + 8 + (k % 3) * 2.2, z = cz0 + 11 + Math.floor(k / 3) * 2.4; M(G.box(), std(0x8a8890, { r: 0.8, map: "rock" }), x, 0.5, z, town, 0.7, 1, 0.18); addCircle(x, z, 0.4, 1); }
+    for (let k = 0; k < 9; k++) { const x = cx0 - 12 + (k % 3) * 2.2, z = cz0 - 4 + Math.floor(k / 3) * 2.4; M(G.box(), std(0x8a8890, { r: 0.8, map: "rock" }), x, 0.5, z, town, 0.7, 1, 0.18); addCircle(x, z, 0.4, 1); }
     addCircle(cx0, cz0, 8.4, 16); addCircle(cx0, cz0 - 6.5, 2.6, 16); lbl("Chapel of Dawn", cx0, 24, cz0); }
   /* north-west: Barracks */
-  { const bx = -55, bz = -55;
+  { const bx = -41, bz = -69;
     const tw = place(bx - 6, bz - 6, 0.8); for (const [x, z] of [[-1.3, -1.3], [1.3, -1.3], [-1.3, 1.3], [1.3, 1.3]]) M(G.box(), wood, x, 5, z, tw, 0.3, 10, 0.3);
     M(G.box(), MAT.bark(0x7a5536), 0, 10, 0, tw, 3.6, 0.3, 3.6); for (const s of [-1, 1]) { M(G.box(), wood, 1.7 * s, 10.6, 0, tw, 0.12, 1, 3.6); M(G.box(), wood, 0, 10.6, 1.7 * s, tw, 3.6, 1, 0.12); }
     const tr = M(G.cone(4), std(0x6a3a2a, { r: 0.8, map: "roof", flat: true }), 0, 12.6, 0, tw, 3.4, 2.2, 3.4); tr.rotation.y = Math.PI / 4;
@@ -3323,17 +3345,7 @@ function townLayout(group, h) {
     const rk = place(bx - 4, bz + 8, 0.8); M(G.box(), wood, 0, 1.6, 0, rk, 3, 0.15, 0.3); for (const q of [-1, 1]) M(G.box(), wood, 1.45 * q, 0.85, 0, rk, 0.15, 1.7, 0.3); ["copperhorn", "militia", "ironoath"].forEach((id, k) => { const w = buildWeapon(ITEM[id]); w.position.set(-0.8 + k * 0.8, 0.2, 0.2); rk.add(w); }); addCircle(bx - 4, bz + 8, 1.6, 2);
     const flag = place(bx - 8, bz + 2, 0); M(G.cyl(0.08, 0.1), wood, 0, 4, 0, flag, 1, 8, 1); M(G.box(), std(0x2a4a8a, { r: 0.9, map: "fabric" }), 0.9, 7, 0, flag, 1.8, 1.2, 0.05); addCircle(bx - 8, bz + 2, 0.3, 4);
     lbl("Barracks", bx, 15, bz - 6); }
-  // houses along every road
-  const homeRing = { E: [36, 47, 64, 75, 86], SE: [36, 47], S: [36, 47], SW: [36, 47], W: [36, 47], NW: [36, 47], N: [36, 47], NE: [36, 47] };
-  for (const c of COMPASS) {
-    const cx = Math.cos(c.a), cz = Math.sin(c.a);
-    for (const t of homeRing[c.k]) for (const s of [-1, 1]) {
-      const off = c.w / 2 + 1.6 + 3, x = cx * t - cz * s * off, z = cz * t + cx * s * off;
-      if (blocked(x, z, 3.2) || onPath(x, z, 3)) continue;
-      const rr = makeHouse(town, x, z, Math.atan2(s * cz, -s * cx), r);
-      addCircle(x, z, rr, 8);
-    }
-  }
+  townHouses(town, r);
   shadows(town, true, true);
   mergeStatic(town);
 }
@@ -3361,11 +3373,11 @@ $("dialog").addEventListener("click", e => { const b = e.target.closest("[data-d
 function startDuel(i) {
   const def = RIVALS[i]; if (!def || duel || run || !world.arena) return;
   const A = world.arena;
-  P.pos.set(A.x, 0, A.z + 5); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.hp = ST.maxHp; P.dead = false; P.buffs = {}; P.dashQ = []; P.kb.set(0, 0, 0);
+  P.pos.set(A.x, 0, A.z + 11); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.hp = ST.maxHp; P.dead = false; P.buffs = {}; P.dashQ = []; P.kb.set(0, 0, 0);
   const R = buildHumanoid({ look: def.look, armour: def.armour, weapon: def.weapon }); scene.add(R.g); shadows(R.g, true, false);
   const tell = glowSprite(0xff3a4a, 1.6, 0.9); tell.visible = false; R.g.add(tell); tell.position.y = 2.2;
   const w = ITEM[def.weapon];
-  const e = { R, name: def.name, role: "duelist", duelist: true, def, boss: false, base: { xp: 0, coins: 0, range: 2.2, cd: def.cd }, pos: new V3(A.x, 0, A.z - 5), kb: new V3(),
+  const e = { R, name: def.name, role: "duelist", duelist: true, def, boss: false, base: { xp: 0, coins: 0, range: 2.2, cd: def.cd }, pos: new V3(A.x, 0, A.z - 11), kb: new V3(),
     hp: Math.max(ST.maxHp, ST.dps * def.ttk), dmg: ST.maxHp * def.hit / Math.max(0.15, 1 - ST.dr), spd: def.spd, atkT: 0, dead: false, flash: 0, accent: w.accent, scale: 1, radius: 0.5, t: 0, atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0,
     face: 0, swing: 0, nextAtk: worldT + 3.6, dashAt: worldT + 5, specAt: worldT + 9, guard: 0, guardCd: 0, windup: null, tell, style: w.weight };
   e.maxHp = e.hp;
@@ -3402,6 +3414,8 @@ function duelistUpdate(e, dt) {
       later(1.1, () => { if (!duel || duel.e !== e) return; ringFx(at, 3.4, e.accent, 0.5); burstFx(at.clone().add(new V3(0, 0.6, 0)), 3, e.accent); if (Math.hypot(P.pos.x - at.x, P.pos.z - at.z) < 3.2) hurtHero(heroTargets()[0], e.dmg * 1.8, at, e); });
     }
   }
+  if (d.phase === "fight" && !stunned && !P.dead && dist > 7 && worldT > (e.throwAt || 0) && !e.windup) { e.throwAt = worldT + rand(2.2, 3.4); e.swing = 1; shoot(e.pos.clone().add(new V3(0, 1.4, 0)), P.pos.clone().add(new V3(0, 1, 0)), e.accent, e.dmg * 0.7, 1, "enemy", { src: e, speed: 17, life: 2.2, size: 0.22 }); }
+  collide(e.pos, 0.45, 0);
   // keep both fighters in the ring
   const ex = e.pos.x - A.x, ez = e.pos.z - A.z, er = Math.hypot(ex, ez); if (er > A.r - 0.8) { e.pos.x = A.x + ex / er * (A.r - 0.8); e.pos.z = A.z + ez / er * (A.r - 0.8); }
   if (d.phase === "fight" && Math.hypot(P.pos.x - A.x, P.pos.z - A.z) > A.r + 2.5) { duelEnd(false, "You left the arena, so the duel is forfeit."); return; }
@@ -3430,6 +3444,7 @@ let blockHeld = false;
 function parryHit(src) {
   floatText(P.pos, "Parry!", "#ffd166", true); ringFx(P.pos, 1.8, 0xffd166, 0.35); burstFx(P.pos.clone().add(new V3(0, 1.2, 0)), 1.2, 0xffd166, 0.25);
   if (src && !src.dead && !src.dummy) { src.stunUntil = worldT + 1; src.atkT = Math.max(src.atkT || 0, 1); src.windup = null; src.charging = null; if (src.tell) src.tell.visible = false; floatText(src.pos, "Stunned", "#ffd166"); }
+  if (src && !src.dead && !src.dummy && run && run.boons && run.boons.riposte) damageEnemy(src, ST.hit * 3 * run.boons.riposte, null, 0, { noProc: true, color: "#ffe0a0" });
   bumpStat("parries"); P.invuln = 0.15; P.parryFlash = 0.3; P.blockStart = -99;
 }
 function tellFx(e, dur) {
@@ -3571,8 +3586,8 @@ QUEST_NPCS.push(
 );
 VILLAGERS.push(
   { name: "Nell", role: "Fruit seller", home: [0, 74], rad: 7, look: { skin: 0xf0d8c0, hair: 0x2a1a10, cloth: 0xd8703a, cloth2: 0x3a2a1a }, lines: ["Apples, pears and one very suspicious melon!", "Lysa buys anything shiny. I mostly buy apples.", "Business is best at dawn, before the portals get busy."] },
-  { name: "Pim", role: "Farmhand", home: [56, -46], rad: 5, look: { skin: 0xd0a080, hair: 0xd8b860, cloth: 0x4a6a2a, cloth2: 0x3a3022 }, lines: ["The scarecrow scares nothing. I have checked.", "Odo says the barley grows faster when heroes walk past.", "Mind the mud by the barn."] },
-  { name: "Bram", role: "Gate guard", home: [-58, -52], rad: 6, look: { skin: 0xb07a52, hair: 0x3a2a1a, cloth: 0x2a4a8a, cloth2: 0x1a2a4a }, armour: "chainshirt", weapon: "militia", lines: ["Halt! Oh, it is you. Carry on.", "Warden Holt says parrying is half of every fight.", "Quiet night. I like quiet nights."] },
+  { name: "Pim", role: "Farmhand", home: [74, -40], rad: 5, look: { skin: 0xd0a080, hair: 0xd8b860, cloth: 0x4a6a2a, cloth2: 0x3a3022 }, lines: ["The scarecrow scares nothing. I have checked.", "Odo says the barley grows faster when heroes walk past.", "Mind the mud by the barn."] },
+  { name: "Bram", role: "Gate guard", home: [-45, -62], rad: 6, look: { skin: 0xb07a52, hair: 0x3a2a1a, cloth: 0x2a4a8a, cloth2: 0x1a2a4a }, armour: "chainshirt", weapon: "militia", lines: ["Halt! Oh, it is you. Carry on.", "Warden Holt says parrying is half of every fight.", "Quiet night. I like quiet nights."] },
   { name: "Ada", role: "Lamplighter", home: [74, 0], rad: 10, look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0x3a3a5a, cloth2: 0x2a2a3a }, lines: ["I light every lantern on the row when the sun goes down.", "At night the windows glow like a hundred small suns.", "Granny Mae always has tea on."] }
 );
 
@@ -3590,13 +3605,14 @@ function matModel(it, g) {
   else if (sh === "hide") { const h = M(G.sph(), std(c, { r: 0.95, map: "fur" }), 0, 0, 0, g, 0.75, 0.07, 0.55); h.rotation.z = 0.25; }
   else if (sh === "scale") { const m = std(c, { m: 0.6, r: 0.3, ...gl }); for (let k = 0; k < 5; k++) { const s = M(G.sph(), m, (k - 2) * 0.22, Math.abs(k - 2) * -0.06, (k % 2) * 0.12, g, 0.26, 0.05, 0.34); s.rotation.x = 0.5; } }
   else if (sh === "feather") { M(G.cone(10), std(c, { r: 0.6, ...gl }), 0, 0.1, 0, g, 0.16, 1.2, 0.05).rotation.z = 0.5; M(G.cyl(0.015, 0.015), std(0xf0e0c0), -0.3, -0.42, 0, g, 1, 0.5, 1).rotation.z = 0.5; }
+  else if (sh === "fish") { const m = std(c, { m: 0.5, r: 0.3, ...gl }); M(G.sph(), m, 0, 0, 0, g, 0.62, 0.3, 0.2); const tl = M(G.cone(4), m, -0.72, 0, 0, g, 0.28, 0.4, 0.06); tl.rotation.z = Math.PI / 2; M(G.cone(4), m, 0.05, 0.3, 0, g, 0.18, 0.22, 0.04); M(G.sph(), std(0x101010, { r: 0.2 }), 0.42, 0.08, 0.15, g, 0.05); }
   else if (sh === "core") { M(G.ico1(), std(c, { e: c, ei: 1.3, m: 0.3, r: 0.2, flat: true }), 0, 0, 0, g, 0.36); const ring = std(0xd8c070, { m: 1, r: 0.2 }); M(G.tor(0.56, 0.035), ring, 0, 0, 0, g).rotation.x = 1.2; M(G.tor(0.56, 0.035), ring, 0, 0, 0, g).rotation.y = 1.2; }
   else { M(G.dode(), std(0x6a6660, { flat: true, r: 0.9, map: "rock" }), 0, 0, 0, g, 0.6); for (let k = 0; k < 5; k++) M(G.oct(), std(c, { m: 0.9, r: 0.2, e: rk >= 2 ? c : 0, ei: 0.3 }), Math.cos(k * 1.3) * 0.45, Math.sin(k * 2.1) * 0.35, Math.sin(k * 1.3) * 0.45, g, 0.14, 0.22, 0.14); }
 }
 function deliverHtml(q) { return `<div class="reqs">${Object.entries(q.deliver).map(([id, n]) => { const h = S.inv[id] || 0; return `<span class="${h >= n ? "has" : "lack"}">${esc(ITEM[id].name)} <b class="num">${Math.min(h, n)}/${n}</b></span>`; }).join("")}</div>`; }
 function townLamps(group) {
   const post = std(0x2a2a30, { m: 0.8, r: 0.4 }), bulb = std(0xffe0a0, { e: 0xffc060, ei: 2.5 }), g = new THREE.Group(); group.add(g);
-  for (const c of COMPASS) for (const t of [41, 58, 75]) { if (t > c.len - 2) continue; const cx = Math.cos(c.a), cz = Math.sin(c.a), off = c.w / 2 + 0.9, x = cx * t + cz * off, z = cz * t - cx * off;
+  for (const c of COMPASS) for (let t = 41; t < c.len - 4; t += 17) { const cx = Math.cos(c.a), cz = Math.sin(c.a), off = c.w / 2 + 0.9, x = cx * t + cz * off, z = cz * t - cx * off;
     if (blocked(x, z, 0.2)) continue; M(G.cyl(0.06, 0.08), post, x, 1.6, z, g, 1, 3.2, 1); M(G.sph(), bulb, x, 3.3, z, g, 0.16); const lg = glowSprite(0xffb050, 2.2, 0.7); lg.position.set(x, 3.3, z); group.add(lg); addCircle(x, z, 0.25, 3); }
   shadows(g, true, false); mergeStatic(g);
 }
@@ -3609,6 +3625,502 @@ function townTrees(group, h) {
 stage.addEventListener("pointerdown", e => { if (e.button === 2) blockHeld = true; });
 window.addEventListener("pointerup", e => { if (e.button === 2) blockHeld = false; });
 stage.addEventListener("contextmenu", e => e.preventDefault());
+
+/* =====================================================================
+   THE FAR ROADS: TERRAIN, DESTINATIONS, CARDS, ENCHANTING, FISHING, AUCTION
+   ===================================================================== */
+const MOUNT = { x: -150, z: 150, top: 40, flat: 16, foot: 95 };
+const LAKE = { x: 178, z: 0, r: 30, depth: 7 };
+const SPIRE = { x: 117.4, z: -117.4, ri: 5, ro: 8.2, H: 22, a0: 0, span: Math.PI * 1.85 };
+SPIRE.a0 = Math.atan2(-SPIRE.z, -SPIRE.x) - 0.1; // the stair starts on the side facing the road
+const PLATFORMS = [
+  { x0: 146, x1: 166, z0: -1.6, z1: 1.6, y: 0.5 }, { x0: 161.5, x1: 167, z0: -6, z1: 6, y: 0.5 }, // lake dock
+  { x0: -2.2, x1: 2.2, z0: 166, z1: 197, y: 0.6 }, { x0: 2.2, x1: 22, z0: 184, z1: 187.6, y: 0.6 } // harbour piers
+];
+const ZONES = [
+  { x0: -34, x1: 34, z0: -92, z1: -38 }, { x: 0, z: -118, r: 28 }, { x: SPIRE.x, z: SPIRE.z, r: 16 }, { x: LAKE.x, z: LAKE.z, r: 40 }, { x: 132, z: -14, r: 8 },
+  { x: 114, z: 114, r: 20 }, { x0: -45, x1: 45, z0: 150, z1: 230 }, { x: MOUNT.x, z: MOUNT.z, r: 60 }, { x: -168, z: 0, r: 16 }, { x: -116.7, z: -116.7, r: 22 }
+];
+const inZone = (x, z, pad = 0) => ZONES.some(q => q.r ? Math.hypot(x - q.x, z - q.z) < q.r + pad : x > q.x0 - pad && x < q.x1 + pad && z > q.z0 - pad && z < q.z1 + pad);
+function lobbyTerrain(x, z, n) {
+  const d = Math.hypot(x, z);
+  let y = d < 190 ? 0 : smooth(190, 270, d) * 30 * (0.55 + n(x * 0.012, z * 0.012) * 0.9);
+  y = Math.max(y, MOUNT.top * smooth(MOUNT.foot, MOUNT.flat, Math.hypot(x - MOUNT.x, z - MOUNT.z)));
+  const dl = Math.hypot(x - LAKE.x, z - LAKE.z); if (dl < LAKE.r + 6) y -= LAKE.depth * smooth(LAKE.r + 6, LAKE.r - 10, dl);
+  if (z > 168) y -= 9 * smooth(168, 192, z) * smooth(140, 90, Math.abs(x));
+  return y;
+}
+function lobbyFeatures(x, z, y) {
+  for (const p of PLATFORMS) if (x > p.x0 && x < p.x1 && z > p.z0 && z < p.z1) y = Math.max(y, p.y);
+  const dx = x - SPIRE.x, dz = z - SPIRE.z;
+  if (Math.abs(dx) < SPIRE.ro && Math.abs(dz) < SPIRE.ro) {
+    const r = Math.hypot(dx, dz);
+    if (r < SPIRE.ri) y = Math.max(y, SPIRE.H);
+    else if (r < SPIRE.ro) { let a = Math.atan2(dz, dx) - SPIRE.a0; a = ((a % TAU) + TAU) % TAU; const k = a / SPIRE.span; if (k <= 1) y = Math.max(y, SPIRE.H * k); }
+  }
+  return y;
+}
+// roads that follow the ground, so they climb the mountain and run down to the docks
+function roadRibbon(parent, c, h, mat, w, y0, off = 0) {
+  const cx = Math.cos(c.a), cz = Math.sin(c.a), nx = -cz, nz = cx, pts = [], uvs = [], idx = [];
+  const n = Math.ceil((c.len - 26) / 2);
+  for (let i = 0; i <= n; i++) { const t = 26 + (c.len - 26) * i / n; for (const s of [-1, 1]) { const x = cx * t + nx * (off + s * w / 2), z = cz * t + nz * (off + s * w / 2); pts.push(x, Math.max(h(x, z), -2.6) + y0, z); uvs.push((s + 1) / 2 * w / 3, t / 3); } }
+  for (let i = 0; i < n; i++) { const a = i * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2)); g.setIndex(idx); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, mat); m.receiveShadow = true; parent.add(m); return m;
+}
+function townRoads(town, h) {
+  const tiles = std(0xa89a84, { r: 0.9, map: "tiles" }), curb = std(0x8a8478, { r: 0.8, map: "rock" });
+  for (const c of COMPASS) { roadRibbon(town, c, h, tiles, c.w, 0.05); for (const s of [-1, 1]) roadRibbon(town, c, h, curb, 0.3, 0.13, s * (c.w / 2 + 0.15)); }
+}
+function townHouses(town, r) {
+  for (const c of COMPASS) {
+    const cx = Math.cos(c.a), cz = Math.sin(c.a);
+    for (let t = 36; t < c.len - 18; t += 11) for (const s of [-1, 1]) {
+      if (t > 100 && r() < 0.35) continue;
+      const off = c.w / 2 + 4.6, x = cx * t - cz * s * off, z = cz * t + cx * s * off;
+      if (inZone(x, z, 4) || blocked(x, z, 3.2) || onPath(x, z, 3) || Math.abs(world.hBase(x, z)) > 0.6) continue;
+      const rr = makeHouse(town, x, z, Math.atan2(s * cz, -s * cx), r); addCircle(x, z, rr, 8);
+    }
+  }
+}
+
+/* ---- the tiered lobby fountain ---- */
+function lobbyFountain(group) {
+  const stone = std(0xc8c0b0, { r: 0.6, map: "rock" });
+  const bowl = (r, y, d) => { const g = new THREE.LatheGeometry([new THREE.Vector2(0.2, -d), new THREE.Vector2(r * 0.55, -d), new THREE.Vector2(r, -0.05), new THREE.Vector2(r + 0.12, 0.08), new THREE.Vector2(r - 0.08, 0.08), new THREE.Vector2(0, -d * 0.4)], 40); const m = M(g, stone, 0, y, 0, group); shadows(m, true, true); return m; };
+  M(G.cyl(0.55, 0.75, 12), stone, 0, 1.0, 0, group, 1, 1.9, 1).castShadow = true;
+  bowl(2.1, 2.0, 0.55); M(G.cyl(0.25, 0.35, 10), stone, 0, 2.7, 0, group, 1, 1.4, 1).castShadow = true; bowl(1.05, 3.35, 0.3);
+  M(G.cone(10), stone, 0, 3.8, 0, group, 0.22, 0.6, 0.22); M(G.sph(), std(0xd8c070, { m: 0.9, r: 0.25 }), 0, 4.15, 0, group, 0.12);
+  const water = (r, y) => { const w = new THREE.Mesh(new THREE.CircleGeometry(r, 32), new THREE.MeshStandardMaterial({ color: lin(0x6ab0d0), roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.8 })); w.rotation.x = -Math.PI / 2; w.position.y = y; group.add(w); };
+  water(1.95, 2.02); water(0.95, 3.36);
+  const curtainMat = new THREE.MeshBasicMaterial({ color: lin(0xcfeeff), transparent: true, opacity: 0.32, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending });
+  const c1 = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.6, 1.45, 40, 1, true), curtainMat); c1.position.y = 1.32; group.add(c1);
+  const c2 = new THREE.Mesh(new THREE.CylinderGeometry(1.12, 1.35, 1.3, 30, 1, true), curtainMat); c2.position.y = 2.72; group.add(c2);
+  const N = 140, arr = new Float32Array(N * 3), seeds = []; for (let i = 0; i < N; i++) seeds.push([Math.random() * TAU, Math.random()]);
+  const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(arr, 3));
+  const drops = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xdff4ff, size: 0.09, transparent: true, opacity: 0.85, depthWrite: false })); group.add(drops);
+  world.animated.push(t => {
+    curtainMat.opacity = 0.26 + Math.sin(t * 9) * 0.05;
+    for (let i = 0; i < N; i++) { const [a, ph] = seeds[i], k = (t * 0.9 + ph) % 1, r = 0.15 + k * 0.85, y = 4.2 + 1.3 * k - 3.3 * k * k; arr[i * 3] = Math.cos(a) * r; arr[i * 3 + 1] = Math.max(3.38, y); arr[i * 3 + 2] = Math.sin(a) * r; }
+    pg.attributes.position.needsUpdate = true;
+  });
+}
+
+/* ---- the eight destinations at the ends of the roads ---- */
+function frontier(group, h) {
+  const town = new THREE.Group(); group.add(town);
+  const stone = std(0x8a8478, { r: 0.85, map: "rock", bump: "rockB", bs: 0.6, rep: 2 }), dark = std(0x5a564e, { r: 0.85, map: "rock" }), wood = MAT.bark(0x5a3a24), plank = MAT.bark(0x7a5a3a);
+  const r = seeded(4242);
+  const place = (x, z, rotY, parent = town, y = 0) => { const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = rotY; parent.add(g); return g; };
+  const toW = (g, lx, lz) => { const c = Math.cos(g.rotation.y), s = Math.sin(g.rotation.y); return [g.position.x + lx * c + lz * s, g.position.z - lx * s + lz * c]; };
+  const lbl = (text, x, y, z, col = "#ffe2a0", size = 1.4) => { const l = textSprite(text, col, size); l.position.set(x, y, z); group.add(l); world.labels.push(l); return l; };
+  const ring = (cx, cz, rad, n, cr, ch, gapA, gapW) => { for (let i = 0; i < n; i++) { const a = i / n * TAU; if (gapA !== undefined && Math.abs(Math.atan2(Math.sin(a - gapA), Math.cos(a - gapA))) < gapW) continue; addCircle(cx + Math.cos(a) * rad, cz + Math.sin(a) * rad, cr, ch); } };
+
+  /* N: the training grounds and the Grand Arena */
+  {
+    const fence = (x0, z0, x1, z1) => { const n = Math.max(1, Math.round(Math.hypot(x1 - x0, z1 - z0) / 2.5)); for (let i = 0; i <= n; i++) { const x = lerp(x0, x1, i / n), z = lerp(z0, z1, i / n); M(G.box(), wood, x, 0.6, z, town, 0.18, 1.2, 0.18); } const rail = M(G.box(), wood, (x0 + x1) / 2, 0.85, (z0 + z1) / 2, town, Math.hypot(x1 - x0, z1 - z0), 0.1, 0.08); rail.rotation.y = -Math.atan2(z1 - z0, x1 - x0); };
+    fence(-32, -40, -32, -90); fence(32, -40, 32, -90); fence(-32, -40, -4.5, -40); fence(4.5, -40, 32, -40); fence(-32, -90, -4.5, -90); fence(4.5, -90, 32, -90);
+    for (const s of [-1, 1]) M(G.box(), std(0xb8a07a, { r: 0.95, map: "groundB", rep: 4 }), s * 18, 0.02, -65, town, 27, 0.04, 49);
+    const dummies = new THREE.Group(); group.add(dummies);
+    for (const x of [-26, -20, -14, 14, 20, 26]) for (const z of [-48, -58]) makeDummy(dummies, x, z, x < 0 ? Math.PI / 2 : -Math.PI / 2);
+    // cover to practise dodging behind: hay bales and wooden barricades
+    for (const [x, z] of [[-24, -70], [-14, -76], [-26, -82], [14, -72], [24, -78], [18, -84]]) { const hb = M(G.cyl(0.8, 0.8, 14), std(0xd8b85a, { r: 0.95, map: "fabric" }), x, 0.8, z, town, 1, 1.8, 1); hb.rotation.z = Math.PI / 2; hb.rotation.y = r() * 3; addCircle(x, z, 1.1, 1.4); }
+    for (const [x, z, ry] of [[-18, -66, 0.3], [-8, -82, -0.2], [9, -66, 0.1], [26, -66, -0.4]]) { const b = place(x, z, ry); for (let k = -1; k <= 1; k++) M(G.box(), plank, k * 1.05, 1.0, 0, b, 1, 2, 0.2); M(G.box(), wood, 0, 0.5, -0.4, b, 3.2, 0.12, 0.12).rotation.x = 0.7; for (let k = -1; k <= 1; k++) { const [wx, wz] = toW(b, k * 1.05, 0); addCircle(wx, wz, 0.6, 2.2); } }
+    for (const x of [-20, -8, 8, 20]) { const tg = place(x, -88, 0); M(G.cyl(0.9, 0.9, 20), std(0xe8dcc0, { r: 0.9 }), 0, 1.4, 0, tg, 1, 0.15, 1).rotation.x = Math.PI / 2; M(G.cyl(0.55, 0.55, 20), std(0xc03a2a, { r: 0.8 }), 0, 1.4, 0.08, tg, 1, 0.02, 1).rotation.x = Math.PI / 2; M(G.cyl(0.2, 0.2, 16), std(0xf2c744, { r: 0.8 }), 0, 1.4, 0.1, tg, 1, 0.02, 1).rotation.x = Math.PI / 2; for (const s of [-1, 1]) M(G.box(), wood, 0.5 * s, 0.7, -0.3, tg, 0.1, 1.5, 0.1).rotation.x = -0.3; }
+    lbl("Training Grounds", 0, 5, -41);
+    // the arena
+    const A = { x: 0, z: -118, r: 24 };
+    M(G.cyl(A.r, A.r, 64), std(0xd8c49a, { r: 0.98, map: "groundB", rep: 8 }), A.x, 0.05, A.z, town, 1, 0.08, 1);
+    const segs = 56; for (let i = 0; i < segs; i++) { const a = i / segs * TAU; if (Math.abs(Math.atan2(Math.sin(a - Math.PI / 2), Math.cos(a - Math.PI / 2))) < 0.12) continue; const x = A.x + Math.cos(a) * (A.r + 0.5), z = A.z + Math.sin(a) * (A.r + 0.5); const b = M(G.box(), stone, x, 1.1, z, town, 2.8, 2.2, 0.9); b.rotation.y = -a + Math.PI / 2;
+      const sx = A.x + Math.cos(a) * (A.r + 3.2), sz = A.z + Math.sin(a) * (A.r + 3.2); const st = M(G.box(), dark, sx, 1.6, sz, town, 2.9, 3.2, 3.6); st.rotation.y = -a + Math.PI / 2; }
+    ring(A.x, A.z, A.r + 0.5, 70, 1.2, 3, Math.PI / 2, 0.14);
+    for (let i = 0; i < 10; i++) { const a = i / 10 * TAU + 0.3, x = A.x + Math.cos(a) * (A.r + 5.2), z = A.z + Math.sin(a) * (A.r + 5.2); M(G.cyl(0.12, 0.15), wood, x, 3.8, z, town, 1, 7.6, 1); const fl = M(G.box(), std([0xc0402a, 0x3a5aa8, 0xd8a83a][i % 3], { r: 0.9, map: "fabric" }), x, 6.1, z, town, 0.05, 2.4, 1.2); fl.rotation.y = -a; }
+    // cover inside the arena: pillars to hide behind, low walls to vault, crate stacks
+    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + Math.PI / 6, x = A.x + Math.cos(a) * 14, z = A.z + Math.sin(a) * 14; M(G.cyl(1.1, 1.25, 12), stone, x, 2.6 + (k % 2) * 0.8, z, town, 1, 5.2 + (k % 2) * 1.6, 1); M(G.cyl(1.4, 1.4, 12), dark, x, 0.2, z, town, 1, 0.4, 1); addCircle(x, z, 1.25, 7); }
+    for (let k = 0; k < 4; k++) { const a = k / 4 * TAU, x = A.x + Math.cos(a) * 7.5, z = A.z + Math.sin(a) * 7.5; const w = place(x, z, -a); M(G.box(), stone, 0, 0.6, 0, w, 0.9, 1.2, 4.4); for (let j = -1.5; j <= 1.5; j += 1) { const [wx, wz] = toW(w, 0, j); addCircle(wx, wz, 0.6, 1.25); } }
+    for (let k = 0; k < 4; k++) { const a = k / 4 * TAU + Math.PI / 4, x = A.x + Math.cos(a) * 19, z = A.z + Math.sin(a) * 19; M(G.box(), plank, x, 0.6, z, town, 1.3, 1.2, 1.3).rotation.y = a; M(G.box(), plank, x + 0.2, 1.7, z - 0.1, town, 1.1, 1.0, 1.1).rotation.y = a + 0.4; addCircle(x, z, 1.0, 2.3); }
+    lbl("Grand Arena · 1v1 duels", A.x, 8.5, A.z - A.r - 3, "#ffd0a0", 1.8);
+    const board = place(8, -91.5, Math.PI); M(G.box(), MAT.bark(0x7a5536), 0, 1.8, 0, board, 2.4, 1.5, 0.12); for (const q of [-1, 1]) M(G.cyl(0.08, 0.1), wood, 1.1 * q, 1.2, 0, board, 1, 2.4, 1); for (let k = 0; k < 4; k++) M(G.box(), std(0xf0e6cc, { r: 0.9 }), -0.75 + k * 0.5, 1.85 + (k % 2) * 0.15, -0.08, board, 0.38, 0.5, 0.01);
+    addCircle(8, -91.5, 0.8, 2); lbl("Duel board", 8, 3.2, -91.5, "#f4ead2", 0.9);
+    world.interact.push({ x: 8, z: -90, r: 3, label: "Challenge a rival to a duel", act: () => openDuelBoard() });
+    world.arena = A;
+  }
+  /* NE: the Spire of the Archmage, climbed by an outside stair */
+  {
+    const S0 = SPIRE, g = place(S0.x, S0.z, 0);
+    M(G.cyl(S0.ri - 0.15, S0.ri + 0.2, 20), stone, 0, S0.H / 2, 0, g, 1, S0.H, 1);
+    for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; const w = M(G.box(), std(0xbfe0ff, { e: 0x6aa8e8, ei: 1.2 }), Math.cos(a) * (S0.ri - 0.1), 6 + k * 3, Math.sin(a) * (S0.ri - 0.1), g, 0.05, 1.6, 0.7); w.rotation.y = -a; }
+    M(G.cyl(S0.ri + 0.4, S0.ri + 0.4, 24), dark, 0, S0.H - 0.15, 0, g, 1, 0.3, 1);
+    for (let k = 0; k < 14; k++) { const a = k / 14 * TAU; let d = a - S0.a0 - S0.span; d = Math.atan2(Math.sin(d), Math.cos(d)); if (Math.abs(d + 0.17) < 0.3) continue; M(G.box(), stone, Math.cos(a) * (S0.ri + 0.1), S0.H + 0.5, Math.sin(a) * (S0.ri + 0.1), g, 0.7, 1, 0.7).rotation.y = -a; }
+    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + 0.3; M(G.cyl(0.18, 0.2), stone, Math.cos(a) * 3.2, S0.H + 2.2, Math.sin(a) * 3.2, g, 1, 4.4, 1); }
+    M(G.cone(6), std(0x3a2a6a, { r: 0.5, m: 0.3, flat: true }), 0, S0.H + 6.2, 0, g, 4.4, 3.8, 4.4);
+    const orb = M(G.sph(), glowMat(0xb08aff, 0.95), 0, S0.H + 8.9, 0, g, 0.5); const og = glowSprite(0xb08aff, 4, 0.7); og.position.set(0, S0.H + 8.9, 0); g.add(og); orb.userData.dyn = true; og.userData.dyn = true;
+    world.animated.push(t => { orb.position.y = S0.H + 8.9 + Math.sin(t * 1.4) * 0.25; og.position.y = orb.position.y; });
+    const N = 64; for (let i = 0; i < N; i++) { const k = (i + 0.5) / N, a = S0.a0 + k * S0.span, rm = (S0.ri + S0.ro) / 2, y = S0.H * k; const st = M(G.box(), stone, S0.x + Math.cos(a) * rm, y - 0.18, S0.z + Math.sin(a) * rm, town, S0.ro - S0.ri + 0.2, 0.36, S0.span / N * rm + 0.08); st.rotation.y = -a;
+      if (i % 3 === 0) M(G.cyl(0.05, 0.05), MAT.metal(0x3a3a40, 0.4), S0.x + Math.cos(a) * (S0.ro + 0.05), y + 0.5, S0.z + Math.sin(a) * (S0.ro + 0.05), town, 1, 1.1, 1);
+      if (i % 4 === 0) M(G.cyl(0.18, 0.22, 8), dark, S0.x + Math.cos(a) * rm, y / 2 - 0.2, S0.z + Math.sin(a) * rm, town, 1, Math.max(0.1, y - 0.2), 1); }
+    // walls for the stair: an outer rail, the tower wall, and a block where the top meets the bottom
+    for (let i = 0; i < 64; i++) { const a = i / 64 * TAU; let d = ((a - S0.a0) % TAU + TAU) % TAU; if (d < 0.3 || d > TAU - 0.05) continue; addCircle(S0.x + Math.cos(a) * (S0.ro + 0.45), S0.z + Math.sin(a) * (S0.ro + 0.45), 0.5, 40); }
+    for (let i = 0; i < 40; i++) { const a = i / 40 * TAU; let d = ((a - S0.a0) % TAU + TAU) % TAU; if (d > S0.span - 0.4 && d < S0.span + 0.02) continue; addCircle(S0.x + Math.cos(a) * (S0.ri - 0.3), S0.z + Math.sin(a) * (S0.ri - 0.3), 0.45, 3); }
+    for (let k = 0; k <= 5; k++) { const a = S0.a0 + S0.span + 0.06, rr = S0.ri + (S0.ro - S0.ri) * k / 5; addCircle(S0.x + Math.cos(a) * rr, S0.z + Math.sin(a) * rr, 0.45, 40); }
+    lbl("Spire of the Archmage · climb the stair", S0.x, S0.H + 12, S0.z, "#d8c8ff", 1.6);
+  }
+  /* E: Glimmerwater Lake with a fishing dock and the tackle shop */
+  {
+    for (let x = 146.3; x < 166; x += 0.62) M(G.box(), plank, x, 0.45, 0, town, 0.55, 0.1, 3.2);
+    for (let z = -5.8; z < 6; z += 0.62) M(G.box(), plank, 164.25, 0.45, z, town, 5.5, 0.1, 0.55);
+    for (const [x, z] of [[148, -1.7], [148, 1.7], [154, -1.7], [154, 1.7], [160, -1.7], [160, 1.7], [162, -6], [167, -6], [162, 6], [167, 6]]) { M(G.cyl(0.12, 0.12), wood, x, -1.2, z, town, 1, 3.4, 1); }
+    const shop = place(132, -14, 0); M(G.box(), std(0x7aa8c8, { r: 0.9, map: "plaster", bump: "plasterB", bs: 1, rep: 2 }), 0, 2.2, 0, shop, 7, 4.4, 5); const rf = M(G.cone(4), std(0x3a5a7a, { r: 0.8, map: "roof", flat: true, rep: 2 }), 0, 5.6, 0, shop, 5.6, 2.4, 4.2); rf.rotation.y = Math.PI / 4;
+    M(G.box(), std(0x3a2618, { r: 0.7 }), 0, 1.1, 2.53, shop, 1.2, 2.2, 0.08); M(G.box(), WIN_MAT(), 2.2, 2.4, 2.53, shop, 1, 0.9, 0.05); M(G.box(), WIN_MAT(), -2.2, 2.4, 2.53, shop, 1, 0.9, 0.05);
+    for (let k = 0; k < 3; k++) M(G.cyl(0.03, 0.03), wood, -3.2 + k * 0.4, 1.7, 2.8, shop, 1, 3.2, 1).rotation.z = 0.1;
+    addCircle(132, -14, 4.5, 6); lbl("Tackle Shop", 132, 7.6, -14);
+    const boat = place(170, 9, 0.4, group, -2.9); M(G.box(), MAT.bark(0x6a4a2a), 0, 0.2, 0, boat, 1.4, 0.4, 3.4); boat.userData.dyn = true; world.animated.push(t => { boat.position.y = -2.9 + Math.sin(t * 1.3) * 0.05; });
+    lbl("Glimmerwater Lake", 172, 6, 0, "#cfeeff", 1.8);
+  }
+  /* SE: Hermit's Grove, an ancient tree with a hermit who trades materials */
+  {
+    const gx = 116, gz = 116, bark = std(0x5a4030, { r: 0.95, map: "bark", bump: "barkB", bs: 0.8, rep: [2, 4] });
+    M(G.cyl(1.8, 2.8, 14), bark, gx, 7, gz, town, 1, 14, 1);
+    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; const rt = M(G.cyl(0.25, 0.7, 8), bark, gx + Math.cos(a) * 2.8, 0.6, gz + Math.sin(a) * 2.8, town, 1, 4, 1); rt.rotation.z = Math.cos(a) * 1.1; rt.rotation.x = -Math.sin(a) * 1.1; }
+    const leaf = std(0x3a7a2a, { r: 0.9, flat: true }); for (let k = 0; k < 8; k++) { const a = k / 8 * TAU; M(G.ico1(), leaf, gx + Math.cos(a) * 5, 14 + (k % 3) * 1.4, gz + Math.sin(a) * 5, town, 4.4 + (k % 2)); } M(G.ico1(), leaf, gx, 18, gz, town, 6);
+    for (let k = 0; k < 14; k++) { const a = r() * TAU, d = 4 + r() * 6, x = gx + Math.cos(a) * d, z = gz + Math.sin(a) * d; M(G.cyl(0.05, 0.07), std(0xe8e0d0), x, 0.2, z, town, 1, 0.4, 1); M(G.sph(), std([0x7ae0ff, 0xb08aff, 0x9aff8a][k % 3], { e: [0x3ab0ff, 0x8a5aff, 0x5aff6a][k % 3], ei: 1.6 }), x, 0.42, z, town, 0.18, 0.1, 0.18); }
+    addCircle(gx, gz, 3, 20);
+    const hut = place(gx - 9, gz + 4, -2.2); M(G.cyl(2.2, 2.4, 10), std(0x8a6a4a, { r: 0.95, map: "bark" }), 0, 1.4, 0, hut, 1, 2.8, 1); M(G.cone(10), std(0x8a8a4a, { r: 1, map: "fabric", flat: true }), 0, 3.6, 0, hut, 3, 1.8, 3); M(G.box(), std(0x3a2618), 0, 0.9, 2.25, hut, 0.9, 1.8, 0.1);
+    addCircle(gx - 9, gz + 4, 2.5, 4); lbl("Hermit's Grove", gx, 22.5, gz, "#c8ffb0", 1.8);
+  }
+  /* S: Port Saltreach, piers into the southern sea */
+  {
+    for (let z = 166.3; z < 197; z += 0.62) M(G.box(), plank, 0, 0.55, z, town, 4.4, 0.1, 0.55);
+    for (let x = 2.5; x < 22; x += 0.62) M(G.box(), plank, x, 0.55, 185.8, town, 0.55, 0.1, 3.6);
+    for (let z = 168; z < 197; z += 4) for (const s of [-1, 1]) M(G.cyl(0.14, 0.14), wood, 2.1 * s, -1.4, z, town, 1, 4, 1);
+    const ship = (x, z, ry, s) => { const sh = place(x, z, ry, group, -2.7); sh.userData.dyn = true; M(G.box(), MAT.bark(0x5a3a22), 0, 0.6, 0, sh, 3.6 * s, 1.6 * s, 11 * s); const bow = M(G.cone(4), MAT.bark(0x5a3a22), 0, 0.6, 6.6 * s, sh, 1.8 * s, 2.4 * s, 1.0 * s); bow.rotation.x = Math.PI / 2; bow.rotation.y = Math.PI / 4;
+      M(G.box(), MAT.bark(0x7a5a3a), 0, 1.45, 0, sh, 3.4 * s, 0.1, 10.6 * s); M(G.cyl(0.14, 0.18), wood, 0, 5.5 * s, 0.6, sh, 1, 9 * s, 1); M(G.box(), std(0xf0e8d8, { r: 0.95, map: "fabric" }), 0, 6 * s, 0.75, sh, 4.6 * s, 4.4 * s, 0.06); M(G.box(), std(0xf0e8d8, { r: 0.95, map: "fabric" }), 0, 3.6 * s, 3.5, sh, 0.05, 2.6 * s, 3 * s);
+      world.animated.push(t => { sh.position.y = -2.7 + Math.sin(t * 0.9 + x) * 0.12; sh.rotation.z = Math.sin(t * 0.7 + z) * 0.03; }); return sh; };
+    ship(-12, 190, 0.1, 1); ship(14, 200, -0.2, 1.15); ship(-40, 214, 0.6, 1.3);
+    for (const [x, z] of [[-18, 158], [18, 158]]) { const wh = place(x, z, 0); M(G.box(), std(0x9a8a72, { r: 0.92, map: "plaster", bump: "plasterB", bs: 1, rep: 3 }), 0, 3, 0, wh, 10, 6, 8); const rf = M(G.box(), std(0x5a4a42, { r: 0.85, map: "roof", rep: [3, 3] }), 0, 6.4, 0, wh, 10.6, 0.3, 8.6); rf.rotation.x = 0.08; M(G.box(), std(0x3a2618), 0, 1.8, 4.02, wh, 3.2, 3.6, 0.1); addCircle(x, z, 6.2, 8); }
+    for (let k = 0; k < 10; k++) { const x = -10 + r() * 20, z = 162 + r() * 4; if (onPath(x, z, 0.6) || blocked(x, z, 0.6)) continue; M(G.cyl(0.4, 0.4, 10), MAT.bark(0x7a5a3a), x, 0.5, z, town, 1, 1, 1); addCircle(x, z, 0.5, 1); }
+    const lh = place(125, 184, 0); M(G.cyl(2.2, 3.2, 14), std(0xf0ece4, { r: 0.8 }), 0, 9, 0, lh, 1, 18, 1); for (let k = 0; k < 3; k++) M(G.cyl(2.25 - k * 0.3, 2.5 - k * 0.3, 14), std(0xc03a2a, { r: 0.8 }), 0, 4 + k * 5, 0, lh, 1, 1.4, 1); M(G.cyl(1.6, 1.6, 12), std(0xffe8a0, { e: 0xffd060, ei: 2 }), 0, 19, 0, lh, 1, 1.6, 1); M(G.cone(12), std(0x3a2a2a), 0, 20.6, 0, lh, 2, 1.6, 2);
+    const beam = glowSprite(0xffe0a0, 10, 0.6); beam.position.set(125, 19, 184); group.add(beam);
+    lbl("Port Saltreach", 0, 7, 172, "#cfeeff", 1.8);
+  }
+  /* SW: Skyhold Castle on the mountain, home of the Vault Auction */
+  {
+    const top = MOUNT.top, c = place(MOUNT.x, MOUNT.z, Math.atan2(-MOUNT.x, -MOUNT.z), town, top);
+    const half = 13, wallH = 8;
+    for (const [x, z, w, d] of [[0, -half, half * 2, 1.6], [-half, 0, 1.6, half * 2], [half, 0, 1.6, half * 2], [-(half + 2.5) / 2, half, half - 2.5, 1.6], [(half + 2.5) / 2, half, half - 2.5, 1.6]]) M(G.box(), stone, x, wallH / 2 - 2, z, c, w, wallH + 4, d);
+    for (let k = -half; k <= half; k += 2) for (const [x, z] of [[k, -half], [-half, k], [half, k]]) M(G.box(), stone, x, wallH + 2.5, z, c, 0.9, 1, 1.9);
+    for (const [x, z] of [[-half, -half], [half, -half], [-half, half], [half, half]]) { M(G.cyl(2.6, 2.9, 14), stone, x, wallH / 2 + 1, z, c, 1, wallH + 6, 1); const tr = M(G.cone(14), std(0x2a3a6a, { r: 0.7, flat: true }), x, wallH + 6.4, z, c, 3.2, 4.4, 3.2); }
+    for (const s of [-1, 1]) { M(G.cyl(1.8, 2, 12), stone, 3.2 * s, wallH / 2 + 2, half, c, 1, wallH + 4, 1); M(G.cone(12), std(0x2a3a6a, { r: 0.7, flat: true }), 3.2 * s, wallH + 5.2, half, c, 2.2, 3, 2.2); }
+    M(G.box(), stone, 0, 6, -5, c, 12, 12, 9); const kr = M(G.cone(4), std(0x2a3a6a, { r: 0.7, map: "roof", flat: true }), 0, 14.2, -5, c, 9.5, 4.4, 7.2); kr.rotation.y = Math.PI / 4;
+    M(G.box(), std(0x3a2618), 0, 2, -0.45, c, 3, 4, 0.1); for (const s of [-1, 1]) M(G.box(), std(0x7a2a8a, { r: 0.9, map: "fabric" }), 2.6 * s, 7, -0.45, c, 1.4, 4, 0.05);
+    for (const s of [-1, 1]) for (const k of [0, 1]) M(G.box(), WIN_MAT(), 4 * s, 4 + k * 4, -0.47, c, 1, 1.4, 0.05);
+    M(G.box(), std(0xd8b860, { m: 0.9, r: 0.25 }), 0, 9.2, -0.42, c, 2.2, 1.6, 0.06);
+    const wl = (lx, lz) => { const [x, z] = toW(c, lx, lz); addCircle(x, z, 1.3, 30); };
+    for (let k = -half; k <= half; k += 2) { wl(k, -half); wl(-half, k); wl(half, k); if (Math.abs(k) > 3) wl(k, half); }
+    { const [x, z] = toW(c, 0, -5); addCircle(x, z, 6.5, 30); }
+    lbl("Skyhold Castle · Vault Auction", MOUNT.x, top + 22, MOUNT.z, "#ffd870", 2);
+    world.castle = { x: MOUNT.x, z: MOUNT.z };
+  }
+  /* W: Moonwell Observatory */
+  {
+    const ox = -168, oz = 0, g = place(ox, oz, Math.PI / 2);
+    M(G.cyl(6, 6.4, 24), stone, 0, 4, 0, g, 1, 8, 1); M(G.sph(), std(0x2a3a6a, { m: 0.6, r: 0.3 }), 0, 8, 0, g, 6, 4.6, 6);
+    M(G.box(), std(0x101420), 0, 10.2, 0, g, 1.2, 3.6, 12.4).rotation.x = 0;
+    const tel = M(G.cyl(0.55, 0.75, 14), MAT.metal(0xb89a5a, 0.3), 0, 11.6, 2.4, g, 1, 5.4, 1); tel.rotation.x = 0.9;
+    M(G.box(), std(0x3a2618), 0, 1.6, 6.15, g, 1.8, 3.2, 0.1); for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; const w = M(G.box(), WIN_MAT(), Math.sin(a) * 6.05, 4.6, Math.cos(a) * 6.05, g, 0.7, 1.4, 0.05); w.rotation.y = a; }
+    addCircle(ox, oz, 6.8, 12); lbl("Moonwell Observatory", ox, 16, oz, "#cfd8ff", 1.8);
+    for (let k = 0; k < 7; k++) { const a = k / 7 * TAU, x = ox + 12 + Math.cos(a) * 4, z = oz + 10 + Math.sin(a) * 4; M(G.box(), std(0x9a98a4, { r: 0.7, map: "rock" }), x, 1.4, z, town, 0.8, 2.8, 0.5).rotation.y = a; addCircle(x, z, 0.5, 3); }
+  }
+  /* NW: Frontier Fort, a log palisade */
+  {
+    const fx = -116.7, fz = -116.7, rad = 15, gap = Math.atan2(-fz, -fx);
+    for (let i = 0; i < 80; i++) { const a = i / 80 * TAU; if (Math.abs(Math.atan2(Math.sin(a - gap), Math.cos(a - gap))) < 0.2) continue; M(G.cyl(0.4, 0.45, 8), MAT.bark(0x6a4a2a), fx + Math.cos(a) * rad, 2.5, fz + Math.sin(a) * rad, town, 1, 5 + (i % 2) * 0.6, 1); M(G.cone(8), MAT.bark(0x6a4a2a), fx + Math.cos(a) * rad, 5.3 + (i % 2) * 0.6, fz + Math.sin(a) * rad, town, 0.42, 0.6, 0.42); }
+    ring(fx, fz, rad, 80, 0.55, 6, gap, 0.2);
+    for (const s of [-1, 1]) { const a = gap + s * 0.32, x = fx + Math.cos(a) * rad, z = fz + Math.sin(a) * rad; const tw = place(x, z, 0); for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) M(G.box(), wood, px, 4, pz, tw, 0.25, 8, 0.25); M(G.box(), plank, 0, 8, 0, tw, 2.8, 0.25, 2.8); const rr = M(G.cone(4), std(0x6a3a2a, { r: 0.8, flat: true }), 0, 9.6, 0, tw, 2.6, 1.8, 2.6); rr.rotation.y = Math.PI / 4; }
+    for (let k = 0; k < 3; k++) { const a = gap + Math.PI + (k - 1) * 0.8, x = fx + Math.cos(a) * 8, z = fz + Math.sin(a) * 8; const tent = M(G.cone(4), std([0x8a3a2a, 0x3a5a8a, 0x8a7a4a][k], { r: 0.95, map: "fabric", flat: true }), x, 1.6, z, town, 2.6, 3.2, 2.6); tent.rotation.y = Math.PI / 4; addCircle(x, z, 2, 3); }
+    const fire = glowSprite(0xff8a30, 3, 0.85); fire.position.set(fx, 0.8, fz); group.add(fire); for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; M(G.cyl(0.08, 0.08), MAT.bark(0x3a2a1a), fx + Math.cos(a) * 0.5, 0.15, fz + Math.sin(a) * 0.5, town, 1, 1.2, 1).rotation.z = 1.3; }
+    const fl = new THREE.PointLight(0xff8a30, 1.2, 14, 2); fl.position.set(fx, 1.6, fz); group.add(fl); world.nightLights.push({ l: fl, b: 1.2 });
+    addCircle(fx, fz, 0.8, 2); lbl("Frontier Fort", fx, 12, fz);
+  }
+  /* houses on the far hills, so the horizon is lived in */
+  {
+    const far = new THREE.Group(); group.add(far);
+    const walls = [0xd8cbb0, 0xcab8a0, 0xe2d8c6].map(c => std(c, { r: 0.92, map: "plaster" })), roofs = [0xa85a4a, 0x6a7a9a, 0x8a6a4a].map(c => std(c, { r: 0.85, map: "roof", flat: true }));
+    for (const [deg, d] of [[10, 250], [40, 262], [-20, 245], [-55, 270], [-100, 255], [-140, 262], [180, 248], [150, 265], [215, 258], [-170, 280]]) {
+      const a = deg * Math.PI / 180, ccx = Math.cos(a) * d, ccz = Math.sin(a) * d;
+      for (let k = 0; k < 8; k++) { const x = ccx + (r() - 0.5) * 34, z = ccz + (r() - 0.5) * 34, y = world.hBase(x, z); if (y < 0) continue; const W = 5 + r() * 3, H = 3.5 + r() * 2.5, D = 4 + r() * 2;
+        const hg = place(x, z, r() * TAU, far, y); M(G.box(), walls[k % 3], 0, H / 2, 0, hg, W, H, D); const rf = M(G.cone(4), roofs[(k + 1) % 3], 0, H + 1.4, 0, hg, W * 0.8, 2.8, D * 0.88); rf.rotation.y = Math.PI / 4; M(G.box(), WIN_MAT(), 1.4, H * 0.6, D / 2 + 0.03, hg, 0.8, 0.8, 0.05); M(G.box(), WIN_MAT(), -1.4, H * 0.6, D / 2 + 0.03, hg, 0.8, 0.8, 0.05); }
+    }
+    // simple far trees on the hills
+    const trunk = std(0x5a4030, { r: 0.9 }), crowns = [std(0x3a6a2a, { r: 0.9, flat: true }), std(0x2a5a32, { r: 0.9, flat: true })];
+    for (let k = 0; k < 220; k++) { const a = r() * TAU, d = 200 + r() * 110, x = Math.cos(a) * d, z = Math.sin(a) * d, y = world.hBase(x, z); if (y < 0.3 || Math.hypot(x - MOUNT.x, z - MOUNT.z) < 22) continue; const s = 1 + r() * 1.2;
+      M(G.cyl(0.25, 0.35, 6), trunk, x, y + 1.2 * s, z, far, s, 2.4 * s, s); if (k % 2) M(G.cone(7), crowns[0], x, y + 4.2 * s, z, far, 1.9 * s, 5 * s, 1.9 * s); else M(G.ico(), crowns[1], x, y + 3.6 * s, z, far, 2.2 * s); }
+    mergeStatic(far);
+  }
+  shadows(town, true, true);
+  mergeStatic(town);
+  // fishing spots
+  world.fishSpots = [{ x: 166, z: -5, bx: 171, bz: -5, by: -2.95, name: "Glimmerwater Lake", bonus: 1.1 }, { x: 166, z: 5, bx: 171, bz: 5, by: -2.95, name: "Glimmerwater Lake", bonus: 1.1 },
+    { x: 0, z: 196, bx: 0, bz: 202, by: -2.95, name: "the southern sea", bonus: 1.25 }, { x: 20, z: 186, bx: 20, bz: 192, by: -2.95, name: "the southern sea", bonus: 1.25 },
+    { x: 36.7, z: 59.3, bx: 42, bz: 65, by: 0.1, name: "Mirror Pond", bonus: 0.85 }];
+  for (const sp of world.fishSpots) world.interact.push({ x: sp.x, z: sp.z, r: 2.6, label: `Cast your line into ${sp.name}`, act: () => startFishing(sp) });
+}
+
+/* ---- blessing cards between waves ---- */
+const BOONS = [
+  { k: "poison", name: "Venom Edge", col: "#7ad86a", text: m => `Your hits poison foes for ${Math.round(12 * m)}% weapon damage per second for 4 s.` },
+  { k: "flame", name: "Kindled Blade", col: "#ff8a40", text: m => `Your hits set foes alight for ${Math.round(15 * m)}% weapon damage per second for 3 s.` },
+  { k: "ice", name: "Rime Touch", col: "#9ad8ff", text: m => `Hits slow foes by 60% for 2 s, with a ${Math.round(8 * m)}% chance to freeze them for 1 s.` },
+  { k: "enchant", name: "Arcane Edge", col: "#b08aff", text: m => `+${Math.round(12 * m)}% weapon damage.` },
+  { k: "crit", name: "Keen Eye", col: "#ffd166", text: m => `+${Math.round(8 * m)}% critical hit chance.` },
+  { k: "critdmg", name: "Executioner", col: "#ff6a5a", text: m => `Critical hits deal +${Math.round(30 * m)}% more damage.` },
+  { k: "stamina", name: "Second Wind", col: "#7ae8c8", text: m => `+${Math.max(1, Math.round(m))} dash charge${Math.round(m) > 1 ? "s" : ""} and dashes return ${Math.round(10 * m)}% faster.` },
+  { k: "recovery", name: "Mending", col: "#7fd69a", text: m => `Recover ${(1 * m).toFixed(1)}% of your health every second.` },
+  { k: "lifesteal", name: "Bloodthirst", col: "#e0505f", text: m => `Heal for ${Math.round(4 * m)}% of the damage you deal.` },
+  { k: "haste", name: "Quickstep", col: "#cfeeff", text: m => `+${Math.round(8 * m)}% move speed and attack speed.` },
+  { k: "vitality", name: "Ironhide", col: "#d8b880", text: m => `+${Math.round(15 * m)}% maximum health.` },
+  { k: "guard", name: "Bulwark", col: "#a1abc4", text: m => `Block an extra ${Math.round(8 * m)}% of all damage.` },
+  { k: "thorns", name: "Bramble Mail", col: "#a8d84a", text: m => `Attackers take ${Math.round(30 * m)}% of the damage they deal to you.` },
+  { k: "focus", name: "Focus", col: "#58a8f2", text: m => `Specials recharge ${Math.round(12 * m)}% faster and hit ${Math.round(15 * m)}% harder.` },
+  { k: "storm", name: "Static Charge", col: "#9ae0ff", text: m => `${Math.round(12 * m)}% chance on hit for lightning to leap to 2 more foes.` },
+  { k: "riposte", name: "Riposte", col: "#ffe0a0", text: m => `Parrying strikes back for ${Math.round(300 * m)}% weapon damage.` }
+];
+const BOON_TIERS = [["common", 1, 55], ["rare", 1.5, 30], ["epic", 2.2, 12], ["legendary", 3.2, 3]];
+let cardOffer = null;
+function offerCards() {
+  if (!run) return;
+  const pool = BOONS.slice(); cardOffer = [];
+  for (let k = 0; k < 3; k++) { const b = pool.splice(Math.floor(Math.random() * pool.length), 1)[0]; const tier = BOON_TIERS[pickWeighted({ 0: 55, 1: 30, 2: 12, 3: 3 }) | 0]; cardOffer.push({ b, tier: tier[0], m: tier[1] }); }
+  $("cardRow").innerHTML = cardOffer.map((c, i) => `<button class="bcard" data-card="${i}" style="--c:${c.b.col};--r:${rc(c.tier)}"><span class="tier">${RNAME[c.tier]}</span><span class="glyph">${c.b.name.split(" ").map(w => w[0]).join("")}</span><b>${esc(c.b.name)}</b><span>${esc(c.b.text(c.m))}</span>${run.boons[c.b.k] ? `<small>You have ${run.boons[c.b.k].toFixed(1)}. This stacks.</small>` : ""}</button>`).join("");
+  $("cards").hidden = false; keys.clear(); attackHeld = false;
+}
+$("cards").addEventListener("click", e => {
+  const b = e.target.closest("[data-card]"); if (!b || !cardOffer || !run) return;
+  const c = cardOffer[+b.dataset.card]; run.boons[c.b.k] = (run.boons[c.b.k] || 0) + c.m; cardOffer = null;
+  const hpFrac = P.hp / ST.maxHp; computeStats(); P.hp = Math.min(ST.maxHp, Math.max(P.hp, hpFrac * ST.maxHp));
+  bumpStat("cards"); $("cards").hidden = true; renderBoonBar(); toast(`<b>${esc(c.b.name)}</b> blessing taken`, c.tier);
+});
+function renderBoonBar() { const el = $("boonBar"); if (!el) return; const b = run && run.boons ? Object.entries(run.boons) : []; el.innerHTML = b.map(([k, v]) => { const B = BOONS.find(x => x.k === k); return `<span style="--c:${B.col}">${esc(B.name)} ${v.toFixed(1)}</span>`; }).join(""); el.hidden = !b.length; }
+function applyBoons(st) {
+  let b = null; try { b = run && run.boons; } catch (e) { b = null; }
+  st.critMult = 1.75;
+  if (!b) return;
+  const v = k => b[k] || 0;
+  st.hit *= 1 + 0.12 * v("enchant"); st.crit += 0.08 * v("crit"); st.critMult += 0.3 * v("critdmg");
+  if (v("stamina")) { st.dashes += Math.min(3, Math.max(1, Math.round(v("stamina")))); st.dashCd *= Math.max(0.5, 1 - 0.1 * v("stamina")); }
+  st.move *= 1 + 0.08 * v("haste"); st.atkSpd *= 1 + 0.08 * v("haste"); st.maxHp = Math.round(st.maxHp * (1 + 0.15 * v("vitality")));
+  st.dr = Math.min(0.85, 1 - (1 - st.dr) * (1 - 0.08 * v("guard"))); st.specCd /= 1 + 0.12 * v("focus"); st.power += 0.15 * v("focus");
+  st.dps = st.hit * st.atkSpd;
+}
+function boonProcs(e, dmg) {
+  const b = run.boons;
+  if (b.poison) { e.poison = worldT + 4; e.poisonDps = Math.max(e.poisonDps || 0, ST.hit * 0.12 * b.poison); }
+  if (b.flame) { e.burn = worldT + 3; e.burnDps = Math.max(e.burnDps || 0, ST.hit * 0.15 * b.flame); }
+  if (b.ice) { e.slow = worldT + 2; if (Math.random() < 0.08 * b.ice && !e.boss) { e.frozen = worldT + 1; floatText(e.pos, "Frozen", "#bff4ff"); } }
+  if (b.lifesteal) heal(dmg * 0.04 * b.lifesteal, true);
+  if (b.storm && Math.random() < 0.12 * b.storm) for (const x of enemies.filter(x => x !== e && !x.dead && x.pos.distanceTo(e.pos) < 8).slice(0, 2)) { boltFx(e.pos.clone().add(new V3(0, 1, 0)), x.pos.clone().add(new V3(0, 1, 0)), 0x9ae0ff, 0.25); damageEnemy(x, dmg * 0.5, null, 0, { noProc: true, canCrit: false, color: "#9ae0ff" }); }
+}
+
+/* ---- enchanting at the top of the spire ---- */
+function enchLv(id) { return (S && S.ench && S.ench[id]) || 0; }
+function enchCost(it, lv) {
+  const coins = Math.round(400 * Math.pow(1.9, lv) * (RANK[it.rarity] + 1));
+  const mats = lv < 3 ? { flint: 3 + lv } : lv < 6 ? { amber: lv - 1 } : lv < 9 ? { emberstone: lv - 4 } : { aethercrystal: 2 };
+  return { coins, mats };
+}
+const atArchmage = () => world && world.kind === "lobby" && Math.hypot(P.pos.x - SPIRE.x, P.pos.z - SPIRE.z) < SPIRE.ri + 0.5 && P.pos.y > SPIRE.H - 1.5;
+function renderEnchant(B) {
+  const here = atArchmage();
+  const card = it => { const lv = enchLv(it.id), max = lv >= 10, cost = max ? null : enchCost(it, lv), ok = !max && S.coins >= cost.coins && Object.entries(cost.mats).every(([m, n]) => (S.inv[m] || 0) >= n);
+    return `<div class="ench" style="--c:${rc(it.rarity)}"><img alt="" data-thumb="${it.id}"><div><b>${esc(it.name)}${lv ? ` +${lv}` : ""}</b><small>${RNAME[it.rarity]} ${it.cat}. Each level adds 7% ${it.cat === "weapon" ? "weapon and special damage" : "health and defence"}.</small>
+      <div class="meter"><i style="width:${lv * 10}%;--mc:#b08aff"></i></div><span class="muted">Level ${lv} of 10 · now +${lv * 7}%</span>
+      ${max ? `<span class="qrew">Fully enchanted.</span>` : `<div class="reqs">${Object.entries(cost.mats).map(([m, n]) => { const h = S.inv[m] || 0; return `<span class="${h >= n ? "has" : "lack"}">${esc(ITEM[m].name)} <b class="num">${h}/${n}</b></span>`; }).join("")}<span class="${S.coins >= cost.coins ? "has" : "lack"}">Coins <b class="num">${fmt(cost.coins)}</b></span></div>
+      <button class="btn ${ok && here ? "primary" : ""}" data-enchant="${it.id}" ${ok && here ? "" : "disabled"}>Enchant to +${lv + 1}</button>`}</div></div>`; };
+  B.innerHTML = `<div style="display:grid;gap:12px;max-width:900px;margin:0 auto"><p class="muted" style="margin:0">${here ? "Archmage Ysolwen raises her staff. Choose what to enchant." : "Only Archmage Ysolwen can enchant. Climb the stair of the Spire, at the end of the north-east road."} Enchantments stay on the item for good.</p>
+    ${card(ITEM[S.equip.weapon])}${card(ITEM[S.equip.armour])}</div>`;
+  B.querySelectorAll("img[data-thumb]").forEach(im => { im.src = thumb(im.dataset.thumb); });
+}
+function doEnchant(id) {
+  const it = ITEM[id], lv = enchLv(id); if (lv >= 10 || !atArchmage()) return; const c = enchCost(it, lv);
+  if (S.coins < c.coins || !Object.entries(c.mats).every(([m, n]) => (S.inv[m] || 0) >= n)) return;
+  S.coins -= c.coins; for (const [m, n] of Object.entries(c.mats)) { S.inv[m] -= n; if (S.inv[m] <= 0) delete S.inv[m]; }
+  S.ench = S.ench || {}; S.ench[id] = lv + 1; computeStats(); bumpStat("enchants"); save();
+  pillarFx(P.pos, 0xb08aff, 12, 0.8); ringFx(P.pos, 3, 0xb08aff, 0.6); toast(`<b>${esc(it.name)} +${lv + 1}</b> enchanted`, it.rarity);
+}
+
+/* ---- fishing ---- */
+const RODS = [
+  ["willow", "Willow Twig Rod", "common", 1.0, 1.0, 0.9, 0, {}], ["hazel", "Hazel Switch", "common", 1.05, 1.08, 0.95, 300, { oakplank: 3, hemp: 1 }],
+  ["bamboo", "Saltmarsh Bamboo", "common", 1.08, 1.15, 1.0, 600, { oakplank: 2, hemp: 2 }], ["driftwood", "Driftwood Caster", "common", 1.12, 1.1, 1.05, 900, { oakplank: 4, copper: 2 }],
+  ["copperring", "Copper-Ring Rod", "rare", 1.2, 1.15, 1.05, 2500, { copper: 6, hemp: 3 }], ["tinline", "Tinline Rod", "rare", 1.25, 1.2, 1.1, 4000, { tin: 6, steel: 1 }],
+  ["bronzewhip", "Bronzewhip", "rare", 1.3, 1.25, 1.1, 6500, { bronze: 4, hemp: 4 }], ["amberglow", "Amberglow Rod", "rare", 1.38, 1.2, 1.2, 9000, { amber: 3, steel: 2 }],
+  ["pearlcast", "Pearlcast Rod", "epic", 1.5, 1.3, 1.2, 18000, { saltpearl: 3, silver: 4 }], ["moonreel", "Moonreel", "epic", 1.6, 1.35, 1.25, 30000, { moonsilver: 3, tidesilk: 2 }],
+  ["emberline", "Emberline", "epic", 1.65, 1.4, 1.2, 42000, { emberstone: 3, steel: 4 }], ["wyvernspine", "Wyvernspine Rod", "epic", 1.75, 1.4, 1.3, 60000, { wyvernscale: 3, ironwoodlog: 2 }],
+  ["tidecaller", "Tidecaller", "legendary", 2.0, 1.5, 1.35, 150000, { tidesilk: 5, aethercrystal: 1 }], ["starsilk", "Starsilk Rod", "legendary", 2.15, 1.55, 1.4, 240000, { starsteel: 2, tidesilk: 4 }],
+  ["phoenixfly", "Phoenix Fly-rod", "legendary", 2.3, 1.6, 1.4, 360000, { phoenixplume: 2, gold: 4 }], ["skyspool", "Skyspool", "legendary", 2.45, 1.7, 1.45, 520000, { skygirder: 2, aethercrystal: 2 }],
+  ["sunreel", "Sunforged Reel", "legendary", 2.6, 1.75, 1.5, 800000, { sunforged: 3, starsteel: 2 }], ["chronocast", "Chronocast", "vaulted", 3.0, 1.9, 1.6, 2500000, { chronoshard: 1, aethercrystal: 3 }],
+  ["voidline", "Voidline", "vaulted", 3.3, 2.0, 1.6, 4000000, { voidglass: 1, sunforged: 3 }], ["leviathanlure", "Leviathan's Lure", "vaulted", 3.8, 2.2, 1.7, 8000000, { vaultheart: 1, starmote: 1, tidesilk: 6 }]
+].map(([id, name, rarity, luck, speed, win, coins, mats]) => ({ id, name, rarity, luck, speed, win, coins, mats }));
+const ROD = Object.fromEntries(RODS.map(r => [r.id, r]));
+let fishing = null, fishPrev = false;
+function startFishing(sp) {
+  if (fishing || run || P.dead) return;
+  const rod = ROD[S.rod] || ROD.willow;
+  P.face = Math.atan2(sp.bx - P.pos.x, sp.bz - P.pos.z); P.swing = 1; P.swingStyle = "normal"; P.swingDur = 0.5;
+  const bob = new THREE.Group(); M(G.sph(), std(0xe0303a, { r: 0.4 }), 0, 0.08, 0, bob, 0.14); M(G.sph(), std(0xf4f4f4, { r: 0.4 }), 0, -0.05, 0, bob, 0.13); bob.position.set(sp.bx, sp.by, sp.bz); scene.add(bob);
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([P.pos.clone().add(new V3(0, 1.8, 0)), bob.position.clone()]), new THREE.LineBasicMaterial({ color: 0xe8e8e8, transparent: true, opacity: 0.7 })); scene.add(line);
+  fishing = { sp, rod, bob, line, stage: "wait", at: worldT + rand(3, 9) / rod.speed };
+  ringFx(bob.position, 0.8, 0xffffff, 0.5);
+  fishMsg(`Line cast with your <b>${esc(rod.name)}</b>. Wait for a bite, then press E, J or Attack.`, false);
+}
+function fishMsg(html, hot) { const el = $("fishPanel"); el.hidden = false; el.classList.toggle("hot", !!hot); $("fishText").innerHTML = html; }
+function stopFishing(msg) { if (!fishing) return; scene.remove(fishing.bob); scene.remove(fishing.line); fishing.line.geometry.dispose(); fishing = null; if (msg) { fishMsg(msg, false); setTimeout(() => { if (!fishing) $("fishPanel").hidden = true; }, 2600); } else $("fishPanel").hidden = true; }
+const FISH_W = { common: 60, rare: 28, epic: 9, legendary: 2.6, vaulted: 0.12 };
+function rollFish(luck) {
+  const night = DAY.day < 0.35 ? 1.3 : 1, w = {};
+  for (const [r, v] of Object.entries(FISH_W)) w[r] = v * Math.pow(luck * night, RANK[r]);
+  const tot = Object.values(w).reduce((s, v) => s + v, 0); if (w.vaulted / tot > 0.005) w.vaulted = 0.005 * (tot - w.vaulted) / 0.995;
+  const rar = pickWeighted(w); return pick(ITEMS.filter(i => i.cat === "fish" && i.rarity === rar));
+}
+function fishControl(mag, reel) {
+  const f = fishing; if (!f) return;
+  if (mag > 0.35) { stopFishing("You reel your line back in."); return; }
+  const bob = f.bob; bob.position.y = f.sp.by + Math.sin(worldT * 3) * 0.03;
+  const pressed = reel && !fishPrev; fishPrev = reel;
+  if (f.stage === "wait") {
+    if (pressed) { stopFishing("Too early. The fish swam away."); return; }
+    if (worldT >= f.at) { f.stage = "bite"; f.until = worldT + 0.75 * f.rod.win; ringFx(bob.position, 1.2, 0xcfeeff, 0.4); fishMsg("<b>A bite!</b> Reel in now!", true); }
+  } else if (f.stage === "bite") {
+    bob.position.y = f.sp.by - 0.18 + Math.sin(worldT * 30) * 0.06;
+    if (pressed) {
+      const luck = f.rod.luck * f.sp.bonus, fish = rollFish(luck), sp = f.sp;
+      gain(fish, null, 1); S.fishLog = S.fishLog || {}; S.fishLog[fish.id] = (S.fishLog[fish.id] || 0) + 1; bumpStat("fish"); if (RANK[fish.rarity] >= 1) bumpStat("rareFish"); if (RANK[fish.rarity] >= 2) bumpStat("epicFish");
+      burstFx(bob.position.clone(), 1, 0xcfeeff, 0.4); stopFishing(`You caught ${article(fish.name)} <b style="color:${rc(fish.rarity)}">${esc(fish.name)}</b>! <span class="muted">${RNAME[fish.rarity]} fish. Press E to cast again.</span>`); save();
+    } else if (worldT > f.until) stopFishing("It got away. Watch for the bobber to dip.");
+  }
+  if (fishing) fishing.line.geometry.setFromPoints([P.pos.clone().add(new V3(Math.sin(P.face) * 0.6, 1.9, Math.cos(P.face) * 0.6)), bob.position.clone()]);
+}
+function renderFishing(B) {
+  const inLobby = world && world.kind === "lobby", rodsOwned = S.rods || {};
+  const can = rd => S.coins >= rd.coins && Object.entries(rd.mats).every(([m, n]) => (S.inv[m] || 0) >= n);
+  const caught = ITEMS.filter(i => i.cat === "fish");
+  B.innerHTML = `<div style="display:grid;gap:12px;max-width:1100px;margin:0 auto">
+    <p class="muted" style="margin:0">Fish at Glimmerwater Lake (east), the piers of Port Saltreach (south) or Mirror Pond. Better rods bring rarer fish and give you longer to react. Fish bite better at night. You can buy rods in any order.</p>
+    <h3 class="sec">Rods · ${Object.keys(rodsOwned).length} of ${RODS.length} owned</h3>
+    <div class="recipes">${RODS.map(rd => { const own = rodsOwned[rd.id], eq = S.rod === rd.id;
+      return `<div class="recipe ${own || can(rd) ? "ok" : ""}" style="--c:${rc(rd.rarity)}"><div class="rodicon" style="--c:${rc(rd.rarity)}"></div><div class="rmain"><b>${esc(rd.name)}</b><small>${RNAME[rd.rarity]} rod · luck ×${rd.luck.toFixed(2)} · bites ×${rd.speed.toFixed(2)} faster · ${(0.75 * rd.win).toFixed(2)} s to react</small>
+        ${own ? "" : `<div class="reqs">${Object.entries(rd.mats).map(([m, n]) => { const h = S.inv[m] || 0; return `<span class="${h >= n ? "has" : "lack"}">${esc(ITEM[m].name)} <b class="num">${h}/${n}</b></span>`; }).join("")}<span class="${S.coins >= rd.coins ? "has" : "lack"}">Coins <b class="num">${fmt(rd.coins)}</b></span></div>`}</div>
+        ${own ? `<button class="btn ${eq ? "" : "primary"}" data-rod="${rd.id}" ${eq ? "disabled" : ""}>${eq ? "Equipped" : "Equip"}</button>` : `<button class="btn ${can(rd) && inLobby ? "primary" : ""}" data-buyrod="${rd.id}" ${can(rd) && inLobby ? "" : "disabled"}>Buy</button>`}</div>`; }).join("")}</div>
+    <h3 class="sec">Fish log</h3><div class="lootlist">${caught.map(f => { const n = (S.fishLog || {})[f.id] || 0; return `<span style="--c:${n ? rc(f.rarity) : "var(--muted)"}">${n ? esc(f.name) : "Unknown fish"}<small>${RNAME[f.rarity]} · caught ${n}</small></span>`; }).join("")}</div></div>`;
+}
+function buyRod(id) {
+  const rd = ROD[id]; if (!rd || (S.rods || {})[id] || !(world && world.kind === "lobby")) return;
+  if (S.coins < rd.coins || !Object.entries(rd.mats).every(([m, n]) => (S.inv[m] || 0) >= n)) return;
+  S.coins -= rd.coins; for (const [m, n] of Object.entries(rd.mats)) { S.inv[m] -= n; if (S.inv[m] <= 0) delete S.inv[m]; }
+  S.rods[id] = 1; S.rod = id; toast(`<b>${esc(rd.name)}</b> bought and equipped`, rd.rarity); save();
+}
+
+/* ---- the Vault Auction at Skyhold ---- */
+const AUCTION_RIVALS = ["Valka Stormborn", "House Aurelian", "The Nameless Duellist", "Merchant Prince Oswin", "Lady Corvane"];
+function newListing(taken) {
+  const pool = ITEMS.filter(i => i.cat === "armour" && i.rarity === "vaulted"), opts = pool.filter(p => !taken.includes(p.id)), it = pick(opts.length ? opts : pool);
+  return { id: it.id, price: Math.round(10 + Math.random() * 16) * 1e6 + Math.round(Math.random() * 9) * 1e5, soldTo: null, restockAt: 0, rivalAt: Date.now() + (30 + Math.random() * 240) * 60e3 };
+}
+function auctionState() {
+  const now = Date.now(); S.auction = S.auction && Array.isArray(S.auction.slots) ? S.auction : { slots: [] };
+  const A = S.auction; while (A.slots.length < 4) A.slots.push(newListing(A.slots.map(s => s.id)));
+  A.slots.forEach((sl, i) => {
+    if (sl.restockAt && now >= sl.restockAt) A.slots[i] = newListing(A.slots.map(s => s.id));
+    else if (!sl.soldTo && now >= sl.rivalAt) { sl.soldTo = pick(AUCTION_RIVALS); sl.restockAt = sl.rivalAt + 6 * 3600e3; }
+  });
+  return A;
+}
+const atCastle = () => world && world.kind === "lobby" && world.castle && Math.hypot(P.pos.x - world.castle.x, P.pos.z - world.castle.z) < 18;
+const dur = ms => { const m = Math.max(0, Math.round(ms / 60e3)), h = Math.floor(m / 60); return h ? `${h} h ${m % 60} min` : `${m} min`; };
+function renderAuction(B) {
+  const A = auctionState(), here = atCastle(), now = Date.now();
+  B.innerHTML = `<div style="display:grid;gap:12px;max-width:1000px;margin:0 auto">
+    <p class="muted" style="margin:0">Only four pieces of Vaulted armour are ever on sale. When someone buys one, it is gone for everyone until the Vault restocks that stand. Rival buyers are always circling, so a listing can vanish while you save up.${here ? "" : " You can browse from anywhere, but you must be inside Skyhold Castle to buy."}</p>
+    <p style="margin:0">You have <b style="color:var(--accent)">${fmt(S.coins)}</b> coins.</p>
+    <div class="auction">${A.slots.map((sl, i) => { const it = ITEM[sl.id], ok = !sl.soldTo && here && S.coins >= sl.price;
+      return `<div class="lot" style="--c:${rc("vaulted")}"><span class="tier">Stand ${i + 1}</span><img alt="" data-thumb="${it.id}"><b>${esc(it.name)}</b><small>${esc(ARM_SPECIALS[it.special] ? "Special: " + ARM_SPECIALS[it.special].name : "")}</small>
+        ${sl.soldTo ? `<span class="sold">Sold to ${esc(sl.soldTo)}</span><span class="muted">Restocks in ${dur(sl.restockAt - now)}</span>` : `<span class="price">${fmt(sl.price)} coins</span><button class="btn ${ok ? "primary" : ""}" data-lot="${i}" ${ok ? "" : "disabled"}>Buy outright</button>`}</div>`; }).join("")}</div></div>`;
+  B.querySelectorAll("img[data-thumb]").forEach(im => { im.src = thumb(im.dataset.thumb); });
+}
+function buyLot(i) {
+  const A = auctionState(), sl = A.slots[i]; if (!sl || sl.soldTo || !atCastle() || S.coins < sl.price) return;
+  S.coins -= sl.price; gain(ITEM[sl.id], null, 1); sl.soldTo = "you"; sl.restockAt = Date.now() + 12 * 3600e3; save();
+}
+
+/* ---- material exchange with the hermit ---- */
+function tradeUp(from, n) {
+  const order = ["common", "rare", "epic", "legendary", "vaulted"], to = order[order.indexOf(from) + 1];
+  const mats = ITEMS.filter(i => i.cat === "material" && i.rarity === from && S.inv[i.id]).sort((a, b) => S.inv[b.id] - S.inv[a.id]);
+  if (mats.reduce((s, i) => s + S.inv[i.id], 0) < n) { toast(`You need ${n} ${RNAME[from].toLowerCase()} materials.`, ""); return; }
+  let need = n; for (const m of mats) { const t = Math.min(need, S.inv[m.id]); S.inv[m.id] -= t; if (S.inv[m.id] <= 0) delete S.inv[m.id]; need -= t; if (!need) break; }
+  gain(rollOfCats(to, ["material"]), null, 1); save();
+}
+$("dialog").addEventListener("click", e => { const b = e.target.closest("[data-trade]"); if (b) { const [f, n] = b.dataset.trade.split(":"); tradeUp(f, +n); if (dlgNpc) openDialog(dlgNpc); } });
+$("menuBody").addEventListener("click", e => {
+  const en = e.target.closest("[data-enchant]"); if (en) { doEnchant(en.dataset.enchant); renderMenu(); return; }
+  const br = e.target.closest("[data-buyrod]"); if (br) { buyRod(br.dataset.buyrod); renderMenu(); return; }
+  const rq = e.target.closest("[data-rod]"); if (rq) { S.rod = rq.dataset.rod; save(); renderMenu(); return; }
+  const lt = e.target.closest("[data-lot]"); if (lt) { buyLot(+lt.dataset.lot); renderMenu(); }
+});
+$("fishStop").addEventListener("click", () => stopFishing("You reel your line back in."));
+
+/* ---- the people at the ends of the roads ---- */
+QUEST_NPCS.push(
+  { id: "ysolwen", name: "Archmage Ysolwen", role: "Enchanter of the Spire", pos: [SPIRE.x, SPIRE.z + 1.5], y: SPIRE.H, face: 0, enchant: true,
+    look: { skin: 0xf0d8c0, hair: 0xe8e0ff, cloth: 0x3a2a7a, cloth2: 0x1e1a40 }, armour: "duskweave", weapon: "prismcaller", quests: [],
+    bye: "You climbed all those stairs? Then you have earned an enchantment. Bring me coins and the right stones, and your gear will grow stronger." },
+  { id: "marlo", name: "Marlo", role: "Tackle Shop", pos: [136.5, -8.5], face: 0, fishing: true,
+    look: { skin: 0xd0a080, hair: 0x8a8a8a, cloth: 0x3a6a8a, cloth2: 0x2a3a4a }, armour: "leather", weapon: "driftstaff", quests: [],
+    bye: "Every angler starts with a willow twig. I sell twenty rods, and you can buy them in any order you like." },
+  { id: "bracken", name: "Hermit Bracken", role: "Keeper of the Grove", pos: [104, 112], face: 0.9, exchange: true,
+    look: { skin: 0xc99a74, hair: 0xd8d8d8, cloth: 0x4a6a2a, cloth2: 0x3a3022 }, armour: "stitchedhide", weapon: "apprentice", quests: [],
+    bye: "The old tree turns plenty into rarity. Give me a pile of lesser stuff and I will give you something finer." },
+  { id: "voss", name: "Castellan Voss", role: "Keeper of the Vault Auction", pos: [MOUNT.x + 4, MOUNT.z - 4], y: MOUNT.top, face: Math.atan2(-MOUNT.x, -MOUNT.z), auction: true,
+    look: { skin: 0xe8c0a0, hair: 0x1a1a1a, cloth: 0x5a2a6a, cloth2: 0x2a1a3a }, armour: "gildedaegis", weapon: "solbrand", quests: [],
+    bye: "Four stands, four treasures, never more. Whoever pays first walks away with it, and the rest of the world waits for the restock." },
+  { id: "quill", name: "Harbourmaster Quill", role: "Port Saltreach", pos: [5.5, 164], face: -Math.PI / 2,
+    look: { skin: 0xb07a52, hair: 0x2a1a10, cloth: 0x2a3a5a, cloth2: 0x1a2a3a }, armour: "saltscale", weapon: "brinewarden",
+    hello: "Ships come and go, but the fish stay. The sea rewards patience. Bring me a decent catch.",
+    bye: "Best angler this port has seen. My nets are yours.",
+    quests: [
+      { id: "q1", title: "Catch of the Day", ask: "Catch 5 fish anywhere.", stat: "fish", n: 5, reward: { coins: 400, items: { saltpearl: 1 } } },
+      { id: "q2", title: "Deep Water", ask: "Catch 3 fish of Rare quality or better.", stat: "rareFish", n: 3, reward: { coins: 1200, items: { tidesilk: 1 } } },
+      { id: "q3", title: "Legend of the Bay", ask: "Catch an Epic fish or better.", stat: "epicFish", n: 1, reward: { coins: 4000, chest: 2 } }
+    ] },
+  { id: "lio", name: "Astronomer Lio", role: "Moonwell Observatory", pos: [-153, 5], face: -Math.PI / 2,
+    look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0x2a2a5a, cloth2: 0x1a1a30 }, armour: "vesperwing", weapon: "starglass",
+    hello: "The stars move, and so do the monsters. I study both. Help me with a few observations.",
+    bye: "My charts are complete. The night sky will always welcome you.",
+    quests: [
+      { id: "s1", title: "Night Hunter", ask: "Defeat 20 foes while it is night.", stat: "nightKills", n: 20, reward: { coins: 800, items: { moonsilver: 2 } } },
+      { id: "s2", title: "Starlit Blessings", ask: "Take 10 blessing cards during island runs.", stat: "cards", n: 10, reward: { coins: 1500, items: { aethercrystal: 1 } } },
+      { id: "s3", title: "Written in the Stars", ask: "Have the Archmage enchant your gear 5 times.", stat: "enchants", n: 5, reward: { coins: 5000, items: { chronoshard: 1 } } }
+    ] },
+  { id: "thorne", name: "Commander Thorne", role: "Frontier Fort", pos: [-108, -108], face: 0.785,
+    look: { skin: 0xd0a080, hair: 0x5a2a12, cloth: 0x6a2a2a, cloth2: 0x2a1a1a }, armour: "bronzeguard", weapon: "riptide",
+    hello: "The frontier needs fighters who can hold a line and win a duel. Prove yourself.",
+    bye: "You would make a fine commander. The fort stands because of people like you.",
+    quests: [
+      { id: "t1", title: "Hold the Line", ask: "Parry 15 attacks.", stat: "parries", n: 15, reward: { coins: 900, items: { obsidian: 3 } } },
+      { id: "t2", title: "Vanguard", ask: "Clear 4 island stages.", stat: "clears", n: 4, reward: { coins: 1600, chest: 1 } },
+      { id: "t3", title: "Warlord", ask: "Win 10 duels in the Grand Arena.", stat: "duels", n: 10, reward: { coins: 8000, items: { voidglass: 1 } } }
+    ] }
+);
+VILLAGERS.push(
+  { name: "Gil", role: "Angler", home: [150, 6], rad: 5, look: { skin: 0xe8c0a0, hair: 0x5a3a1a, cloth: 0x5a7a3a, cloth2: 0x3a3022 }, lines: ["The big ones bite at night. Trust me.", "Marlo will sell you a better rod if you bring him the right bits.", "I once hooked something golden. It hooked me back."] },
+  { name: "Rook", role: "Sailor", home: [-6, 160], rad: 6, look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0xe8e0d0, cloth2: 0x2a3a5a }, lines: ["Wind's good for sailing. Not that we are going anywhere.", "The lighthouse keeper has not come down in years.", "Quill pays well for a proper catch."] },
+  { name: "Mira", role: "Net mender", home: [10, 170], rad: 5, look: { skin: 0xf0d8c0, hair: 0xc89a5a, cloth: 0x8a5a7a, cloth2: 0x3a2a3a }, lines: ["Every net has a story, usually about a crab.", "The sea goes all the way to the edge of the world. I checked."] },
+  { name: "Sten", role: "Castle guard", home: [MOUNT.x + 7, MOUNT.z - 7], rad: 3, armour: "ironplate", weapon: "militia", look: { skin: 0xd0a080, hair: 0x3a2a1a, cloth: 0x5a2a6a, cloth2: 0x2a1a3a }, lines: ["Ten million coins for one piece of armour. I could retire on a sleeve.", "Rival buyers come at all hours. Be quick if you see something you like."] },
+  { name: "Tib", role: "Apprentice mage", home: [106, -104], rad: 5, look: { skin: 0xf0d0b0, hair: 0x8a2a8a, cloth: 0x3a2a6a, cloth2: 0x1e1a40 }, lines: ["The stair goes round once. Do not look down.", "The Archmage enchants anything, for a price. Mostly a big price."] },
+  { name: "Fenn", role: "Scout", home: [-100, -96], rad: 6, look: { skin: 0xc99a74, hair: 0x2a1a10, cloth: 0x4a5a3a, cloth2: 0x2a3022 }, lines: ["I have walked every road to its end. Have you?", "From the castle you can see villages on the far hills."] },
+  { name: "Brother Ansel", role: "Stargazer", home: [-156, -6], rad: 5, look: { skin: 0xe8c0a0, hair: 0x8a8a8a, cloth: 0x6a5a4a, cloth2: 0x3a3022 }, lines: ["At night the observatory dome opens. It is breathtaking.", "Lio says monsters grow bolder when the stars are out."] }
+);
 
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
@@ -3899,7 +4411,7 @@ function frame(now) {
 }
 $("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; if (coarse || usedTouch) $("joyHint").hidden = false; });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
