@@ -259,6 +259,13 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 .lot img { width: 110px; height: 110px; } .lot b { color: var(--c); font-family: var(--f-display); } .lot .tier { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 800; }
 .lot .price { font-family: var(--f-data); font-weight: 700; color: var(--accent); } .lot .sold { color: var(--bad); font-weight: 800; } .lot small { color: var(--muted); }
 .dlg #dlgBtns { flex-wrap: wrap; }
+.dailysheet { width: min(760px, 100%); } .dailybody { display: grid; gap: 12px; padding: 14px; overflow-y: auto; }
+.dtrack { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+@media (max-width: 640px) { .dtrack { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.dday { position: relative; display: grid; gap: 3px; justify-items: center; text-align: center; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 4px; }
+.dday svg { width: 42px; height: 37px; } .dday .dn { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 800; } .dday b { font-size: 12.5px; color: var(--accent); } .dday small { font-size: 10.5px; color: var(--muted); line-height: 1.25; }
+.dday.now { border-color: var(--accent); box-shadow: 0 0 22px -6px var(--accent); } .dday.done { opacity: 0.55; } .dday .tick { font-size: 11px; font-weight: 800; color: var(--good); }
+#menuBar #mbDaily.ready { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 14px -2px var(--accent); }
 .dlg { width: min(520px, 100%); max-height: 100%; overflow-y: auto; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 12px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
 .dlg-who { display: grid; gap: 2px; } .dlg-who b { font-family: var(--f-display); font-size: 22px; } .dlg-who span { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
 .dlg p { margin: 0; font-size: 16px; line-height: 1.5; }
@@ -311,7 +318,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <button class="hbtn warn" id="bLeave" hidden>Leave island</button>
 </div>
 <div id="menuBar">
-  <button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
+  <button id="mbDaily">Daily</button><button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
 <div id="musicPanel" hidden role="dialog" aria-label="Music">
   <div class="mpHead"><b>Music</b><button class="hbtn" id="mpClose">Close</button></div>
@@ -355,6 +362,11 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 </div>
 <div class="modal" id="dialog" hidden>
   <div class="dlg" role="dialog" aria-labelledby="dlgName"><div class="dlg-who"><b id="dlgName"></b><span id="dlgRole"></span></div><p id="dlgText"></p><div id="dlgQuest"></div><div class="row" id="dlgBtns" style="justify-content:center"></div></div>
+</div>
+<div class="modal" id="daily" hidden>
+  <div class="sheet small dailysheet" role="dialog" aria-labelledby="dailyH"><header><h2 id="dailyH">Daily reward</h2><button class="btn" id="dailyClose">Close</button></header>
+    <div class="dailybody"><div class="dtrack" id="dailyTrack"></div><p class="muted" id="dailyNote"></p>
+    <div class="row" style="justify-content:center"><button class="btn primary" id="dailyClaim">Claim</button><button class="btn" id="dailyOpenChests">Open my chests</button></div></div></div>
 </div>
 <div class="modal" id="cards" hidden>
   <div class="cardsheet" role="dialog" aria-labelledby="cardsH"><h2 id="cardsH">Choose a blessing</h2><p class="muted">Free, and yours until this island run ends. Blessings stack.</p><div class="cardrow" id="cardRow"></div></div>
@@ -2153,6 +2165,7 @@ window.addEventListener("keydown", e => {
   const k = e.key.toLowerCase();
   if (k === "escape" && !$("musicPanel").hidden) { closeMusic(); return; }
   if (k === "escape" && !$("dialog").hidden) { $("dialog").hidden = true; return; }
+  if (k === "escape" && !$("daily").hidden) { $("daily").hidden = true; return; }
   if (k === "escape") { if (!$("menu").hidden) closeMenu(); else if (!$("mapModal").hidden) closeMap(); return; }
   if (isPaused()) return;
   if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "tab"].includes(k)) e.preventDefault();
@@ -2297,7 +2310,7 @@ function thumb(id) {
    ===================================================================== */
 let menuTab = "weapons", selItem = { weapon: null, armour: null, items: null }, selClass = null, rollResult = null;
 const MENU_TABS = [["weapons", "Weapons"], ["armour", "Armour"], ["items", "Potions and materials"], ["chests", "Chests"], ["forge", "Forge"], ["fishing", "Fishing"], ["enchant", "Enchant"], ["auction", "Vault Auction"], ["quests", "Quests"], ["classes", "Classes"], ["stats", "Stats"], ["shop", "Shop"]];
-const isPaused = () => !$("intro").hidden || !$("dialog").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
+const isPaused = () => !$("intro").hidden || !$("dialog").hidden || !$("daily").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
 function openMenu(tab) { menuTab = tab; rollResult = null; lastLoot = null; if (prevCanvas.parentNode && ["chests", "forge", "quests", "fishing", "enchant", "auction"].includes(tab)) prevCanvas.remove(); $("menu").hidden = false; keys.clear(); attackHeld = false; renderMenu(); }
 function closeMenu() { $("menu").hidden = true; if (prevCanvas.parentNode) prevCanvas.remove(); }
 function closeAllModals() { closeMenu(); $("dialog").hidden = true; $("mapModal").hidden = true; $("confirmLeave").hidden = true; }
@@ -4122,6 +4135,42 @@ VILLAGERS.push(
   { name: "Brother Ansel", role: "Stargazer", home: [-156, -6], rad: 5, look: { skin: 0xe8c0a0, hair: 0x8a8a8a, cloth: 0x6a5a4a, cloth2: 0x3a3022 }, lines: ["At night the observatory dome opens. It is breathtaking.", "Lio says monsters grow bolder when the stars are out."] }
 );
 
+/* ---- daily rewards: a chest and coins once a day, with a 7-day streak ---- */
+const DAILY = [
+  { coins: 200, chest: 0 }, { coins: 250, chest: 0, items: { minor: 2 } }, { coins: 300, chest: 0 }, { coins: 350, chest: 0, items: { draught: 1 } },
+  { coins: 400, chest: 0, items: { steel: 2 } }, { coins: 500, chest: 0, items: { draught: 2 } }, { coins: 800, chest: 1, items: { greater: 1 } }
+];
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+function dailyInfo() {
+  const D = S.daily || { last: "", streak: 0 }, today = dayKey(), y = new Date(); y.setDate(y.getDate() - 1);
+  const claimed = D.last === today, keeps = D.last === dayKey(y);
+  const next = claimed ? D.streak : keeps ? D.streak + 1 : 1; // the streak day you are on (or would claim)
+  return { claimed, day: ((next - 1) % 7) + 1, streak: next, D };
+}
+function renderDaily() {
+  const I = dailyInfo();
+  const t = new Date(); t.setHours(24, 0, 0, 0); const left = t - Date.now(), hh = Math.floor(left / 3600e3), mm = Math.floor(left / 60e3) % 60;
+  $("dailyTrack").innerHTML = DAILY.map((r, i) => { const d = i + 1, done = I.claimed ? d <= I.day : d < I.day, now = !I.claimed && d === I.day; const T = CHEST_TIERS[r.chest];
+    return `<div class="dday ${done ? "done" : ""} ${now ? "now" : ""}" style="--c:${rc(T.rarity)}"><span class="dn">Day ${d}</span>${chestSvg(r.chest)}<b>${fmt(r.coins)} coins</b><small>${esc(T.name)}${r.items ? " + " + Object.entries(r.items).map(([id, n]) => `${n} ${esc(ITEM[id].name)}`).join(", ") : ""}</small>${done ? '<span class="tick">Claimed</span>' : ""}</div>`; }).join("");
+  $("dailyNote").textContent = I.claimed ? `Come back tomorrow for day ${(I.day % 7) + 1}. Next reward in ${hh} h ${mm} min.` : I.streak > 1 ? `Day ${I.streak} in a row. Missing a day starts the streak again from day 1.` : "Log in each day for bigger rewards. Day 7 gives an Ironbound Chest.";
+  $("dailyClaim").disabled = I.claimed; $("dailyClaim").textContent = I.claimed ? "Claimed today" : `Claim day ${I.day}`;
+}
+function claimDaily() {
+  const I = dailyInfo(); if (I.claimed) return;
+  const r = DAILY[I.day - 1], best = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true));
+  S.coins += r.coins; grantChest(r.chest, best); for (const [id, n] of Object.entries(r.items || {})) gain(ITEM[id], null, n, true);
+  S.daily = { last: dayKey(), streak: I.streak }; save();
+  toast(`<b>Daily reward:</b> ${fmt(r.coins)} coins and ${article(CHEST_TIERS[r.chest].name)} ${CHEST_TIERS[r.chest].name}. Open it from Chests.`, CHEST_TIERS[r.chest].rarity);
+  renderDaily(); updateDailyBadge();
+}
+function updateDailyBadge() { const b = $("mbDaily"); if (b) b.classList.toggle("ready", !dailyInfo().claimed); }
+function openDaily() { renderDaily(); $("daily").hidden = false; keys.clear(); attackHeld = false; }
+$("mbDaily").addEventListener("click", openDaily);
+$("dailyClaim").addEventListener("click", claimDaily);
+$("dailyClose").addEventListener("click", () => { $("daily").hidden = true; });
+$("dailyOpenChests").addEventListener("click", () => { $("daily").hidden = true; openMenu("chests"); });
+setInterval(updateDailyBadge, 60000);
+
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
    and scheduled a fraction of a second ahead. Battle music thickens as more foes
@@ -4409,9 +4458,9 @@ function frame(now) {
   saveT += dt; if (saveT > 6) { saveT = 0; save(); }
   requestAnimationFrame(frame);
 }
-$("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; if (coarse || usedTouch) $("joyHint").hidden = false; });
+$("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; updateDailyBadge(); if (!dailyInfo().claimed) setTimeout(openDaily, 900); if (coarse || usedTouch) $("joyHint").hidden = false; });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
