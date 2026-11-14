@@ -846,6 +846,79 @@ ISLANDS.push( // the five rift islands, reached only through the black portal at
   { name: "The Vault Gate", rift: true, dark: true, tree: "obelisk", sky: [0x0a0806, 0x5a4a1a], fog: 0x2a2410, fogNear: 30, ground: [0x2a2418, 0x3a3020, 0x6a5a30], water: 0xffd040, glowWater: true, grass: null, map: [0, 0],
     enemies: [["Vault Sentinel", "golem", "melee", 0x6a5a30, 0xffd040], ["Gilded Specter", "floater", "ranged", 0xffe8a0, 0xffffff], ["Keybearer", "humanoid", "skirm", 0x3a3020, 0xffd040]], bosses: [["The First Keeper", "humanoid"], ["Gatebreaker", "golem"], ["The Vault Itself", "golem"]] }
 );
+/* ---- extra rosters: every level of an island brings new foes ---- */
+const MORE_FOES = [
+  [["Webwood Spider", "spider", "skirm", 0x4a5a2a, 0x9aff6a], ["Mossling Slime", "slime", "melee", 0x6aa84a, 0xd8ff8a], ["Dusk Bat", "bat", "ranged", 0x3a2a22, 0xffd060], ["Barkback Treant", "treant", "melee", 0x5a4a32, 0x6aa83a], ["Thicket Mantis", "mantis", "skirm", 0x5a9a3a, 0xe8ff9a], ["Glade Watcher", "void", "ranged", 0x1a2a14, 0x9aff6a]],
+  [["Sandweb Spider", "spider", "skirm", 0xd8b880, 0xffe0a0], ["Tidepool Slime", "slime", "melee", 0x5ad8e8, 0xd8ffff], ["Gull Bat", "bat", "ranged", 0xe8e0d0, 0xffb060], ["Sea Viper", "serpent", "skirm", 0x1a6a8a, 0x9affe8], ["Coral Mantis", "mantis", "melee", 0xff8a7a, 0xffe0d0], ["Driftwood Treant", "treant", "melee", 0x9a8a6a, 0x8aa85a]],
+  [["Cinder Spider", "spider", "skirm", 0x2a1a14, 0xff6a1a], ["Magma Slime", "slime", "melee", 0xff5a1a, 0xffd060], ["Ember Bat", "bat", "ranged", 0x3a1a14, 0xffa040], ["Ash Serpent", "serpent", "skirm", 0x3a3430, 0xff7a3a], ["Obsidian Mantis", "mantis", "melee", 0x1a1418, 0xff5a2a], ["Charred Treant", "treant", "melee", 0x2a2018, 0xff6a2a]],
+  [["Frost Spider", "spider", "skirm", 0xd8e8f8, 0x7ad8ff], ["Ice Slime", "slime", "melee", 0x9ad8ff, 0xe8f8ff], ["Snow Bat", "bat", "ranged", 0xe8f0f8, 0x9ae8ff], ["Rime Serpent", "serpent", "skirm", 0xbfe0ff, 0x5ab8ff], ["Glacier Mantis", "mantis", "melee", 0x9ac8e8, 0xffffff], ["Pine Sentinel", "treant", "melee", 0x3a4a3a, 0xd8f0ff]],
+  [["Bog Spider", "spider", "skirm", 0x3a3a22, 0xb8ff6a], ["Swamp Slime", "slime", "melee", 0x5a7a2a, 0xd8ff6a], ["Rotwing Bat", "bat", "ranged", 0x2a2a1a, 0xb8ff6a], ["Mire Viper", "serpent", "skirm", 0x2a3a1a, 0xff5a5a], ["Fen Mantis", "mantis", "melee", 0x4a5a2a, 0xd8ff8a], ["Drowned Willow", "treant", "melee", 0x3a3a2a, 0x5a7a3a]],
+  [["Dune Tarantula", "spider", "skirm", 0xc89060, 0xffe0a0], ["Quicksand Slime", "slime", "melee", 0xe0b070, 0xffd060], ["Sunbat", "bat", "ranged", 0xc89060, 0xffe060], ["Sand Viper", "serpent", "skirm", 0xd8b070, 0xff8a3a], ["Desert Mantis", "mantis", "melee", 0xe8c080, 0xfff0c0], ["Saguaro Walker", "treant", "melee", 0x5a8a4a, 0xffd0a0]],
+  [["Cloud Spider", "spider", "skirm", 0xf0f0ff, 0x9ad8ff], ["Storm Slime", "slime", "melee", 0x9ac8ff, 0xffffff], ["Thunderbat", "bat", "ranged", 0x5a6a8a, 0xfff0a0], ["Sky Serpent", "serpent", "skirm", 0xd8e8ff, 0x6ac8ff], ["Gale Mantis", "mantis", "melee", 0xe0f0ff, 0x6ac8ff], ["Cliff Treant", "treant", "melee", 0x7a7a6a, 0x7ab85a]],
+  [["Crystal Weaver", "spider", "skirm", 0xb07cf2, 0xffffff], ["Prism Slime", "slime", "melee", 0x7ae8ff, 0xff9af8], ["Gem Bat", "bat", "ranged", 0x5a3a8a, 0x7ae8ff], ["Quartz Serpent", "serpent", "skirm", 0xe8c8ff, 0x7ae8ff], ["Shard Mantis", "mantis", "melee", 0x9a7ad8, 0xffffff], ["Hollow Gaze", "void", "ranged", 0x3a1a6a, 0xff9af8]],
+  [["Bone Spider", "spider", "skirm", 0xd8d0b8, 0x9aff9a], ["Grave Slime", "slime", "melee", 0x5a6a5a, 0x9affd8], ["Crypt Bat", "bat", "ranged", 0x2a2a2a, 0xffd060], ["Tomb Serpent", "serpent", "skirm", 0x4a4a3e, 0x9aff9a], ["Hollow Mantis", "mantis", "melee", 0xc8c0a8, 0x9affd8], ["Gallows Oak", "treant", "melee", 0x2a2a22, 0x4a5a3a]],
+  [["Abyss Crawler", "spider", "skirm", 0x1a3a4a, 0x40ffd0], ["Brine Slime", "slime", "melee", 0x3a8a9a, 0x9affe8], ["Deep Watcher", "void", "ranged", 0x0a2a3a, 0x40ffd0], ["Reef Serpent", "serpent", "skirm", 0x1a6a6a, 0xff8aa0], ["Pearl Mantis", "mantis", "melee", 0xf0e8f0, 0x9affe8], ["Kelp Treant", "treant", "melee", 0x2a4a3a, 0x3a8a6a]],
+  [["Clockwork Spider", "spider", "skirm", 0xb8a070, 0xffd070], ["Oil Slime", "slime", "melee", 0x2a2420, 0xffc040], ["Rivet Bat", "bat", "ranged", 0x8a7a5a, 0x9ae8ff], ["Cable Serpent", "serpent", "skirm", 0x6a5a48, 0xffd070], ["Saw Mantis", "mantis", "melee", 0xd8a040, 0xffe8a0], ["Null Engine", "void", "ranged", 0x2a2420, 0xff9a3a]],
+  [["Void Weaver", "spider", "skirm", 0x1a0a2a, 0xc040ff], ["Starspawn Slime", "slime", "melee", 0x4a2a8a, 0xff70ff], ["Nightwing", "bat", "ranged", 0x0a0614, 0xc040ff], ["Rift Serpent", "serpent", "skirm", 0x2a1a4a, 0xd8a0ff], ["Null Mantis", "mantis", "melee", 0x1a1428, 0xff70ff], ["Void Eye", "void", "ranged", 0x0a0614, 0xc040ff]],
+  [["Lava Weaver", "spider", "skirm", 0x1a1014, 0xff5a2a], ["Molten Slime", "slime", "melee", 0xff4a1a, 0xffd08a], ["Cinder Bat", "bat", "ranged", 0x2a1414, 0xffa060], ["Magma Serpent", "serpent", "skirm", 0x2a1414, 0xff7a3a], ["Basalt Mantis", "mantis", "melee", 0x2a1a1a, 0xff5a2a], ["Void Maw", "void", "ranged", 0x1a0808, 0xff5a2a]],
+  [["Choir Spider", "spider", "skirm", 0x0a2a30, 0x40ffd0], ["Font Slime", "slime", "melee", 0x20ffd0, 0xffffff], ["Cathedral Eye", "void", "ranged", 0x03141a, 0x40ffd0], ["Bell Serpent", "serpent", "skirm", 0x1a4a4a, 0x9affe8], ["Vigil Mantis", "mantis", "melee", 0x2a5a5a, 0x9affe8], ["Coral Treant", "treant", "melee", 0x1a4a4a, 0xff8aa0]],
+  [["Moon Weaver", "spider", "skirm", 0x2a2440, 0xd8c8ff], ["Lunar Slime", "slime", "melee", 0x8a7aff, 0xffffff], ["Eclipse Bat", "bat", "ranged", 0x1a1428, 0xd8c8ff], ["Star Serpent", "serpent", "skirm", 0x2a2440, 0xffffff], ["Crater Mantis", "mantis", "melee", 0x3a2a5a, 0xb07aff], ["Void Herald", "void", "ranged", 0x05030f, 0xb07aff]],
+  [["Ash Weaver", "spider", "skirm", 0x3a3430, 0xff8a40], ["Ember Slime", "slime", "melee", 0xff6a20, 0xffd08a], ["Pyre Bat", "bat", "ranged", 0x3a3430, 0xffa060], ["Smoke Serpent", "serpent", "skirm", 0x5a5450, 0xff6a20], ["Burnt Treant", "treant", "melee", 0x2a2420, 0xff6a20], ["Hollow Flame", "void", "ranged", 0x1a1614, 0xff8a40]],
+  [["Gold Weaver", "spider", "skirm", 0x6a5a30, 0xffd040], ["Gilded Slime", "slime", "melee", 0xffd040, 0xffffff], ["Coin Bat", "bat", "ranged", 0x3a3020, 0xffd040], ["Lock Serpent", "serpent", "skirm", 0x3a3020, 0xffe8a0], ["Treasure Mantis", "mantis", "melee", 0x6a5a30, 0xffe8a0], ["Vault Eye", "void", "ranged", 0x2a2418, 0xffd040]]
+];
+MORE_FOES.forEach((m, i) => { ISLANDS[i].more = m; });
+/* every named boss gets its own body, colours and signature attack: [body, colour, accent, signature] */
+const BOSS_LOOK = {
+  "Old Gnarlhorn": ["beast", 0x5a4a32, 0x9aff6a, "spikes"], "Queen Bramblethrone": ["treant", 0x4a3a22, 0xff6ab0, "poison"], "The Rootwyrm": ["serpent", 0x4a5a2a, 0x9aff6a, "spikes"],
+  "Captain Barnacle-Grin": ["humanoid", 0x3a8a9a, 0xffd080, "shards"], "The Tidecaller": ["floater", 0x16b4cc, 0xe0f4ff, "tide"], "Maw of the Shallows": ["crab", 0xd8603a, 0xffb08a, "tide"],
+  "Forgemother Vulka": ["humanoid", 0xd84a1a, 0xffc040, "meteor"], "Pyrelord Ixxan": ["mantis", 0x2a1a14, 0xff6a1a, "meteor"], "The Molten Crown": ["slime", 0xff4a1a, 0xffd060, "poison"],
+  "Jarl Hoarfrost": ["humanoid", 0xd8e0e8, 0x7ad8ff, "frost"], "The Pale Matron": ["spider", 0xe8f4ff, 0x9ad8ff, "web"], "Wyrm of Endless Winter": ["serpent", 0xd8e8f8, 0x7ad8ff, "frost"],
+  "Mother Murk": ["slime", 0x4a5a2a, 0xb8ff6a, "poison"], "The Drowned Abbot": ["humanoid", 0x5a6a3a, 0xd8ff8a, "summon"], "Gulpmaw the Ancient": ["beast", 0x3a2a2a, 0xff5a5a, "poison"],
+  "Matriarch Sekhara": ["spider", 0xc89060, 0xffe060, "web"], "The Glass Pharaoh": ["humanoid", 0xe0c080, 0x5ac8e8, "shards"], "Eye of the Sandstorm": ["void", 0xc89060, 0xffe0a0, "voidPull"],
+  "Aerie Lord Kestrel": ["bat", 0xd8d8e8, 0x6ac8ff, "lightning"], "The Storm Herald": ["floater", 0x9ac8ff, 0xfff0a0, "lightning"], "Skybreaker Colossus": ["golem", 0xd8d8e8, 0x6ac8ff, "meteor"],
+  "The Facet Queen": ["mantis", 0xb07cf2, 0xffffff, "shards"], "Lumen Devourer": ["void", 0x1a0a3a, 0xff9af8, "voidPull"], "Heart of Prisms": ["golem", 0x7ae8ff, 0xff9af8, "shards"],
+  "Warden of Ashes": ["humanoid", 0xd8d0b8, 0x9aff9a, "spikes"], "The Ossuary King": ["golem", 0xd8d0b8, 0x9affd8, "summon"], "The Unburied": ["spider", 0xd8d0b8, 0x9aff9a, "web"],
+  "Admiral Nautilon": ["crab", 0x3a8a8a, 0x9affe8, "tide"], "Siren Empress Valae": ["serpent", 0x3a8a8a, 0xff8aa0, "lightning"], "The Leviathan Below": ["serpent", 0x0a2a3a, 0x40ffd0, "tide"],
+  "Overseer Tickmaw": ["mantis", 0xb8a070, 0xffd070, "spikes"], "The Grand Regulator": ["humanoid", 0xd8a040, 0x9ae8ff, "lightning"], "Engine of the Last Hour": ["golem", 0x8a7a5a, 0xffc040, "meteor"],
+  "Herald of the Rift": ["humanoid", 0x4a2a8a, 0xff70ff, "voidPull"], "The Hollow Star": ["void", 0x05030f, 0xc040ff, "voidPull"], "Aeonis the Unmade": ["void", 0x2a1a4a, 0xffffff, "shards"],
+  "Gorehorn the Molten": ["beast", 0x2a1414, 0xff5a2a, "meteor"], "Queen of Cinders": ["spider", 0x1a1014, 0xff5a2a, "web"], "The Maw Itself": ["void", 0x1a0808, 0xff5a2a, "voidPull"],
+  "The Drowned Bishop": ["humanoid", 0x2a5a5a, 0x40ffd0, "summon"], "Tolling Leviathan": ["serpent", 0x1a4a4a, 0x40ffd0, "tide"], "Choir of the Deep": ["void", 0x03141a, 0x40ffd0, "lightning"],
+  "The Pale Regent": ["humanoid", 0xc8b0ff, 0xffffff, "frost"], "Eclipse Beast": ["bat", 0x1a1428, 0xd8c8ff, "shards"], "Heart of the Hollow Moon": ["void", 0x05030f, 0xb07aff, "voidPull"],
+  "The Ash King": ["humanoid", 0x5a5450, 0xff8a40, "meteor"], "Pyre Colossus": ["treant", 0x2a2018, 0xff6a20, "poison"], "The Crown That Burns": ["golem", 0x3a3430, 0xff6a20, "meteor"],
+  "The First Keeper": ["humanoid", 0x6a5a30, 0xffd040, "shards"], "Gatebreaker": ["golem", 0x6a5a30, 0xffd040, "spikes"], "The Vault Itself": ["void", 0x2a2418, 0xffd040, "voidPull"]
+};
+/* the raids: reached only from the Raid Hall */
+const RAID_START = ISLANDS.length;
+ISLANDS.push(
+  { name: "The Broodmother's Nest", raid: true, dark: true, tree: "dead", sky: [0x0a0806, 0x3a2a1a], fog: 0x1a140c, fogNear: 28, ground: [0x2a2018, 0x3a3022, 0x5a4a3a], water: 0x3a2a1a, grass: null, map: [0, 0], col: "#ff7a3a", blurb: "Silk-choked caverns. Webs slow you; burn through the brood fast.",
+    enemies: [["Nest Crawler", "spider", "skirm", 0x2a2018, 0xff5a3a], ["Egg Slime", "slime", "melee", 0xd8d0a8, 0xff9a5a], ["Webwing Bat", "bat", "ranged", 0x2a2018, 0xff7a3a]],
+    more: [["Brood Guard", "spider", "melee", 0x3a2a1a, 0xffb060], ["Silk Mantis", "mantis", "melee", 0xe8e0c8, 0xff7a3a], ["Venom Viper", "serpent", "skirm", 0x2a3a1a, 0x9aff6a], ["Hatchling Swarm", "spider", "skirm", 0x4a3a2a, 0xffd060], ["Cocoon Treant", "treant", "melee", 0xd8d0b8, 0x9a8a6a], ["Silk Eye", "void", "ranged", 0x1a1410, 0xff7a3a]],
+    bosses: [["Vexxara the Broodmother", "spider", 0x1a1210, 0xff4a2a, "web"], ["Vexxara, Queen of Silk", "spider", 0xe8e0c8, 0xff4a2a, "web"], ["Vexxara, the Endless Brood", "spider", 0x0a0806, 0xff2a1a, "web"]] },
+  { name: "The Void Cathedral", raid: true, dark: true, tree: "riftshard", sky: [0x020108, 0x1a0a3a], fog: 0x0a0418, fogNear: 30, ground: [0x0a0814, 0x1a1428, 0x3a2a5a], water: 0x6a2aff, glowWater: true, grass: null, map: [0, 0], col: "#b07aff", blurb: "A church built for nothing. It pulls you in, then tears you apart.",
+    enemies: [["Void Acolyte", "humanoid", "melee", 0x1a1428, 0xb07aff], ["Null Eye", "void", "ranged", 0x05030f, 0xb07aff], ["Rift Weaver", "spider", "skirm", 0x0a0814, 0xd8a0ff]],
+    more: [["Hollow Choir", "void", "ranged", 0x0a0418, 0xffffff], ["Starless Mantis", "mantis", "melee", 0x1a1428, 0xd8a0ff], ["Unlit Slime", "slime", "melee", 0x2a1a5a, 0xb07aff], ["Gloom Serpent", "serpent", "skirm", 0x0a0814, 0xb07aff], ["Silent Bat", "bat", "ranged", 0x05030f, 0xd8a0ff], ["Void Templar", "humanoid", "melee", 0x2a1a4a, 0xff70ff]],
+    bosses: [["Ny'tharos, the Unlit Choir", "void", 0x05030f, 0xb07aff, "voidPull"], ["Ny'tharos, Hymn of Nothing", "void", 0x0a0418, 0xff70ff, "voidPull"], ["Ny'tharos, the Last Silence", "void", 0x000000, 0xffffff, "voidPull"]] },
+  { name: "The Leviathan's Trench", raid: true, dark: true, tree: "coral", sky: [0x01121a, 0x0a3a4a], fog: 0x062a34, fogNear: 30, ground: [0x0a2a30, 0x1a3a3a, 0x2a4a4a], water: 0x20c8d0, glowWater: true, grass: null, map: [0, 0], col: "#40ffd0", blurb: "The deepest trench in the world. Watch for the tide line.",
+    enemies: [["Trench Crawler", "crab", "melee", 0x1a3a3a, 0x40ffd0], ["Deep Eel", "serpent", "skirm", 0x0a2a3a, 0x40ffd0], ["Abyssal Gaze", "void", "ranged", 0x01121a, 0x40ffd0]],
+    more: [["Pressure Slime", "slime", "melee", 0x1a6a6a, 0x9affe8], ["Angler Bat", "bat", "ranged", 0x0a1a2a, 0xffe060], ["Coral Mantis", "mantis", "melee", 0xff8aa0, 0x40ffd0], ["Kelp Horror", "treant", "melee", 0x1a3a2a, 0x40ffd0], ["Trench Weaver", "spider", "skirm", 0x0a2a30, 0x9affe8], ["Drowned Knight", "humanoid", "melee", 0x1a4a4a, 0x40ffd0]],
+    bosses: [["Thalassor, the Coiled Deep", "serpent", 0x0a2a3a, 0x40ffd0, "tide"], ["Thalassor, Breaker of Hulls", "serpent", 0x1a3a4a, 0x9affe8, "tide"], ["Thalassor, the World Serpent", "serpent", 0x01121a, 0xffffff, "tide"]] },
+  { name: "The World-Root Hollow", raid: true, dark: true, tree: "swamp", sky: [0x0a1408, 0x2a4a1a], fog: 0x1a2a10, fogNear: 30, ground: [0x2a2a14, 0x3a4a1a, 0x4a4a2a], water: 0x6aff4a, glowWater: true, grass: 0x3a5a1a, map: [0, 0], col: "#9aff6a", blurb: "Under the oldest tree alive. Roots erupt and poison pools spread.",
+    enemies: [["Root Strangler", "treant", "melee", 0x3a2a1a, 0x9aff6a], ["Spore Slime", "slime", "melee", 0x8aa83a, 0xffe060], ["Thorn Mantis", "mantis", "skirm", 0x4a6a2a, 0x9aff6a]],
+    more: [["Bark Spider", "spider", "skirm", 0x3a2a1a, 0x9aff6a], ["Hollow Bat", "bat", "ranged", 0x2a2a14, 0xffe060], ["Vine Serpent", "serpent", "skirm", 0x3a5a1a, 0xff6ab0], ["Seed Eye", "void", "ranged", 0x0a1408, 0x9aff6a], ["Elder Boar", "beast", "melee", 0x4a3a22, 0x9aff6a], ["Druid Thrall", "humanoid", "ranged", 0x3a4a2a, 0x9aff6a]],
+    bosses: [["Yggrath, the World-Root", "treant", 0x3a2a1a, 0x9aff6a, "poison"], ["Yggrath, the Thousand Thorns", "treant", 0x2a1a0a, 0xff6ab0, "spikes"], ["Yggrath, Heart of the Old Wood", "treant", 0x1a1008, 0xffe060, "poison"]] }
+);
+ISLANDS.forEach(I => { I.bosses = I.bosses.map(b => BOSS_LOOK[b[0]] ? [b[0], ...BOSS_LOOK[b[0]]] : b); });
+const BODY_SIG = { beast: "spikes", crab: "tide", floater: "lightning", golem: "meteor", humanoid: "shards", spider: "web", void: "voidPull", serpent: "tide", slime: "poison", bat: "shards", mantis: "spikes", treant: "poison" };
+const LT_TITLE = ["Alpha", "Warlord", "Broodlord", "Matriarch", "Chieftain", "Overseer", "Elder", "Grand"];
+function rosterFor(I, level) {
+  const m = I.more || [];
+  if (level <= 1 || m.length < 6) return I.enemies;
+  if (level === 2) return m.slice(0, 3);
+  if (level === 3) return m.slice(3, 6);
+  const mix = level === 4 ? [I.enemies[0], m[1], m[5]] : [m[0], I.enemies[2], m[4]];
+  return mix.map(d => [(level === 4 ? "Elder " : "Dread ") + d[0], d[1], d[2], d[3], d[4]]);
+}
+const roster = () => rosterFor(ISLANDS[run.idx], run.level);
 const ROLE_BASE = {
   melee:  { hp: 42, dmg: 7, spd: 3.3, range: 1.7, cd: 1.25, xp: 6, coins: 6 },
   skirm:  { hp: 28, dmg: 5, spd: 5.0, range: 1.5, cd: 0.9, xp: 5, coins: 5 },
@@ -888,7 +961,7 @@ try {
 } catch (e) { S = fresh(); }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const xpNeed = L => Math.round(30 + 20 * Math.pow(L, 1.45));
-const islandUnlocked = i => i === 0 || (S.prog[i - 1].normal && S.prog[i - 1].hard);
+const islandUnlocked = i => !ISLANDS[i].raid && (i === 0 || (S.prog[i - 1].normal && S.prog[i - 1].hard));
 
 /* derived stats */
 let ST = {};
@@ -1527,6 +1600,78 @@ function buildCreature(body, col, acc, scale, boss) {
     for (const sx of [-1, 1]) { const arm = new THREE.Group(); arm.position.set(0.72 * sx, 1.62, 0); inner.add(arm); M(rockGeo(2), rk, 0, -0.4, 0, arm, 0.24, 0.5, 0.24); M(rockGeo(4), rk, 0, -0.95, 0.05, arm, 0.32, 0.3, 0.32); R.parts[sx < 0 ? "armL" : "armR"] = arm; }
     R.legs = [];
     for (const sx of [-1, 1]) { const l = new THREE.Group(); l.position.set(0.28 * sx, 0.75, 0); inner.add(l); M(rockGeo(0), rk, 0, -0.38, 0, l, 0.25, 0.42, 0.25); R.legs.push(l); }
+  } else if (body === "spider") {
+    const chit = std(col, { r: 0.35, m: 0.15, map: "rock", rep: 1 }), mark = std(acc, { e: acc, ei: boss ? 2.2 : 1.4, r: 0.3 });
+    M(blobGeo("spabd", v => new V3(v.x * 0.55, v.y * 0.45 * (v.y > 0 ? 1.1 : 0.9), v.z * 0.68)), chit, 0, 0.95, -0.62, inner);
+    for (let k = 0; k < 3; k++) M(G.box(), mark, 0, 1.38 - k * 0.04, -0.38 - k * 0.24, inner, 0.32 - k * 0.07, 0.03, 0.05).rotation.x = -0.35;
+    M(blobGeo("spceph", v => new V3(v.x * 0.36, v.y * 0.26, v.z * 0.4)), chit, 0, 0.82, 0.14, inner);
+    for (let k = 0; k < 4; k++) for (const sx of [-1, 1]) { const gx = (0.05 + (k % 2) * 0.1) * sx, gy = 0.98 + Math.floor(k / 2) * 0.07; M(G.sph(), eyeM, gx, gy, 0.48, inner, k < 2 ? 0.045 : 0.03); }
+    const gl = glowSprite(acc, 0.9, 0.55); gl.position.set(0, 1, 0.5); inner.add(gl);
+    for (const sx of [-1, 1]) { const f = M(G.cone(8), horn, 0.07 * sx, 0.66, 0.5, inner, 0.035, 0.18, 0.035); f.rotation.x = Math.PI; }
+    R.spLegs = [];
+    for (let k = 0; k < 8; k++) { const sx = k < 4 ? -1 : 1, i = k % 4, z = 0.32 - i * 0.2; const l = new THREE.Group(); l.position.set(0.26 * sx, 0.88, z); l.rotation.y = (i - 1.5) * 0.35 * sx; inner.add(l);
+      const up = M(lathe("spleg", [[0.001, 0], [0.04, 0.02], [0.035, 0.62], [0.001, 0.66]], 7), chit, 0, 0, 0, l); up.rotation.z = -0.75 * sx;
+      const low = M(lathe("spleg2", [[0.001, 0], [0.03, 0.02], [0.012, 0.92], [0.001, 0.96]], 7), chit, 0.44 * sx, 0.44, 0, l); low.rotation.z = 2.55 * sx; R.spLegs.push(l); }
+  } else if (body === "void") {
+    const dark = std(0x07060c, { r: 0.08, m: 0.6, env: 2, e: col, ei: 0.25 });
+    const core = M(blobGeo("voidcore", v => v.clone().multiplyScalar(0.5 * (1 + (NZ(v.x * 2 + 5, v.y * 2 + v.z * 3, 64, 2) - 0.5) * 0.35))), dark, 0, 1.6, 0, inner);
+    M(G.sph(), std(0xf8f4ff, { r: 0.2 }), 0, 1.62, 0.36, inner, 0.2, 0.2, 0.12); M(G.sph(), glowMat(acc, 1), 0, 1.62, 0.46, inner, 0.09, 0.14, 0.04);
+    const eg = glowSprite(acc, 1.6, 0.7); eg.position.set(0, 1.62, 0.5); inner.add(eg);
+    const halo = M(G.tor(0.82, 0.03), glowMat(acc, 0.8), 0, 1.6, -0.15, inner); R.parts.halo = halo;
+    const shards = new THREE.Group(); shards.position.y = 1.6; inner.add(shards); R.parts.shards = shards;
+    for (let k = 0; k < 7; k++) { const a = k / 7 * TAU; const s = M(G.oct(), std(col, { e: acc, ei: 1.2, r: 0.2, flat: true }), Math.cos(a) * 1.05, Math.sin(k * 2.1) * 0.35, Math.sin(a) * 1.05, shards, 0.09, 0.22, 0.09); s.rotation.z = a; }
+    R.parts.tents = [];
+    for (let k = 0; k < 5; k++) { const tg = new THREE.Group(); tg.position.set(Math.cos(k * TAU / 5) * 0.26, 1.25, Math.sin(k * TAU / 5) * 0.26); inner.add(tg);
+      M(lathe("vtent", [[0.001, -1.1], [0.015, -1.0], [0.07, -0.3], [0.08, 0], [0.001, 0.03]], 8), std(0x0c0a14, { r: 0.3, e: acc, ei: 0.35 }), 0, 0, 0, tg); R.parts.tents.push(tg); }
+    const vg = glowSprite(col, 4, 0.35); vg.position.y = 1.6; inner.add(vg); R.core = core;
+  } else if (body === "serpent") {
+    const scale2 = std(col, { r: 0.4, m: 0.1, map: "fur", rep: [6, 2] }), belly = std(new THREE.Color(acc).lerp(new THREE.Color(0xf0e8d0), 0.6).getHex(), { r: 0.5 });
+    for (let k = 0; k < 3; k++) { const c = M(G.tor(0.5 - k * 0.1, 0.17 - k * 0.02), scale2, 0, 0.18 + k * 0.24, -0.1, inner); c.rotation.x = Math.PI / 2; }
+    const neck = new THREE.Group(); neck.position.set(0, 0.8, 0); inner.add(neck); R.parts.neck = neck;
+    for (let k = 0; k < 7; k++) { const f = k / 6; M(G.sph(), scale2, 0, f * 1.35, Math.sin(f * 2.4) * 0.28, neck, 0.17 - f * 0.03); M(G.sph(), belly, 0, f * 1.35, Math.sin(f * 2.4) * 0.28 + 0.07, neck, 0.13 - f * 0.03); }
+    const head = new THREE.Group(); head.position.set(0, 1.5, 0.28); neck.add(head); R.parts.head = head;
+    M(blobGeo("snhood", v => new V3(v.x * 0.5, v.y * 0.42, v.z * 0.06)), std(col, { r: 0.45, map: "fur" }), 0, -0.05, -0.12, head);
+    M(blobGeo("snhead", v => new V3(v.x * 0.17, v.y * 0.12, v.z * 0.26 + (v.z > 0 ? 0.05 : 0))), scale2, 0, 0.05, 0.08, head);
+    for (let k = 0; k < 4; k++) for (const sx of [-1, 1]) M(G.sph(), std(acc, { e: acc, ei: 1.1 }), 0.22 * sx, 0.12 - k * 0.11, -0.08, head, 0.035);
+    eyes(head, 0.1, 0.12, 0.2, 0.035);
+    for (const sx of [-1, 1]) { const f = M(G.cone(6), horn, 0.05 * sx, -0.06, 0.28, head, 0.02, 0.1, 0.02); f.rotation.x = Math.PI; }
+  } else if (body === "slime") {
+    const goo = std(col, { op: 0.72, r: 0.08, m: 0.1, env: 1.6, e: acc, ei: 0.15 });
+    const blob = M(blobGeo("slime", v => new V3(v.x * 0.7, v.y > 0 ? v.y * 0.62 : v.y * 0.18, v.z * 0.7)), goo, 0, 0.18, 0, inner); R.parts.blob = blob;
+    M(G.ico1(), std(acc, { e: acc, ei: 1.6, r: 0.3 }), 0, 0.45, 0, inner, 0.2);
+    for (let k = 0; k < 5; k++) M(G.sph(), std(new THREE.Color(col).multiplyScalar(0.6).getHex(), { r: 0.6 }), Math.cos(k * 2.4) * 0.3, 0.3 + (k % 3) * 0.12, Math.sin(k * 2.4) * 0.3, inner, 0.05);
+    for (const sx of [-1, 1]) { M(G.sph(), std(0xffffff, { r: 0.2 }), 0.18 * sx, 0.68, 0.5, inner, 0.1); M(G.sph(), std(0x111111, { r: 0.2 }), 0.18 * sx, 0.69, 0.58, inner, 0.05); }
+    const sg = glowSprite(acc, 2.4, 0.35); sg.position.y = 0.45; inner.add(sg);
+  } else if (body === "bat") {
+    M(blobGeo("batbody", v => new V3(v.x * 0.26, v.y * 0.36, v.z * 0.24)), fur, 0, 1.55, 0, inner);
+    const head = new THREE.Group(); head.position.set(0, 1.98, 0.05); inner.add(head);
+    M(G.sph(), fur, 0, 0, 0, head, 0.2, 0.18, 0.18);
+    for (const sx of [-1, 1]) { const e = M(G.cone(6), fur, 0.11 * sx, 0.2, 0, head, 0.07, 0.24, 0.05); e.rotation.z = -0.25 * sx; M(G.cone(6), horn, 0.05 * sx, -0.11, 0.14, head, 0.015, 0.07, 0.015).rotation.x = Math.PI; }
+    eyes(head, 0.08, 0.04, 0.15, 0.03);
+    const memb = std(new THREE.Color(col).multiplyScalar(0.7).getHex(), { r: 0.6, op: 0.92, e: acc, ei: 0.12 });
+    for (const sx of [-1, 1]) { const w = new THREE.Group(); w.position.set(0.18 * sx, 1.7, 0); inner.add(w);
+      for (let k = 0; k < 3; k++) { const m2 = M(G.cone(3), memb, (0.4 + k * 0.32) * sx, -0.12 - k * 0.06, 0, w, 0.22, 0.75 - k * 0.12, 0.01); m2.rotation.z = (2.6 + k * 0.25) * sx; }
+      M(G.cyl(0.02, 0.015, 6), horn, 0.55 * sx, 0.05, 0, w, 1, 1.1, 1).rotation.z = Math.PI / 2; R.parts[sx < 0 ? "wingL" : "wingR"] = w; }
+    for (const sx of [-1, 1]) M(G.cyl(0.03, 0.015, 6), fur, 0.1 * sx, 1.15, 0, inner, 1, 0.3, 1);
+  } else if (body === "mantis") {
+    const chit = std(col, { r: 0.35, m: 0.1, map: "rock", rep: 1 }), blade = std(acc, { m: 0.6, r: 0.2, e: acc, ei: 0.5 });
+    M(blobGeo("mtabd", v => new V3(v.x * 0.24, v.y * 0.22, v.z * 0.6)), chit, 0, 0.8, -0.55, inner).rotation.x = 0.35;
+    M(G.cyl(0.12, 0.17, 10), chit, 0, 1.3, 0.05, inner, 1, 0.9, 1).rotation.x = -0.3;
+    const head = new THREE.Group(); head.position.set(0, 1.85, 0.22); inner.add(head); R.parts.head = head;
+    M(G.cone(3), chit, 0, 0, 0, head, 0.2, 0.26, 0.12).rotation.x = Math.PI;
+    for (const sx of [-1, 1]) { M(G.sph(), eyeM, 0.16 * sx, 0.05, 0, head, 0.08); const a = M(G.cyl(0.008, 0.008, 4), chit, 0.06 * sx, 0.25, 0, head, 1, 0.4, 1); a.rotation.z = 0.4 * sx; }
+    for (const sx of [-1, 1]) { const arm = new THREE.Group(); arm.position.set(0.16 * sx, 1.55, 0.2); inner.add(arm); M(G.cyl(0.05, 0.04, 8), chit, 0, -0.22, 0.05, arm, 1, 0.45, 1); const fa = new THREE.Group(); fa.position.set(0, -0.42, 0.1); arm.add(fa); const b2 = M(G.cone(4), blade, 0, 0.3, 0, fa, 0.05, 0.62, 0.02); for (let k = 0; k < 4; k++) M(G.cone(4), blade, 0, 0.1 + k * 0.12, 0.03, fa, 0.015, 0.06, 0.015).rotation.x = 0.9; R.parts[sx < 0 ? "armL" : "armR"] = arm; arm.rotation.x = -0.9; fa.rotation.x = 2.3; }
+    R.legs = [];
+    for (const [x, z] of [[-0.18, 0.05], [0.18, 0.05], [-0.18, -0.4], [0.18, -0.4]]) { const l = new THREE.Group(); l.position.set(x, 1.0, z); inner.add(l); const s1 = M(G.cyl(0.025, 0.02, 6), chit, x * 1.2, -0.25, 0, l, 1, 0.6, 1); s1.rotation.z = x > 0 ? 0.6 : -0.6; M(G.cyl(0.02, 0.012, 6), chit, x * 2.3, -0.65, 0, l, 1, 0.75, 1); R.legs.push(l); }
+  } else if (body === "treant") {
+    const bark = MAT.bark(col), leaf = std(acc, { r: 0.8, flat: true }), glow = std(0xffd870, { e: 0xffc040, ei: 2.2 });
+    M(lathe("trunk", [[0.001, 0], [0.5, 0.02], [0.36, 0.3], [0.32, 1.2], [0.38, 1.9], [0.3, 2.2], [0.001, 2.25]], 12), bark, 0, 0, 0, inner);
+    for (const sx of [-1, 1]) { M(G.sph(), std(0x0a0806, { r: 1 }), 0.13 * sx, 1.7, 0.31, inner, 0.08, 0.06, 0.04); M(G.sph(), glow, 0.13 * sx, 1.7, 0.33, inner, 0.035); }
+    M(G.box(), std(0x0a0806, { r: 1 }), 0, 1.42, 0.32, inner, 0.22, 0.05, 0.04);
+    for (let k = 0; k < 5; k++) M(G.ico(), leaf, Math.cos(k * 1.3) * 0.45, 2.4 + (k % 2) * 0.25, Math.sin(k * 1.3) * 0.35, inner, 0.45 + (k % 3) * 0.1);
+    for (const sx of [-1, 1]) { const arm = new THREE.Group(); arm.position.set(0.36 * sx, 1.75, 0); inner.add(arm); const b = M(G.cyl(0.07, 0.11, 7), bark, 0.25 * sx, -0.3, 0, arm, 1, 0.9, 1); b.rotation.z = 0.5 * sx; M(G.ico(), leaf, 0.5 * sx, -0.75, 0, arm, 0.22); R.parts[sx < 0 ? "armL" : "armR"] = arm; }
+    R.legs = [];
+    for (const sx of [-1, 1]) { const l = new THREE.Group(); l.position.set(0.22 * sx, 0.3, 0); inner.add(l); for (let k = 0; k < 3; k++) { const rt = M(G.cone(5), bark, (k - 1) * 0.12, -0.15, 0.1 * (k - 1), l, 0.08, 0.5, 0.08); rt.rotation.z = (k - 1) * 0.6; rt.rotation.x = Math.PI; } R.legs.push(l); }
   } else {
     const H = buildHumanoid({ look: { skin: col, hair: acc, cloth: new THREE.Color(col).multiplyScalar(0.6).getHex(), cloth2: 0x222226 }, armour: null, weapon: null });
     inner.add(H.g); R.hum = H;
@@ -1535,7 +1680,7 @@ function buildCreature(body, col, acc, scale, boss) {
     for (const sx of [-1, 1]) { const gs = glowSprite(acc, 0.12, 0.9); gs.position.set(0.042 * sx, 0.018, 0.12); H.head.add(gs); }
   }
   if (boss) {
-    const crown = new THREE.Group(); crown.position.set(0, body === "golem" ? 2.42 : body === "floater" ? 2.15 : body === "humanoid" ? 1.98 : 1.38, body === "beast" ? 0.85 : 0); inner.add(crown);
+    const crown = new THREE.Group(); crown.position.set(0, ({ golem: 2.42, floater: 2.15, humanoid: 1.98, spider: 1.25, void: 2.2, serpent: 2.55, slime: 1.0, bat: 2.25, mantis: 2.15, treant: 2.95 })[body] || 1.38, body === "beast" ? 0.85 : body === "serpent" ? 0.3 : 0); inner.add(crown);
     const gold = MAT.metal(0xf2c044, 0.22);
     M(G.tor(0.2, 0.025), gold, 0, 0, 0, crown).rotation.x = Math.PI / 2;
     for (let k = 0; k < 7; k++) M(G.cone(6), gold, Math.cos(k * TAU / 7) * 0.2, 0.09, Math.sin(k * TAU / 7) * 0.2, crown, 0.035, 0.18, 0.035);
@@ -1553,6 +1698,14 @@ function poseCreature(R, t, move, atk) {
   if (R.body === "golem") { R.parts.armL.rotation.x = -s * 0.5 - atk * 1.8; R.parts.armR.rotation.x = s * 0.5 - atk * 1.8; }
   if (R.body === "beast") { R.parts.head.rotation.x = atk * 0.6; R.inner.position.y = Math.abs(s) * 0.06; R.parts.tail.rotation.z = Math.sin(t * 3) * 0.3; }
   if (R.body === "crab") { R.parts.clawL.rotation.y = atk * 0.8 + Math.sin(t * 3) * 0.1; R.parts.clawR.rotation.y = -atk * 0.8 - Math.sin(t * 3) * 0.1; }
+  if (R.spLegs) R.spLegs.forEach((l, i) => { l.rotation.x = Math.sin(t * 14 + i * 1.7) * 0.28 * move; });
+  if (R.body === "spider") R.inner.rotation.x = -atk * 0.35;
+  if (R.body === "void") { R.inner.position.y = Math.sin(t * 1.8) * 0.2; R.parts.shards.rotation.y = t * 1.4; R.parts.shards.rotation.x = Math.sin(t * 0.7) * 0.4; R.parts.halo.rotation.z = -t; R.parts.tents.forEach((g, i) => { g.rotation.x = Math.sin(t * 2.4 + i) * 0.35; g.rotation.z = Math.cos(t * 2 + i * 1.3) * 0.3; }); R.core.scale.setScalar(1 + atk * 0.25); }
+  if (R.body === "serpent") { R.parts.neck.rotation.z = Math.sin(t * 1.6) * 0.12; R.parts.neck.rotation.x = -atk * 0.7; R.parts.head.rotation.x = atk * 0.4; }
+  if (R.body === "slime") { const q = Math.sin(t * 6) * 0.08 * (0.4 + move) + atk * 0.25; R.inner.scale.set(1 + q, 1 - q, 1 + q); }
+  if (R.body === "bat") { R.inner.position.y = Math.sin(t * 3) * 0.2; const f = Math.sin(t * 16) * 0.7; R.parts.wingL.rotation.y = -f; R.parts.wingR.rotation.y = f; R.inner.rotation.x = atk * 0.5; }
+  if (R.body === "mantis") { R.parts.armL.rotation.x = -0.9 - atk * 1.3; R.parts.armR.rotation.x = -0.9 - atk * 1.3; R.parts.head.rotation.y = Math.sin(t * 1.3) * 0.4; }
+  if (R.body === "treant") { R.parts.armL.rotation.x = -s * 0.4 - atk * 1.6; R.parts.armR.rotation.x = s * 0.4 - atk * 1.6; R.inner.rotation.z = Math.sin(t * 1.1) * 0.03; }
   if (R.hum) poseHumanoid(R.hum, t, move, atk > 0 ? 1 - atk : 0, "normal", false);
   if (R.aura) R.aura.rotation.z = t;
 }
@@ -1806,7 +1959,7 @@ function buildLobby() {
   world.clouds = addClouds(group, 0xffffff);
   // distant mountains
   for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 380, s = 80 + (k % 4) * 28; if (Math.cos(a) > 0.2) continue; const m = M(G.cone(7), std(0x5a6a7a, { flat: true, r: 0.9 }), Math.cos(a) * d, s * 0.45, Math.sin(a) * d, group, s, s * 1.1, s); M(G.cone(7), std(0xf0f4ff, { flat: true, r: 0.7 }), Math.cos(a) * d, s * 0.82, Math.sin(a) * d, group, s * 0.35, s * 0.35, s * 0.35); }
-  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); seaWorld(group); boatDealer(group); floraFauna(group);
+  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); seaWorld(group); boatDealer(group); floraFauna(group); lobbyRaidPortal(group);
 }
 
 function buildIsland(idx) {
@@ -2000,7 +2153,7 @@ function killEnemy(e) {
   if (S.cls === "reaper") heal(ST.maxHp * 0.08);
   const table = dropTable(isl, si, e.boss);
   if (e.boss) {
-    const drops = 2 + (run && run.level === STAGES[si].levels ? 1 : 0);
+    const drops = 2 + (run && run.level === run.levels ? 1 : 0) + (e.raidBoss ? 3 : 0);
     for (let k = 0; k < drops; k++) gain(rollItemOf(rollRarity(table)), e.pos);
     if (Math.random() < 0.04) gain(ITEM.die, e.pos);
   } else if (Math.random() < 0.07) gain(rollItemOf(rollRarity(table)), e.pos);
@@ -2189,11 +2342,11 @@ const ENEMY_DMG = 0.55; // enemies hit 45% softer than before
 function spawnEnemy(def, role, boss, scaleBoost = 1) {
   const I = ISLANDS[run.idx], st = STAGES[run.stage];
   const base = ROLE_BASE[boss ? "boss" : role];
-  const ri = run.idx >= 12 ? 12.5 : run.idx, isl = Math.pow(1.5, ri), lv = 1 + 0.15 * (run.level - 1);
+  const ri = I.raid ? 13 : run.idx >= 12 ? 12.5 : run.idx, isl = Math.pow(1.5, ri), lv = 1 + 0.15 * (run.level - 1);
   const hpMult = isl * st.hp * lv * (boss ? (1 + 0.25 * (run.level - 1)) : 1) * (1 + 0.35 * (run.party - 1));
   const dmgMult = ENEMY_DMG * Math.pow(1.32, ri) * st.dmg * (1 + 0.06 * (run.level - 1));
-  const body = boss ? def[1] : def[1], col = boss ? I.enemies[(run.stage) % 3][3] : def[3], acc = boss ? I.enemies[(run.stage + 1) % 3][4] : def[4];
-  const scale = (boss ? 2.3 : body === "floater" ? 0.95 : body === "crab" ? 0.9 : 1) * scaleBoost * (role === "skirm" && !boss ? 0.85 : 1);
+  const body = def[1], col = boss ? (typeof def[2] === "number" ? def[2] : I.enemies[run.stage % 3][3]) : def[3], acc = boss ? (typeof def[3] === "number" ? def[3] : I.enemies[(run.stage + 1) % 3][4]) : def[4];
+  const scale = (boss ? 2.3 : ({ floater: 0.95, crab: 0.9, slime: 0.95, bat: 0.95, treant: 1.05, void: 0.95 })[body] || 1) * scaleBoost * (role === "skirm" && !boss ? 0.85 : 1);
   const R = buildCreature(body, col, acc, scale, boss);
   if (!boss) shadows(R.g, false, false);
   scene.add(R.g);
@@ -2202,7 +2355,7 @@ function spawnEnemy(def, role, boss, scaleBoost = 1) {
   p.y = world.h(p.x, p.z);
   const name = boss ? def[0] : def[0];
   const e = { R, name, role: boss ? "boss" : role, boss, base, pos: p, kb: new V3(), hp: base.hp * hpMult, maxHp: base.hp * hpMult, dmg: base.dmg * dmgMult, spd: base.spd * (boss ? 1 : 1),
-    atkT: rand(0.5, 1.5), dead: false, flash: 0, accent: acc, scale, radius: 0.5 * scale, t: rand(0, 10), atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, bossT: 3, summoned: false };
+    atkT: rand(0.5, 1.5), dead: false, flash: 0, accent: acc, col, hgt: ({ treant: 2.9, serpent: 2.6, void: 2.4, bat: 2.3, mantis: 2.1, slime: 1.25, spider: 1.45 })[body] || 1.9, scale, radius: 0.5 * scale, t: rand(0, 10), atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, bossT: 3, summoned: false, enrage: 1 };
   if (!boss) { e.label = textSprite(name, "#" + new THREE.Color(acc).getHexString(), 0.9); scene.add(e.label); }
   const bar = new THREE.Group(); M(G.box(), new THREE.MeshBasicMaterial({ color: 0x1a0a10 }), 0, 0, 0, bar, 1.1, 0.09, 0.01); e.fg = M(G.box(), new THREE.MeshBasicMaterial({ color: 0xe0505f }), 0, 0, 0.01, bar, 1.1, 0.09, 0.01); if (!boss) { scene.add(bar); e.bar = bar; }
   enemies.push(e);
@@ -2215,11 +2368,11 @@ function startRun(idx, stageIdx, allyIds) {
   enemies = []; projectiles.forEach(p => scene.remove(p.m)); projectiles = []; telegraphs.forEach(t => scene.remove(t.mesh)); telegraphs = []; timers = [];
   allies.forEach(a => { scene.remove(a.R.g); scene.remove(a.lbl); }); allies = [];
   buildIsland(idx);
-  run = { idx, stage: stageIdx, level: 1, wave: 0, state: "intro", party: 1 + allyIds.length, allyIds, boons: {} }; computeStats(); renderBoonBar(); stopFishing(); if (sailing) removeBoat();
+  run = { idx, stage: stageIdx, level: 1, levels: ISLANDS[idx].raid ? 2 : STAGES[stageIdx].levels, wave: 0, state: "intro", party: 1 + allyIds.length, allyIds, boons: {} }; computeStats(); renderBoonBar(); stopFishing(); if (sailing) removeBoat();
   P.pos.set(0, world.h(0, 22), 22); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.dead = false; P.hp = ST.maxHp; P.flags = {}; P.buffs = {}; P.dashQ = [];
   allyIds.forEach((id, k) => spawnAlly(ALLY_POOL.find(a => a.id === id), k));
   const I = ISLANDS[idx], st = STAGES[stageIdx];
-  banner(I.name, `${st.name} · ${st.levels} levels`);
+  banner(I.name, I.raid ? `Raid · ${st.name} · ${run.levels} levels and a three-phase raid boss` : `${st.name} · ${st.levels} levels`);
   MUSIC.setMode("battle", idx, `${I.name}: battle theme`);
   later(2.4, startLevel);
   updateModeUi();
@@ -2227,7 +2380,7 @@ function startRun(idx, stageIdx, allyIds) {
 function startLevel() {
   if (!run) return;
   run.wave = 0; run.state = "between"; P.flags = {};
-  banner(`Level ${run.level} of ${STAGES[run.stage].levels}`, ISLANDS[run.idx].name);
+  banner(`Level ${run.level} of ${run.levels}`, `${ISLANDS[run.idx].name} · new foes: ${roster().map(d => d[0]).join(", ")}`);
   later(1.8, nextWave);
 }
 function nextWave() {
@@ -2235,18 +2388,20 @@ function nextWave() {
   run.wave++;
   const I = ISLANDS[run.idx], st = STAGES[run.stage];
   const count = 4 + run.level + run.wave + run.stage * 2 + (run.party - 1);
-  for (let k = 0; k < count; k++) { const def = I.enemies[k % 3]; spawnEnemy(def, def[2], false); }
+  const R3 = roster(); for (let k = 0; k < count; k++) { const def = R3[k % 3]; spawnEnemy(def, def[2], false); }
   run.state = "waves";
   toast(`<b>Wave ${run.wave} of ${st.waves}</b> ${count} foes`, "");
 }
 function spawnBoss() {
   const I = ISLANDS[run.idx];
   run.state = "boss";
-  const def = I.bosses[run.stage];
-  const name = run.level === STAGES[run.stage].levels ? def[0] : `${def[0]}${["", " (Echo)", " (Shade)", " (Wrath)", " (Avatar)"][run.level - 1] || ""}`;
-  const e = spawnEnemy([name, def[1]], "boss", true, 1 + 0.06 * run.level);
+  const final = run.level === run.levels;
+  let name, e;
+  if (final) { const d = I.bosses[run.stage]; name = d[0]; e = spawnEnemy([name, d[1], d[2], d[3]], "boss", true, (1 + 0.06 * run.level) * (I.raid ? 1.35 : 1)); e.sig = d[4] || BODY_SIG[d[1]]; }
+  else { const d = roster()[(run.level - 1) % 3]; name = `${LT_TITLE[(run.idx * 3 + run.level + run.stage) % LT_TITLE.length]} ${d[0].replace(/^(Elder|Dread) /, "")}`; e = spawnEnemy([name, d[1], d[3], d[4]], "boss", true, 0.8); e.sig = BODY_SIG[d[1]]; }
+  if (final && I.raid) { e.raidBoss = true; e.phase = 0; e.summoned = true; e.hp = e.maxHp = e.maxHp * 2.5; }
   run.boss = e;
-  banner(name, `Boss of level ${run.level}`);
+  banner(name, final ? (I.raid ? "Raid boss · three phases" : `Boss of ${I.name}`) : `Lieutenant of level ${run.level}`);
   MUSIC.setMode("boss", run.idx, `${name}: boss theme`);
 }
 function checkRunProgress() {
@@ -2260,7 +2415,7 @@ function checkRunProgress() {
     run.state = "between";
     const xp = 30 * Math.pow(1.3, run.idx) * (1 + run.stage);
     addXp(xp);
-    if (run.level < st.levels) { banner(`Level ${run.level} cleared`, `+${fmt(xp)} exp. The next level begins shortly.`); heal(ST.maxHp * 0.3); MUSIC.setMode("battle", run.idx, `${ISLANDS[run.idx].name}: battle theme`); run.level++; later(4, startLevel); }
+    if (run.level < run.levels) { banner(`Level ${run.level} cleared`, `+${fmt(xp)} exp. The next level begins shortly.`); heal(ST.maxHp * 0.3); MUSIC.setMode("battle", run.idx, `${ISLANDS[run.idx].name}: battle theme`); run.level++; later(4, startLevel); }
     else stageComplete(xp);
   }
 }
@@ -2271,10 +2426,11 @@ function stageComplete(xp) {
   S.coins += bonus;
   let text = `+${fmt(xp)} exp and ${fmt(bonus)} coins.`;
   if (first) { gain(ITEM.die, null, 1, true); text += " First clear: you earned a Fortune Die."; }
-  grantChest(run.stage, Math.min(run.idx, 11)); bumpStat("clears"); if (run.idx >= 12) bumpStat("riftClears"); if (run.stage >= 1) bumpStat("hardClears"); if (run.stage === 2) bumpStat("nightmareClears");
+  grantChest(run.stage, Math.min(run.idx, 11)); bumpStat("clears"); if (I.rift) bumpStat("riftClears"); if (I.raid) bumpStat("raidClears"); if (run.stage >= 1) bumpStat("hardClears"); if (run.stage === 2) bumpStat("nightmareClears");
   text += ` You received ${article(CHEST_TIERS[run.stage].name)} ${CHEST_TIERS[run.stage].name}. Open it from Chests.`;
   const next = run.idx + 1;
   if (first && next < 12 && prog.normal && prog.hard && (st.id === "normal" || st.id === "hard")) text += ` ${ISLANDS[next].name} has been discovered on the map.`;
+  if (I.raid) { S.coins += bonus * 2; const got = raidHoard(); text += ` Raid hoard: ${fmt(bonus * 2)} more coins, ${got.join(", ")}.`; }
   run.state = "done"; save(); MUSIC.sting("victory");
   showResult(`${st.name} cleared`, I.name, text, "var(--good)");
 }
@@ -2313,12 +2469,20 @@ function bossAttack(e) {
   const st = run.stage, speedUp = [1, 0.85, 0.72][st];
   const targets = heroTargets(); const tgt = targets.reduce((b, t) => (!b || t.pos.distanceTo(e.pos) < b.pos.distanceTo(e.pos)) ? t : b, null);
   if (!tgt) return;
-  const roll = Math.random();
+  let roll = Math.random();
+  if (e.raidBoss && e.phase < 2 && e.hp < e.maxHp * (e.phase ? 0.34 : 0.67)) {
+    e.phase++; e.enrage *= 0.75; banner(e.name, `Phase ${e.phase + 1}${e.phase === 2 ? " · enraged" : ""}`);
+    const at = e.pos.clone(); ringFx(at, 12, e.accent, 0.8); pillarFx(at, e.accent, 20, 0.8); for (const t of heroTargets()) { const d = t.pos.clone().sub(at).setY(0); if (d.length() < 10 && t.isHero) P.kb.addScaledVector(d.normalize(), 12); }
+    const R3 = roster(); for (let k = 0; k < 3 + st + e.phase; k++) spawnEnemy(R3[k % 3], R3[k % 3][2], false);
+    e.R.g.scale.multiplyScalar(1.08); return;
+  }
   if (!e.summoned && e.hp < e.maxHp * 0.5) {
     e.summoned = true; banner(e.name, "calls for help");
-    const I = ISLANDS[run.idx]; for (let k = 0; k < 3 + st; k++) spawnEnemy(I.enemies[k % 3], I.enemies[k % 3][2], false);
+    const R3 = roster(); for (let k = 0; k < 3 + st; k++) spawnEnemy(R3[k % 3], R3[k % 3][2], false);
     return;
   }
+  if (e.sig && roll < (e.raidBoss ? 0.55 : 0.42)) { sigAttack(e, tgt, st, speedUp * (e.raidBoss ? Math.max(0.75, e.enrage) : 1)); e.atkAnim = 1; return; }
+  roll = Math.random();
   if (roll < 0.4) {
     const at = tgt.pos.clone(); at.y = world.h(at.x, at.z); const r = 4 + st;
     ringTelegraph(at, r, 0, 1.1 * speedUp, false);
@@ -2739,6 +2903,8 @@ $("clLeave").addEventListener("click", () => { $("confirmLeave").hidden = true; 
 function updateModeUi() {
   const inLobby = world && world.kind === "lobby";
   $("bLeave").hidden = inLobby;
+  $("bLeave").textContent = world && world.kind === "raid" ? "Leave the hall" : "Leave island";
+  if (world && world.kind === "raid") { $("hWhere").textContent = "The Raid Hall"; $("hSub").textContent = "Step through a gate to start a raid"; $("bossBar").hidden = true; }
   if (inLobby) { $("hWhere").textContent = "The Lobby"; $("hSub").textContent = "Step onto a portal to choose an island"; $("bossBar").hidden = true; }
 }
 function updateActionLabels() {
@@ -2799,7 +2965,7 @@ function update(dt) {
       if (S.cls === "samurai" || P.buffs.veil > worldT) for (const e of enemiesNear(P.pos, 1.6)) if (!P.dashHit.has(e)) { P.dashHit.add(e); damageEnemy(e, ST.hit * (P.buffs.veil > worldT ? 2 : 0.5), P.dashDir, 1, { color: "#cfefff" }); }
       if (Math.random() < 0.5) ghostFx(hero);
     } else {
-      P.pos.addScaledVector(move, ST.move * (P.blocking ? 0.45 : 1) * (P.swimming ? 0.5 : 1) * (P.onGround ? 1 : 0.9) * (P.atkT > 0 && ITEM[S.equip.weapon].weight === "heavy" ? 0.6 : 1) * dt);
+      P.pos.addScaledVector(move, ST.move * (P.blocking ? 0.45 : 1) * (P.swimming ? 0.5 : 1) * (worldT < (P.slowUntil || 0) ? 0.5 : 1) * (P.onGround ? 1 : 0.9) * (P.atkT > 0 && ITEM[S.equip.weapon].weight === "heavy" ? 0.6 : 1) * dt);
       if (mag > 0.05 && P.swing <= 0) { const tgt = Math.atan2(move.x, move.z); let d = tgt - P.face; d = Math.atan2(Math.sin(d), Math.cos(d)); P.face += d * Math.min(1, dt * 12); }
     }
     P.pos.addScaledVector(P.kb, dt); P.kb.multiplyScalar(Math.exp(-7 * dt));
@@ -2812,9 +2978,9 @@ function update(dt) {
     }
   }
   // portals in the lobby
-  if (world.kind === "lobby") {
+  if (world.kind === "lobby" || world.kind === "raid") {
     let on = -1; for (const p of world.portals) if (Math.hypot(P.pos.x - p.x, P.pos.z - p.z) < p.r) on = p.i;
-    if (on >= 0 && P.onPortal !== on) { P.onPortal = on; openMap(on); }
+    if (on >= 0 && P.onPortal !== on) { P.onPortal = on; if (on === 99) enterRaidHall(); else if (on === 98) leaveRaidHall(); else if (on >= 100) openRaidBoard(on - 100); else openMap(on); }
     if (on < 0) P.onPortal = -1;
   }
   // allies
@@ -2871,7 +3037,7 @@ function update(dt) {
           if (dist > reach * 0.85) { e.pos.addScaledVector(toT, spd * dt); moving = 1; }
           e.atkT -= dt;
           if (dist < reach && e.atkT <= 0) { e.atkT = e.base.cd; e.atkAnim = 1; const hitT = tgt; tellFx(e, 0.34); later(0.34, () => { if (!e.dead && !(e.stunUntil > worldT) && hitT.pos.distanceTo(e.pos) < reach + 0.6) hurtHero(hitT, e.dmg, e.pos, e); }); }
-          if (e.boss) { e.bossT -= dt; if (e.bossT <= 0) { e.bossT = [3.6, 3.0, 2.4][run.stage] * rand(0.85, 1.15); bossAttack(e); } }
+          if (e.boss) { e.bossT -= dt; if (e.bossT <= 0) { e.bossT = [3.6, 3.0, 2.4][run.stage] * rand(0.85, 1.15) * e.enrage; bossAttack(e); } }
         }
       }
     }
@@ -2918,8 +3084,8 @@ function animate(dt, paused) {
   hero.g.visible = !(P.buffs.veil > worldT && Math.floor(t * 12) % 2 === 0);
   for (const a of allies) { a.R.g.position.copy(a.pos); if (a.down) a.R.g.position.y += 0.3; a.R.g.rotation.y = a.face; if (!a.down) poseHumanoid(a.R, t + allies.indexOf(a), a.moving || 0, a.swing, "normal", false); a.lbl.position.copy(a.pos).add(new V3(0, 2.35, 0)); }
   for (const e of enemies) if (!e.dead) {
-    if (e.label) { e.label.position.copy(e.pos).add(new V3(0, 1.9 * e.scale + 0.4, 0)); e.label.visible = e.pos.distanceTo(P.pos) < 16; }
-    if (e.bar) { e.bar.position.copy(e.pos).add(new V3(0, 1.9 * e.scale + 0.1, 0)); e.bar.quaternion.copy(camera.quaternion); e.bar.visible = e.hp < e.maxHp; e.fg.scale.x = 1.1 * Math.max(0.001, e.hp / e.maxHp); e.fg.position.x = -0.55 * (1 - e.hp / e.maxHp); }
+    if (e.label) { e.label.position.copy(e.pos).add(new V3(0, (e.hgt || 1.9) * e.scale + 0.4, 0)); e.label.visible = e.pos.distanceTo(P.pos) < 16; }
+    if (e.bar) { e.bar.position.copy(e.pos).add(new V3(0, (e.hgt || 1.9) * e.scale + 0.1, 0)); e.bar.quaternion.copy(camera.quaternion); e.bar.visible = e.hp < e.maxHp; e.fg.scale.x = 1.1 * Math.max(0.001, e.hp / e.maxHp); e.fg.position.x = -0.55 * (1 - e.hp / e.maxHp); }
   }
   // camera
   camTarget.lerp(new V3(P.pos.x, P.pos.y + 1.55, P.pos.z), 1 - Math.exp(-12 * dt));
@@ -2963,7 +3129,7 @@ function updateHud() {
   if (run) {
     const I = ISLANDS[run.idx], st = STAGES[run.stage];
     $("hWhere").textContent = I.name;
-    $("hSub").textContent = `${st.name} · Level ${run.level}/${st.levels} · ${run.state === "boss" ? "Boss fight" : run.state === "waves" || run.state === "between" ? `Wave ${run.wave}/${st.waves}` : "Get ready"}`;
+    $("hSub").textContent = `${I.raid ? "Raid · " : ""}${st.name} · Level ${run.level}/${run.levels} · ${run.state === "boss" ? "Boss fight" : run.state === "waves" || run.state === "between" ? `Wave ${run.wave}/${st.waves}` : "Get ready"}`;
     const b = run.state === "boss" && run.boss && !run.boss.dead ? run.boss : null;
     $("bossBar").hidden = !b;
     if (b) { $("bossName").textContent = b.name; $("bossHp").style.width = (100 * b.hp / b.maxHp) + "%"; $("bossHpT").textContent = `${fmt(b.hp)} / ${fmt(b.maxHp)}`; }
@@ -4680,7 +4846,7 @@ function openRiftBoard() {
   if (run) return; dlgNpc = null; keys.clear(); attackHeld = false;
   $("dlgName").textContent = "The Black Rift Portal"; $("dlgRole").textContent = "Five islands that are not on any map";
   $("dlgText").textContent = "The portal hums with a cold, black light. Beyond it lie five rift islands, harder than anything on the map, with the best odds for Vaulted loot in the world.";
-  $("dlgQuest").innerHTML = `<div class="duels">${ISLANDS.map((I, i) => i >= 12 ? `<div class="duel" style="--c:#b07aff"><span><b>${esc(I.name)}</b><small>Foes: ${I.enemies.map(e => esc(e[0])).join(", ")}</small><small class="num">${STAGES.map(s => `${s.name} ${S.prog[i][s.id] ? "cleared" : "not cleared"}`).join(" · ")}</small></span>
+  $("dlgQuest").innerHTML = `<div class="duels">${ISLANDS.map((I, i) => I.rift ? `<div class="duel" style="--c:#b07aff"><span><b>${esc(I.name)}</b><small>Foes: ${I.enemies.map(e => esc(e[0])).join(", ")}</small><small class="num">${STAGES.map(s => `${s.name} ${S.prog[i][s.id] ? "cleared" : "not cleared"}`).join(" · ")}</small></span>
     <span class="row" style="gap:4px;grid-column:1">${STAGES.map((s, k) => `<button class="btn ${k ? "" : "primary"}" data-rift="${i}:${k}">${s.name}</button>`).join("")}</span></div>` : "").join("")}</div>`;
   $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Step back</button>`;
   $("dialog").hidden = false;
@@ -5083,6 +5249,156 @@ PLATFORMS.push({ x0: 161, x1: 165, z0: 6, z1: 68, y: 0.5 });
 ].filter(r => ITEM[r.out] && Object.keys(r.mats).every(m => ITEM[m])).forEach(r => RECIPES.push(r));
 RECIPES.sort((a, b) => ["Refining", "Potions", "Weapons", "Armour", "Relics"].indexOf(a.g) - ["Refining", "Potions", "Weapons", "Armour", "Relics"].indexOf(b.g) || RANK[ITEM[a.out].rarity] - RANK[ITEM[b.out].rarity]);
 
+/* =====================================================================
+   BOSS SIGNATURES and THE RAID HALL
+   ===================================================================== */
+function hazardZone(at, r, col, dur, every, onTick) {
+  const g = new THREE.Group(); g.position.set(at.x, at.y + 0.07, at.z);
+  const fill = new THREE.Mesh(geo("circ", () => new THREE.CircleGeometry(1, 40)), new THREE.MeshBasicMaterial({ color: lin(col), transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide }));
+  const edge = new THREE.Mesh(geo("ringfx2", () => new THREE.RingGeometry(0.94, 1, 48)), new THREE.MeshBasicMaterial({ color: lin(col), transparent: true, opacity: 0.8, depthWrite: false, side: THREE.DoubleSide }));
+  fill.rotation.x = edge.rotation.x = -Math.PI / 2; fill.scale.setScalar(r); edge.scale.setScalar(r); g.add(fill, edge);
+  addFx(g, dur, (o, k) => { fill.material.opacity = 0.32 * (1 - k * k); edge.rotation.z = k * 6; });
+  let n = Math.floor(dur / every); const tick = () => { if (n-- <= 0 || !run) return; for (const t of heroTargets()) if (Math.hypot(t.pos.x - at.x, t.pos.z - at.z) < r) onTick(t); later(every, tick); }; later(every, tick);
+}
+function slowHero(t, sec) { if (t.isHero) { P.slowUntil = Math.max(P.slowUntil || 0, worldT + sec); } }
+function sigAttack(e, tgt, st, speedUp) {
+  const hp = p => { const q = p.clone(); q.y = world.h(q.x, q.z); return q; };
+  const D = e.dmg, sig = e.sig, col = e.accent;
+  if (sig === "web") {
+    banner(e.name, "spins webs");
+    for (let k = 0; k < 3 + st; k++) { const at = hp(tgt.pos.clone().add(new V3(rand(-4, 4), 0, rand(-4, 4)))); ringTelegraph(at, 2.8, 0, 0.9 * speedUp, false);
+      later(0.9 * speedUp, () => { if (e.dead) return; ringFx(at, 2.8, 0xffffff, 0.4); for (const t of heroTargets()) if (t.pos.distanceTo(at) < 2.8) hurtHero(t, D * 1.2, at, e); hazardZone(at, 2.8, 0xe8e8f0, 5, 0.25, t => slowHero(t, 0.5)); }); }
+  } else if (sig === "voidPull") {
+    banner(e.name, "drags you into the void");
+    const c = e.pos.clone(), R = 9 + st; ringTelegraph(hp(c), R, 0, 1.4 * speedUp, false);
+    let n = 0; const pull = () => { if (e.dead || n++ > 12) return; const d = e.pos.clone().sub(P.pos).setY(0); if (d.length() < R + 2 && d.length() > 2) P.kb.addScaledVector(d.normalize(), 3.2); later(0.1, pull); }; pull();
+    later(1.4 * speedUp, () => { if (e.dead) return; const at = hp(e.pos); ringFx(at, 5, col, 0.5); burstFx(at.clone().add(new V3(0, 1.5, 0)), 5, 0x6a2aff, 0.5); for (const t of heroTargets()) if (t.pos.distanceTo(at) < 5) hurtHero(t, D * 2.4, at, e);
+      const from = at.clone().add(new V3(0, 1.6, 0)); for (let k = 0; k < 8; k++) { const d = new V3(Math.cos(k * TAU / 8), 0, Math.sin(k * TAU / 8)); shoot(from, from.clone().addScaledVector(d, 10), col, D, 1, "enemy", { src: e, speed: 9, life: 2.4, size: 0.35 }); } });
+  } else if (sig === "meteor") {
+    banner(e.name, "calls down fire");
+    for (let k = 0; k < 5 + st * 2; k++) { const at = hp(tgt.pos.clone().add(new V3(rand(-7, 7), 0, rand(-7, 7)))); const dl = (0.9 + k * 0.18) * speedUp; later(k * 0.18 * speedUp, () => ringTelegraph(at, 2.6, 0, 0.9 * speedUp, false));
+      later(dl, () => { if (e.dead) return; pillarFx(at, 0xff7a3a, 14, 0.45); burstFx(at.clone().add(new V3(0, 0.6, 0)), 2.6, 0xffa040, 0.35); for (const t of heroTargets()) if (t.pos.distanceTo(at) < 2.6) hurtHero(t, D * 1.6, at, e); }); }
+  } else if (sig === "spikes") {
+    banner(e.name, "tears up the ground");
+    const dir = tgt.pos.clone().sub(e.pos).setY(0).normalize();
+    for (const off of st >= 1 ? [-0.35, 0, 0.35] : [0]) { const d2 = dir.clone().applyAxisAngle(new V3(0, 1, 0), off);
+      for (let k = 1; k <= 9; k++) { const at = hp(e.pos.clone().addScaledVector(d2, k * 2.1)); const tt = (0.6 + k * 0.1) * speedUp; later(k * 0.05, () => ringTelegraph(at, 1.4, 0, 0.6 * speedUp, false));
+        later(tt, () => { if (e.dead) return; const sp = M(G.cone(6), std(0x6a5a4a, { flat: true, r: 0.8 }), 0, 0, 0, null, 0.5, 2.2, 0.5); sp.position.copy(at).add(new V3(0, 1, 0)); addFx(sp, 0.6, (o, q) => { o.scale.y = 2.2 * (1 - q); o.position.y = at.y + 1.1 * (1 - q); }); for (const t of heroTargets()) if (t.pos.distanceTo(at) < 1.5) hurtHero(t, D * 1.5, at, e); }); } }
+  } else if (sig === "frost") {
+    banner(e.name, "breathes winter");
+    const at = hp(e.pos), R = 8 + st; ringTelegraph(at, R, 0, 1.1 * speedUp, false);
+    later(1.1 * speedUp, () => { if (e.dead) return; ringFx(at, R, 0x9ad8ff, 0.6); ringFx(at, R * 0.6, 0xffffff, 0.5); for (const t of heroTargets()) if (t.pos.distanceTo(at) < R) { hurtHero(t, D * 1.8, at, e); slowHero(t, 2.2); } hazardZone(at, R * 0.5, 0x9ad8ff, 4, 0.3, t => slowHero(t, 0.6)); });
+  } else if (sig === "poison") {
+    banner(e.name, "spills poison");
+    for (let k = 0; k < 3 + st; k++) { const at = hp(tgt.pos.clone().add(new V3(rand(-5, 5), 0, rand(-5, 5)))); ringTelegraph(at, 3, 0, 0.8 * speedUp, false);
+      later(0.8 * speedUp, () => { if (e.dead) return; burstFx(at.clone().add(new V3(0, 0.4, 0)), 2.5, 0x9aff4a, 0.4); hazardZone(at, 3, 0x7ad83a, 6, 0.5, t => hurtHero(t, D * 0.35, null, e)); }); }
+  } else if (sig === "lightning") {
+    banner(e.name, "summons the storm");
+    for (const t0 of heroTargets()) for (let k = 0; k < 3; k++) later(k * 0.55 * speedUp, () => { if (e.dead) return; const at = hp(t0.pos); ringTelegraph(at, 2, 0, 0.6 * speedUp, false);
+      later(0.6 * speedUp, () => { if (e.dead) return; boltFx(at.clone().add(new V3(0, 16, 0)), at.clone(), 0xfff0a0, 0.25); ringFx(at, 2, 0xfff0a0, 0.3); for (const t of heroTargets()) if (t.pos.distanceTo(at) < 2) hurtHero(t, D * 1.4, at, e); }); });
+  } else if (sig === "tide") {
+    banner(e.name, "raises a tidal wave");
+    const dir = tgt.pos.clone().sub(e.pos).setY(0).normalize(), L = 20, W = 8 + st * 2;
+    const g = new THREE.Group(); const plane = new THREE.Mesh(G.box(), new THREE.MeshBasicMaterial({ color: lin(0x2a8aff), transparent: true, opacity: 0.3, depthWrite: false }));
+    plane.scale.set(W, 0.02, L); plane.position.z = L / 2; g.add(plane); g.position.set(e.pos.x, e.pos.y + 0.08, e.pos.z); g.rotation.y = Math.atan2(dir.x, dir.z);
+    addFx(g, 1.2 * speedUp, (o, k) => { plane.material.opacity = 0.15 + k * 0.35; });
+    later(1.2 * speedUp, () => { if (e.dead) return; const o = e.pos.clone();
+      for (let k = 1; k < 9; k++) { const at = hp(o.clone().addScaledVector(dir, k * 2.4)); burstFx(at.clone().add(new V3(0, 0.6, 0)), W * 0.35, 0x7ad8ff, 0.35); }
+      for (const t of heroTargets()) { const rel = t.pos.clone().sub(o).setY(0), along = rel.dot(dir), side = Math.abs(rel.x * dir.z - rel.z * dir.x); if (along > 0 && along < L && side < W / 2) { hurtHero(t, D * 2, o, e); if (t.isHero) P.kb.addScaledVector(dir, 14); } } });
+  } else if (sig === "shards") {
+    banner(e.name, "unleashes a storm of shards");
+    const from = e.pos.clone().add(new V3(0, 1.4 * e.scale / 2.3 + 0.6, 0)), n = 12 + st * 2;
+    for (let w = 0; w < 3; w++) later(w * 0.3 * speedUp, () => { if (e.dead) return; for (let k = 0; k < n; k++) { const a = k * TAU / n + w * 0.26; const d = new V3(Math.cos(a), 0, Math.sin(a)); shoot(from, from.clone().addScaledVector(d, 10), col, D * 0.9, 1, "enemy", { src: e, speed: 12, life: 2.4, size: 0.26 }); } });
+  } else if (sig === "summon") {
+    banner(e.name, "raises its servants");
+    const base = e.name.split(/[ ,]/)[e.name.startsWith("The ") ? 1 : 0];
+    for (let k = 0; k < 2 + st; k++) spawnEnemy([`${base}'s Servant`, e.R.body, "skirm", e.col, e.accent], "skirm", false, 0.8);
+  }
+}
+
+/* the raid hall: a floating sanctum with four raid gates */
+const RAID_GATES = [[0, -22], [22, 0], [-22, 0], [0, 22]];
+function raidPortalMesh(parent, x, z, c1, c2, label, labelCol, i) {
+  const pg = new THREE.Group(); pg.position.set(x, 0, z); parent.add(pg);
+  const ring = M(new THREE.TorusGeometry(2.4, 0.3, 12, 48), std(0x2a2026, { r: 0.5, m: 0.4, map: "rock" }), 0, 0.15, 0, pg); ring.rotation.x = Math.PI / 2;
+  for (let k = 0; k < 10; k++) { const a = k * TAU / 10; const sp = M(G.cone(5), std(0x1a1418, { r: 0.4, m: 0.5, flat: true }), Math.cos(a) * 2.75, 0.9, Math.sin(a) * 2.75, pg, 0.22, 1.8 + (k % 2) * 0.8, 0.22); sp.rotation.z = Math.cos(a) * -0.2; sp.rotation.x = Math.sin(a) * 0.2; M(G.sph(), glowMat(c2, 0.9), Math.cos(a) * 2.75, 1.9 + (k % 2) * 0.8, Math.sin(a) * 2.75, pg, 0.08); }
+  const disc = portalDisc(c1, c2); disc.rotation.x = -Math.PI / 2; disc.position.y = 0.08; disc.scale.setScalar(2.3); pg.add(disc);
+  const pts = new THREE.BufferGeometry(), arr = new Float32Array(60 * 3); for (let k = 0; k < 60; k++) { const a = rand(0, TAU), r = rand(0, 2.2); arr[k * 3] = Math.cos(a) * r; arr[k * 3 + 1] = rand(0, 3); arr[k * 3 + 2] = Math.sin(a) * r; }
+  pts.setAttribute("position", new THREE.BufferAttribute(arr, 3));
+  const pp = new THREE.Points(pts, new THREE.PointsMaterial({ color: lin(c2), size: 0.1, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false })); pg.add(pp);
+  const lbl = textSprite(label, labelCol, 1.3); lbl.position.y = 3.9; pg.add(lbl);
+  const gl = glowSprite(c2, 7, 0.4); gl.position.y = 0.6; pg.add(gl);
+  world.portals.push({ x, z, r: 2.2, disc, pts: pp, i });
+  return pg;
+}
+function lobbyRaidPortal(group) {
+  const x = 19, z = -19;
+  raidPortalMesh(group, x, z, 0x3a0a1a, 0xff3a5a, "Raid Portal · to the Raid Hall", "#ffb0c0", 99);
+  addCircle(x + 2.9, z, 0.3, 3);
+}
+function buildRaidHall() {
+  clearWorld();
+  const group = new THREE.Group(); scene.add(group);
+  const h = (x, z) => { const d = Math.hypot(x, z); return d < 33 ? 0 : -40 * smooth(33, 40, d); };
+  world = { kind: "raid", group, h, hBase: h, radius: 31, circles: [], portals: [], interact: [], animated: [] };
+  setSky(0x05030c, 0x2a1030, 0x1a1020, 0x1a0a20, 40, 160, 0xd8b0ff, 1.2, 0.6);
+  // the floating platform
+  const plat = new THREE.Mesh(new THREE.CylinderGeometry(33, 18, 14, 48, 3), std(0x3a3238, { r: 0.8, map: "rock", rep: 6 })); plat.position.y = -7.02; plat.receiveShadow = true; group.add(plat);
+  const floorTex = TEX.tiles.clone(); floorTex.needsUpdate = true; floorTex.repeat.set(12, 12);
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(33, 64), new THREE.MeshStandardMaterial({ map: floorTex, color: 0x6a5a6a, roughness: 0.8 })); floor.rotation.x = -Math.PI / 2; floor.position.y = 0.01; floor.receiveShadow = true; group.add(floor);
+  for (const [r, c] of [[33, 0xff3a5a], [14, 0xb07aff]]) { const rr = M(new THREE.TorusGeometry(r, 0.18, 8, 96), glowMat(c, 0.7), 0, 0.06, 0, group); rr.rotation.x = Math.PI / 2; }
+  // drifting rocks below and around
+  const r = seeded(777);
+  for (let k = 0; k < 40; k++) { const a = r() * TAU, d = 45 + r() * 90, y = -30 + r() * 60; const rk = M(rockGeo(k % 5), MAT.rock(0x3a3238), Math.cos(a) * d, y, Math.sin(a) * d, group, 2 + r() * 6); rk.rotation.set(r() * 3, r() * 3, r() * 3); const sp = 0.05 + r() * 0.1; world.animated.push(t => { rk.position.y = y + Math.sin(t * sp * 4 + k) * 2; rk.rotation.y = t * sp; }); }
+  // pillars with braziers around the rim
+  for (let k = 0; k < 12; k++) { const a = k / 12 * TAU + TAU / 24, x = Math.cos(a) * 29, z = Math.sin(a) * 29;
+    M(G.cyl(0.7, 0.9, 8), std(0x4a4048, { r: 0.7, map: "rock" }), x, 3, z, group, 1, 6, 1); M(G.cyl(1.1, 0.7, 8), std(0x2a2026, { m: 0.6, r: 0.4 }), x, 6.3, z, group, 1, 0.6, 1);
+    const fl = glowSprite(k % 2 ? 0xff3a5a : 0xb07aff, 3.2, 0.8); fl.position.set(x, 7, z); group.add(fl); world.animated.push(t => { fl.scale.setScalar(3 + Math.sin(t * 7 + k) * 0.4); }); addCircle(x, z, 1, 8); }
+  // central obelisk with the raid roll of honour
+  const ob = new THREE.Group(); group.add(ob);
+  M(G.cyl(2.2, 2.6, 8), std(0x2a2026, { r: 0.6, map: "rock" }), 0, 0.4, 0, ob, 1, 0.8, 1);
+  const crystal = M(G.oct(), std(0xb07aff, { e: 0x8a3aff, ei: 1.8, r: 0.2, flat: true }), 0, 4.2, 0, ob, 1.2, 2.4, 1.2);
+  const cg = glowSprite(0xb07aff, 9, 0.45); cg.position.y = 4.2; ob.add(cg); addCircle(0, 0, 2.6, 6);
+  world.animated.push(t => { crystal.rotation.y = t * 0.6; crystal.position.y = 4.2 + Math.sin(t * 1.5) * 0.3; });
+  const lt = new THREE.PointLight(0xb07aff, 1.4, 50, 2); lt.position.set(0, 6, 0); group.add(lt);
+  const tl = textSprite("The Raid Hall", "#e8d0ff", 2); tl.position.y = 8.2; ob.add(tl);
+  world.interact.push({ x: 0, z: 0, r: 4.2, label: "Read the raid roll of honour", act: () => openRaidBoard(-1) });
+  // the four raid gates
+  RAID_GATES.forEach(([x, z], k) => { const I = ISLANDS[RAID_START + k], c = new THREE.Color(I.col).getHex();
+    raidPortalMesh(group, x, z, new THREE.Color(c).multiplyScalar(0.25).getHex(), c, `${I.name} · raid`, I.col, 100 + k); });
+  // the way home
+  raidPortalMesh(group, 16, 16, 0x0a2a6a, 0x7af0ff, "Back to town", "#cfeeff", 98);
+  world.clouds = addClouds(group, 0x2a1a3a);
+  const pg = new THREE.BufferGeometry(), arr = new Float32Array(400 * 3);
+  for (let k = 0; k < 400; k++) { arr[k * 3] = rand(-60, 60); arr[k * 3 + 1] = rand(-20, 25); arr[k * 3 + 2] = rand(-60, 60); }
+  pg.setAttribute("position", new THREE.BufferAttribute(arr, 3));
+  const motes = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xd8b0ff, size: 0.14, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false })); group.add(motes); world.animated.push(t => { motes.rotation.y = t * 0.015; });
+}
+function enterRaidHall() {
+  closeAllModals(); if (sailing) removeBoat(); stopFishing();
+  buildRaidHall();
+  P.pos.set(0, 0, 9); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.onPortal = -1; P.kb.set(0, 0, 0);
+  updateModeUi(); MUSIC.setMode("portal", 0, "The Raid Hall");
+  banner("The Raid Hall", "Four raids. Bring everything you have.");
+}
+function leaveRaidHall() { goLobby(); P.pos.set(15, 0, -14); P.face = Math.PI * 0.75; P.onPortal = 99; }
+function openRaidBoard(k) {
+  if (run) return; dlgNpc = null; keys.clear(); attackHeld = false;
+  const list = k >= 0 ? [k] : [0, 1, 2, 3];
+  $("dlgName").textContent = k >= 0 ? ISLANDS[RAID_START + k].name : "The Raid Roll of Honour"; $("dlgRole").textContent = "Raid · your whole party fights";
+  $("dlgText").textContent = k >= 0 ? ISLANDS[RAID_START + k].blurb + " All three allies march with you. The raid boss has three phases, and every clear pays out a raid hoard." : "Four raids wait behind the gates. Each has two levels of new foes and a raid boss that changes phase at two thirds and one third health.";
+  $("dlgQuest").innerHTML = `<div class="duels">${list.map(r => { const i = RAID_START + r, I = ISLANDS[i]; return `<div class="duel" style="--c:${I.col}"><span><b>${esc(I.name)}</b><small>Foes: ${[...I.enemies, ...I.more].map(e => esc(e[0])).join(", ")}</small><small>Raid boss: ${esc(I.bosses[0][0])}</small><small class="num">${STAGES.map(s => `${s.name} ${S.prog[i][s.id] ? "cleared" : "not cleared"}`).join(" · ")}</small></span>
+    <span class="row" style="gap:4px;grid-column:1">${STAGES.map((s, q) => `<button class="btn ${q ? "" : "primary"}" data-raid="${i}:${q}">${s.name}</button>`).join("")}</span></div>`; }).join("")}</div>`;
+  $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Step back</button>`;
+  $("dialog").hidden = false;
+}
+$("dialog").addEventListener("click", e => { const b = e.target.closest("[data-raid]"); if (!b) return; const [i, k] = b.dataset.raid.split(":").map(Number); $("dialog").hidden = true; startRun(i, k, ALLY_POOL.slice(0, 3).map(a => a.id)); });
+function raidHoard() {
+  const t = dropTable(12.5, run.stage, true); t.common = 0; t.rare *= 0.3; const got = [];
+  for (let k = 0; k < 3 + run.stage; k++) { const it = rollItemOf(rollRarity(t)); gain(it, P.pos); got.push(it.name); }
+  return got;
+}
+
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
    and scheduled a fraction of a second ahead. Battle music thickens as more foes
@@ -5400,7 +5716,7 @@ function frame(now) {
 }
 $("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; updateDailyBadge(); if (!dailyInfo().claimed) setTimeout(openDaily, 900); if (coarse || usedTouch) $("joyHint").hidden = false; });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { ISLANDS, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
