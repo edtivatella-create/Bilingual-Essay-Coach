@@ -235,6 +235,22 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 
 /* reveal / results */
 .reveal-card { max-height: 100%; overflow-y: auto; width: min(440px, 100%); text-align: center; border-radius: 14px; padding: 24px 22px; display: grid; gap: 10px; background: var(--panel-solid); border: 2px solid var(--c); box-shadow: 0 0 60px -8px var(--c); }
+.dlg { width: min(520px, 100%); max-height: 100%; overflow-y: auto; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 12px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+.dlg-who { display: grid; gap: 2px; } .dlg-who b { font-family: var(--f-display); font-size: 22px; } .dlg-who span { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+.dlg p { margin: 0; font-size: 16px; line-height: 1.5; }
+.qbox { display: grid; gap: 6px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.qbox b { font-family: var(--f-display); font-size: 17px; } .qtag { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 800; } .qrew { color: var(--accent); font-weight: 700; font-size: 13.5px; }
+.qcard { display: grid; gap: 8px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.chestgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.ccard { display: grid; gap: 4px; justify-items: center; text-align: center; background: var(--panel-2); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 12px; padding: 12px; }
+.ccard svg { width: 72px; height: 63px; } .ccard b { color: var(--c); font-family: var(--f-display); }
+.loot { display: grid; gap: 8px; background: var(--panel-2); border: 1px solid var(--c); border-radius: 12px; padding: 12px; } .loot > b { font-family: var(--f-display); font-size: 17px; color: var(--c); }
+.lootlist { display: flex; flex-wrap: wrap; gap: 6px; } .lootlist span { display: grid; grid-template-columns: auto 1fr; column-gap: 6px; align-items: center; background: var(--panel-3); border-left: 3px solid var(--c); border-radius: 8px; padding: 4px 9px 4px 4px; font-weight: 700; font-size: 13.5px; color: var(--c); }
+.lootlist img { width: 34px; height: 34px; grid-row: span 2; } .lootlist small { color: var(--muted); font-weight: 600; font-size: 11px; }
+.recipes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 8px; }
+.recipe { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 10px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-left: 3px solid var(--c); border-radius: 10px; padding: 8px 10px; opacity: 0.8; }
+.recipe.ok { opacity: 1; border-color: var(--c); } .recipe img { width: 52px; height: 52px; } .rmain { display: grid; gap: 3px; min-width: 0; } .rmain > b { color: var(--c); } .rmain small { color: var(--muted); font-size: 12px; }
+.reqs { display: flex; flex-wrap: wrap; gap: 4px; } .reqs span { font-size: 12px; background: var(--panel-3); border-radius: 6px; padding: 2px 6px; } .reqs .has b { color: var(--good); } .reqs .lack b { color: var(--bad); }
 .reveal-card.vaulted { animation: glow 2.2s ease-in-out infinite alternate; }
 @keyframes glow { from { box-shadow: 0 0 40px -8px var(--r-vaulted); } to { box-shadow: 0 0 80px -4px var(--r-vaulted-2); } }
 .reveal-card .eyebrow { text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; color: var(--c); font-weight: 800; }
@@ -269,7 +285,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <button class="hbtn warn" id="bLeave" hidden>Leave island</button>
 </div>
 <div id="menuBar">
-  <button id="mbArmoury">Armoury</button><button id="mbClasses">Classes</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
+  <button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
 <div id="musicPanel" hidden role="dialog" aria-label="Music">
   <div class="mpHead"><b>Music</b><button class="hbtn" id="mpClose">Close</button></div>
@@ -307,6 +323,9 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
     <header><h2 id="mapTitle">Choose an island</h2><span class="muted" id="mapPortal"></span><button class="btn" id="mapClose">Step back</button></header>
     <div class="body"><div class="mapwrap"><div class="seamap" id="seaMap"></div><div class="mside" id="mapSide"></div></div></div>
   </div>
+</div>
+<div class="modal" id="dialog" hidden>
+  <div class="dlg" role="dialog" aria-labelledby="dlgName"><div class="dlg-who"><b id="dlgName"></b><span id="dlgRole"></span></div><p id="dlgText"></p><div id="dlgQuest"></div><div class="row" id="dlgBtns" style="justify-content:center"></div></div>
 </div>
 <div class="modal" id="reveal" hidden>
   <div class="reveal-card" id="revealCard">
@@ -644,7 +663,8 @@ const KEY = "vaultbound-isles-v1";
 function fresh() {
   return { coins: 150, cls: "wanderer", level: 1, xp: 0, unspent: 0, pts: { speed: 0, damage: 0, defence: 0, power: 0 },
     inv: { ironwood: 1, padded: 1, minor: 3 }, seen: { ironwood: 1, padded: 1, minor: 1 }, equip: { weapon: "ironwood", armour: "padded" },
-    prog: ISLANDS.map(() => ({ normal: false, hard: false, nightmare: false })), allies: [], rolls: 0 };
+    prog: ISLANDS.map(() => ({ normal: false, hard: false, nightmare: false })), allies: [], rolls: 0,
+    chests: [], stats: { kills: 0, bosses: 0, clears: 0, chests: 0, crafts: 0 }, quests: {} };
 }
 let S = fresh();
 try {
@@ -653,6 +673,8 @@ try {
     const d = JSON.parse(raw), f = fresh();
     S = Object.assign(f, d);
     S.pts = Object.assign(f.pts, d.pts || {});
+    S.stats = Object.assign(f.stats, d.stats || {}); S.quests = d.quests && typeof d.quests === "object" ? d.quests : {};
+    S.chests = Array.isArray(d.chests) ? d.chests.filter(c => c && c.t >= 0 && c.t < 3 && c.i >= 0 && c.i < ISLANDS.length) : [];
     S.prog = ISLANDS.map((_, i) => Object.assign({ normal: false, hard: false, nightmare: false }, (d.prog || [])[i] || {}));
     for (const id of Object.keys(S.inv)) if (!ITEM[id] || S.inv[id] <= 0) delete S.inv[id];
     if (!S.inv[S.equip.weapon] || ITEM[S.equip.weapon]?.cat !== "weapon") { S.equip.weapon = "ironwood"; S.inv.ironwood = S.inv.ironwood || 1; }
@@ -1517,9 +1539,10 @@ function buildLobby() {
   const stl = textSprite("Stat Stone", "#cfeeff", 1.1); stl.position.y = 2.8; stone.add(stl);
   shadows(stone); addCircle(-9, 9, 1, 2);
   world.interact.push({ x: -9, z: 9, r: 3, label: "Spend stat points", act: () => openMenu("stats") });
+  lobbyExtras(group, h);
   // trees and lamps
   const r3 = seeded(21);
-  for (let k = 0; k < 70; k++) { const a = r3() * TAU, d = 50 + r3() * 45, x = Math.cos(a) * d, z = Math.sin(a) * d; const t = makeTree(r3() < 0.6 ? "oak" : "pine", r3); t.position.set(x, h(x, z), z); t.scale.setScalar(0.9 + r3() * 0.6); t.rotation.y = r3() * TAU; group.add(t); }
+  for (let k = 0; k < 70; k++) { const a = r3() * TAU, d = 50 + r3() * 45, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z)) continue; const t = makeTree(r3() < 0.6 ? "oak" : "pine", r3); t.position.set(x, h(x, z), z); t.scale.setScalar(0.9 + r3() * 0.6); t.rotation.y = r3() * TAU; group.add(t); }
   for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + TAU / 16, x = Math.cos(a) * 25, z = Math.sin(a) * 25; M(G.cyl(0.06, 0.08), std(0x2a2a30, { m: 0.8, r: 0.4 }), x, 1.6, z, group, 1, 3.2, 1).castShadow = true; M(G.sph(), std(0xffe0a0, { e: 0xffc060, ei: 2.5 }), x, 3.3, z, group, 0.16); const lg = glowSprite(0xffb050, 2.2, 0.75); lg.position.set(x, 3.3, z); group.add(lg); addCircle(x, z, 0.3, 3); }
   const lampL = new THREE.PointLight(0xffc070, 0.8, 14, 2); lampL.position.set(0, 4, 0); group.add(lampL);
   grassField(group, coarse ? 5000 : 15000, 0x6a9a3a, () => { const a = rand(0, TAU), d = rand(27.6, 80); const x = Math.cos(a) * d, z = Math.sin(a) * d; return [x, h(x, z), z]; });
@@ -1713,7 +1736,7 @@ function killEnemy(e) {
   const xp = e.base.xp * Math.pow(1.3, isl) * (1 + 0.5 * si);
   const coins = Math.round(e.base.coins * Math.pow(1.35, isl) * (1 + 0.6 * si) * rand(0.8, 1.2));
   S.coins += coins; floatText(e.pos, `+${fmt(coins)}`, "#e6b85c");
-  addXp(xp);
+  addXp(xp); bumpStat("kills"); if (e.boss) bumpStat("bosses");
   if (S.cls === "reaper") heal(ST.maxHp * 0.08);
   const table = dropTable(isl, si, e.boss);
   if (e.boss) {
@@ -1891,12 +1914,13 @@ function dash(dirV) {
 /* =====================================================================
    RUNS: islands, stages, levels, waves, bosses
    ===================================================================== */
+const ENEMY_DMG = 0.55; // enemies hit 45% softer than before
 function spawnEnemy(def, role, boss, scaleBoost = 1) {
   const I = ISLANDS[run.idx], st = STAGES[run.stage];
   const base = ROLE_BASE[boss ? "boss" : role];
   const isl = Math.pow(1.5, run.idx), lv = 1 + 0.15 * (run.level - 1);
   const hpMult = isl * st.hp * lv * (boss ? (1 + 0.25 * (run.level - 1)) : 1) * (1 + 0.35 * (run.party - 1));
-  const dmgMult = Math.pow(1.38, run.idx) * st.dmg * (1 + 0.08 * (run.level - 1));
+  const dmgMult = ENEMY_DMG * Math.pow(1.32, run.idx) * st.dmg * (1 + 0.06 * (run.level - 1));
   const body = boss ? def[1] : def[1], col = boss ? I.enemies[(run.stage) % 3][3] : def[3], acc = boss ? I.enemies[(run.stage + 1) % 3][4] : def[4];
   const scale = (boss ? 2.3 : body === "floater" ? 0.95 : body === "crab" ? 0.9 : 1) * scaleBoost * (role === "skirm" && !boss ? 0.85 : 1);
   const R = buildCreature(body, col, acc, scale, boss);
@@ -1976,6 +2000,8 @@ function stageComplete(xp) {
   S.coins += bonus;
   let text = `+${fmt(xp)} exp and ${fmt(bonus)} coins.`;
   if (first) { gain(ITEM.die, null, 1, true); text += " First clear: you earned a Fortune Die."; }
+  grantChest(run.stage, run.idx); bumpStat("clears");
+  text += ` You received ${article(CHEST_TIERS[run.stage].name)} ${CHEST_TIERS[run.stage].name}. Open it from Chests.`;
   const next = run.idx + 1;
   if (first && next < ISLANDS.length && prog.normal && prog.hard && (st.id === "normal" || st.id === "hard")) text += ` ${ISLANDS[next].name} has been discovered on the map.`;
   run.state = "done"; save(); MUSIC.sting("victory");
@@ -2052,6 +2078,7 @@ const cam = { yaw: 0, pitch: 0.36, dist: 8.5 };
 window.addEventListener("keydown", e => {
   const k = e.key.toLowerCase();
   if (k === "escape" && !$("musicPanel").hidden) { closeMusic(); return; }
+  if (k === "escape" && !$("dialog").hidden) { $("dialog").hidden = true; return; }
   if (k === "escape") { if (!$("menu").hidden) closeMenu(); else if (!$("mapModal").hidden) closeMap(); return; }
   if (isPaused()) return;
   if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "tab"].includes(k)) e.preventDefault();
@@ -2194,16 +2221,18 @@ function thumb(id) {
    MENUS
    ===================================================================== */
 let menuTab = "weapons", selItem = { weapon: null, armour: null, items: null }, selClass = null, rollResult = null;
-const MENU_TABS = [["weapons", "Weapons"], ["armour", "Armour"], ["items", "Potions and materials"], ["classes", "Classes"], ["stats", "Stats"], ["shop", "Shop"]];
-const isPaused = () => !$("intro").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
-function openMenu(tab) { menuTab = tab; rollResult = null; $("menu").hidden = false; keys.clear(); attackHeld = false; renderMenu(); }
+const MENU_TABS = [["weapons", "Weapons"], ["armour", "Armour"], ["items", "Potions and materials"], ["chests", "Chests"], ["forge", "Forge"], ["quests", "Quests"], ["classes", "Classes"], ["stats", "Stats"], ["shop", "Shop"]];
+const isPaused = () => !$("intro").hidden || !$("dialog").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
+function openMenu(tab) { menuTab = tab; rollResult = null; lastLoot = null; if (prevCanvas.parentNode && (tab === "chests" || tab === "forge" || tab === "quests")) prevCanvas.remove(); $("menu").hidden = false; keys.clear(); attackHeld = false; renderMenu(); }
 function closeMenu() { $("menu").hidden = true; if (prevCanvas.parentNode) prevCanvas.remove(); }
-function closeAllModals() { closeMenu(); $("mapModal").hidden = true; $("confirmLeave").hidden = true; }
+function closeAllModals() { closeMenu(); $("dialog").hidden = true; $("mapModal").hidden = true; $("confirmLeave").hidden = true; }
 $("menuClose").addEventListener("click", closeMenu);
 $("mbArmoury").addEventListener("click", () => openMenu("weapons"));
 $("mbClasses").addEventListener("click", () => openMenu("classes"));
 $("mbStats").addEventListener("click", () => openMenu("stats"));
 $("mbShop").addEventListener("click", () => openMenu("shop"));
+$("mbChests").addEventListener("click", () => openMenu("chests"));
+$("mbQuests").addEventListener("click", () => openMenu("quests"));
 function sortByRarity(list) { return list.sort((a, b) => RANK[b.rarity] - RANK[a.rarity] || a.name.localeCompare(b.name)); }
 function meterRow(label, val, frac, color, cmp) {
   let em = "";
@@ -2212,14 +2241,17 @@ function meterRow(label, val, frac, color, cmp) {
 }
 function renderMenu() {
   const tabs = $("menuTabs"); tabs.innerHTML = MENU_TABS.map(([k, n]) => `<button class="tab ${menuTab === k ? "on" : ""}" data-tab="${k}">${n}</button>`).join("");
-  const T = MENU_TABS.find(t => t[0] === menuTab); $("menuTitle").textContent = { weapons: "Armoury", armour: "Armoury", items: "Satchel", classes: "Classes", stats: "Stats", shop: "Merchant" }[menuTab];
+  const T = MENU_TABS.find(t => t[0] === menuTab); $("menuTitle").textContent = { weapons: "Armoury", armour: "Armoury", items: "Satchel", chests: "Chests", forge: "The Forge", quests: "Quests", classes: "Classes", stats: "Stats", shop: "Merchant" }[menuTab];
   const B = $("menuBody");
   if (menuTab === "weapons" || menuTab === "armour" || menuTab === "items") renderInspector(B, menuTab);
   else if (menuTab === "classes") renderClasses(B);
   else if (menuTab === "stats") renderStats(B);
+  else if (menuTab === "chests") renderChests(B);
+  else if (menuTab === "forge") renderForge(B);
+  else if (menuTab === "quests") renderQuests(B);
   else renderShop(B);
 }
-$("menuTabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) { menuTab = b.dataset.tab; rollResult = null; renderMenu(); } });
+$("menuTabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) { menuTab = b.dataset.tab; rollResult = null; if (menuTab !== "chests") lastLoot = null; renderMenu(); } });
 function renderInspector(B, tab) {
   const cat = tab === "weapons" ? "weapon" : tab === "armour" ? "armour" : null;
   const owned = sortByRarity(Object.keys(S.inv).map(id => ITEM[id]).filter(i => cat ? i.cat === cat : (i.cat === "potion" || i.cat === "material" || i.cat === "special")));
@@ -2649,6 +2681,375 @@ function updateHud() {
   const it = isPaused() ? null : nearestInteract(), pr = $("prompt");
   if (it) { pr.hidden = false; pr.innerHTML = `<kbd>E</kbd>${esc(it.label)}`; } else pr.hidden = true;
 }
+/* =====================================================================
+   CHESTS, FORGE, QUESTS AND LOBBY TOWNSFOLK
+   ===================================================================== */
+const CHEST_TIERS = [
+  { name: "Wooden Chest", rarity: "rare", col: "#b07a45", band: "#6a6a72", mats: [3, 4], gear: 1, extra: 0.35, potion: 0.5, coins: [80, 160] },
+  { name: "Ironbound Chest", rarity: "epic", col: "#6a4a32", band: "#b9c2cc", mats: [4, 6], gear: 1, extra: 0.6, potion: 0.65, coins: [220, 420] },
+  { name: "Gilded Vault Chest", rarity: "legendary", col: "#5a2a6a", band: "#f2b744", mats: [5, 8], gear: 2, extra: 0.5, potion: 0.8, coins: [520, 1000] }
+];
+function chestSvg(t) {
+  const c = CHEST_TIERS[t];
+  return `<svg viewBox="0 0 64 56" aria-hidden="true"><path d="M6 24h52v26a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z" fill="${c.col}"/><path d="M6 24c0-11 8-19 26-19s26 8 26 19z" fill="${c.col}" opacity="0.85"/>
+    <path d="M6 24h52v5H6z" fill="${c.band}"/><path d="M14 6.5v46M50 6.5v46" stroke="${c.band}" stroke-width="4"/><rect x="27" y="20" width="10" height="13" rx="2" fill="${c.band}"/><circle cx="32" cy="26" r="2" fill="#141414"/>${t === 2 ? '<path d="M32 9l2 4 4 .5-3 3 .8 4-3.8-2-3.8 2 .8-4-3-3 4-.5z" fill="#fff3b0"/>' : ""}</svg>`;
+}
+function grantChest(t, i) { S.chests.push({ t, i }); if (S.chests.length > 200) S.chests.shift(); updateChestBadge(); }
+function rollOfCats(rarity, cats) {
+  const order = ["vaulted", "legendary", "epic", "rare", "common"];
+  for (let k = order.indexOf(rarity); k < order.length; k++) { const pool = ITEMS.filter(it => it.rarity === order[k] && cats.includes(it.cat) && it.id !== "die"); if (pool.length) return pick(pool); }
+  return ITEM.minor;
+}
+let lastLoot = null;
+function openChest(index) {
+  const c = S.chests[index]; if (!c) return null;
+  S.chests.splice(index, 1);
+  const T = CHEST_TIERS[c.t], table = dropTable(c.i, c.t, true), got = [];
+  const add = (it, n = 1) => { gain(it, null, n, true); const g = got.find(x => x.it === it); if (g) g.n += n; else got.push({ it, n }); };
+  const nm = T.mats[0] + Math.floor(Math.random() * (T.mats[1] - T.mats[0] + 1));
+  for (let k = 0; k < nm; k++) { let r = rollRarity(table); if (r === "vaulted") r = "legendary"; add(rollOfCats(r, ["material"])); }
+  const ng = T.gear + (Math.random() < T.extra ? 1 : 0);
+  for (let k = 0; k < ng; k++) add(rollOfCats(rollRarity(table), ["weapon", "armour"]));
+  if (Math.random() < T.potion) { let r = rollRarity(table); if (r === "vaulted") r = "legendary"; add(rollOfCats(r, ["potion"])); }
+  const coins = Math.round((T.coins[0] + Math.random() * (T.coins[1] - T.coins[0])) * Math.pow(1.3, c.i));
+  S.coins += coins;
+  bumpStat("chests");
+  updateChestBadge(); save();
+  return { tier: c.t, isle: c.i, got, coins };
+}
+function updateChestBadge() { const b = $("mbChests"); if (b) b.textContent = S.chests.length ? `Chests (${S.chests.length})` : "Chests"; }
+
+/* ---- forge recipes ---- */
+const RECIPES = [
+  // refining: turn plentiful ore into rarer stock
+  { g: "Refining", out: "steel", mats: { ironore: 3, copper: 1 }, coins: 20 },
+  { g: "Refining", out: "glasspane", mats: { claybrick: 2, copper: 2 }, coins: 20 },
+  { g: "Refining", out: "moonsilver", mats: { silver: 3, steel: 1 }, coins: 120 },
+  { g: "Refining", out: "ironwoodlog", mats: { oakplank: 4, steel: 1 }, coins: 120 },
+  { g: "Refining", out: "starsteel", mats: { moonsilver: 2, gold: 2 }, coins: 600 },
+  { g: "Refining", out: "skygirder", mats: { starsteel: 1, ironwoodlog: 2, steel: 2 }, coins: 800 },
+  // potions
+  { g: "Potions", out: "minor", n: 2, mats: { copper: 2, oakplank: 1 }, coins: 10 },
+  { g: "Potions", out: "draught", mats: { glasspane: 1, silver: 1 }, coins: 40 },
+  { g: "Potions", out: "greater", mats: { glasspane: 1, gold: 1 }, coins: 150 },
+  { g: "Potions", out: "phoenixtear", mats: { starsteel: 1, gold: 2, glasspane: 2 }, coins: 900 },
+  // weapons
+  { g: "Weapons", out: "militia", mats: { ironore: 3, oakplank: 2 }, coins: 30 },
+  { g: "Weapons", out: "brinewarden", mats: { steel: 3, copper: 2, oakplank: 1 }, coins: 150 },
+  { g: "Weapons", out: "ironoath", mats: { steel: 4, ironore: 4 }, coins: 200 },
+  { g: "Weapons", out: "cinderedge", mats: { steel: 4, gold: 2, moonsilver: 1 }, coins: 900 },
+  { g: "Weapons", out: "frostbite", mats: { moonsilver: 3, steel: 3, glasspane: 2 }, coins: 1100 },
+  { g: "Weapons", out: "solbrand", mats: { starsteel: 2, gold: 4, moonsilver: 3 }, coins: 4000 },
+  { g: "Weapons", out: "ironbloom", mats: { skygirder: 2, ironwoodlog: 3, steel: 6 }, coins: 4500 },
+  { g: "Weapons", out: "hourglass", mats: { starsteel: 6, skygirder: 4, moonsilver: 6, gold: 8 }, coins: 25000 },
+  // armour
+  { g: "Armour", out: "chainshirt", mats: { ironore: 4, copper: 2 }, coins: 30 },
+  { g: "Armour", out: "wardwood", mats: { oakplank: 6, steel: 2 }, coins: 180 },
+  { g: "Armour", out: "bronzeguard", mats: { copper: 6, steel: 3 }, coins: 200 },
+  { g: "Armour", out: "glacierheart", mats: { moonsilver: 3, steel: 4, glasspane: 2 }, coins: 1100 },
+  { g: "Armour", out: "gildedaegis", mats: { gold: 8, starsteel: 2, steel: 6 }, coins: 4500 },
+  { g: "Armour", out: "frostwarden", mats: { starsteel: 6, skygirder: 4, moonsilver: 6, glasspane: 6 }, coins: 25000 },
+  // relics
+  { g: "Relics", out: "die", mats: { starsteel: 2, gold: 3, skygirder: 1 }, coins: 5000 }
+].filter(r => ITEM[r.out] && Object.keys(r.mats).every(m => ITEM[m]));
+const canCraft = r => S.coins >= r.coins && Object.entries(r.mats).every(([m, n]) => (S.inv[m] || 0) >= n);
+function craft(idx) {
+  const r = RECIPES[idx]; if (!r || !canCraft(r) || !(world && world.kind === "lobby")) return;
+  for (const [m, n] of Object.entries(r.mats)) { S.inv[m] -= n; if (S.inv[m] <= 0) delete S.inv[m]; }
+  S.coins -= r.coins;
+  gain(ITEM[r.out], null, r.n || 1, true);
+  toast(`<b>Forged ${esc(ITEM[r.out].name)}</b>${(r.n || 1) > 1 ? " ×" + r.n : ""}`, ITEM[r.out].rarity);
+  bumpStat("crafts"); save();
+}
+
+/* ---- quests ---- */
+const QUEST_NPCS = [
+  { id: "maren", name: "Captain Maren", role: "Harbour Warden", pos: [-5, -21], face: 0.2,
+    look: { skin: 0xc99a74, hair: 0x2a1a10, cloth: 0x2a4a7a, cloth2: 0x1a2a3a }, armour: "saltscale", weapon: "brinewarden",
+    hello: "The portals have been restless. Every island out there is crawling with trouble, and I need someone who can swing a blade.",
+    bye: "You have done more for this harbour than my whole watch. Come back any time, friend.",
+    quests: [
+      { id: "m1", title: "Clear the Shoreline", ask: "Defeat 25 foes on any island and I will pay you from the harbour chest.", stat: "kills", n: 25, reward: { coins: 300, items: { ironore: 4, copper: 4 } } },
+      { id: "m2", title: "Crowns Must Fall", ask: "Every island has its tyrants. Bring down 3 bosses and the watch will owe you an Ironbound Chest.", stat: "bosses", n: 3, reward: { coins: 600, chest: 1 } },
+      { id: "m3", title: "Island Hopper", ask: "Clear 5 island stages, any difficulty. Do that and this old Fortune Die is yours.", stat: "clears", n: 5, reward: { coins: 1500, items: { die: 1 } } }
+    ] },
+  { id: "brannoc", name: "Brannoc", role: "Master Smith", pos: [-15.5, 18.6], face: 2.4, forge: true,
+    look: { skin: 0xb07a52, hair: 0x5a2a12, cloth: 0x5a3a26, cloth2: 0x2a2018 }, armour: "ironplate", weapon: "quarrymallet",
+    hello: "Ore in, steel out. Bring me materials from the islands and my forge will turn them into something worth swinging.",
+    bye: "Your hands know the hammer now. The forge is yours whenever you need it.",
+    quests: [
+      { id: "b1", title: "First Hammer Blow", ask: "Craft anything at my forge. Even a single steel ingot counts.", stat: "crafts", n: 1, reward: { coins: 200, items: { steel: 2 } } },
+      { id: "b2", title: "Hot Iron", ask: "Craft 5 things at the forge. Practice is the only teacher a smith trusts.", stat: "crafts", n: 5, reward: { items: { moonsilver: 2, gold: 1 } } },
+      { id: "b3", title: "The Master's Proof", ask: "Craft 15 things and I will hand you the rarest stock I keep under the anvil.", stat: "crafts", n: 15, reward: { items: { starsteel: 1, skygirder: 1 } } }
+    ] },
+  { id: "ilvara", name: "Sage Ilvara", role: "Keeper of Maps", pos: [21, -6], face: -1.4,
+    look: { skin: 0xf0d0b0, hair: 0xe8e0ff, cloth: 0x3a2a6a, cloth2: 0x1e1a40 }, armour: "duskweave", weapon: "starglass",
+    hello: "Chests wash out of the portals after every victory. I study what is inside them. Open a few and tell me what you find.",
+    bye: "My maps are fuller thanks to you. The isles remember those who walk them.",
+    quests: [
+      { id: "i1", title: "Treasure Seeker", ask: "Open 3 chests from your satchel. Clearing any island stage earns one, every time.", stat: "chests", n: 3, reward: { items: { greater: 2 } } },
+      { id: "i2", title: "Deeper Vaults", ask: "Open 10 chests. The pattern in their contents is almost clear to me.", stat: "chests", n: 10, reward: { chest: 2 } },
+      { id: "i3", title: "Champion of the Isles", ask: "Defeat 150 foes. Then the isles will know your name, and so will I.", stat: "kills", n: 150, reward: { coins: 4000, items: { phoenixtear: 1 } } }
+    ] }
+];
+const VILLAGERS = [
+  { name: "Fenna", role: "Baker", look: { skin: 0xe8c0a0, hair: 0xc89a5a, cloth: 0xc8b090, cloth2: 0x8a5a3a }, lines: ["Fresh bread for heroes! Well, it was fresh this morning.", "If you find wheat on the islands, I want to hear about it.", "My oven runs hotter than Brannoc's forge. Do not tell him I said that."] },
+  { name: "Tobin", role: "Errand boy", look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0x4a7a3a, cloth2: 0x3a3022 }, lines: ["Is it true the Vaulted blades sing at night?", "I am going to roll a Reaper one day. Just you wait.", "Captain Maren pays well. Ask her for work!"] },
+  { name: "Old Hesk", role: "Fisherman", look: { skin: 0xd0a080, hair: 0xd8d8d8, cloth: 0x5a6a7a, cloth2: 0x3a3a3a }, lines: ["The water by the fountain glows when a portal opens.", "Saltspray Atoll has the best fish and the worst crabs.", "I once saw a Gilded Vault Chest. Never forgot the shine."] },
+  { name: "Wren", role: "Courier", look: { skin: 0xf0d8c0, hair: 0x8a2a1a, cloth: 0x7a2a3a, cloth2: 0x2a1a22 }, lines: ["Sage Ilvara wants to know what is in your chests. Everyone does.", "Four portals, twelve islands, one very tired courier.", "Heard the Forge can make a Fortune Die, if you bring enough starsteel."] }
+];
+const questOf = npc => npc.quests.find(q => !(S.quests[q.id] && S.quests[q.id].s === "done"));
+const questProg = q => { const st = S.quests[q.id]; return st && st.s === "active" ? Math.min(q.n, (S.stats[q.stat] || 0) - st.base) : 0; };
+function npcStatus(npc) { const q = questOf(npc); if (!q) return "done"; const st = S.quests[q.id]; if (!st) return "offer"; return questProg(q) >= q.n ? "ready" : "active"; }
+function bumpStat(k, n = 1) {
+  const before = QUEST_NPCS.map(npcStatus);
+  S.stats[k] = (S.stats[k] || 0) + n;
+  QUEST_NPCS.forEach((npc, i) => { if (before[i] === "active" && npcStatus(npc) === "ready") toast(`<b>Quest complete:</b> ${esc(questOf(npc).title)}. Return to ${esc(npc.name)} in the lobby.`, "epic"); });
+}
+function rewardText(r) {
+  const parts = [];
+  if (r.coins) parts.push(`${fmt(r.coins)} coins`);
+  for (const [id, n] of Object.entries(r.items || {})) parts.push(`${n > 1 ? n + " × " : ""}${ITEM[id].name}`);
+  if (r.chest !== undefined) parts.push(CHEST_TIERS[r.chest].name);
+  return parts.join(", ");
+}
+function giveReward(r) {
+  if (r.coins) S.coins += r.coins;
+  for (const [id, n] of Object.entries(r.items || {})) gain(ITEM[id], null, n);
+  if (r.chest !== undefined) { const best = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true)); grantChest(r.chest, best); toast(`<b>${CHEST_TIERS[r.chest].name}</b> added to your chests`, CHEST_TIERS[r.chest].rarity); }
+}
+let dlgNpc = null;
+function openDialog(npc, line) {
+  dlgNpc = npc; keys.clear(); attackHeld = false;
+  $("dlgName").textContent = npc.name; $("dlgRole").textContent = npc.role;
+  let text = "", quest = "", btns = "";
+  if (npc.lines) { text = line || pick(npc.lines); btns = `<button class="btn primary" data-dlg="close">Farewell</button>`; }
+  else {
+    const q = questOf(npc), st = npcStatus(npc);
+    if (st === "done") text = npc.bye;
+    else if (st === "offer") { text = npc.hello; quest = questBox(q, "New quest"); btns = `<button class="btn primary" data-dlg="accept">Accept quest</button>`; }
+    else if (st === "active") { text = "Still working on it? I will be right here."; quest = questBox(q, "In progress"); }
+    else { text = "You did it! Here is what I promised."; quest = questBox(q, "Ready to hand in"); btns = `<button class="btn primary" data-dlg="turnin">Collect reward</button>`; }
+    if (npc.forge) btns += `<button class="btn" data-dlg="forge">Use the forge</button>`;
+    btns += `<button class="btn" data-dlg="close">${st === "offer" ? "Not now" : "Farewell"}</button>`;
+  }
+  $("dlgText").textContent = text; $("dlgQuest").innerHTML = quest; $("dlgBtns").innerHTML = btns;
+  $("dialog").hidden = false;
+}
+function questBox(q, tag) {
+  const p = questProg(q), active = S.quests[q.id] && S.quests[q.id].s === "active";
+  return `<div class="qbox"><span class="qtag">${tag}</span><b>${esc(q.title)}</b><span>${esc(q.ask)}</span>
+    ${active ? `<div class="bar xp" style="height:8px"><i style="width:${100 * p / q.n}%"></i></div><span class="muted num">${p} / ${q.n}</span>` : ""}
+    <span class="qrew">Reward: ${esc(rewardText(q.reward))}</span></div>`;
+}
+$("dialog").addEventListener("click", e => {
+  const b = e.target.closest("[data-dlg]"); if (!b) return;
+  const a = b.dataset.dlg, npc = dlgNpc;
+  if (a === "close") { $("dialog").hidden = true; return; }
+  if (a === "forge") { $("dialog").hidden = true; openMenu("forge"); return; }
+  const q = questOf(npc); if (!q) return;
+  if (a === "accept") { S.quests[q.id] = { s: "active", base: S.stats[q.stat] || 0 }; toast(`<b>Quest accepted:</b> ${esc(q.title)}`, "rare"); save(); openDialog(npc); }
+  if (a === "turnin" && npcStatus(npc) === "ready") { S.quests[q.id] = { s: "done" }; giveReward(q.reward); banner("Quest complete", q.title); save(); openDialog(npc); }
+});
+
+/* ---- menu tabs: chests, forge, quests ---- */
+function renderChests(B) {
+  const groups = {};
+  S.chests.forEach((c, i) => { const k = c.t + ":" + c.i; (groups[k] = groups[k] || { t: c.t, i: c.i, idx: [] }).idx.push(i); });
+  const list = Object.values(groups).sort((a, b) => b.t - a.t || b.i - a.i);
+  const loot = lastLoot ? `<div class="loot" style="--c:${rc(CHEST_TIERS[lastLoot.tier].rarity)}"><b>${lastLoot.count > 1 ? `Opened ${lastLoot.count} chests` : `Opened a ${esc(CHEST_TIERS[lastLoot.tier].name)}`}</b>
+    <div class="lootlist">${lastLoot.got.sort((a, b) => RANK[b.it.rarity] - RANK[a.it.rarity]).map(g => `<span style="--c:${rc(g.it.rarity)}"><img alt="" data-thumb="${g.it.id}">${esc(g.it.name)}${g.n > 1 ? ` ×${g.n}` : ""}<small>${RNAME[g.it.rarity]} ${CAT_LABEL[g.it.cat].toLowerCase()}</small></span>`).join("")}<span style="--c:var(--accent)"><small>Coins</small>+${fmt(lastLoot.coins)}</span></div></div>` : "";
+  B.innerHTML = `<div style="display:grid;gap:12px;max-width:980px;margin:0 auto">
+    <p class="muted" style="margin:0">You earn a chest every time you clear an island stage, as often as you like. Normal gives a Wooden Chest, Hard an Ironbound Chest and Nightmare a Gilded Vault Chest. Later islands pack better loot.</p>
+    ${loot}
+    ${list.length ? `<div class="row" style="justify-content:space-between"><b>${S.chests.length} chest${S.chests.length === 1 ? "" : "s"} waiting</b><button class="btn primary" data-openall="all">Open every chest</button></div>
+    <div class="chestgrid">${list.map(g => { const T = CHEST_TIERS[g.t]; return `<div class="ccard" style="--c:${rc(T.rarity)}">${chestSvg(g.t)}<b>${esc(T.name)}</b><span class="muted">${esc(ISLANDS[g.i].name)} · ${RNAME[T.rarity]}</span><span class="num">×${g.idx.length}</span>
+      <div class="row" style="justify-content:center"><button class="btn primary" data-openchest="${g.idx[0]}">Open</button>${g.idx.length > 1 ? `<button class="btn" data-opengroup="${g.t}:${g.i}">Open all ${g.idx.length}</button>` : ""}</div></div>`; }).join("")}</div>`
+    : `<p class="empty">No chests yet. Clear Normal, Hard or Nightmare on any island to earn one.</p>`}</div>`;
+  B.querySelectorAll("img[data-thumb]").forEach(im => { im.src = thumb(im.dataset.thumb); });
+}
+function openMany(indices) {
+  const res = { tier: 0, got: [], coins: 0, count: 0 };
+  indices.sort((a, b) => b - a).forEach(ix => { const r = openChest(ix); if (!r) return; res.count++; res.tier = Math.max(res.tier, r.tier); res.coins += r.coins; r.got.forEach(g => { const x = res.got.find(y => y.it === g.it); if (x) x.n += g.n; else res.got.push({ it: g.it, n: g.n }); }); });
+  lastLoot = res; renderMenu();
+}
+function renderForge(B) {
+  const inLobby = world && world.kind === "lobby";
+  const groups = [...new Set(RECIPES.map(r => r.g))];
+  B.innerHTML = `<div style="display:grid;gap:12px;max-width:1100px;margin:0 auto">
+    <p class="muted" style="margin:0">${inLobby ? "Brannoc's forge turns island materials into gear. Refine common ore into rarer stock, then forge it into weapons, armour, potions and relics." : "You can read the recipes anywhere, but you can only craft at the forge in the lobby."} You have <b style="color:var(--accent)">${fmt(S.coins)}</b> coins.</p>
+    ${groups.map(g => `<h3 class="sec">${g}</h3><div class="recipes">${RECIPES.map((r, i) => [r, i]).filter(([r]) => r.g === g).map(([r, i]) => { const it = ITEM[r.out], ok = canCraft(r);
+      return `<div class="recipe ${ok ? "ok" : ""}" style="--c:${rc(it.rarity)}"><img alt="" data-thumb="${it.id}"><div class="rmain"><b>${esc(it.name)}${(r.n || 1) > 1 ? ` ×${r.n}` : ""}</b><small>${RNAME[it.rarity]} ${CAT_LABEL[it.cat].toLowerCase()}</small>
+        <div class="reqs">${Object.entries(r.mats).map(([m, n]) => { const have = S.inv[m] || 0; return `<span class="${have >= n ? "has" : "lack"}" style="--rc:${rc(ITEM[m].rarity)}">${esc(ITEM[m].name)} <b class="num">${have}/${n}</b></span>`; }).join("")}<span class="${S.coins >= r.coins ? "has" : "lack"}">Coins <b class="num">${fmt(r.coins)}</b></span></div></div>
+        <button class="btn ${ok && inLobby ? "primary" : ""}" data-craft="${i}" ${ok && inLobby ? "" : "disabled"}>Craft</button></div>`; }).join("")}</div>`).join("")}</div>`;
+  const imgs = Array.from(B.querySelectorAll("img[data-thumb]")); let k = 0;
+  const step = () => { if ($("menu").hidden || menuTab !== "forge") return; for (let j = 0; j < 4 && k < imgs.length; j++, k++) imgs[k].src = thumb(imgs[k].dataset.thumb); if (k < imgs.length) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function renderQuests(B) {
+  B.innerHTML = `<div style="display:grid;gap:12px;max-width:900px;margin:0 auto">
+    <p class="muted" style="margin:0">Townsfolk with a gold <b style="color:var(--accent)">!</b> over their heads have work for you. A <b style="color:var(--good)">?</b> means a quest is ready to hand in. Walk up to them in the lobby and press E, or tap them.</p>
+    ${QUEST_NPCS.map(npc => { const q = questOf(npc), st = npcStatus(npc), done = npc.quests.filter(x => S.quests[x.id] && S.quests[x.id].s === "done").length;
+      return `<div class="qcard"><div class="row" style="justify-content:space-between"><span><b>${esc(npc.name)}</b> <span class="muted">${esc(npc.role)}</span></span><span class="muted num">${done} / ${npc.quests.length} done</span></div>
+      ${st === "done" ? `<span class="muted">All quests complete. ${esc(npc.bye)}</span>` : questBox(q, { offer: "Available, talk to " + npc.name.split(" ").pop(), active: "In progress", ready: "Ready to hand in" }[st])}</div>`; }).join("")}
+    <h3 class="sec">Your record</h3>
+    <div class="derived">${[["Foes defeated", S.stats.kills], ["Bosses defeated", S.stats.bosses], ["Stages cleared", S.stats.clears], ["Chests opened", S.stats.chests], ["Items crafted", S.stats.crafts]].map(([a, b]) => `<div><small>${a}</small><b>${fmt(b || 0)}</b></div>`).join("")}</div></div>`;
+}
+$("menuBody").addEventListener("click", e => {
+  const oc = e.target.closest("[data-openchest]"); if (oc) { openMany([+oc.dataset.openchest]); return; }
+  const og = e.target.closest("[data-opengroup]"); if (og) { const [t, i] = og.dataset.opengroup.split(":").map(Number); openMany(S.chests.map((c, k) => c.t === t && c.i === i ? k : -1).filter(k => k >= 0)); return; }
+  if (e.target.closest("[data-openall]")) { openMany(S.chests.map((_, k) => k)); return; }
+  const cr = e.target.closest("[data-craft]"); if (cr) { craft(+cr.dataset.craft); renderMenu(); }
+});
+
+/* ---- the lobby: forge, new buildings, more trees and townsfolk ---- */
+function lobbyExtras(group, h) {
+  const place = (x, z, rotY) => { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY; group.add(g); return g; };
+  const facing = (x, z) => Math.atan2(-x, -z);
+  const toW = (g, lx, lz) => { const c = Math.cos(g.rotation.y), s = Math.sin(g.rotation.y); return [g.position.x + lx * c + lz * s, g.position.z - lx * s + lz * c]; };
+  const stoneM = std(0x8a8478, { r: 0.85, map: "rock", bump: "rockB", bs: 0.6, rep: 2 }), darkStone = std(0x5a564e, { r: 0.85, map: "rock" });
+  const wood = MAT.bark(0x5a3a24), ironM = MAT.metal(0x3a3a40, 0.45);
+  /* the forge */
+  {
+    const fx = -21, fz = 21, f = place(fx, fz, facing(fx, fz));
+    M(G.box(), darkStone, 0, 0.2, 0, f, 9, 0.4, 6.5);
+    M(G.box(), stoneM, 0, 2.4, -3, f, 9, 4.4, 0.6);
+    for (const s of [-1, 1]) M(G.box(), stoneM, 4.2 * s, 1.6, -1, f, 0.6, 2.8, 4);
+    for (const s of [-1, 1]) for (const z2 of [2.9]) M(G.cyl(0.18, 0.2), wood, 4.2 * s, 2.3, z2, f, 1, 4.2, 1);
+    const roof = M(G.box(), std(0x5a4a42, { r: 0.8, map: "roof", bump: "roof", bs: 1.2, rep: [4, 2] }), 0, 4.75, 0, f, 9.8, 0.3, 7.4); roof.rotation.x = -0.18;
+    M(G.box(), wood, 0, 4.35, 2.95, f, 9, 0.3, 0.3);
+    // furnace with a living fire
+    const furn = M(G.box(), std(0x6a5a50, { r: 0.9, map: "rock" }), -2.2, 1.3, -2.1, f, 2.6, 2.6, 1.6);
+    M(G.box(), std(0xff7a20, { e: 0xff6010, ei: 3 }), -2.2, 1.0, -1.28, f, 1.2, 0.9, 0.05);
+    const chim = M(G.box(), stoneM, -2.2, 4.8, -2.4, f, 1.2, 4.4, 1.2);
+    const fire = glowSprite(0xff7a20, 3.2, 0.9); fire.material = fire.material.clone(); { const [wx, wz] = toW(f, -2.2, -1.0); fire.position.set(wx, 1.1, wz); } group.add(fire);
+    const fl = new THREE.PointLight(0xff8030, 1.6, 12, 2); { const [wx, wz] = toW(f, -2.2, 0); fl.position.set(wx, 2, wz); } group.add(fl);
+    const smoke = []; for (let k = 0; k < 6; k++) { const sp = glowSprite(0x9a9088, 1.8, 0.0); sp.material = sp.material.clone(); sp.material.blending = THREE.NormalBlending; const [wx, wz] = toW(f, -2.2, -2.4); sp.position.set(wx, 7, wz); group.add(sp); smoke.push(sp); }
+    world.animated.push(t => { const k = 0.8 + Math.sin(t * 13) * 0.12 + Math.sin(t * 7.3) * 0.1; fl.intensity = 1.6 * k; fire.material.opacity = 0.75 * k;
+      smoke.forEach((sp, i) => { const p = (t * 0.25 + i / smoke.length) % 1; sp.position.y = 7 + p * 6; sp.scale.setScalar(1.4 + p * 3); sp.material.opacity = 0.35 * (1 - p) * Math.min(1, p * 5); }); });
+    // anvil, quench barrel, racks
+    const anv = new THREE.Group(); { const [wx, wz] = toW(f, 1.2, 1.2); anv.position.set(wx, 0, wz); anv.rotation.y = f.rotation.y; } group.add(anv);
+    M(G.cyl(0.35, 0.45), wood, 0, 0.35, 0, anv, 1, 0.7, 1);
+    M(G.box(), ironM, 0, 0.82, 0, anv, 1.1, 0.28, 0.42); M(G.box(), ironM, 0, 0.62, 0, anv, 0.5, 0.2, 0.3); M(G.cone(4), ironM, 0.72, 0.84, 0, anv, 0.18, 0.4, 0.18).rotation.z = -Math.PI / 2;
+    const glowBar = M(G.box(), std(0xff9a40, { e: 0xff7020, ei: 2.4 }).clone(), -0.1, 0.99, 0, anv, 0.6, 0.06, 0.08);
+    world.animated.push(t => { glowBar.material.emissiveIntensity = 1.8 + Math.sin(t * 3) * 0.6; });
+    M(G.cyl(0.45, 0.4), wood, 3, 0.5, 1.6, f, 1, 1.0, 1); M(G.cyl(0.4, 0.4), std(0x2a4a5a, { r: 0.1, m: 0.2 }), 3, 0.98, 1.6, f, 1, 0.04, 1);
+    M(G.box(), wood, 2.6, 1.6, -2.6, f, 2.6, 0.12, 0.3);
+    ["ironoath", "brinewarden", "militia"].forEach((id, k) => { const w = buildWeapon(ITEM[id]); w.position.set(1.6 + k * 0.8, 0.4, -2.4); f.add(w); });
+    const sign = textSprite("The Forge · craft gear from materials", "#ffd0a0", 1.3); sign.position.set(fx * 0.92, 6.2, fz * 0.92); group.add(sign); world.labels = (world.labels || []).concat(sign);
+    shadows(f, true, true); shadows(anv, true, true);
+    addCircle(...toW(f, 0, -1.6), 4.4, 6);
+    const [ax, az] = toW(f, 1.2, 1.2); addCircle(ax, az, 0.6, 2);
+    world.interact.push({ x: ax, z: az, r: 3.2, label: "Use the forge", act: () => openMenu("forge") });
+  }
+  /* new landmark buildings in the gaps between houses */
+  const spots = [0.699, 2.095 + 0.35, 3.49, 4.89].map(a => [Math.cos(a) * 49, Math.sin(a) * 49]);
+  // bell tower
+  { const [x, z] = spots[0], g = place(x, z, facing(x, z));
+    M(G.box(), stoneM, 0, 6, 0, g, 4.2, 12, 4.2); M(G.box(), darkStone, 0, 0.4, 0, g, 4.6, 0.8, 4.6);
+    for (const [ox, oz, ry] of [[0, 2.11, 0], [0, -2.11, 0], [2.11, 0, Math.PI / 2], [-2.11, 0, Math.PI / 2]]) { const o = M(G.box(), std(0x1a1614, { r: 1 }), ox, 10.2, oz, g, 1.4, 2.2, 0.05); o.rotation.y = ry; }
+    const r = M(G.cone(4), std(0x6a3a2a, { r: 0.8, map: "roof", bump: "roof", bs: 1.5, rep: 2, flat: true }), 0, 13.6, 0, g, 3.6, 3.2, 3.6); r.rotation.y = Math.PI / 4;
+    const bell = M(G.cone(16), MAT.metal(0xc89a40, 0.3), 0, 10.4, 0, g, 0.8, 1, 0.8);
+    world.animated.push(t => { bell.rotation.z = Math.sin(t * 1.3) * 0.15; });
+    M(G.box(), std(0x3a2618, { r: 0.7 }), 0, 1.2, 2.12, g, 1.3, 2.4, 0.08);
+    shadows(g, true, true); addCircle(x, z, 3.2, 14);
+    const l = textSprite("Bell Tower", "#ffe2a0", 1.2); l.position.set(x, 15.8, z); group.add(l); world.labels.push(l); }
+  // tavern
+  { const [x, z] = spots[1], g = place(x, z, facing(x, z));
+    M(G.box(), std(0xd8c8a8, { r: 0.92, map: "plaster", bump: "plasterB", bs: 1.2, rep: 3 }), 0, 3.5, 0, g, 11, 7, 7); M(G.box(), MAT.rock(0x7a756c), 0, 0.4, 0, g, 11.2, 0.8, 7.2);
+    for (const xx of [-5.3, -1.8, 1.8, 5.3]) M(G.box(), MAT.bark(0x4a3222), xx, 3.5, 3.52, g, 0.3, 7, 0.1);
+    M(G.box(), MAT.bark(0x4a3222), 0, 3.6, 3.53, g, 11, 0.3, 0.1);
+    const roof = M(G.cone(4), std(0x9a5a3a, { r: 0.8, map: "roof", bump: "roof", bs: 1.5, rep: 4, flat: true }), 0, 8.8, 0, g, 9, 3.8, 6.2); roof.rotation.y = Math.PI / 4;
+    M(G.box(), std(0x3a2618, { r: 0.7 }), 0, 1.3, 3.55, g, 1.8, 2.6, 0.1);
+    for (const s of [-1, 1]) for (const yy of [1.8, 5.2]) { M(G.box(), std(0xffd890, { e: 0xffb050, ei: 1.5 }), 3.6 * s, yy, 3.56, g, 1.1, 1, 0.05); const wg = glowSprite(0xffb050, 1.8, 0.4); const [wx, wz] = toW(g, 3.6 * s, 3.9); wg.position.set(wx, yy, wz); group.add(wg); }
+    M(G.box(), MAT.bark(0x4a3222), 0, 3.2, 4.1, g, 0.12, 0.12, 1.2);
+    M(G.box(), std(0x7a4a2a, { r: 0.7 }), 0, 2.7, 4.6, g, 1.6, 0.8, 0.08);
+    for (const s of [-1, 1]) { M(G.cyl(0.45, 0.4), wood, 4.6 * s, 0.6, 4.4, g, 1, 1.2, 1); }
+    shadows(g, true, true); addCircle(x, z, 6, 9);
+    const l = textSprite("The Salted Anchor · Tavern", "#ffe2a0", 1.2); l.position.set(x, 11.6, z); group.add(l); world.labels.push(l); }
+  // library tower (Sage Ilvara's maps)
+  { const [x, z] = spots[2], g = place(x, z, facing(x, z));
+    M(G.cyl(3, 3.3, 20), stoneM, 0, 4.5, 0, g, 1, 9, 1);
+    M(G.sph(), std(0x3a5a8a, { r: 0.35, m: 0.4 }), 0, 9, 0, g, 3.2, 2.6, 3.2);
+    M(G.cyl(0.08, 0.08), ironM, 0, 12, 0, g, 1, 1.6, 1); const orb = M(G.sph(), glowMat(0x9ad8ff, 0.9), 0, 12.9, 0, g, 0.3); const og = glowSprite(0x9ad8ff, 2.4, 0.6); og.position.set(0, 12.9, 0); g.add(og);
+    world.animated.push(t => { orb.position.y = 12.9 + Math.sin(t * 1.6) * 0.15; og.position.y = orb.position.y; });
+    M(G.box(), std(0x3a2618, { r: 0.7 }), 0, 1.3, 3.05, g, 1.4, 2.6, 0.2);
+    for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; const w = M(G.box(), std(0xbfe0ff, { e: 0x6aa8e8, ei: 1.2 }), Math.sin(a) * 3.02, 5.6, Math.cos(a) * 3.02, g, 0.6, 1.2, 0.05); w.rotation.y = a; }
+    shadows(g, true, true); addCircle(x, z, 3.6, 12);
+    const l = textSprite("Map Library", "#cfeeff", 1.2); l.position.set(x, 14.4, z); group.add(l); world.labels.push(l); }
+  // windmill
+  { const [x, z] = spots[3], g = place(x, z, facing(x, z));
+    M(G.cyl(1.9, 3.2, 12), std(0xe0d4bc, { r: 0.9, map: "plaster", bump: "plasterB", bs: 1, rep: 2 }), 0, 4.5, 0, g, 1, 9, 1);
+    M(G.cone(12), std(0x6a4a3a, { r: 0.8, map: "roof", flat: true }), 0, 10.2, 0, g, 2.4, 2.6, 2.4);
+    const hub = new THREE.Group(); hub.position.set(0, 8.6, 2.3); g.add(hub);
+    M(G.cyl(0.25, 0.25), wood, 0, 0, 0, hub, 1, 0.6, 1).rotation.x = Math.PI / 2;
+    for (let k = 0; k < 4; k++) { const arm = new THREE.Group(); arm.rotation.z = k * Math.PI / 2; hub.add(arm); M(G.box(), wood, 0, 3.4, 0.2, arm, 0.18, 6.8, 0.12); M(G.box(), std(0xeee6d4, { r: 0.95, map: "fabric" }), 0.55, 4, 0.22, arm, 1.0, 4.6, 0.04); }
+    world.animated.push(t => { hub.rotation.z = t * 0.6; });
+    M(G.box(), std(0x3a2618, { r: 0.7 }), 0, 1.2, 3.05, g, 1.2, 2.4, 0.2);
+    shadows(g, true, true); addCircle(x, z, 3.3, 10);
+    const l = textSprite("Windmill", "#ffe2a0", 1.2); l.position.set(x, 13.2, z); group.add(l); world.labels.push(l); }
+  /* benches and flower beds around the plaza */
+  for (let k = 0; k < 8; k++) {
+    const a = k / 8 * TAU, x = Math.cos(a) * 22, z = Math.sin(a) * 22;
+    if (LOBBY_PORTALS.some(([px, pz]) => Math.hypot(px - x, pz - z) < 5) || QUEST_NPCS.some(n => Math.hypot(n.pos[0] - x, n.pos[1] - z) < 3) || Math.hypot(x + 21, z - 21) < 7) continue;
+    const b = place(x, z, facing(x, z) + Math.PI);
+    M(G.box(), wood, 0, 0.45, 0, b, 2, 0.1, 0.5); M(G.box(), wood, 0, 0.8, -0.24, b, 2, 0.5, 0.08);
+    for (const s of [-1, 1]) M(G.box(), ironM, 0.85 * s, 0.22, 0, b, 0.08, 0.45, 0.45);
+    for (const s of [-1, 1]) { const fb = place(...toW(b, 1.7 * s, 0), 0); M(G.cyl(0.55, 0.6, 10), MAT.rock(0x8a8478), 0, 0.2, 0, fb, 1, 0.4, 1); for (let j = 0; j < 7; j++) { const fa = j / 7 * TAU; M(G.sph(), std([0xe85a7a, 0xf2c744, 0xb37cf4, 0xffffff][j % 4], { r: 0.6 }), Math.cos(fa) * 0.32, 0.5, Math.sin(fa) * 0.32, fb, 0.12); } M(G.sph(), std(0x4a8a3a, { r: 0.8 }), 0, 0.42, 0, fb, 0.42, 0.2, 0.42); }
+    shadows(b, true, true); addCircle(x, z, 1.1, 1);
+  }
+  /* an inner ring of trees between the plaza and the houses */
+  const rt = seeded(77);
+  for (let k = 0; k < 40; k++) {
+    const a = rt() * TAU, d = 29.5 + rt() * 6, x = Math.cos(a) * d, z = Math.sin(a) * d;
+    if (blockedLobby(x, z) || Math.hypot(x + 21, z - 21) < 8) continue;
+    const t = makeTree(rt() < 0.7 ? "oak" : "pine", rt); t.position.set(x, h(x, z), z); t.scale.setScalar(0.65 + rt() * 0.35); t.rotation.y = rt() * TAU; group.add(t); addCircle(x, z, 0.5, 6);
+  }
+  /* townsfolk */
+  const mk = (def, x, z, face) => {
+    const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null });
+    R.g.position.set(x, 0, z); R.g.rotation.y = face; group.add(R.g); shadows(R.g, true, false);
+    const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, 2.45, z); group.add(lbl); world.labels.push(lbl);
+    return { R, lbl };
+  };
+  world.npcs = [];
+  QUEST_NPCS.forEach(def => {
+    const [x, z] = def.pos, o = mk(def, x, z, def.face);
+    const marks = { offer: textSprite("!", "#ffd166", 2.4, "rgba(0,0,0,0)"), ready: textSprite("?", "#7fd69a", 2.4, "rgba(0,0,0,0)") };
+    for (const m of Object.values(marks)) { m.position.set(x, 3.15, z); group.add(m); m.visible = false; }
+    const n = { def, ...o, x, z, marks, quest: true }; world.npcs.push(n); addCircle(x, z, 0.5, 2);
+    world.interact.push({ x, z, r: 2.8, label: `Talk to ${def.name}`, act: () => openDialog(def) });
+  });
+  VILLAGERS.forEach((def, k) => {
+    const a = k / VILLAGERS.length * TAU + 0.4, x = Math.cos(a) * 18, z = Math.sin(a) * 18, o = mk(def, x, z, 0);
+    const n = { def, ...o, x, z, ang: a, rad: 18, tgt: null, wait: 1 + k, walk: 0, rng: seeded(300 + k) }; world.npcs.push(n);
+    const it = { x, z, r: 2.4, label: `Talk to ${def.name}`, act: () => { n.wait = 4; openDialog(def); } }; n.it = it; world.interact.push(it);
+  });
+  let lastT = null;
+  world.animated.push(t => {
+    const dt = lastT === null ? 0 : Math.min(0.1, t - lastT); lastT = t;
+    const paused = isPaused();
+    for (const n of world.npcs) {
+      if (n.quest) { const st = npcStatus(n.def); n.marks.offer.visible = st === "offer"; n.marks.ready.visible = st === "ready"; const bob = 3.15 + Math.sin(t * 2.4) * 0.1; n.marks.offer.position.y = n.marks.ready.position.y = bob;
+        const dx = P.pos.x - n.x, dz = P.pos.z - n.z, near = Math.hypot(dx, dz) < 6; const want = near ? Math.atan2(dx, dz) : n.def.face; let d = want - n.R.g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); n.R.g.rotation.y += d * Math.min(1, dt * 4);
+        poseHumanoid(n.R, t + n.x, 0, 0, "normal", false); continue; }
+      if (!paused) {
+        if (n.wait > 0) n.wait -= dt;
+        else if (!n.tgt) { const a = n.ang + (n.rng() - 0.5) * 1.6, r = 9 + n.rng() * 14; n.tgt = [Math.cos(a) * r, Math.sin(a) * r]; }
+        if (n.tgt && n.wait <= 0) {
+          const dx = n.tgt[0] - n.x, dz = n.tgt[1] - n.z, d = Math.hypot(dx, dz);
+          if (d < 0.3) { n.tgt = null; n.wait = 2 + n.rng() * 5; }
+          else { const sp = 1.3 * dt; let nx = n.x + dx / d * sp, nz = n.z + dz / d * sp; if (Math.hypot(nx, nz) < 6.5 || LOBBY_PORTALS.some(([px, pz]) => Math.hypot(px - nx, pz - nz) < 3.2)) { n.tgt = null; n.wait = 0.5; } else { n.x = nx; n.z = nz; n.ang = Math.atan2(nz, nx); }
+            let want = Math.atan2(dx, dz), dd = want - n.R.g.rotation.y; dd = Math.atan2(Math.sin(dd), Math.cos(dd)); n.R.g.rotation.y += dd * Math.min(1, dt * 6); }
+        }
+      }
+      n.walk = lerp(n.walk, n.tgt && n.wait <= 0 && !paused ? 0.55 : 0, Math.min(1, dt * 6));
+      n.R.g.position.set(n.x, 0, n.z); n.lbl.position.set(n.x, 2.45, n.z); n.it.x = n.x; n.it.z = n.z;
+      poseHumanoid(n.R, t * 0.8 + n.x, n.walk, 0, "normal", false);
+    }
+  });
+}
+
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
    and scheduled a fraction of a second ahead. Battle music thickens as more foes
@@ -2937,8 +3338,8 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 $("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; if (coarse || usedTouch) $("joyHint").hidden = false; });
-buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals");
-window.__game = { MUSIC, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
+window.__game = { MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
