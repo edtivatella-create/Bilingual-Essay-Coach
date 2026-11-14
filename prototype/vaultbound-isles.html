@@ -2762,8 +2762,8 @@ const MUSIC = (() => {
   /* ---- the sequencer ---- */
   function pump() {
     if (!ctx || !cur || cur === "silent") return;
-    const ahead = ctx.currentTime + 0.18;
-    if (nextT < ctx.currentTime - 0.1) nextT = ctx.currentTime + 0.05;
+    const ahead = ctx.currentTime + 0.6; // generous lookahead so a slow frame never starves the score
+    if (nextT < ctx.currentTime) { while (nextT < ctx.currentTime) { nextT += 60 / bpm / 4; step++; if (step % 16 === 0) bar++; } }
     while (nextT < ahead) { play(step, nextT); nextT += 60 / bpm / 4; step++; if (step % 16 === 0) bar++; }
   }
   function play(s, t) {
@@ -2850,6 +2850,7 @@ const MUSIC = (() => {
   function endPreview() { if (!previewing) return; previewing = false; curIdx = -1; cur = null; apply(real.m, real.idx, real.label); }
   function update(dt, alive, hp, menus) {
     if (!ctx) return;
+    pump();
     if (!previewing) intenT = Math.min(1, alive / 9);
     inten += (intenT - inten) * Math.min(1, dt * 0.6);
     hpFrac = hp; menuOpen = menus;
