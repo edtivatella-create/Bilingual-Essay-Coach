@@ -431,7 +431,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
       <li><b>Move</b> with the touch joystick, WASD, or a controller. Drag to look around.</li>
       <li><b>Dash</b> up to 3 times in a row. Each dash comes back 1.5 seconds after you use it.</li>
       <li><b>Step on a portal</b> to open the island map. Black islands are undiscovered: clear Normal and Hard on an island to reveal the next.</li>
-      <li><b>Every island</b> has Normal, Hard and Nightmare stages, each a dungeon of stages and waves. Clear a stage, take a blessing and pick one of two doors.</li>
+      <li><b>Every island</b> has Normal, Hard and Nightmare stages, each a dungeon of chapters made of levels. Clear a level, take a blessing and pick one of two doors. A boss waits at the end of every chapter.</li>
       <li><b>Level up</b> from fights and spend stat points on Speed, Damage, Defence or Power.</li>
       <li><b>Open the Armoury</b> to turn your weapons and armour around in 3D and compare their stats.</li>
     </ul>
@@ -662,7 +662,23 @@ const WEAPON_DEFS = [
   ["foxfang", "Foxfang Twinblades", "legendary", "twinblade", 0xd8603a, 0xffe0a0, "bladeFan", "Quick as the Masked Fox, and just as rude."],
   ["sirenslament", "Siren's Lament", "legendary", "staff", 0x2a6a8a, 0x9affe8, "riptideSpiral", "It sings the sea to sleep."],
   ["godspark", "Godspark", "vaulted", "greatsword", 0xfff0c0, 0xffd040, "prismNova", "A spark of something that was once worshipped."],
-  ["wanderersoath", "The Wanderer's Oath", "vaulted", "sword", 0xe8e0d0, 0x7affb0, "timeEcho", "Sworn on every road in the realm."]
+  ["wanderersoath", "The Wanderer's Oath", "vaulted", "sword", 0xe8e0d0, 0x7affb0, "timeEcho", "Sworn on every road in the realm."],
+  ["crimsonoath", "Crimson Oath", "rare", "sword", 0xd8203a, 0xff8a8a, "heavyStrike", "Red as the vow it was forged to keep."],
+  ["tangerinefang", "Tangerine Fang", "common", "sword", 0xff8a2a, 0xffd0a0, "heavyStrike", "Bright orange, and proud of it."],
+  ["goldenhour", "Golden Hour", "epic", "sword", 0xffd040, 0xfff0a0, "flameWave", "It glows like the last light of day."],
+  ["limelight", "Limelight Sabre", "rare", "sword", 0x9aff3a, 0xe8ffb0, "bladeFan", "Impossible to miss on a stage or a battlefield."],
+  ["emeraldvow", "Emerald Vow", "epic", "katana", 0x2ad86a, 0xb0ffd0, "drainBurst", "Green as the first spring after a war."],
+  ["tealtide", "Teal Tide Blade", "rare", "katana", 0x2ad8c8, 0xc0fff8, "riptideSpiral", "Cut from the colour of a shallow lagoon."],
+  ["skyline", "Skyline Edge", "rare", "rapier", 0x5ac8ff, 0xe0f4ff, "chainBolt", "Light enough to carry the sky on its tip."],
+  ["cobaltcrown", "Cobalt Crown", "legendary", "greatsword", 0x2a5aff, 0x9ab8ff, "shockwave", "A king's blade, deep blue from hilt to point."],
+  ["violetvein", "Violet Vein", "epic", "sword", 0x8a3aff, 0xd8b0ff, "vortex", "Purple light runs along it like blood."],
+  ["magentafury", "Magenta Fury", "legendary", "katana", 0xff3ad8, 0xffb0f0, "bladeFan", "Loud, fast and very pink."],
+  ["rosethorn", "Rosethorn Rapier", "epic", "rapier", 0xff8ab0, 0xffe0ec, "drainBurst", "Every rose has one. This one is the point."],
+  ["obsidianreign", "Obsidian Reign", "legendary", "greatsword", 0x1a1a22, 0xff5a3a, "meteor", "Black glass that remembers being a volcano."],
+  ["pearlwhisper", "Pearl Whisper", "rare", "sword", 0xf0ece0, 0xffffff, "frostNova", "Smooth as the inside of a shell."],
+  ["bronzehelm", "Bronzehelm Blade", "common", "greatsword", 0xb87a3a, 0xffd0a0, "heavyStrike", "Old bronze, still sharp enough."],
+  ["jadeserpent", "Jade Serpent", "epic", "katana", 0x5aa87a, 0xd8ffe8, "chainBolt", "Carved from a single piece of jade."],
+  ["rubyheart", "Rubyheart Longsword", "legendary", "sword", 0x9a0a2a, 0xff4a6a, "flameWave", "A ruby the size of a fist beats in the pommel."]
 ];
 // [id, name, rarity, weight, metal, cloth, accent, helm, cape, special, description]
 const ARMOUR_DEFS = [
@@ -851,6 +867,28 @@ function swordFx(s, w) {
   else { ringFx(at.clone().setY(P.pos.y), 1.8, 0x7ad8ff, 0.4); burstFx(at, 1, 0x9ae8ff, 0.3); }
   burstFx(at, 0.5, col, 0.18);
 }
+/* ---- every sword its own colour; big weapons ride on the back when not swinging ---- */
+(function uniqueSwordColours() {
+  const used = new Set();
+  for (const w of ITEMS.filter(it => it.cat === "weapon" && SWORD_TYPES.includes(it.type))) {
+    let c = new THREE.Color(w.blade), hsl = {}; c.getHSL(hsl); let tries = 0;
+    while (used.has(c.getHex()) && tries++ < 40) { hsl.h = (hsl.h + 0.061) % 1; hsl.s = Math.max(0.35, hsl.s); c.setHSL(hsl.h, hsl.s, clamp(hsl.l, 0.25, 0.75)); }
+    w.blade = c.getHex(); used.add(w.blade);
+  }
+})();
+const BACK_TYPES = ["scythe", "halberd", "greatsword", "greataxe", "warhammer", "spear", "trident"];
+function carrySocket(R) {
+  if (R.backSock || !R.chest) return;
+  const s = new THREE.Group(); s.position.set(0, 0.2, -0.24); s.rotation.set(0, 0, 0.75); R.chest.add(s);
+  const inner = new THREE.Group(); inner.position.y = -0.62; s.add(inner); R.backSock = inner;
+}
+function carryTick(R, swing) {
+  if (!R.carryBack || !R.weapon) return;
+  const now = performance.now() / 1000; if (swing > 0) R.lastSw = now;
+  const back = now - (R.lastSw || -9) > 0.9;
+  if (back && R.weapon.parent !== R.backSock) R.backSock.add(R.weapon);
+  else if (!back && R.weapon.parent !== R.hold) R.hold.add(R.weapon);
+}
 const CAT_LABEL = { weapon: "Weapon", armour: "Armour", potion: "Potion", material: "Material", special: "Relic", fish: "Fish" };
 
 /* ---------- classes ---------- */
@@ -894,9 +932,9 @@ const ROLL_COINS = 10000;
 
 /* ---------- islands ---------- */
 const STAGES = [
-  { id: "normal", name: "Normal", levels: 3, hp: 1, dmg: 1, waves: 2 },
-  { id: "hard", name: "Hard", levels: 4, hp: 1.9, dmg: 1.5, waves: 2 },
-  { id: "nightmare", name: "Nightmare", levels: 5, hp: 3.4, dmg: 2.1, waves: 3 }
+  { id: "normal", name: "Normal", levels: 2, subs: 5, hp: 1, dmg: 1, waves: 1 },
+  { id: "hard", name: "Hard", levels: 3, subs: 6, hp: 1.9, dmg: 1.5, waves: 1 },
+  { id: "nightmare", name: "Nightmare", levels: 4, subs: 7, hp: 3.4, dmg: 2.1, waves: 1 }
 ];
 // enemy: [name, body, role, colour, accent]
 const ISLANDS = [
@@ -1073,13 +1111,12 @@ RAIDS2.forEach(([name, pre, col, acc, tree, sky, grd, blurb, boss], r) => {
 const RAID_COUNT = ISLANDS.length - RAID_START;
 BODY_SIG.giant = "spikes"; BODY_SIG.beetle = "tide";
 /* the rolling roster: each wave keeps two foes and brings one new one */
-function seqOf(I) { return [...I.enemies, ...(I.more || []), ...(I.extra || [])]; }
 function waveWindow(I, n) {
   const q = seqOf(I), L = q.length, out = [];
   for (let j = 0; j < 3; j++) { const i = n + j, cyc = Math.floor(i / L), d = q[i % L]; out.push(cyc ? [(cyc === 1 ? "Elder " : cyc === 2 ? "Dread " : "Ancient ") + d[0], d[1], d[2], d[3], d[4]] : d); }
   return out;
 }
-const waveIndex = () => (run.level - 1) * STAGES[run.stage].waves + Math.max(0, run.wave - 1);
+const waveIndex = () => ((run.level - 1) * run.subs + ((run.sub || 1) - 1)) * STAGES[run.stage].waves + Math.max(0, run.wave - 1);
 /* ---- rare sea portals: each leads to an island of its own ---- */
 const RARE_START = ISLANDS.length;
 const RARE_PORTALS = [
@@ -1102,6 +1139,126 @@ const ROLE_BASE = {
   ranged: { hp: 30, dmg: 6, spd: 2.8, range: 10, cd: 2.2, xp: 6, coins: 6 },
   boss:   { hp: 950, dmg: 13, spd: 3.3, range: 3.2, cd: 1.6, xp: 70, coins: 90 }
 };
+/* ---- enemy roles beyond "walk up and hit": bombers, mages, alchemists, shamans, chargers, summoners, shieldbearers ---- */
+Object.assign(ROLE_BASE, {
+  bomber:    { hp: 30, dmg: 7, spd: 3.0, range: 10, cd: 3.2, xp: 7, coins: 7 },
+  mage:      { hp: 28, dmg: 6, spd: 3.2, range: 11, cd: 2.6, xp: 7, coins: 7 },
+  alchemist: { hp: 32, dmg: 5, spd: 3.0, range: 10, cd: 3.4, xp: 7, coins: 7 },
+  shaman:    { hp: 34, dmg: 4, spd: 3.0, range: 10, cd: 5.0, xp: 8, coins: 8 },
+  charger:   { hp: 48, dmg: 8, spd: 3.6, range: 1.8, cd: 1.4, xp: 8, coins: 8 },
+  summoner:  { hp: 34, dmg: 4, spd: 2.8, range: 12, cd: 8.0, xp: 8, coins: 8 },
+  shield:    { hp: 62, dmg: 7, spd: 2.8, range: 1.8, cd: 1.5, xp: 8, coins: 8 }
+});
+const ROLE_NOUN = { bomber: "Bombardier", mage: "Hexcaster", alchemist: "Alchemist", shaman: "Shaman", charger: "Charger", summoner: "Summoner", shield: "Shieldbearer" };
+const ROLE_BODY = { bomber: "humanoid", mage: "humanoid", alchemist: "humanoid", shaman: "giant", charger: "beast", summoner: "floater", shield: "giant" };
+const ISLAND_PREFIX = ["Thornwood", "Saltspray", "Ashen", "Frostmere", "Gloomfen", "Sunscorch", "Skyreach", "Prism", "Hollowroot", "Thalmyr", "Clockwork", "Starfall", "Obsidian", "Cathedral", "Moonhollow", "Crownfire", "Vaultbound",
+  "Broodnest", "Voidchoir", "Trenchdeep", "Rootbound"];
+ISLANDS.forEach((I, i) => {
+  const pre = ISLAND_PREFIX[i] || (I.enemies[0][0].split(" ")[0]);
+  const c0 = I.enemies[0][3], acc = I.enemies[2][4];
+  I.roleFoes = ["bomber", "mage", "shield", "alchemist", "charger", "shaman", "summoner"].map((role, k) => [`${pre} ${ROLE_NOUN[role]}`, ROLE_BODY[role], role, new THREE.Color(c0).lerp(new THREE.Color(acc), 0.1 + k * 0.07).getHex(), acc]);
+});
+// the order foes appear in: new kinds keep arriving, wave after wave
+function seqOf(I) {
+  const a = I.enemies, m = I.more || [], x = I.extra || [], r = I.roleFoes || [];
+  return [a[0], a[1], a[2], r[0], m[0], r[1], m[1], r[2], m[2], r[3], m[3], r[4], m[4], r[5], m[5], x[0], r[6], x[1], x[2]].filter(Boolean);
+}
+function roleProps(e) {
+  const H = e.R.hum; if (!H) return;
+  H.hold.clear();
+  const acc = e.accent, glow = std(acc, { e: acc, ei: 1.6 }), wood = MAT.bark(0x4a3020);
+  if (e.role === "bomber") { M(G.sph(), std(0x1a1a1a, { r: 0.5, m: 0.3 }), 0, 0.1, 0, H.hold, 0.16); const f = glowSprite(0xffa040, 0.4, 1); f.position.y = 0.28; H.hold.add(f); }
+  if (e.role === "mage" || e.role === "shaman") { M(G.cyl(0.025, 0.03, 6), wood, 0, 0.55, 0, H.hold, 1, 1.4, 1); M(G.ico(), glow, 0, 1.3, 0, H.hold, 0.11); const gs = glowSprite(acc, 0.8, 0.8); gs.position.y = 1.3; H.hold.add(gs);
+    if (e.role === "shaman") for (let k = 0; k < 3; k++) M(G.cone(4), std(0xe8dcc0), Math.cos(k * 2) * 0.06, 1.15, Math.sin(k * 2) * 0.06, H.hold, 0.02, 0.18, 0.02).rotation.z = 2.6; }
+  if (e.role === "alchemist") { M(G.sph(), std(0x7ad83a, { e: 0x5aff3a, ei: 1, op: 0.85 }), 0, 0.1, 0, H.hold, 0.11, 0.14, 0.11); M(G.cyl(0.03, 0.03, 6), std(0xd8d0c0), 0, 0.26, 0, H.hold, 1, 0.1, 1); }
+  if (e.role === "shield") { const sh = M(G.cyl(0.32, 0.32, 18), std(0x8a8a92, { m: 0.8, r: 0.3 }), 0.05, -0.15, 0.08, H.elL, 1, 0.06, 1); sh.rotation.z = Math.PI / 2; M(G.sph(), glow, 0.09, -0.15, 0.08, H.elL, 0.07); M(G.box(), wood, 0, 0.4, 0, H.hold, 0.05, 0.8, 0.05); M(G.box(), std(0xc8ccd0, { m: 0.8 }), 0, 0.85, 0, H.hold, 0.12, 0.35, 0.03); }
+}
+const keepAway = (e, toT, dist, spd, dt, near, far) => { if (dist > far) { e.pos.addScaledVector(toT, spd * dt); return 1; } if (dist < near) { e.pos.addScaledVector(toT, -spd * 0.8 * dt); return 1; } return 0; };
+function lob(from, at, col, t, onLand) {
+  const m = M(G.sph(), std(col, { e: col, ei: 0.8 }), 0, 0, 0, null, 0.22); m.position.copy(from);
+  addFx(m, t, (o, k) => { o.position.lerpVectors(from, at, k); o.position.y += Math.sin(k * Math.PI) * 4; o.rotation.x += 0.3; });
+  later(t, onLand);
+}
+const ROLE_AI = {
+  bomber(e, tgt, toT, dist, spd, dt) {
+    const mv = keepAway(e, toT, dist, spd, dt, 6, 11); e.atkT -= dt;
+    if (e.atkT <= 0 && dist < 15) { e.atkT = e.base.cd; e.atkAnim = 1; const at = tgt.pos.clone(); at.y = world.h(at.x, at.z); ringTelegraph(at, 2.6, 0, 1.0, false);
+      lob(e.pos.clone().add(new V3(0, 1.6, 0)), at, 0x2a2a2a, 1.0, () => { if (e.dead) return; burstFx(at.clone().add(new V3(0, 0.6, 0)), 2.6, 0xffa040, 0.35); ringFx(at, 2.6, 0xff7a2a, 0.35); for (const h of heroTargets()) if (h.pos.distanceTo(at) < 2.6) hurtHero(h, e.dmg * 1.7, at, e); }); }
+    return mv;
+  },
+  mage(e, tgt, toT, dist, spd, dt) {
+    let mv = keepAway(e, toT, dist, spd, dt, 8, 12); e.atkT -= dt;
+    if (dist < 4 && (e.blinkT || 0) < worldT) { e.blinkT = worldT + 6; burstFx(e.pos.clone().add(new V3(0, 1, 0)), 1.2, e.accent, 0.3); const away = toT.clone().multiplyScalar(-7); const np = e.pos.clone().add(away); if (!world.inside || world.inside(np.x, np.z, 1)) e.pos.copy(np); burstFx(e.pos.clone().add(new V3(0, 1, 0)), 1.2, e.accent, 0.3); }
+    if (e.atkT <= 0 && dist < 16) { e.atkT = e.base.cd; e.atkAnim = 1;
+      if (Math.random() < 0.5) { const at = tgt.pos.clone(); at.y = world.h(at.x, at.z); ringTelegraph(at, 2.2, 0, 0.85, false); later(0.85, () => { if (e.dead) return; pillarFx(at, e.accent, 8, 0.4); for (const h of heroTargets()) if (h.pos.distanceTo(at) < 2.2) hurtHero(h, e.dmg * 1.5, at, e); }); }
+      else shoot(e.pos.clone().add(new V3(0, 1.6 * e.scale, 0)), tgt.pos.clone().add(new V3(0, 1, 0)), e.accent, e.dmg * 1.2, 1, "enemy", { src: e, speed: 9, life: 2.4, size: 0.38 }); }
+    return mv;
+  },
+  alchemist(e, tgt, toT, dist, spd, dt) {
+    const mv = keepAway(e, toT, dist, spd, dt, 6, 10); e.atkT -= dt;
+    if (e.atkT <= 0 && dist < 14) { e.atkT = e.base.cd; e.atkAnim = 1; const at = tgt.pos.clone(); at.y = world.h(at.x, at.z); ringTelegraph(at, 2.6, 0, 0.9, false);
+      lob(e.pos.clone().add(new V3(0, 1.6, 0)), at, 0x7ad83a, 0.9, () => { if (e.dead) return; burstFx(at.clone().add(new V3(0, 0.4, 0)), 2, 0x9aff4a, 0.35); hazardZone(at, 2.6, 0x7ad83a, 4.5, 0.5, h => hurtHero(h, e.dmg * 0.45, null, e)); }); }
+    if ((e.healT || 0) < worldT) { e.healT = worldT + 6; let any = false; for (const o of enemies) if (!o.dead && o !== e && !o.boss && o.pos.distanceTo(e.pos) < 9 && o.hp < o.maxHp) { o.hp = Math.min(o.maxHp, o.hp + o.maxHp * 0.12); floatText(o.pos, "+heal", "#7fd69a"); any = true; } if (any) ringFx(e.pos, 9, 0x7fd69a, 0.5); }
+    return mv;
+  },
+  shaman(e, tgt, toT, dist, spd, dt) {
+    const mv = keepAway(e, toT, dist, spd, dt, 7, 11); e.atkT -= dt;
+    if (e.atkT <= 0) { e.atkT = e.base.cd; e.atkAnim = 1; ringFx(e.pos, 10, 0xff9a3a, 0.6);
+      for (const o of enemies) if (!o.dead && !o.boss && o.pos.distanceTo(e.pos) < 10 && !(o.empUntil > worldT)) { o.empUntil = worldT + 5; const d0 = o.dmg, s0 = o.spd; o.dmg *= 1.25; o.spd *= 1.3; floatText(o.pos, "Empowered", "#ffb060"); later(5, () => { o.dmg = d0; o.spd = s0; }); }
+      if (dist < 14) shoot(e.pos.clone().add(new V3(0, 1.8 * e.scale, 0)), tgt.pos.clone().add(new V3(0, 1, 0)), 0xffb060, e.dmg, 1, "enemy", { src: e, speed: 12, life: 1.6, size: 0.22 }); }
+    return mv;
+  },
+  charger(e, tgt, toT, dist, spd, dt) {
+    if (dist > 4 && dist < 13 && (e.chargeT || 0) < worldT) { e.chargeT = worldT + 5.5; const dir = toT.clone();
+      const g = new THREE.Group(); const plane = new THREE.Mesh(G.box(), new THREE.MeshBasicMaterial({ color: lin(0xff2a3a), transparent: true, opacity: 0.3, depthWrite: false })); plane.scale.set(1.8, 0.02, 14); plane.position.z = 7; g.add(plane); g.position.set(e.pos.x, e.pos.y + 0.08, e.pos.z); g.rotation.y = Math.atan2(dir.x, dir.z);
+      addFx(g, 0.7, (o, k) => { plane.material.opacity = 0.15 + k * 0.35; }); e.charging = { dir, until: 0, start: worldT + 0.7, hit: new Set() }; return 0; }
+    return "melee";
+  },
+  summoner(e, tgt, toT, dist, spd, dt) {
+    const mv = keepAway(e, toT, dist, spd, dt, 9, 13); e.atkT -= dt;
+    if (e.atkT <= 0 && run) { e.atkT = e.base.cd; const mine = enemies.filter(o => !o.dead && o.owner === e).length;
+      if (mine < 3) { ringFx(e.pos, 3, e.accent, 0.6); const base = ISLANDS[run.idx].enemies[0]; for (let k = 0; k < 2; k++) { const m = spawnEnemy([`Summoned ${base[0]}`, base[1], "skirm", e.accent, e.accent], "skirm", false, 0.7); m.pos.copy(e.pos).add(new V3(rand(-2, 2), 0, rand(-2, 2))); m.hp = m.maxHp = m.maxHp * 0.4; m.owner = e; m.base = Object.assign({}, m.base, { xp: 1, coins: 1 }); } }
+      else if (dist < 15) shoot(e.pos.clone().add(new V3(0, 1.5, 0)), tgt.pos.clone().add(new V3(0, 1, 0)), e.accent, e.dmg, 1, "enemy", { src: e, speed: 11, life: 1.8, size: 0.25 }); }
+    return mv;
+  },
+  shield() { return "melee"; }
+};
+/* ---- dragons and hydras among the bosses ---- */
+const BOSS_BEASTS = {
+  "Wyrm of Endless Winter": ["dragon", 0xd8e8f8, 0x7ad8ff, "breath"], "Pyrelord Ixxan": ["dragon", 0x3a1a14, 0xff6a1a, "breath"], "The Rootwyrm": ["hydra", 0x4a5a2a, 0x9aff6a, "heads"],
+  "The Leviathan Below": ["hydra", 0x0a2a3a, 0x40ffd0, "heads"], "Aeonis the Unmade": ["dragon", 0x1a0a2a, 0xc040ff, "breath"], "Gorehorn the Molten": ["dragon", 0x2a1414, 0xff5a2a, "breath"],
+  "Tolling Leviathan": ["hydra", 0x1a4a4a, 0x40ffd0, "heads"], "Eclipse Beast": ["dragon", 0x1a1428, 0xd8c8ff, "breath"], "Gulpmaw the Ancient": ["hydra", 0x3a2a2a, 0xff5a5a, "heads"],
+  "Skybreaker Colossus": ["dragon", 0xd8d8e8, 0x6ac8ff, "breath"], "Maw of the Shallows": ["hydra", 0xd8603a, 0xffb08a, "heads"]
+};
+ISLANDS.forEach(I => { I.bosses = I.bosses.map(b => BOSS_BEASTS[b[0]] ? [b[0], ...BOSS_BEASTS[b[0]]] : /^Morhgal/.test(b[0]) ? [b[0], "dragon", b[2], b[3], "breath"] : /Godbeast$/.test(b[0]) ? [b[0], "dragon", b[2], b[3], "breath"] : /^Thalassor/.test(b[0]) ? [b[0], "hydra", b[2], b[3], "heads"] : b); });
+BODY_SIG.dragon = "breath"; BODY_SIG.hydra = "heads";
+function coneTelegraph(at, dir, L, half, dur) {
+  const g = new THREE.Group(); g.position.set(at.x, at.y + 0.07, at.z); g.rotation.y = Math.atan2(dir.x, dir.z);
+  const m = new THREE.Mesh(new THREE.CircleGeometry(L, 28, Math.PI / 2 - half, half * 2), new THREE.MeshBasicMaterial({ color: lin(0xff2a3a), transparent: true, opacity: 0.25, depthWrite: false, side: THREE.DoubleSide }));
+  m.rotation.x = -Math.PI / 2; g.add(m); addFx(g, dur, (o, k) => { m.material.opacity = 0.15 + k * 0.35; });
+}
+function bigSig(e, tgt, st, speedUp) {
+  const D = e.dmg, col = e.accent, hp = p => { const q = p.clone(); q.y = world.h(q.x, q.z); return q; };
+  if (e.sig === "breath" && Math.random() < 0.38) {
+    banner(e.name, "takes to the air"); const at = hp(tgt.pos), R = 5 + st; ringTelegraph(at, R, 0, 1.3 * speedUp, false); e.R.g.visible = false; burstFx(e.pos.clone().add(new V3(0, 2, 0)), 3, col, 0.4);
+    later(1.3 * speedUp, () => { if (e.dead) return; e.pos.copy(at); e.R.g.visible = true; pillarFx(at, col, 18, 0.5); ringFx(at, R, col, 0.5); burstFx(at.clone().add(new V3(0, 1, 0)), R, col, 0.4); for (const h of heroTargets()) if (h.pos.distanceTo(at) < R) { hurtHero(h, D * 2.6, at, e); if (h.isHero) P.kb.addScaledVector(h.pos.clone().sub(at).setY(0).normalize(), 12); } });
+    return true;
+  }
+  if (e.sig === "breath") {
+    banner(e.name, "breathes fire"); const dir = tgt.pos.clone().sub(e.pos).setY(0).normalize(), L = 13 + st * 2, half = 0.45, o = hp(e.pos); coneTelegraph(o, dir, L, half, 1.1 * speedUp); e.atkAnim = 1;
+    later(1.1 * speedUp, () => { if (e.dead) return; e.atkAnim = 1; for (let k = 1; k <= 6; k++) for (const s of [-1, 0, 1]) { const p = o.clone().addScaledVector(dir.clone().applyAxisAngle(new V3(0, 1, 0), s * half * 0.6), k * L / 6.5); burstFx(p.clone().add(new V3(0, 0.8, 0)), 1.6, col, 0.35); }
+      for (const h of heroTargets()) { const rel = h.pos.clone().sub(o).setY(0), d = rel.length(); if (d < L && Math.acos(clamp(rel.normalize().dot(dir), -1, 1)) < half) hurtHero(h, D * 2.3, o, e); }
+      for (let k = 2; k <= 4; k++) hazardZone(o.clone().addScaledVector(dir, k * L / 5), 2.2, col, 4, 0.5, h => hurtHero(h, D * 0.35, null, e)); });
+    return true;
+  }
+  if (e.sig === "heads") {
+    banner(e.name, "strikes with every head");
+    for (let k = 0; k < 3; k++) later(k * 0.3 * speedUp, () => { if (e.dead) return; const from = e.pos.clone().add(new V3((k - 1) * 1.4, 3.6 * e.scale / 2.3, 0)); for (const h of heroTargets()) shoot(from, h.pos.clone().add(new V3(rand(-1.5, 1.5), 1, rand(-1.5, 1.5))), col, D * 1.1, 1, "enemy", { src: e, speed: 14, life: 2, size: 0.32 }); });
+    for (let k = 0; k < 3; k++) later((0.9 + k * 0.45) * speedUp, () => { if (e.dead) return; const at = hp(tgt.pos); ringTelegraph(at, 2.2, 0, 0.55 * speedUp, false); later(0.55 * speedUp, () => { if (e.dead) return; boltFx(at.clone().add(new V3(0, 14, 0)), at, col, 0.25); for (const h of heroTargets()) if (h.pos.distanceTo(at) < 2.2) hurtHero(h, D * 1.4, at, e); }); });
+    return true;
+  }
+  return false;
+}
 const ALLY_POOL = [
   { id: "bram", name: "Bram", cls: "warrior", look: { skin: 0xd9a77f, hair: 0x2a1a10, cloth: 0x7a3a2a, cloth2: 0x2a2a2a } },
   { id: "ysolde", name: "Ysolde", cls: "mage", look: { skin: 0xf0d0b0, hair: 0xe8e0ff, cloth: 0x3a3a8a, cloth2: 0x1e2450 } },
@@ -1126,7 +1283,7 @@ try {
     const d = JSON.parse(raw), f = fresh();
     S = Object.assign(f, d);
     S.pts = Object.assign(f.pts, d.pts || {});
-    S.stats = Object.assign(f.stats, d.stats || {}); S.boats = d.boats || {}; S.isleLoot = d.isleLoot || {}; S.secrets = d.secrets || {}; S.castleLoot = d.castleLoot || {}; S.rods = Object.assign({ willow: 1 }, d.rods || {}); if (!S.rods[S.rod]) S.rod = "willow"; S.ench = d.ench || {}; S.quests = d.quests && typeof d.quests === "object" ? d.quests : {};
+    S.stats = Object.assign(f.stats, d.stats || {}); S.boats = d.boats || {}; S.isleLoot = d.isleLoot || {}; S.secrets = d.secrets || {}; S.shopDay = d.shopDay; S.shopBought = d.shopBought || {}; S.mineCd = d.mineCd || {}; S.castleLoot = d.castleLoot || {}; S.rods = Object.assign({ willow: 1 }, d.rods || {}); if (!S.rods[S.rod]) S.rod = "willow"; S.ench = d.ench || {}; S.quests = d.quests && typeof d.quests === "object" ? d.quests : {};
     S.chests = Array.isArray(d.chests) ? d.chests.filter(c => c && c.t >= 0 && c.t < 3 && c.i >= 0 && c.i < ISLANDS.length) : [];
     S.prog = ISLANDS.map((_, i) => Object.assign({ normal: false, hard: false, nightmare: false }, (d.prog || [])[i] || {}));
     for (const id of Object.keys(S.inv)) if (!ITEM[id] || S.inv[id] <= 0) delete S.inv[id];
@@ -1661,6 +1818,7 @@ function buildHumanoid(o) {
   }
   const hold = new THREE.Group(); hold.position.set(0, -0.3, 0.02); hold.rotation.x = Math.PI / 2; R.elR.add(hold); R.hold = hold;
   if (o.weapon) { R.weapon = buildWeapon(ITEM[o.weapon]); hold.add(R.weapon); }
+  R.carryBack = !!(o.weapon && BACK_TYPES.includes(ITEM[o.weapon].type)); carrySocket(R);
   if (a && a.cape) {
     const cg = new THREE.PlaneGeometry(0.44, 0.9, 4, 8); cg.translate(0, -0.45, 0);
     const pp = cg.attributes.position; for (let i = 0; i < pp.count; i++) { const x = pp.getX(i), y = pp.getY(i); pp.setZ(i, -Math.cos(x / 0.22 * 1.2) * 0.04 - y * 0.05); }
@@ -1694,6 +1852,7 @@ function buildHumanoid(o) {
   return R;
 }
 function poseHumanoid(R, t, move, swing, style, air, spin) {
+  carryTick(R, swing);
   const sw = move * Math.sin(t * 9.5);
   R.hipL.rotation.x = sw * 0.75; R.hipR.rotation.x = -sw * 0.75;
   R.kneeL.rotation.x = Math.max(0, -Math.sin(t * 9.5)) * move * 0.9; R.kneeR.rotation.x = Math.max(0, Math.sin(t * 9.5)) * move * 0.9;
@@ -1706,7 +1865,7 @@ function poseHumanoid(R, t, move, swing, style, air, spin) {
   if (swing > 0) {
     const k = 1 - swing; // 0 → 1 over the swing
     if (style === "thrust") { R.shR.rotation.x = lerp(-0.6, -1.65, Math.sin(k * Math.PI)); R.elR.rotation.x = lerp(-1.4, 0, Math.sin(k * Math.PI)); R.chest.rotation.y = -0.3 * Math.sin(k * Math.PI); }
-    else if (style === "reap") { const e2 = 1 - Math.pow(1 - k, 2); R.shR.rotation.x = lerp(-2.4, -0.45, e2); R.shR.rotation.z = lerp(-0.9, 0.55, e2); R.elR.rotation.x = -0.5; if (R.shL) { R.shL.rotation.x = lerp(-1.8, -0.6, e2); R.shL.rotation.z = lerp(0.35, 0.6, e2); R.elL.rotation.x = -1.0; } R.chest.rotation.y = lerp(0.35, -0.35, e2); R.chest.rotation.x = lerp(-0.05, 0.1, e2); }
+    else if (style === "reap") { const e2 = ease(k); R.shR.rotation.x = -0.12; R.shR.rotation.z = lerp(-0.35, 0.45, e2); R.elR.rotation.x = 0.05; if (R.shL) { R.shL.rotation.x = -0.7; R.shL.rotation.z = lerp(-0.1, 0.7, e2); R.elL.rotation.x = -0.6; } R.chest.rotation.y = lerp(1.25, -1.25, e2); R.chest.rotation.x = 0.14; if (R.weapon) R.weapon.rotation.y = Math.PI / 2; }
     else if (style === "polearm") { const e2 = 1 - Math.pow(1 - k, 2); R.shR.rotation.x = lerp(-2.1, -0.7, e2); R.shR.rotation.z = lerp(-0.6, 0.3, e2); R.elR.rotation.x = -0.6; if (R.shL) { R.shL.rotation.x = lerp(-1.6, -0.9, e2); R.elL.rotation.x = -0.9; } R.chest.rotation.y = lerp(0.3, -0.3, e2); }
     else if (style === "flail") { R.shR.rotation.x = k < 0.35 ? lerp(-0.5, -3.0, k / 0.35) : lerp(-3.0, -0.8, (k - 0.35) / 0.65); R.shR.rotation.z = 0.2; R.elR.rotation.x = k < 0.35 ? -1.2 : lerp(-1.2, -0.1, (k - 0.35) / 0.65); R.chest.rotation.y = -0.2 * Math.sin(k * Math.PI); }
     else if (style === "nunchaku") { const f = Math.sin(k * Math.PI * 2); R.shR.rotation.x = -1.3; R.shR.rotation.z = f * 0.7; R.elR.rotation.x = -1.3 + f * 0.9; R.chest.rotation.y = f * 0.18; }
@@ -1869,6 +2028,38 @@ function buildCreature(body, col, acc, scale, boss) {
     eyes(head, 0.12, 0.05, 0.14, 0.035);
     R.legs = [];
     for (let k = 0; k < 6; k++) { const sx = k < 3 ? -1 : 1, z = 0.3 - (k % 3) * 0.3; const l = new THREE.Group(); l.position.set(0.3 * sx, 0.55, z); inner.add(l); const s1 = M(G.cyl(0.03, 0.02, 6), sh2, 0.15 * sx, -0.2, 0, l, 1, 0.5, 1); s1.rotation.z = 0.9 * sx; R.legs.push(l); }
+  } else if (body === "dragon") {
+    const sc2 = std(col, { r: 0.4, m: 0.15, map: "fur", rep: [6, 3] }), belly = std(new THREE.Color(col).lerp(new THREE.Color(0xe8d8b0), 0.5).getHex(), { r: 0.6 }), wingM = std(new THREE.Color(col).multiplyScalar(0.7).getHex(), { r: 0.6, op: 0.95, e: acc, ei: 0.15 });
+    M(blobGeo("drbody", v => new V3(v.x * 0.6, v.y * 0.5 * (v.y > 0 ? 1.1 : 0.9), v.z * 1.1)), sc2, 0, 1.25, 0, inner); M(blobGeo("drbelly", v => new V3(v.x * 0.45, v.y * 0.3, v.z * 0.95)), belly, 0, 1.0, 0.1, inner);
+    const neck = new THREE.Group(); neck.position.set(0, 1.55, 0.95); inner.add(neck); R.parts.neck = neck;
+    for (let k = 0; k < 5; k++) M(G.sph(), sc2, 0, k * 0.2, k * 0.16, neck, 0.26 - k * 0.025);
+    const head = new THREE.Group(); head.position.set(0, 1.0, 0.85); neck.add(head); R.parts.head = head;
+    M(blobGeo("drhead", v => new V3(v.x * 0.24, v.y * 0.2, v.z * 0.42 + (v.z > 0 ? 0.05 : 0))), sc2, 0, 0, 0.1, head);
+    const jaw = M(blobGeo("drjaw", v => new V3(v.x * 0.2, v.y * 0.07, v.z * 0.36)), belly, 0, -0.14, 0.12, head); R.parts.jaw = jaw;
+    for (const sx of [-1, 1]) { const hn = M(hornGeo(), horn, 0.12 * sx, 0.18, -0.12, head, 1.3); hn.scale.x = sx * 1.3; hn.rotation.x = -0.6; }
+    eyes(head, 0.13, 0.08, 0.3, 0.04);
+    const fire = glowSprite(acc, 1.2, 0.7); fire.position.set(0, -0.05, 0.55); head.add(fire); R.parts.fire = fire;
+    for (const sx of [-1, 1]) { const w = new THREE.Group(); w.position.set(0.45 * sx, 1.75, 0.1); inner.add(w);
+      for (let k = 0; k < 4; k++) { const m2 = M(G.cone(3), wingM, (0.7 + k * 0.45) * sx, -0.2 - k * 0.12, -k * 0.15, w, 0.42, 1.6 - k * 0.22, 0.02); m2.rotation.z = (2.4 + k * 0.18) * sx; }
+      M(G.cyl(0.04, 0.03, 6), horn, 1.0 * sx, 0.15, 0, w, 1, 2.1, 1).rotation.z = Math.PI / 2; R.parts[sx < 0 ? "wingL" : "wingR"] = w; }
+    R.legs = [];
+    for (const [x, z] of [[-0.42, 0.55], [0.42, 0.55], [-0.42, -0.6], [0.42, -0.6]]) { const l = new THREE.Group(); l.position.set(x, 0.95, z); inner.add(l); M(G.cyl(0.13, 0.09, 8), sc2, 0, -0.45, 0, l, 1, 0.95, 1); M(G.box(), horn, 0, -0.92, 0.1, l, 0.22, 0.08, 0.3); R.legs.push(l); }
+    const tail = new THREE.Group(); tail.position.set(0, 1.2, -1.0); inner.add(tail); R.parts.tail = tail;
+    for (let k = 0; k < 7; k++) M(G.sph(), sc2, 0, -k * 0.06, -k * 0.26, tail, 0.22 - k * 0.025);
+    M(G.cone(4), std(acc, { e: acc, ei: 0.8 }), 0, -0.4, -1.9, tail, 0.12, 0.35, 0.05).rotation.x = -1.6;
+    for (let k = 0; k < 8; k++) M(G.cone(4), std(acc, { e: acc, ei: 0.6 }), 0, 1.78 - Math.abs(k - 2) * 0.03, 0.75 - k * 0.3, inner, 0.05, 0.22, 0.05).rotation.x = -0.4;
+  } else if (body === "hydra") {
+    const sc2 = std(col, { r: 0.4, m: 0.15, map: "fur", rep: [6, 3] }), belly = std(new THREE.Color(acc).lerp(new THREE.Color(0xe8e0c0), 0.6).getHex(), { r: 0.6 });
+    M(blobGeo("hybody", v => new V3(v.x * 0.85, v.y * 0.55, v.z * 0.95)), sc2, 0, 0.75, 0, inner);
+    R.parts.necks = [];
+    for (let h = 0; h < 3; h++) { const ang = (h - 1) * 0.55, neck = new THREE.Group(); neck.position.set(Math.sin(ang) * 0.5, 1.1, 0.45); neck.rotation.z = -ang * 0.6; inner.add(neck); R.parts.necks.push(neck);
+      for (let k = 0; k < 7; k++) { const f = k / 6; M(G.sph(), sc2, 0, f * 1.6, Math.sin(f * 2.2) * 0.3, neck, 0.17 - f * 0.04); }
+      const head = new THREE.Group(); head.position.set(0, 1.75, 0.35); neck.add(head);
+      M(blobGeo("hyhead", v => new V3(v.x * 0.17, v.y * 0.13, v.z * 0.3)), sc2, 0, 0, 0.08, head); M(G.box(), belly, 0, -0.08, 0.15, head, 0.22, 0.03, 0.4);
+      eyes(head, 0.09, 0.06, 0.2, 0.03); const gl = glowSprite(acc, 0.6, 0.7); gl.position.set(0, -0.05, 0.38); head.add(gl); }
+    R.legs = [];
+    for (const [x, z] of [[-0.6, 0.4], [0.6, 0.4], [-0.6, -0.5], [0.6, -0.5]]) { const l = new THREE.Group(); l.position.set(x, 0.55, z); inner.add(l); M(G.cyl(0.14, 0.1, 8), sc2, 0, -0.3, 0, l, 1, 0.6, 1); R.legs.push(l); }
+    const tail = new THREE.Group(); tail.position.set(0, 0.7, -0.9); inner.add(tail); R.parts.tail = tail; for (let k = 0; k < 6; k++) M(G.sph(), sc2, 0, -k * 0.05, -k * 0.24, tail, 0.25 - k * 0.035);
   } else {
     const H = buildHumanoid({ look: { skin: col, hair: acc, cloth: new THREE.Color(col).multiplyScalar(0.6).getHex(), cloth2: 0x222226 }, armour: null, weapon: null });
     inner.add(H.g); R.hum = H;
@@ -1877,7 +2068,7 @@ function buildCreature(body, col, acc, scale, boss) {
     for (const sx of [-1, 1]) { const gs = glowSprite(acc, 0.12, 0.9); gs.position.set(0.042 * sx, 0.018, 0.12); H.head.add(gs); }
   }
   if (boss) {
-    const crown = new THREE.Group(); crown.position.set(0, ({ golem: 2.42, floater: 2.15, humanoid: 1.98, spider: 1.25, void: 2.2, serpent: 2.55, slime: 1.0, bat: 2.25, mantis: 2.15, treant: 2.95, giant: 3.0, beetle: 1.15 })[body] || 1.38, body === "beast" ? 0.85 : body === "serpent" ? 0.3 : 0); inner.add(crown);
+    const crown = new THREE.Group(); crown.position.set(0, ({ golem: 2.42, floater: 2.15, humanoid: 1.98, spider: 1.25, void: 2.2, serpent: 2.55, slime: 1.0, bat: 2.25, mantis: 2.15, treant: 2.95, giant: 3.0, beetle: 1.15, dragon: 2.55, hydra: 3.1 })[body] || 1.38, body === "beast" ? 0.85 : body === "serpent" ? 0.3 : 0); inner.add(crown);
     const gold = MAT.metal(0xf2c044, 0.22);
     M(G.tor(0.2, 0.025), gold, 0, 0, 0, crown).rotation.x = Math.PI / 2;
     for (let k = 0; k < 7; k++) M(G.cone(6), gold, Math.cos(k * TAU / 7) * 0.2, 0.09, Math.sin(k * TAU / 7) * 0.2, crown, 0.035, 0.18, 0.035);
@@ -1903,6 +2094,8 @@ function poseCreature(R, t, move, atk) {
   if (R.body === "bat") { R.inner.position.y = Math.sin(t * 3) * 0.2; const f = Math.sin(t * 16) * 0.7; R.parts.wingL.rotation.y = -f; R.parts.wingR.rotation.y = f; R.inner.rotation.x = atk * 0.5; }
   if (R.body === "mantis") { R.parts.armL.rotation.x = -0.9 - atk * 1.3; R.parts.armR.rotation.x = -0.9 - atk * 1.3; R.parts.head.rotation.y = Math.sin(t * 1.3) * 0.4; }
   if (R.body === "treant") { R.parts.armL.rotation.x = -s * 0.4 - atk * 1.6; R.parts.armR.rotation.x = s * 0.4 - atk * 1.6; R.inner.rotation.z = Math.sin(t * 1.1) * 0.03; }
+  if (R.body === "dragon") { const f = Math.sin(t * 2.2); R.parts.wingL.rotation.z = -0.3 + f * 0.35; R.parts.wingR.rotation.z = 0.3 - f * 0.35; R.parts.neck.rotation.x = -atk * 0.5 + Math.sin(t * 1.3) * 0.08; R.parts.jaw.rotation.x = atk * 0.6; R.parts.tail.rotation.y = Math.sin(t * 1.7) * 0.4; R.parts.fire.material.opacity = 0.3 + atk * 0.7; }
+  if (R.body === "hydra") { R.parts.necks.forEach((n, i) => { n.rotation.x = Math.sin(t * 1.6 + i * 2) * 0.18 - atk * 0.4; n.rotation.y = Math.sin(t * 1.1 + i) * 0.2; }); R.parts.tail.rotation.y = Math.sin(t * 1.5) * 0.4; }
   if (R.hum) poseHumanoid(R.hum, t, move, atk > 0 ? 1 - atk : 0, "normal", false);
   if (R.aura) R.aura.rotation.z = t;
 }
@@ -2156,7 +2349,7 @@ function buildLobby() {
   world.clouds = addClouds(group, 0xffffff);
   // distant mountains
   for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 380, s = 80 + (k % 4) * 28; if (Math.cos(a) > 0.2) continue; const m = M(G.cone(7), std(0x5a6a7a, { flat: true, r: 0.9 }), Math.cos(a) * d, s * 0.45, Math.sin(a) * d, group, s, s * 1.1, s); M(G.cone(7), std(0xf0f4ff, { flat: true, r: 0.7 }), Math.cos(a) * d, s * 0.82, Math.sin(a) * d, group, s * 0.35, s * 0.35, s * 0.35); }
-  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); const isleBase = group.children.length; seaWorld(group); rarePortals(group); groupIsles(group, isleBase); boatDealer(group); floraFauna(group); lobbyRaidPortal(group); buildQuarters(group); buildCastles(group, h); secretReset();
+  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); const isleBase = group.children.length; seaWorld(group); rarePortals(group); groupIsles(group, isleBase); boatDealer(group); floraFauna(group); lobbyRaidPortal(group); buildQuarters(group); buildCastles(group, h); secretReset(); if (mining) endMining(false); buildVeins(group, h);
 }
 
 function buildIsland(idx) {
@@ -2330,7 +2523,8 @@ function damageEnemy(e, amount, dir, kb, o = {}) {
   if (!o.silent && o.canCrit !== false && worldT - lastHitSfx > 0.06) { lastHitSfx = worldT; MUSIC.sfx("hit", { crit }); }
   if (e.dummy) { dummyHit(e, dmg, crit, o); return; }
   if (e.duelist && e.guard > worldT) { dmg *= 0.3; if (!o.silent) floatText(e.pos, "Blocked", "#a1abc4"); }
-  if (run && run.drumsLevel === run.level) dmg *= 1.2;
+  if (run && run.drumsKey === lvKey()) dmg *= 1.2;
+  if (e.role === "shield" && dir) { const fy = e.R.g.rotation.y, d2 = dir.clone().setY(0); if (d2.lengthSq() > 1e-6 && Math.sin(fy) * d2.x + Math.cos(fy) * d2.z < -0.3 * d2.length()) { dmg *= 0.35; if (!o.silent) floatText(e.pos, "Shielded", "#a1abc4"); } }
   if (e.vulnUntil > worldT) { dmg *= 1.6; o = Object.assign({}, o, { color: o.color || "#ffd166" }); }
   e.hp -= dmg; e.flash = 0.12;
   if (run && run.boons && o.canCrit !== false && !o.noProc && !e.dead) boonProcs(e, dmg);
@@ -2371,7 +2565,7 @@ function hurtHero(target, amount, from, src) {
     if (P.blocking) { if (worldT - P.blockStart <= PARRY_WINDOW) { parryHit(src); return; } amount *= 0.3; P.kb.multiplyScalar(0.3); }
     let dr = ST.dr;
     if (P.buffs.shield > worldT) dr = 1 - (1 - dr) * (1 - P.buffs.shieldAmt);
-    const dmg = amount * (1 - dr);
+    const dmg = P.swimming ? amount * 2 : amount * (1 - dr);
     P.hp -= dmg; floatText(P.pos, `-${Math.round(dmg)}`, "#ff7a85");
     if (src && !src.dead && !src.dummy && run && run.boons && run.boons.thorns) damageEnemy(src, dmg * 0.3 * run.boons.thorns, null, 0, { noProc: true, canCrit: false, color: "#d8ff6a" });
     if (from && !(P.buffs.noKb > worldT) && !(S.cls === "berserker" && P.atkT > 0)) { const d = P.pos.clone().sub(from).setY(0); if (d.lengthSq() > 0) P.kb.copy(d.normalize().multiplyScalar(5 * ST.kbTaken)); }
@@ -2404,6 +2598,8 @@ function nearestEnemy(pos, r, dirV, cone) {
   return best;
 }
 function attack() {
+  if (sailing && !sailing.anchored) { fireCannons(); return; }
+  if (mining) return;
   if (P.atkT > 0 || P.dead || P.dashT > 0) return;
   const w = ITEM[S.equip.weapon];
   P.atkT = 1 / ST.atkSpd; P.swing = 1; P.swingStyle = swingStyleFor(w); P.swingDur = Math.min(0.55, 0.9 / ST.atkSpd); swingFx(w); if (SWORD_STYLE[w.id]) { const ss = SWORD_STYLE[w.id]; later(P.swingDur * 0.45, () => swordFx(ss, w)); } MUSIC.sfx("swing", { w });
@@ -2543,7 +2739,7 @@ const ENEMY_DMG = 0.55; // enemies hit 45% softer than before
 function spawnEnemy(def, role, boss, scaleBoost = 1) {
   const I = ISLANDS[run.idx], st = STAGES[run.stage];
   const base = ROLE_BASE[boss ? "boss" : role];
-  const ri = I.raid ? 13 : I.sri ? I.sri : run.idx >= 12 ? 12.5 : run.idx, isl = Math.pow(1.5, ri), lv = 1 + 0.15 * (run.level - 1);
+  const ri = I.raid ? 13 : I.sri ? I.sri : run.idx >= 12 ? 12.5 : run.idx, isl = Math.pow(1.5, ri), lv = 1 + 0.15 * (run.level - 1) + 0.04 * ((run.sub || 1) - 1);
   const hpMult = isl * st.hp * lv * (boss ? (1 + 0.25 * (run.level - 1)) : 1) * (1 + 0.35 * (run.party - 1)) * (run.foeHpStage || 1);
   const dmgMult = ENEMY_DMG * Math.pow(1.32, ri) * st.dmg * (1 + 0.06 * (run.level - 1));
   const body = def[1], col = boss ? (typeof def[2] === "number" ? def[2] : I.enemies[run.stage % 3][3]) : def[3], acc = boss ? (typeof def[3] === "number" ? def[3] : I.enemies[(run.stage + 1) % 3][4]) : def[4];
@@ -2556,9 +2752,10 @@ function spawnEnemy(def, role, boss, scaleBoost = 1) {
   p.y = world.h(p.x, p.z);
   const name = boss ? def[0] : def[0];
   const e = { R, name, role: boss ? "boss" : role, boss, base, pos: p, kb: new V3(), hp: base.hp * hpMult, maxHp: base.hp * hpMult, dmg: base.dmg * dmgMult, spd: base.spd * (boss ? 1 : 1),
-    atkT: rand(0.5, 1.5), dead: false, flash: 0, accent: acc, col, hgt: ({ treant: 2.9, serpent: 2.6, void: 2.4, bat: 2.3, mantis: 2.1, slime: 1.25, spider: 1.45, giant: 3.0, beetle: 1.2 })[body] || 1.9, scale, radius: 0.5 * scale, t: rand(0, 10), atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, bossT: 3, summoned: false, enrage: 1 };
+    atkT: rand(0.5, 1.5), dead: false, flash: 0, accent: acc, col, hgt: ({ treant: 2.9, serpent: 2.6, void: 2.4, bat: 2.3, mantis: 2.1, slime: 1.25, spider: 1.45, giant: 3.0, beetle: 1.2, dragon: 3.0, hydra: 3.3 })[body] || 1.9, scale, radius: 0.5 * scale, t: rand(0, 10), atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, bossT: 3, summoned: false, enrage: 1 };
   if (!boss) { e.label = textSprite(name, "#" + new THREE.Color(acc).getHexString(), 0.9); scene.add(e.label); }
   const bar = new THREE.Group(); M(G.box(), new THREE.MeshBasicMaterial({ color: 0x1a0a10 }), 0, 0, 0, bar, 1.1, 0.09, 0.01); e.fg = M(G.box(), new THREE.MeshBasicMaterial({ color: 0xe0505f }), 0, 0, 0.01, bar, 1.1, 0.09, 0.01); if (!boss) { scene.add(bar); e.bar = bar; }
+  if (ROLE_AI[e.role]) roleProps(e);
   enemies.push(e);
   return e;
 }
@@ -2569,11 +2766,11 @@ function startRun(idx, stageIdx, allyIds) {
   enemies = []; projectiles.forEach(p => scene.remove(p.m)); projectiles = []; telegraphs.forEach(t => scene.remove(t.mesh)); telegraphs = []; timers = [];
   allies.forEach(a => { scene.remove(a.R.g); scene.remove(a.lbl); }); allies = [];
   buildDungeon(idx, Math.floor(Math.random() * (ROOMS.length - 1)));
-  run = { idx, stage: stageIdx, level: 1, levels: ISLANDS[idx].raid ? 2 : STAGES[stageIdx].levels, wave: 0, state: "intro", party: 1 + allyIds.length, allyIds, boons: {} }; computeStats(); renderBoonBar(); stopFishing(); if (sailing) removeBoat();
+  run = { idx, stage: stageIdx, level: 1, levels: ISLANDS[idx].raid ? 2 : STAGES[stageIdx].levels, sub: 1, subs: ISLANDS[idx].raid ? 4 : STAGES[stageIdx].subs, wave: 0, state: "intro", party: 1 + allyIds.length, allyIds, boons: {} }; computeStats(); renderBoonBar(); stopFishing(); if (sailing) removeBoat();
   P.pos.set(world.entry.x, 0, world.entry.z); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.dead = false; P.hp = ST.maxHp; P.flags = {}; P.buffs = {}; P.dashQ = [];
   allyIds.forEach((id, k) => spawnAlly(ALLY_POOL.find(a => a.id === id), k));
   const I = ISLANDS[idx], st = STAGES[stageIdx];
-  banner(I.name, I.raid ? `Raid · ${st.name} · ${run.levels} dungeon stages and a three-phase raid boss` : `${st.name} · ${st.levels} dungeon stages`);
+  banner(I.name, I.raid ? `Raid · ${st.name} · ${run.levels} chapters of ${run.subs} levels and a three-phase raid boss` : `${st.name} · ${st.levels} chapters of ${st.subs} levels`);
   MUSIC.setMode("battle", idx, `${I.name}: battle theme`);
   later(2.4, startLevel);
   updateModeUi();
@@ -2581,28 +2778,28 @@ function startRun(idx, stageIdx, allyIds) {
 function startLevel() {
   if (!run) return;
   run.wave = 0; run.state = "between"; P.flags = {};
-  banner(`Stage ${run.level} of ${run.levels} · Wave 1`, `${ISLANDS[run.idx].name} · new foes: ${roster().map(d => d[0]).join(", ")}`);
+  banner(`Chapter ${run.level} · Level ${run.sub} of ${run.subs}`, `${ISLANDS[run.idx].name} · new foes: ${roster().map(d => d[0]).join(", ")}`);
   later(1.8, nextWave);
 }
 function nextWave() {
   if (!run) return;
   run.wave++;
   const I = ISLANDS[run.idx], st = STAGES[run.stage];
-  const count = 4 + run.level + run.wave + run.stage * 2 + (run.party - 1);
+  let count = 5 + run.level + run.sub + run.stage * 2 + (run.party - 1); if (run.fewKey === lvKey()) count = Math.round(count * 0.7);
   const R3 = roster(); for (let k = 0; k < count; k++) { const def = R3[k % 3]; spawnEnemy(def, def[2], false); }
   run.state = "waves";
-  toast(`<b>Stage ${run.level} · Wave ${run.wave} of ${wavesNow()}</b> ${count} foes${run.wave + run.level > 2 ? ` · new foe: <b>${esc(R3[2][0])}</b>` : ""}`, "");
+  toast(`<b>Chapter ${run.level} · Level ${run.sub} · Wave ${run.wave} of ${wavesNow()}</b> ${count} foes${run.wave + run.level > 2 ? ` · new foe: <b>${esc(R3[2][0])}</b>` : ""}`, "");
 }
 function spawnBoss() {
   const I = ISLANDS[run.idx];
   run.state = "boss";
   const final = run.level === run.levels;
   let name, e;
-  if (final) { const d = I.bosses[run.stage]; name = d[0]; e = spawnEnemy([name, d[1], d[2], d[3]], "boss", true, (1 + 0.06 * run.level) * (I.raid ? 1.35 : 1)); e.sig = d[4] || BODY_SIG[d[1]]; }
-  else { const d = roster()[2]; name = `${LT_TITLE[(run.idx * 3 + run.level + run.stage) % LT_TITLE.length]} ${d[0].replace(/^(Elder|Dread) /, "")}`; e = spawnEnemy([name, d[1], d[3], d[4]], "boss", true, 0.8); e.sig = BODY_SIG[d[1]]; }
+  if (final) { const d = I.bosses[run.stage]; name = d[0]; e = spawnEnemy([name, d[1], d[2], d[3]], "boss", true, (1 + 0.06 * run.level) * (I.raid ? 1.35 : 1)); e.sig = d[4] || BODY_SIG[d[1]]; if (!I.raid) { e.namedBoss = true; e.phase = 0; e.summoned = true; e.hp = e.maxHp = e.maxHp * 1.6; e.dmg *= 1.25; } }
+  else { const d = roster()[2]; name = `${LT_TITLE[(run.idx * 3 + run.level + run.stage) % LT_TITLE.length]} ${d[0].replace(/^(Elder|Dread) /, "")}`; e = spawnEnemy([name, d[1], d[3], d[4]], "boss", true, 0.8); e.sig = BODY_SIG[d[1]]; e.hp = e.maxHp = e.maxHp * 1.25; }
   if (final && I.raid) { e.raidBoss = true; e.phase = 0; e.summoned = true; e.hp = e.maxHp = e.maxHp * 2.5; }
   run.boss = e;
-  banner(name, final ? (I.raid ? "Raid boss · three phases" : `Boss of ${I.name}`) : `Lieutenant of stage ${run.level}`);
+  banner(name, final ? (I.raid ? "Raid boss · three phases" : `Boss of ${I.name}`) : `Boss of chapter ${run.level}`);
   MUSIC.setMode("boss", run.idx, `${name}: boss theme`);
 }
 function checkRunProgress() {
@@ -2611,12 +2808,12 @@ function checkRunProgress() {
   if (alive) return;
   enemies = enemies.filter(e => !e.dead);
   const st = STAGES[run.stage];
-  if (run.state === "waves") { offerCards(); if (Math.random() < 0.5) { grantChest(Math.max(0, run.stage - 1), Math.min(run.idx, 11)); toast("<b>A chest</b> drops as the wave falls.", "rare"); } if (run.wave < wavesNow()) { run.state = "between"; later(1.6, nextWave); } else { run.state = "between"; later(1.8, spawnBoss); } }
+  if (run.state === "waves") { if (run.wave < wavesNow()) { run.state = "between"; later(1.6, nextWave); } else if (run.sub < run.subs) { levelCleared(); } else { run.state = "between"; banner(`Chapter ${run.level} · Level ${run.sub}`, "The boss is coming."); later(1.8, spawnBoss); } }
   else if (run.state === "boss") {
     run.state = "between";
     const xp = 30 * Math.pow(1.3, run.idx) * (1 + run.stage);
     addXp(xp);
-    if (run.level < run.levels) { banner(`Stage ${run.level} cleared`, `+${fmt(xp)} exp. Take a blessing, then pick one of the two doors.`); heal(ST.maxHp * 0.3); stageChests(); MUSIC.setMode("battle", run.idx, `${ISLANDS[run.idx].name}: battle theme`); offerCards(); openDoors(); }
+    if (run.level < run.levels) { run.doorNext = "chapter"; banner(`Chapter ${run.level} cleared`, `+${fmt(xp)} exp. Take a blessing, then pick a door into the next chapter.`); heal(ST.maxHp * 0.3); stageChests(); MUSIC.setMode("battle", run.idx, `${ISLANDS[run.idx].name}: battle theme`); offerCards(); openDoors(); }
     else { stageChests(true); stageComplete(xp); }
   }
 }
@@ -2672,7 +2869,7 @@ function bossAttack(e) {
   const targets = heroTargets(); const tgt = targets.reduce((b, t) => (!b || t.pos.distanceTo(e.pos) < b.pos.distanceTo(e.pos)) ? t : b, null);
   if (!tgt) return;
   let roll = Math.random();
-  if (e.raidBoss && e.phase < 2 && e.hp < e.maxHp * (e.phase ? 0.34 : 0.67)) {
+  if ((e.raidBoss || e.namedBoss) && e.phase < 2 && e.hp < e.maxHp * (e.phase ? 0.34 : 0.67)) {
     e.phase++; e.enrage *= 0.75; banner(e.name, `Phase ${e.phase + 1}${e.phase === 2 ? " · enraged" : ""}`);
     const at = e.pos.clone(); ringFx(at, 12, e.accent, 0.8); pillarFx(at, e.accent, 20, 0.8); for (const t of heroTargets()) { const d = t.pos.clone().sub(at).setY(0); if (d.length() < 10 && t.isHero) P.kb.addScaledVector(d.normalize(), 12); }
     const R3 = roster(); for (let k = 0; k < 3 + st + e.phase; k++) spawnEnemy(R3[k % 3], R3[k % 3][2], false);
@@ -3161,7 +3358,7 @@ function update(dt) {
   if (P.spinT > 0) P.spinT = Math.max(0, P.spinT - dt);
   if (!P.dead) {
     if (S.cls === "paladin") { heal(ST.maxHp * 0.01 * dt, true); P.consecrateT -= dt; if (P.consecrateT <= 0 && enemies.some(e => !e.dead && e.pos.distanceTo(P.pos) < 5)) { P.consecrateT = 8; for (const e of enemiesNear(P.pos, 5)) damageEnemy(e, ST.hit * 1.5, e.pos.clone().sub(P.pos), 1.5, { color: "#fff0a0" }); ringFx(P.pos, 5, 0xffe8a0, 0.6); } }
-    if (sailing && !sailing.anchored) sailUpdate(dt, ix, iy); else {
+    helmTick(dt, ix); if (sailing && !sailing.anchored) sailUpdate(dt, wheelTurn !== null ? wheelTurn : ix, iy); else {
     // horizontal
     if (P.dashT > 0) {
       P.dashT -= dt; P.pos.addScaledVector(P.dashDir, 30 * dt);
@@ -3233,7 +3430,9 @@ function update(dt) {
       } else if (!e.charging) {
         const toT = tgt.pos.clone().sub(e.pos).setY(0); const dist = toT.length(); toT.normalize();
         e.R.g.rotation.y = Math.atan2(toT.x, toT.z);
-        if (e.role === "ranged") {
+        const rr = ROLE_AI[e.role] ? ROLE_AI[e.role](e, tgt, toT, dist, spd, dt) : "base";
+        if (rr !== "base" && rr !== "melee") { moving = rr; }
+        else if (e.role === "ranged") {
           if (dist > 9) { e.pos.addScaledVector(toT, spd * dt); moving = 1; } else if (dist < 6) { e.pos.addScaledVector(toT, -spd * 0.7 * dt); moving = 1; }
           e.atkT -= dt; if (e.atkT <= 0 && dist < 14) { e.atkT = e.base.cd; e.atkAnim = 1; shoot(e.pos.clone().add(new V3(0, 1.4 * e.scale, 0)), tgt.pos.clone().add(new V3(0, 1, 0)), e.accent, e.dmg, 1, "enemy", { src: e, speed: 13, life: 1.6, size: 0.2 }); }
         } else {
@@ -3241,7 +3440,7 @@ function update(dt) {
           if (dist > reach * 0.85) { e.pos.addScaledVector(toT, spd * dt); moving = 1; }
           e.atkT -= dt;
           if (dist < reach && e.atkT <= 0) { e.atkT = e.base.cd; e.atkAnim = 1; const hitT = tgt; tellFx(e, 0.34); later(0.34, () => { if (!e.dead && !(e.stunUntil > worldT) && hitT.pos.distanceTo(e.pos) < reach + 0.6) hurtHero(hitT, e.dmg, e.pos, e); }); }
-          if (e.boss) { e.bossT -= dt; if (e.bossT <= 0) { e.bossT = [3.6, 3.0, 2.4][run.stage] * rand(0.85, 1.15) * e.enrage; bossAttack(e); } }
+          if (e.boss) { e.bossT -= dt; if (e.bossT <= 0) { e.bossT = [3.6, 3.0, 2.4][run.stage] * rand(0.85, 1.15) * e.enrage * 0.85; bossAttack(e); } }
         }
       }
     }
@@ -3283,7 +3482,7 @@ function animate(dt, paused) {
   P.walk = lerp(P.walk, moving ? 1 : 0, 1 - Math.exp(-10 * dt));
   hero.g.position.copy(P.pos); hero.g.rotation.y = P.face;
   poseHumanoid(hero, t, P.walk, P.swing, P.swingStyle, !P.onGround, P.spinT > 0 ? (1 - P.spinT / 0.45) * TAU : 0);
-  if (P.blocking && !P.dead) { hero.shR.rotation.x = -1.35; hero.shR.rotation.z = 0.7; hero.elR.rotation.x = -1.3; if (hero.shL) hero.shL.rotation.x = -0.9; }
+  if (P.blocking && !P.dead) { hero.lastSw = performance.now() / 1000; hero.shR.rotation.x = -1.35; hero.shR.rotation.z = 0.7; hero.elR.rotation.x = -1.3; if (hero.shL) hero.shL.rotation.x = -0.9; }
   trailTick(Math.min(0.05, dt)); waypointTick();
   hero.g.visible = !(P.buffs.veil > worldT && Math.floor(t * 12) % 2 === 0);
   for (const a of allies) { a.R.g.position.copy(a.pos); if (a.down) a.R.g.position.y += 0.3; a.R.g.rotation.y = a.face; if (!a.down) poseHumanoid(a.R, t + allies.indexOf(a), a.moving || 0, a.swing, "normal", false); a.lbl.position.copy(a.pos).add(new V3(0, 2.35, 0)); }
@@ -3333,7 +3532,7 @@ function updateHud() {
   if (run) {
     const I = ISLANDS[run.idx], st = STAGES[run.stage];
     $("hWhere").textContent = I.name;
-    $("hSub").textContent = `${I.raid ? "Raid · " : ""}${st.name} · Stage ${run.level}/${run.levels} · ${run.state === "boss" ? "Boss fight" : run.state === "doors" ? "Choose a door" : run.state === "waves" || run.state === "between" ? `Wave ${run.wave}/${wavesNow()}` : "Get ready"}`;
+    $("hSub").textContent = `${I.raid ? "Raid · " : ""}${st.name} · Chapter ${run.level}/${run.levels} · Level ${run.sub}/${run.subs} · ${run.state === "boss" ? "Boss fight" : run.state === "doors" ? "Choose a door" : run.state === "waves" || run.state === "between" ? `Wave ${run.wave}/${wavesNow()}` : "Get ready"}`;
     const b = run.state === "boss" && run.boss && !run.boss.dead ? run.boss : null;
     $("bossBar").hidden = !b;
     if (b) { $("bossName").textContent = b.name; $("bossHp").style.width = (100 * b.hp / b.maxHp) + "%"; $("bossHpT").textContent = `${fmt(b.hp)} / ${fmt(b.maxHp)}`; }
@@ -3418,7 +3617,8 @@ const RECIPES = [
   { g: "Relics", out: "die", mats: { starsteel: 2, gold: 3, skygirder: 1 }, coins: 5000 }
 ].filter(r => ITEM[r.out] && Object.keys(r.mats).every(m => ITEM[m]));
 const canCraft = r => S.coins >= r.coins && Object.entries(r.mats).every(([m, n]) => (S.inv[m] || 0) >= n);
-function craft(idx) {
+function craft(idx) { startForgeGame(idx); }
+function craftInstant(idx) {
   const r = RECIPES[idx]; if (!r || !canCraft(r) || !(world && world.kind === "lobby")) return;
   for (const [m, n] of Object.entries(r.mats)) { S.inv[m] -= n; if (S.inv[m] <= 0) delete S.inv[m]; }
   S.coins -= r.coins;
@@ -4554,7 +4754,7 @@ function startFishing(sp) {
   fishMsg(`Line cast with your <b>${esc(rod.name)}</b>. Wait for a bite, then press E, J or Attack.`, false);
 }
 function fishMsg(html, hot) { const el = $("fishPanel"); el.hidden = false; el.classList.toggle("hot", !!hot); $("fishText").innerHTML = html; }
-function stopFishing(msg) { if (!fishing) return; if (fishing.rodM) { hero.hold.remove(fishing.rodM); if (hero.weapon) hero.weapon.visible = true; } scene.remove(fishing.bob); scene.remove(fishing.line); fishing.line.geometry.dispose(); fishing = null; if (msg) { fishMsg(msg, false); setTimeout(() => { if (!fishing) $("fishPanel").hidden = true; }, 2600); } else $("fishPanel").hidden = true; }
+function stopFishing(msg) { if (!fishing) return; if ($("reelBox")) $("reelBox").hidden = true; if (fishing.rodM) { hero.hold.remove(fishing.rodM); if (hero.weapon) hero.weapon.visible = true; } scene.remove(fishing.bob); scene.remove(fishing.line); fishing.line.geometry.dispose(); fishing = null; if (msg) { fishMsg(msg, false); setTimeout(() => { if (!fishing) $("fishPanel").hidden = true; }, 2600); } else $("fishPanel").hidden = true; }
 const FISH_W = { common: 60, rare: 28, epic: 9, legendary: 2.6, vaulted: 0.12 };
 function rollFish(luck) {
   const night = DAY.day < 0.35 ? 1.3 : 1, w = {};
@@ -4572,12 +4772,9 @@ function fishControl(mag, reel) {
     if (worldT >= f.at) { f.stage = "bite"; f.until = worldT + 0.75 * f.rod.win; MUSIC.sfx("bite"); ringFx(bob.position, 1.2, 0xcfeeff, 0.4); fishMsg("<b>A bite!</b> Reel in now!", true); }
   } else if (f.stage === "bite") {
     bob.position.y = f.sp.by - 0.18 + Math.sin(worldT * 30) * 0.06;
-    if (pressed) {
-      const luck = f.rod.luck * f.sp.bonus, fish = rollFish(luck), sp = f.sp;
-      gain(fish, null, 1); S.fishLog = S.fishLog || {}; S.fishLog[fish.id] = (S.fishLog[fish.id] || 0) + 1; MUSIC.sfx("splash"); bumpStat("fish"); if (RANK[fish.rarity] >= 1) bumpStat("rareFish"); if (RANK[fish.rarity] >= 2) bumpStat("epicFish");
-      burstFx(bob.position.clone(), 1, 0xcfeeff, 0.4); stopFishing(`You caught ${article(fish.name)} <b style="color:${rc(fish.rarity)}">${esc(fish.name)}</b>! <span class="muted">${RNAME[fish.rarity]} fish. Press E to cast again.</span>`); save();
-    } else if (worldT > f.until) stopFishing("It got away. Watch for the bobber to dip.");
-  }
+    if (pressed) startReel(f);
+    else if (worldT > f.until) stopFishing("It got away. Watch for the bobber to dip.");
+  } else if (f.stage === "reel") reelTick(f, reel);
   if (fishing) fishing.line.geometry.setFromPoints([fishing.rodM ? fishing.rodM.userData.tip.getWorldPosition(new V3()) : P.pos.clone().add(new V3(0, 1.9, 0)), bob.position.clone()]);
 }
 function renderFishing(B) {
@@ -5155,13 +5352,13 @@ $("dialog").addEventListener("click", e => { const b = e.target.closest("[data-r
 let beastT = 8, lastHitSfx = 0;
 function seaTick(dt) {
   if (!world || world.kind !== "lobby") { stormLevel = 0; return; }
-  secretTick(dt);
+  secretTick(dt); miningTick();
   const ref = sailing && !sailing.anchored ? sailing.pos : P.pos;
   stormLevel = stormAt(ref.x, ref.z); cullIsles(dt);
   world.radius = (sailing || P.pos.x > 120) ? 2500 : 290;
   // breath
-  P.breathMax = 12; if (P.breath === undefined) P.breath = P.breathMax;
-  if (P.swimming && !P.dead) { P.breath -= dt; if (P.breath < 0) { P.breath = 0; P.hp -= ST.maxHp * 0.14 * dt; if (Math.random() < dt * 2) floatText(P.pos, "Drowning", "#9ad8ff"); if (P.hp <= 0) heroDown(); } }
+  P.breathMax = 6; if (P.breath === undefined) P.breath = P.breathMax;
+  if (P.swimming && !P.dead) { P.breath -= dt; if (P.breath < 0) { P.breath = 0; P.hp -= ST.maxHp * 0.28 * dt; if (Math.random() < dt * 2) floatText(P.pos, "Drowning", "#9ad8ff"); if (P.hp <= 0) heroDown(); } }
   else P.breath = Math.min(P.breathMax, P.breath + dt * 4);
   // hull wear in a storm the boat was not built for
   if (sailing && !sailing.anchored && !sailing.sink) { const wear = Math.max(0, Math.min(stormLevel, 100) - sailing.def.storm) * 0.12 + Math.max(0, stormLevel - Math.max(100, sailing.def.storm)) * 0.035; if (wear > 0) hurtHull(wear * dt); }
@@ -5562,6 +5759,7 @@ function hazardZone(at, r, col, dur, every, onTick) {
 }
 function slowHero(t, sec) { if (t.isHero) { P.slowUntil = Math.max(P.slowUntil || 0, worldT + sec); } }
 function sigAttack(e, tgt, st, speedUp) {
+  if (bigSig(e, tgt, st, speedUp)) return;
   const hp = p => { const q = p.clone(); q.y = world.h(q.x, q.z); return q; };
   const D = e.dmg, sig = e.sig, col = e.accent;
   if (sig === "web") {
@@ -5852,24 +6050,26 @@ function openCastleTreasury(C) {
    DUNGEONS: every stage is a room; clear it, take a blessing, pick a door
    ===================================================================== */
 const ROOMS = [
-  { name: "Great Hall", W: 50, D: 36, deco: "pillars" },
-  { name: "Round Crypt", R: 22, deco: "tombs" },
-  { name: "Long Gallery", W: 74, D: 26, deco: "statues" },
-  { name: "Pillar Maze", W: 46, D: 46, deco: "grid" },
-  { name: "Sunken Pool", W: 48, D: 40, deco: "pool" },
-  { name: "Bone Pit", R: 24, deco: "pit" },
-  { name: "Forge Chamber", W: 46, D: 34, deco: "forge" },
-  { name: "Collapsed Library", W: 52, D: 38, deco: "shelves" },
-  { name: "Throne Room", W: 40, D: 56, deco: "throne", final: true }
+  { name: "Great Hall", W: 72, D: 52, deco: "pillars" },
+  { name: "Round Crypt", R: 32, deco: "tombs" },
+  { name: "Long Gallery", W: 100, D: 38, deco: "statues" },
+  { name: "Pillar Maze", W: 66, D: 66, deco: "grid" },
+  { name: "Sunken Pool", W: 70, D: 58, deco: "pool" },
+  { name: "Bone Pit", R: 34, deco: "pit" },
+  { name: "Forge Chamber", W: 68, D: 50, deco: "forge" },
+  { name: "Collapsed Library", W: 74, D: 54, deco: "shelves" },
+  { name: "Throne Room", W: 56, D: 80, deco: "throne", final: true }
 ];
 const DOOR_FX = [
   { name: "Healer's Spring", text: "Restore 40% of your health now.", apply: () => heal(ST.maxHp * 0.4) },
-  { name: "Treasure Vault", text: "One extra chest when the next stage is cleared, but foes have 15% more health.", apply: () => { run.bonusChest = (run.bonusChest || 0) + 1; run.foeHpStage = 1.15; } },
-  { name: "Shadow Path", text: "Foes in the next stage have 15% less health.", apply: () => { run.foeHpStage = 0.85; } },
-  { name: "War Drums", text: "Deal 20% more damage for the whole next stage.", apply: () => { run.drumsLevel = run.level; } },
-  { name: "Quiet Corridor", text: "The next stage has one wave fewer.", apply: () => { run.quiet = run.level; } },
+  { name: "Treasure Vault", text: "One extra chest when the next level is cleared, but foes have 15% more health.", apply: () => { run.bonusChest = (run.bonusChest || 0) + 1; run.foeHpStage = 1.15; } },
+  { name: "Shadow Path", text: "Foes in the next level have 15% less health.", apply: () => { run.foeHpStage = 0.85; } },
+  { name: "War Drums", text: "Deal 20% more damage for the whole next level.", apply: () => { run.drumsKey = lvKey(); } },
+  { name: "Quiet Corridor", text: "30% fewer foes in the next level.", apply: () => { run.fewKey = lvKey(); } },
   { name: "Gambler's Door", text: "A coin toss: two extra chests, or foes with 30% more health.", apply: () => { if (Math.random() < 0.5) { run.bonusChest = (run.bonusChest || 0) + 2; toast("<b>Gambler's Door:</b> you won. Two extra chests wait at the end.", "epic"); } else { run.foeHpStage = 1.3; toast("<b>Gambler's Door:</b> you lost. The next foes are tougher.", ""); } } }
 ];
+const lvKey = () => run.level * 100 + (run.sub || 1);
+function levelCleared() { run.state = "between"; run.doorNext = "sub"; banner(`Level ${run.sub} cleared`, "Take a blessing, then pick one of the two doors."); heal(ST.maxHp * 0.15); const n = 1 + (run.bonusChest || 0); run.bonusChest = 0; for (let k = 0; k < n; k++) grantChest(run.stage, Math.min(run.idx, 11)); toast(`<b>${n} chest${n > 1 ? "s" : ""}</b> for clearing level ${run.sub}.`, "rare"); offerCards(); openDoors(); }
 const wavesNow = () => Math.max(1, STAGES[run.stage].waves - (run.quiet === run.level ? 1 : 0));
 let fadeEl = null;
 function fadeThrough(fn) {
@@ -5886,14 +6086,14 @@ function buildDungeon(idx, roomIdx) {
   world = { kind: "island", dungeon: true, idx, room: roomIdx, group, h, hBase: h, radius: Math.hypot(hw, hd), inside, clamp: clampPos, circles: [], portals: [], interact: [], animated: [], walls: [], entry: { x: 0, z: circ ? Rm.R - 4 : hd - 4 } };
   const acc = I.enemies[2][4], dark = !!I.dark;
   const fog = new THREE.Color(I.fog).multiplyScalar(0.25).getHex();
-  setSky(new THREE.Color(I.sky[0]).multiplyScalar(0.2).getHex(), fog, 0x050405, fog, 28, 95, 0xffe0c0, 0.55, 0.32);
+  setSky(new THREE.Color(I.sky[0]).multiplyScalar(0.2).getHex(), fog, 0x050405, fog, 45, 170, 0xffe0c0, 0.6, 0.36);
   // floor
   const ft = TEX.tiles.clone(); ft.needsUpdate = true; ft.repeat.set(W / 4, D / 4);
   const floorCol = new THREE.Color(I.ground[1]).lerp(new THREE.Color(0x8a8278), 0.45);
   const floor = new THREE.Mesh(circ ? new THREE.CircleGeometry(Rm.R, 56) : new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ map: ft, color: floorCol, roughness: 0.85 }));
   floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; group.add(floor);
   // walls that fade when the camera is behind them
-  const wallCol = new THREE.Color(I.ground[2]).lerp(new THREE.Color(0x5a5650), 0.5).getHex(), WH = 5.5;
+  const wallCol = new THREE.Color(I.ground[2]).lerp(new THREE.Color(0x5a5650), 0.5).getHex(), WH = 10;
   const mkWall = (x, z, rot, len, nx, nz, off) => { const m = new THREE.Mesh(G.box(), new THREE.MeshStandardMaterial({ color: lin(wallCol), roughness: 0.9, transparent: true, opacity: 1 })); m.position.set(x, WH / 2, z); m.rotation.y = rot; m.scale.set(len, WH, 1.2); m.castShadow = m.receiveShadow = true; group.add(m); world.walls.push({ m, nx, nz, off }); };
   if (circ) { const n = 28; for (let k = 0; k < n; k++) { const a = (k + 0.5) / n * TAU, x = Math.cos(a) * (Rm.R + 0.4), z = Math.sin(a) * (Rm.R + 0.4); mkWall(x, z, -a + Math.PI / 2, TAU * Rm.R / n + 0.4, Math.cos(a), Math.sin(a), Rm.R - 0.5); } }
   else { mkWall(0, -hd - 0.5, 0, W + 2, 0, -1, hd - 0.5); mkWall(0, hd + 0.5, 0, W + 2, 0, 1, hd - 0.5); mkWall(-hw - 0.5, 0, Math.PI / 2, D + 2, -1, 0, hw - 0.5); mkWall(hw + 0.5, 0, Math.PI / 2, D + 2, 1, 0, hw - 0.5); }
@@ -5906,19 +6106,26 @@ function buildDungeon(idx, roomIdx) {
   for (const [lx, lz] of [[0, 0], [-hw * 0.5, -hd * 0.4], [hw * 0.5, hd * 0.4]]) { const l = new THREE.PointLight(lin(acc), 1.1, 40, 2); l.position.set(lx, 4.5, lz); group.add(l); }
   // decoration per room type, themed by the island
   const r = seeded(idx * 97 + roomIdx * 13 + (run ? run.level : 0)), stone = std(wallCol, { r: 0.85, map: "rock" }), accM = std(acc, { e: acc, ei: 1.2 });
-  const pillar = (x, z, s = 1) => { M(G.cyl(0.9 * s, 1.05 * s, 10), stone, x, 2.8, z, group, 1, 5.6, 1); M(G.box(), stone, x, 0.25, z, group, 2.4 * s, 0.5, 2.4 * s); addCircle(x, z, 1.1 * s, 6); };
+  const pillar = (x, z, s = 1) => { M(G.cyl(0.9 * s, 1.05 * s, 10), stone, x, 5, z, group, 1, 10, 1); M(G.box(), stone, x, 0.25, z, group, 2.4 * s, 0.5, 2.4 * s); addCircle(x, z, 1.1 * s, 6); };
   const prop = (x, z) => { const t = makeTree(I.tree, r); t.position.set(x, 0, z); t.scale.setScalar(0.45 + r() * 0.25); group.add(t); addCircle(x, z, 0.6, 3); };
   if (Rm.deco === "pillars") for (const sx of [-1, 1]) for (let z = -hd + 7; z <= hd - 7; z += 7) pillar(sx * hw * 0.55, z);
-  if (Rm.deco === "grid") for (let gx = -1.5; gx <= 1.5; gx++) for (let gz = -1.5; gz <= 1.5; gz++) if (!(Math.abs(gx) < 1 && Math.abs(gz) < 1 && r() < 0.5)) pillar(gx * 10, gz * 10, 0.8);
+  if (Rm.deco === "grid") for (let gx = -1.5; gx <= 1.5; gx++) for (let gz = -1.5; gz <= 1.5; gz++) if (!(Math.abs(gx) < 1 && Math.abs(gz) < 1 && r() < 0.5)) pillar(gx * 15, gz * 15, 0.9);
   if (Rm.deco === "statues") for (const sx of [-1, 1]) for (let x = -hw + 8; x <= hw - 8; x += 11) { M(G.box(), stone, x, 0.6, sx * (hd - 3), group, 1.6, 1.2, 1.6); M(G.dode(), stone, x, 2.2, sx * (hd - 3), group, 0.6, 1.1, 0.5); addCircle(x, sx * (hd - 3), 1, 3); }
-  if (Rm.deco === "tombs") for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + 0.2, x = Math.cos(a) * 13, z = Math.sin(a) * 13; const tb = M(G.box(), stone, x, 0.55, z, group, 1.6, 1.1, 3); tb.rotation.y = -a; addCircle(x, z, 1.6, 2); }
-  if (Rm.deco === "pool") { const pool = M(new THREE.CircleGeometry(7, 40), new THREE.MeshStandardMaterial({ color: lin(I.water), emissive: lin(I.lava || I.glowWater ? I.water : 0x000000), emissiveIntensity: I.lava ? 1.4 : 0.5, roughness: 0.1, metalness: 0.4, transparent: true, opacity: 0.85 }), 0, 0.04, 0, group); pool.rotation.x = -Math.PI / 2; const rim = M(G.tor(7.2, 0.35), stone, 0, 0.2, 0, group); rim.rotation.x = Math.PI / 2; addCircle(0, 0, 7, 2); }
-  if (Rm.deco === "pit") { const pit = M(new THREE.CircleGeometry(5, 32), std(I.lava ? 0xff5a1a : 0x0a0808, { e: I.lava ? 0xff4a10 : acc, ei: I.lava ? 2 : 0.4 }), 0, 0.03, 0, group); pit.rotation.x = -Math.PI / 2; addCircle(0, 0, 5, 2); for (let k = 0; k < 10; k++) { const a = r() * TAU, d = 8 + r() * 10; M(G.ico(), std(0xe8dcc0, { r: 0.6, flat: true }), Math.cos(a) * d, 0.3, Math.sin(a) * d, group, 0.3 + r() * 0.4); } }
+  if (Rm.deco === "tombs") for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + 0.2, x = Math.cos(a) * 19, z = Math.sin(a) * 19; const tb = M(G.box(), stone, x, 0.55, z, group, 1.6, 1.1, 3); tb.rotation.y = -a; addCircle(x, z, 1.6, 2); }
+  if (Rm.deco === "pool") { const pool = M(new THREE.CircleGeometry(10, 40), new THREE.MeshStandardMaterial({ color: lin(I.water), emissive: lin(I.lava || I.glowWater ? I.water : 0x000000), emissiveIntensity: I.lava ? 1.4 : 0.5, roughness: 0.1, metalness: 0.4, transparent: true, opacity: 0.85 }), 0, 0.04, 0, group); pool.rotation.x = -Math.PI / 2; const rim = M(G.tor(10.2, 0.35), stone, 0, 0.2, 0, group); rim.rotation.x = Math.PI / 2; addCircle(0, 0, 10, 2); }
+  if (Rm.deco === "pit") { const pit = M(new THREE.CircleGeometry(7, 32), std(I.lava ? 0xff5a1a : 0x0a0808, { e: I.lava ? 0xff4a10 : acc, ei: I.lava ? 2 : 0.4 }), 0, 0.03, 0, group); pit.rotation.x = -Math.PI / 2; addCircle(0, 0, 7, 2); for (let k = 0; k < 10; k++) { const a = r() * TAU, d = 8 + r() * 10; M(G.ico(), std(0xe8dcc0, { r: 0.6, flat: true }), Math.cos(a) * d, 0.3, Math.sin(a) * d, group, 0.3 + r() * 0.4); } }
   if (Rm.deco === "forge") for (let k = 0; k < 4; k++) { const x = (k - 1.5) * 10, z = (k % 2 ? -1 : 1) * hd * 0.4; M(G.box(), std(0x2a2a30, { m: 0.8, r: 0.4 }), x, 0.6, z, group, 2, 1.2, 1.2); const lv = M(G.box(), std(0xff5a1a, { e: 0xff4a10, ei: 2 }), x, 0.05, z + 3, group, 6, 0.1, 1); addCircle(x, z, 1.3, 2); }
   if (Rm.deco === "shelves") for (let k = 0; k < 6; k++) { const x = -hw + 6 + k * (W - 12) / 5, z = (k % 2 ? -1 : 1) * hd * 0.35; const sh = M(G.box(), MAT.bark(0x4a3020), x, 1.6, z, group, 5, 3.2, 1); sh.rotation.y = r() * 0.4 - 0.2; addCircle(x, z, 2.2, 4); }
-  if (Rm.deco === "throne") { M(G.box(), stone, 0, 0.4, -hd + 7, group, 14, 0.8, 8); M(G.box(), std(0x5a1a2a, { r: 0.8 }), 0, 0.82, -hd + 3, group, 4, 0.04, 30); M(G.box(), accM, 0, 2.4, -hd + 4, group, 2.2, 3.6, 1); for (const sx of [-1, 1]) for (let z = -hd + 12; z <= hd - 8; z += 8) pillar(sx * 9, z); }
+  if (Rm.deco === "throne") { M(G.box(), stone, 0, 0.4, -hd + 7, group, 14, 0.8, 8); M(G.box(), std(0x5a1a2a, { r: 0.8 }), 0, 0.82, -hd + 3, group, 4, 0.04, 30); M(G.box(), accM, 0, 2.4, -hd + 4, group, 2.2, 3.6, 1); for (const sx of [-1, 1]) for (let z = -hd + 14; z <= hd - 10; z += 10) pillar(sx * 13, z); }
   for (let k = 0; k < 8; k++) { const a = r() * TAU; let x, z; if (circ) { const d = Rm.R - 3; x = Math.cos(a) * d; z = Math.sin(a) * d; } else { x = (r() - 0.5) * (W - 6); z = (r() < 0.5 ? -1 : 1) * (hd - 2.5); } if (Math.hypot(x - world.entry.x, z - world.entry.z) > 6) prop(x, z); }
   for (let k = 0; k < 14; k++) { const x = (r() - 0.5) * (W - 6), z = (r() - 0.5) * (D - 6); if (inside(x, z, 2) && !blocked(x, z, 2) && Math.hypot(x - world.entry.x, z - world.entry.z) > 6) makeRock(group, x, 0, z, 0.3 + r() * 0.5, I.ground[2], r); }
+  // scattered obstacles: crates, barricades, broken pillars and barrels
+  const obstacle = (x, z) => { const k = r();
+    if (k < 0.3) { for (let j = 0; j < 3; j++) M(G.box(), MAT.bark(0x6a4a2a), x + (r() - 0.5) * 2.4, 0.7, z + (r() - 0.5) * 2.4, group, 1.4, 1.4, 1.4).rotation.y = r() * 3; addCircle(x, z, 2.2, 3); }
+    else if (k < 0.55) { const L = 6 + r() * 4, rot = r() * Math.PI, c = Math.cos(rot), sn = Math.sin(rot); const b = M(G.box(), stone, x, 0.9, z, group, L, 1.8, 1.1); b.rotation.y = -rot; for (let t = -L / 2; t <= L / 2; t += 1.4) addCircle(x + c * t, z + sn * t, 0.9, 2); }
+    else if (k < 0.8) { const p = M(G.cyl(1, 1.2, 9), stone, x, 1.2, z, group, 1, 2.4, 1); p.rotation.z = (r() - 0.5) * 0.3; M(G.cyl(0.95, 1, 9), stone, x + 1.6, 0.6, z + 0.6, group, 1, 1.9, 1).rotation.z = Math.PI / 2; addCircle(x, z, 1.4, 3); addCircle(x + 1.6, z + 0.6, 1.1, 2); }
+    else { for (const [ox, oz] of [[0, 0], [1.2, 0.3], [0.5, 1.1]]) M(G.cyl(0.55, 0.6, 10), MAT.bark(0x5a3a22), x + ox, 0.65, z + oz, group, 1, 1.3, 1); addCircle(x + 0.6, z + 0.4, 1.6, 2); } };
+  for (let k = 0, n = 0; k < 80 && n < 16; k++) { const x = (r() - 0.5) * (W - 10), z = (r() - 0.5) * (D - 10); if (!inside(x, z, 4) || blocked(x, z, 3.5) || Math.hypot(x - world.entry.x, z - world.entry.z) < 10 || z < -hd + 9) continue; obstacle(x, z); n++; }
   // the way in (sealed behind you) and two doors out on the far wall
   const doorM = std(0x3a2414, { r: 0.8, map: "bark" }), ironM = MAT.metal(0x5a5a62, 0.4);
   const entryDoor = new THREE.Group(); entryDoor.position.set(0, 0, circ ? Rm.R - 0.3 : hd - 0.3); group.add(entryDoor); M(G.box(), doorM, 0, 1.9, 0, entryDoor, 3, 3.8, 0.3);
@@ -5940,7 +6147,7 @@ function openDoors() {
   if (!world || !world.doors) return;
   run.state = "doors";
   const fx = DOOR_FX.slice().sort(() => Math.random() - 0.5).slice(0, 2);
-  const lastStage = run.level + 1 === run.levels;
+  const lastStage = run.doorNext === "chapter" ? run.subs === 1 : run.sub + 1 === run.subs;
   const pool = ROOMS.map((R, i) => i).filter(i => !ROOMS[i].final && i !== world.room).sort(() => Math.random() - 0.5);
   world.doors.forEach((d, k) => {
     d.open = true; d.room = lastStage ? ROOMS.findIndex(R => R.final) : pool[k]; d.fx = fx[k];
@@ -5955,7 +6162,7 @@ function doorTick() {
 function enterDoor(d) {
   run.state = "travel";
   fadeThrough(() => {
-    run.level++; run.foeHpStage = 1; d.fx.apply();
+    if (run.doorNext === "chapter") { run.level++; run.sub = 1; } else run.sub++; run.foeHpStage = 1; d.fx.apply();
     projectiles.forEach(p => scene.remove(p.m)); projectiles = []; telegraphs.forEach(t => scene.remove(t.mesh)); telegraphs = [];
     buildDungeon(run.idx, d.room);
     P.pos.set(world.entry.x, 0, world.entry.z); P.face = Math.PI; cam.yaw = 0; P.kb.set(0, 0, 0);
@@ -5967,7 +6174,7 @@ function enterDoor(d) {
 function stageChests(final) {
   const n = 1 + (Math.random() < 0.5 ? 1 : 0) + (run.bonusChest || 0); run.bonusChest = 0;
   for (let k = 0; k < n; k++) grantChest(run.stage, Math.min(run.idx, 11));
-  toast(`<b>${n} chest${n > 1 ? "s" : ""}</b> for clearing stage ${run.level}. Open ${n > 1 ? "them" : "it"} from Chests.`, "epic");
+  toast(`<b>${n} chest${n > 1 ? "s" : ""}</b> for clearing chapter ${run.level}. Open ${n > 1 ? "them" : "it"} from Chests.`, "epic");
 }
 /* ---- secrets: hidden wanderers with secret quests, and secret dealers ---- */
 const SECRET_ITEMS = ["whisperblade", "foxfang", "sirenslament", "godspark", "wanderersoath", "veilofthefox", "starlitdiadem", "cartographercoat"];
@@ -6069,6 +6276,192 @@ $("dialog").addEventListener("click", e => {
   const a = e.target.closest("[data-secret]"); if (a) { const d = SECRET_NPCS.find(x => x.id === a.dataset.secret); S.secrets = S.secrets || {}; S.secrets[d.id] = { s: "active", base: S.stats[d.quest.stat] || 0 }; toast(`<b>Secret quest accepted:</b> ${esc(d.quest.title)}. It is not written in any quest log.`, "legendary"); save(); openSecretNpc(); return; }
   const b = e.target.closest("[data-sdbuy]"); if (b && dealerNow) { const s = dealerNow.stock[+b.dataset.sdbuy]; if (!s || s.sold || S.coins < s.price) return; S.coins -= s.price; s.sold = true; gain(ITEM[s.id], P.pos); MUSIC.sfx("chest"); save(); openSecretDealer(); }
 });
+
+/* ---- the merchant's daily armoury: each piece can be bought once per day ---- */
+const GEAR_MULT = { common: 20, rare: 25, epic: 30, legendary: 40 };
+function dailyGear() {
+  const r = seeded(hash(dayKey())), out = [], used = new Set();
+  for (const [rar, cat] of [["common", "weapon"], ["common", "armour"], ["rare", "weapon"], ["rare", "armour"], ["rare", "weapon"], ["epic", "weapon"], ["epic", "armour"], ["legendary", "weapon"], ["legendary", "armour"]]) {
+    const pool = ITEMS.filter(it => it.rarity === rar && it.cat === cat && !it.secret && !used.has(it.id)); if (!pool.length) continue;
+    const it = pool[Math.floor(r() * pool.length)]; used.add(it.id); out.push({ id: it.id, price: Math.round(it.value * GEAR_MULT[rar] / 10) * 10 });
+  }
+  return out;
+}
+function dailyGearHtml() {
+  if (S.shopDay !== dayKey()) { S.shopDay = dayKey(); S.shopBought = {}; }
+  const inLobby = world && world.kind === "lobby";
+  return `<h3 class="sec">Today's armoury · resets at midnight · one of each</h3>
+    <div class="list">${dailyGear().map(g => { const it = ITEM[g.id], sold = S.shopBought[g.id];
+      return `<div class="li" style="--c:${rc(it.rarity)}"><span><b>${esc(it.name)}</b><br><span class="muted" style="font-size:12px">${RNAME[it.rarity]} ${CAT_LABEL[it.cat].toLowerCase()}${it.cat === "weapon" ? ` · ${it.type} · ${fmt(it.dmg)} damage` : ` · ${fmt(it.hp)} health · ${fmt(it.def)} defence`}</span></span>
+        <button class="btn ${sold ? "" : "primary"}" data-buygear="${g.id}" data-price="${g.price}" ${sold || !inLobby || S.coins < g.price ? "disabled" : ""}>${sold ? "Bought today" : "Buy · " + fmt(g.price)}</button></div>`; }).join("")}</div>`;
+}
+const renderShopBase = renderShop;
+renderShop = function (B) { renderShopBase(B); const box = B.firstElementChild || B; box.insertAdjacentHTML("beforeend", dailyGearHtml()); };
+$("menu").addEventListener("click", e => {
+  const b = e.target.closest("[data-buygear]"); if (!b) return; const id = b.dataset.buygear, price = +b.dataset.price;
+  if (!(world && world.kind === "lobby") || S.coins < price || (S.shopBought || {})[id]) return;
+  S.coins -= price; S.shopBought[id] = true; gain(ITEM[id], null, 1, true); toast(`<b>Bought ${esc(ITEM[id].name)}</b> from today's armoury.`, ITEM[id].rarity); MUSIC.sfx("chest"); save(); openMenu("shop");
+});
+
+/* ---- mining: ore veins in the hills, worked with a pickaxe ---- */
+const VEINS = [];
+const VEIN_KIND = { iron: { name: "Iron vein", col: 0x8a7a6a, gem: 0xc8b8a8, loot: [["ironore", 3], ["copper", 2], ["tin", 2], ["flint", 1]] }, silver: { name: "Silver vein", col: 0x6a6a7a, gem: 0xe0e8f0, loot: [["silver", 2], ["steel", 1], ["obsidian", 1], ["ironore", 2]] },
+  gold: { name: "Gold vein", col: 0x7a6a4a, gem: 0xffd040, loot: [["gold", 2], ["moonsilver", 1], ["emberstone", 1], ["silver", 1]] }, crystal: { name: "Crystal vein", col: 0x4a3a6a, gem: 0xb07aff, loot: [["aethercrystal", 1], ["starsteel", 1], ["moonsilver", 1], ["glasspane", 2]] } };
+function buildVeins(group, h) {
+  VEINS.length = 0; const r = seeded(3131);
+  const spots = [];
+  for (const C of CASTLES) if (!C.sea) for (let k = 0; k < 2; k++) { const a = r() * TAU; spots.push([C.x + Math.cos(a) * 26, C.z + Math.sin(a) * 26, k ? (C.biome === "crystal" ? "crystal" : "gold") : "silver"]); }
+  for (let k = 0; k < 8; k++) { const a = r() * TAU, d = 150 + r() * 30; spots.push([Math.cos(a) * d, Math.sin(a) * d, "iron"]); }
+  spots.forEach(([x, z, kind], i) => {
+    if (x > 135 || blockedLobby(x, z) || onPath(x, z, 2)) return;
+    const K = VEIN_KIND[kind], y = h(x, z), g = new THREE.Group(); g.position.set(x, y, z); group.add(g);
+    M(rockGeo(i % 5), MAT.rock(K.col), 0, 0.8, 0, g, 1.8, 1.4, 1.6);
+    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; M(G.oct(), std(K.gem, { e: K.gem, ei: 0.8, flat: true }), Math.cos(a) * 1.1, 0.9 + (k % 3) * 0.35, Math.sin(a) * 1.0, g, 0.18, 0.35, 0.18).rotation.z = a; }
+    const lb = textSprite(K.name, "#ffe2a0", 0.8); lb.position.y = 2.8; g.add(lb); addCircle(x, z, 1.8, 2);
+    const V = { id: "v" + i, x, z, y, kind, K, g }; VEINS.push(V);
+    world.interact.push({ x, z, y, r: 3.2, label: `Mine the ${K.name.toLowerCase()}`, act: () => startMining(V) });
+  });
+}
+let mining = null;
+function startMining(V) {
+  if (mining || run || sailing) return;
+  S.mineCd = S.mineCd || {}; const left = (S.mineCd[V.id] || 0) - Date.now();
+  if (left > 0) { toast(`This vein is worked out. It comes back in ${dur(left)}.`, ""); return; }
+  const pick = new THREE.Group(); M(G.cyl(0.03, 0.035, 6), MAT.bark(0x5a3a22), 0, 0.45, 0, pick, 1, 0.9, 1); const head = M(G.box(), MAT.metal(0x8a8a92, 0.4), 0, 0.88, 0, pick, 0.7, 0.08, 0.08); M(G.cone(4), MAT.metal(0x8a8a92, 0.4), 0.38, 0.88, 0, pick, 0.05, 0.16, 0.05).rotation.z = -Math.PI / 2; M(G.cone(4), MAT.metal(0x8a8a92, 0.4), -0.38, 0.88, 0, pick, 0.05, 0.16, 0.05).rotation.z = Math.PI / 2;
+  if (hero.weapon) hero.weapon.visible = false; hero.hold.add(pick);
+  P.face = Math.atan2(V.x - P.pos.x, V.z - P.pos.z);
+  mining = { V, pick, hits: 0, next: worldT + 0.15, at: P.pos.clone() };
+  toast(`Mining the <b>${esc(V.K.name.toLowerCase())}</b>...`, "");
+}
+function miningTick() {
+  const m = mining; if (!m) return;
+  P.pos.x = m.at.x; P.pos.z = m.at.z;
+  if (worldT >= m.next) {
+    if (m.hits >= 5) { endMining(true); return; }
+    m.hits++; m.next = worldT + 0.62; P.swing = 1; P.swingStyle = "heavy"; P.swingDur = 0.55;
+    later(0.33, () => { if (!mining) return; const at = new V3(m.V.x, m.V.y + 0.9, m.V.z); burstFx(at, 0.9, 0xffd27a, 0.25); for (let k = 0; k < 5; k++) { const p = glowSprite(m.V.K.gem, 0.22, 1); p.position.copy(at); const v = new V3(rand(-2, 2), rand(1, 3), rand(-2, 2)); addFx(p, 0.45, (o, q) => { o.position.addScaledVector(v, 0.016); v.y -= 0.2; o.material.opacity = 1 - q; }); } MUSIC.sfx("hit", { crit: false }); m.V.g.rotation.y += 0.04; });
+  }
+}
+function endMining(done) {
+  const m = mining; if (!m) return; hero.hold.remove(m.pick); if (hero.weapon) hero.weapon.visible = true; mining = null;
+  if (!done) return;
+  const got = []; for (const [id, n] of m.V.K.loot) if (Math.random() < 0.75) { const q = 1 + Math.floor(Math.random() * n); gain(ITEM[id], null, q, true); got.push(`${q} × ${ITEM[id].name}`); }
+  if (!got.length) { const [id] = m.V.K.loot[0]; gain(ITEM[id], null, 1, true); got.push(`1 × ${ITEM[id].name}`); }
+  S.mineCd[m.V.id] = Date.now() + 5 * 60e3; bumpStat("mined");
+  toast(`<b>Mined</b> ${got.map(esc).join(", ")}.`, "rare"); save();
+}
+
+/* ---- the forge mini-game: strike while the marker is in the glowing zone ---- */
+let forgeGame = null;
+function forgeOverlay() {
+  let el = $("forgeGame"); if (el) return el;
+  el = document.createElement("div"); el.id = "forgeGame"; el.className = "modal"; el.hidden = true;
+  el.innerHTML = `<div class="intro" style="max-width:460px;text-align:center"><h2 style="margin:0 0 4px">At the anvil</h2><p class="muted" id="fgText" style="margin:0 0 12px">Strike when the marker is in the glowing zone. Three strikes.</p>
+    <div style="position:relative;height:34px;border-radius:10px;background:#1a1612;border:1px solid #5a4a3a;overflow:hidden"><div id="fgZone" style="position:absolute;top:0;bottom:0;background:linear-gradient(90deg,#ff8a2a55,#ffd040,#ff8a2a55)"></div><div id="fgPerfect" style="position:absolute;top:0;bottom:0;background:#fff8"></div><div id="fgNeedle" style="position:absolute;top:-2px;bottom:-2px;width:4px;background:#fff;box-shadow:0 0 8px #fff"></div></div>
+    <div id="fgHits" style="margin:12px 0;font-size:22px;letter-spacing:6px">○ ○ ○</div><button class="btn primary" id="fgStrike" style="min-width:200px">Strike (Space)</button></div>`;
+  document.body.appendChild(el);
+  $("fgStrike").addEventListener("click", forgeStrike);
+  window.addEventListener("keydown", e => { if (forgeGame && (e.code === "Space" || e.key === "j" || e.key === "e")) { e.preventDefault(); e.stopPropagation(); forgeStrike(); } }, true);
+  return el;
+}
+function startForgeGame(idx) {
+  const r = RECIPES[idx]; if (!r || !canCraft(r) || !(world && world.kind === "lobby")) return;
+  const el = forgeOverlay(), rk = RANK[ITEM[r.out].rarity] || 0, zw = 0.26 - rk * 0.035, zs = 0.15 + Math.random() * (0.7 - zw);
+  forgeGame = { idx, r, x: 0, dir: 1, speed: 0.75 + rk * 0.2, zs, zw, hits: [], last: performance.now() };
+  $("fgZone").style.left = zs * 100 + "%"; $("fgZone").style.width = zw * 100 + "%"; $("fgPerfect").style.left = (zs + zw * 0.38) * 100 + "%"; $("fgPerfect").style.width = zw * 24 + "%";
+  $("fgText").textContent = `Forging ${ITEM[r.out].name}. Strike when the marker is in the glowing zone. Rarer items move faster.`; $("fgHits").textContent = "○ ○ ○"; el.hidden = false;
+  const step = () => { const g = forgeGame; if (!g) return; const now = performance.now(), dt = Math.min(0.05, (now - g.last) / 1000); g.last = now; g.x += g.dir * g.speed * dt; if (g.x > 1) { g.x = 1; g.dir = -1; } if (g.x < 0) { g.x = 0; g.dir = 1; } $("fgNeedle").style.left = `calc(${g.x * 100}% - 2px)`; requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function forgeStrike() {
+  const g = forgeGame; if (!g || g.hits.length >= 3) return;
+  const inZone = g.x >= g.zs && g.x <= g.zs + g.zw, perfect = g.x >= g.zs + g.zw * 0.38 && g.x <= g.zs + g.zw * 0.62;
+  g.hits.push(perfect ? 2 : inZone ? 1 : 0); MUSIC.sfx("hit", { crit: perfect });
+  $("fgHits").textContent = [0, 1, 2].map(k => k < g.hits.length ? ["✕", "●", "★"][g.hits[k]] : "○").join(" ");
+  g.speed *= 1.12; g.zs = 0.1 + Math.random() * (0.8 - g.zw); $("fgZone").style.left = g.zs * 100 + "%"; $("fgPerfect").style.left = (g.zs + g.zw * 0.38) * 100 + "%";
+  if (g.hits.length === 3) setTimeout(finishForge, 450);
+}
+function finishForge() {
+  const g = forgeGame; if (!g) return; forgeGame = null; $("forgeGame").hidden = true;
+  const good = g.hits.filter(h => h > 0).length, stars = g.hits.filter(h => h === 2).length, r = g.r;
+  if (good === 0) { toast("<b>The metal cracked.</b> Your materials are safe. Try again.", ""); return; }
+  for (const [m, n] of Object.entries(r.mats)) { S.inv[m] -= n; if (S.inv[m] <= 0) delete S.inv[m]; }
+  S.coins -= r.coins; let n = r.n || 1, note = "";
+  if (stars === 3) { S.coins += Math.round(r.coins * 0.5); note = " <b>Masterwork!</b> Half your coins back"; if (ITEM[r.out].cat === "material" && Math.random() < 0.5) { n += 1; note += " and an extra one"; } }
+  else if (good === 3) note = " Clean work.";
+  gain(ITEM[r.out], null, n, true); toast(`<b>Forged ${esc(ITEM[r.out].name)}</b>${n > 1 ? " ×" + n : ""}.${note}`, ITEM[r.out].rarity); bumpStat("crafts"); save();
+  if (!$("menu").hidden) renderMenu();
+}
+/* ---- the reel mini-game: keep the hook in the fish's zone until the bar fills ---- */
+function reelBox() {
+  let el = $("reelBox"); if (el) return el;
+  el = document.createElement("div"); el.id = "reelBox";
+  el.style.cssText = "position:fixed;right:24px;top:50%;transform:translateY(-50%);z-index:7;display:flex;gap:8px;align-items:stretch;padding:10px;border-radius:12px;background:rgba(10,12,20,.78);border:1px solid rgba(255,255,255,.15)";
+  el.innerHTML = `<div style="position:relative;width:34px;height:200px;border-radius:8px;background:linear-gradient(#1a3a5a,#0a1a2a);overflow:hidden"><div id="rlZone" style="position:absolute;left:2px;right:2px;border-radius:6px;background:#7fd69a88;border:1px solid #7fd69a"></div><div id="rlHook" style="position:absolute;left:0;right:0;height:6px;background:#fff;box-shadow:0 0 8px #fff"></div></div>
+    <div style="position:relative;width:12px;height:200px;border-radius:6px;background:#2a2a32;overflow:hidden"><i id="rlProg" style="position:absolute;left:0;right:0;bottom:0;background:#e6b85c"></i></div>`;
+  document.body.appendChild(el); return el;
+}
+function startReel(f) {
+  const luck = f.rod.luck * f.sp.bonus; f.fish = rollFish(luck); const rk = RANK[f.fish.rarity] || 0;
+  Object.assign(f, { stage: "reel", prog: 0.3, hook: 0.2, vel: 0, zone: 0.5, zv: 0, zw: Math.max(0.14, 0.34 - rk * 0.045) * (0.9 + f.rod.win * 0.1), rk, zT: 0, last: worldT });
+  reelBox().hidden = false;
+  fishMsg(rk >= 2 ? "<b>Something big is pulling!</b> Hold E, J or Attack to raise the hook; let go to drop it. Keep it in the green." : "<b>Fish on!</b> Hold E, J or Attack to raise the hook; let go to drop it. Keep it in the green.", true);
+}
+function reelTick(f, held) {
+  const dt = Math.min(0.05, Math.max(0, worldT - f.last)); f.last = worldT;
+  f.vel = clamp(f.vel + (held ? 2.8 : -2.4) * dt, -1.3, 1.3); f.hook += f.vel * dt; if (f.hook < 0) { f.hook = 0; f.vel = 0; } if (f.hook > 1) { f.hook = 1; f.vel = 0; }
+  f.zT -= dt; if (f.zT <= 0) { f.zT = rand(0.5, 1.2); f.zv = rand(-0.55, 0.55) * (1 + f.rk * 0.35); }
+  f.zone = clamp(f.zone + f.zv * dt, f.zw / 2, 1 - f.zw / 2); if (f.zone <= f.zw / 2 || f.zone >= 1 - f.zw / 2) f.zv *= -1;
+  const inZone = Math.abs(f.hook - f.zone) < f.zw / 2; f.prog = clamp(f.prog + (inZone ? 0.3 : -0.2 - f.rk * 0.02) * dt, 0, 1);
+  $("rlZone").style.bottom = ((f.zone - f.zw / 2) * 100) + "%"; $("rlZone").style.height = (f.zw * 100) + "%"; $("rlHook").style.bottom = `calc(${f.hook * 100}% - 3px)`; $("rlProg").style.height = (f.prog * 100) + "%";
+  f.bob.position.y = f.sp.by - 0.2 + Math.sin(worldT * 25) * 0.08;
+  if (f.prog >= 1) catchFish(f); else if (f.prog <= 0) { reelBox().hidden = true; stopFishing("The line went slack. It got away."); }
+}
+function catchFish(f) {
+  const fish = f.fish; reelBox().hidden = true;
+  gain(fish, null, 1); S.fishLog = S.fishLog || {}; S.fishLog[fish.id] = (S.fishLog[fish.id] || 0) + 1; MUSIC.sfx("splash"); bumpStat("fish"); if (RANK[fish.rarity] >= 1) bumpStat("rareFish"); if (RANK[fish.rarity] >= 2) bumpStat("epicFish");
+  burstFx(f.bob.position.clone(), 1, 0xcfeeff, 0.4); stopFishing(`You caught ${article(fish.name)} <b style="color:${rc(fish.rarity)}">${esc(fish.name)}</b>! <span class="muted">${RNAME[fish.rarity]} fish. Press E to cast again.</span>`); save();
+}
+/* ---- the helm: a steering wheel, the hull gauge and the cannons ---- */
+let wheelTurn = null, cannonT = 0;
+(function helmUi() {
+  const el = document.createElement("div"); el.id = "helm"; el.hidden = true;
+  el.style.cssText = "position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:6;display:flex;align-items:flex-end;gap:14px;pointer-events:none;font:600 13px/1.2 system-ui,sans-serif;color:#f4ead2";
+  el.innerHTML = `<div style="pointer-events:auto;background:rgba(10,12,20,.72);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:8px 10px;min-width:190px">
+      <div style="display:flex;justify-content:space-between;gap:8px"><span id="helmBoat">Boat</span><b id="helmHullT">100%</b></div>
+      <div style="height:12px;border-radius:6px;background:#2a1a1a;margin-top:5px;overflow:hidden"><i id="helmHull" style="display:block;height:100%;width:100%;background:#7fd69a;transition:width .2s"></i></div>
+      <div id="helmWarn" style="margin-top:5px;color:#ff7a85;display:none">Hull critical. Retreat to shore!</div></div>
+    <svg id="helmWheel" viewBox="-60 -60 120 120" width="118" height="118" style="pointer-events:auto;touch-action:none;cursor:grab;filter:drop-shadow(0 4px 8px #0008)">
+      <g id="helmSpin"><circle r="44" fill="none" stroke="#7a5536" stroke-width="9"/><circle r="44" fill="none" stroke="#a87a4a" stroke-width="3"/><circle r="11" fill="#5a3a22" stroke="#d8b860" stroke-width="3"/>
+      ${Array.from({ length: 8 }, (_, k) => { const a = k * Math.PI / 4, c = Math.cos(a), s = Math.sin(a); return `<line x1="${c * 11}" y1="${s * 11}" x2="${c * 56}" y2="${s * 56}" stroke="#7a5536" stroke-width="6" stroke-linecap="round"/><circle cx="${c * 56}" cy="${s * 56}" r="4" fill="#d8b860"/>`; }).join("")}</g></svg>
+    <button class="act" id="helmFire" style="pointer-events:auto;width:84px;height:84px;border-radius:50%"><span>Fire cannons</span><i class="cd" id="cdCannon"></i></button>`;
+  document.body.appendChild(el);
+  const wh = $("helmWheel"); let x0 = null;
+  wh.addEventListener("pointerdown", e => { x0 = e.clientX; wh.setPointerCapture(e.pointerId); wheelTurn = 0; });
+  wh.addEventListener("pointermove", e => { if (x0 === null) return; wheelTurn = clamp((e.clientX - x0) / 70, -1, 1); });
+  const up = () => { x0 = null; wheelTurn = null; }; wh.addEventListener("pointerup", up); wh.addEventListener("pointercancel", up);
+  $("helmFire").addEventListener("click", () => fireCannons());
+})();
+let helmAngle = 0;
+function helmTick(dt, ix) {
+  const sh = sailing && !sailing.anchored && !sailing.sink, el = $("helm"); el.hidden = !sh; if (!sh) return;
+  const t = wheelTurn !== null ? wheelTurn : clamp(ix || 0, -1, 1); helmAngle = lerp(helmAngle, t * 150, Math.min(1, dt * 8)); $("helmSpin").setAttribute("transform", `rotate(${helmAngle.toFixed(1)})`);
+  const k = sailing.hull / sailing.def.hull; $("helmBoat").textContent = `${sailing.def.name} · hull ${Math.ceil(sailing.hull)} / ${sailing.def.hull}`; $("helmHullT").textContent = Math.round(k * 100) + "%";
+  $("helmHull").style.width = (k * 100) + "%"; $("helmHull").style.background = k > 0.6 ? "#7fd69a" : k > 0.35 ? "#e6b85c" : "#ff5a6a"; $("helmWarn").style.display = k < 0.35 ? "block" : "none";
+  cannonT = Math.max(0, cannonT - dt); $("cdCannon").style.height = (cannonT > 0 ? 100 * cannonT / 1.6 : 0) + "%";
+}
+function fireCannons() {
+  if (!sailing || sailing.anchored || sailing.sink || cannonT > 0) return;
+  cannonT = 1.6; const sh = sailing, f = new V3(Math.sin(sh.yaw), 0, Math.cos(sh.yaw)), side = new V3(f.z, 0, -f.x), rk = RANK[sh.def.rarity] || 0;
+  const dmg = ST.hit * (1.6 + rk * 0.7), guns = 2 + Math.min(3, rk);
+  let tgt = null, td = 45; for (const e of enemies) if (!e.dead && (e.seaBeast || e.guardian)) { const d = e.pos.distanceTo(sh.pos); if (d < td) { td = d; tgt = e; } }
+  for (const s of [-1, 1]) for (let k = 0; k < guns; k++) {
+    const from = sh.pos.clone().addScaledVector(side, s * 1.6).addScaledVector(f, (k - (guns - 1) / 2) * 1.4); from.y = SEA + 1.2;
+    let to; if (tgt && side.dot(tgt.pos.clone().sub(sh.pos)) * s > 0) to = tgt.pos.clone().add(new V3(rand(-1, 1), 0.6, rand(-1, 1))); else to = from.clone().addScaledVector(side, s * 30);
+    later(k * 0.08, () => { burstFx(from, 1.1, 0xd8d0c0, 0.35); shoot(from, to, 0x3a3a3a, dmg, 1.5, "hero", { speed: 34, life: 1.4, size: 0.32 }); });
+  }
+  MUSIC.sfx("thunder"); sh.mesh.rotation.z += 0.04;
+}
 
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
@@ -6387,7 +6780,7 @@ function frame(now) {
 }
 $("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; updateDailyBadge(); if (!dailyInfo().claimed) setTimeout(openDaily, 900); if (coarse || usedTouch) $("joyHint").hidden = false; });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
