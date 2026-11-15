@@ -1283,7 +1283,7 @@ try {
     const d = JSON.parse(raw), f = fresh();
     S = Object.assign(f, d);
     S.pts = Object.assign(f.pts, d.pts || {});
-    S.stats = Object.assign(f.stats, d.stats || {}); S.boats = d.boats || {}; S.isleLoot = d.isleLoot || {}; S.secrets = d.secrets || {}; S.shopDay = d.shopDay; S.shopBought = d.shopBought || {}; S.mineCd = d.mineCd || {}; S.castleLoot = d.castleLoot || {}; S.rods = Object.assign({ willow: 1 }, d.rods || {}); if (!S.rods[S.rod]) S.rod = "willow"; S.ench = d.ench || {}; S.quests = d.quests && typeof d.quests === "object" ? d.quests : {};
+    S.stats = Object.assign(f.stats, d.stats || {}); S.boats = d.boats || {}; S.isleLoot = d.isleLoot || {}; S.secrets = d.secrets || {}; S.auctions = d.auctions || {}; S.shopDay = d.shopDay; S.shopBought = d.shopBought || {}; S.mineCd = d.mineCd || {}; S.castleLoot = d.castleLoot || {}; S.rods = Object.assign({ willow: 1 }, d.rods || {}); if (!S.rods[S.rod]) S.rod = "willow"; S.ench = d.ench || {}; S.quests = d.quests && typeof d.quests === "object" ? d.quests : {};
     S.chests = Array.isArray(d.chests) ? d.chests.filter(c => c && c.t >= 0 && c.t < 3 && c.i >= 0 && c.i < ISLANDS.length) : [];
     S.prog = ISLANDS.map((_, i) => Object.assign({ normal: false, hard: false, nightmare: false }, (d.prog || [])[i] || {}));
     for (const id of Object.keys(S.inv)) if (!ITEM[id] || S.inv[id] <= 0) delete S.inv[id];
@@ -3893,7 +3893,7 @@ function lobbyExtras(group, h) {
   }
   /* townsfolk */
   const mk = (def, x, z, face) => {
-    const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null });
+    const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null }); if (def.scale) R.g.scale.setScalar(def.scale);
     const gy0 = world.h(x, z); R.g.position.set(x, gy0, z); R.g.rotation.y = face; group.add(R.g); shadows(R.g, true, false);
     const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, gy0 + 2.45, z); lbl.userData.far = 34; group.add(lbl); world.labels.push(lbl);
     return { R, lbl };
@@ -5352,7 +5352,7 @@ $("dialog").addEventListener("click", e => { const b = e.target.closest("[data-r
 let beastT = 8, lastHitSfx = 0;
 function seaTick(dt) {
   if (!world || world.kind !== "lobby") { stormLevel = 0; return; }
-  secretTick(dt); miningTick();
+  secretTick(dt); miningTick(); auctionTick(dt);
   const ref = sailing && !sailing.anchored ? sailing.pos : P.pos;
   stormLevel = stormAt(ref.x, ref.z); cullIsles(dt);
   world.radius = (sailing || P.pos.x > 120) ? 2500 : 290;
@@ -5627,8 +5627,19 @@ function floraFauna(group) {
       if (opts.antlers) for (const s of [-1, 1]) { const an = M(G.cyl(0.012, 0.018), std(0xd8c8a8), s * 0.08, 1.85, 0.66, g, 1, 0.36, 1); an.rotation.z = -s * 0.5; const b2 = M(G.cyl(0.01, 0.012), std(0xd8c8a8), s * 0.16, 1.92, 0.72, g, 1, 0.18, 1); b2.rotation.x = 0.6; }
       for (const [lx, lz] of [[-0.14, 0.4], [0.14, 0.4], [-0.14, -0.4], [0.14, -0.4]]) legs.push(M(G.cyl(0.035, 0.03), fur, lx, 0.42, lz, g, 1, 0.84, 1)); }
     else if (kind === "rabbit") { M(G.sph(), fur, 0, 0.18, 0, g, 0.13, 0.13, 0.18); M(G.sph(), fur, 0, 0.3, 0.14, g, 0.09); for (const s of [-1, 1]) M(G.cyl(0.02, 0.025), fur, s * 0.04, 0.45, 0.12, g, 1, 0.18, 1).rotation.x = -0.2; M(G.sph(), std(0xffffff), 0, 0.2, -0.18, g, 0.05); }
+    else if (kind === "sheep") { M(G.ico1(), std(0xf0ece4, { r: 1, flat: true }), 0, 0.62, 0, g, 0.42, 0.36, 0.55); M(G.sph(), std(0x2a2422, { r: 0.6 }), 0, 0.72, 0.52, g, 0.14, 0.15, 0.18); for (const [lx, lz] of [[-0.18, 0.28], [0.18, 0.28], [-0.18, -0.28], [0.18, -0.28]]) legs.push(M(G.cyl(0.04, 0.035), std(0x2a2422), lx, 0.22, lz, g, 1, 0.44, 1)); }
+    else if (kind === "cow") { const hide = std(c, { r: 0.8 }); M(G.box(), hide, 0, 0.95, 0, g, 0.7, 0.62, 1.4); M(G.box(), std(0xf0ece4, { r: 0.8 }), 0.2, 1.05, 0.2, g, 0.32, 0.3, 0.5); M(G.box(), hide, 0, 1.15, 0.82, g, 0.38, 0.38, 0.42); M(G.box(), std(0xe8b0a0), 0, 1.0, 1.04, g, 0.3, 0.2, 0.1); for (const s of [-1, 1]) M(G.cone(5), std(0xe8dcc0), s * 0.18, 1.42, 0.82, g, 0.04, 0.16, 0.04).rotation.z = -s * 0.6;
+      for (const [lx, lz] of [[-0.25, 0.5], [0.25, 0.5], [-0.25, -0.5], [0.25, -0.5]]) legs.push(M(G.cyl(0.07, 0.06), hide, lx, 0.33, lz, g, 1, 0.66, 1)); }
+    else if (kind === "horse") { M(G.sph(), fur, 0, 1.25, 0, g, 0.36, 0.38, 0.85); const nk = M(G.cyl(0.13, 0.18), fur, 0, 1.68, 0.7, g, 1, 0.8, 1); nk.rotation.x = 0.55; M(G.box(), fur, 0, 2.0, 1.05, g, 0.2, 0.22, 0.5); M(G.box(), std(0x1a1410), 0, 1.85, 0.55, g, 0.06, 0.5, 0.36).rotation.x = 0.55; const tl = M(G.cyl(0.03, 0.09), std(0x1a1410), 0, 1.25, -0.9, g, 1, 0.7, 1); tl.rotation.x = -0.4;
+      for (const [lx, lz] of [[-0.18, 0.55], [0.18, 0.55], [-0.18, -0.55], [0.18, -0.55]]) legs.push(M(G.cyl(0.05, 0.04), fur, lx, 0.46, lz, g, 1, 0.92, 1)); }
+    else if (kind === "pig") { const pink = std(0xf0a8a0, { r: 0.7 }); M(G.sph(), pink, 0, 0.42, 0, g, 0.3, 0.27, 0.45); M(G.cyl(0.08, 0.08), std(0xe08a80), 0, 0.42, 0.46, g, 1, 0.08, 1).rotation.x = Math.PI / 2; for (const s of [-1, 1]) M(G.cone(4), pink, s * 0.12, 0.65, 0.3, g, 0.06, 0.1, 0.04); for (const [lx, lz] of [[-0.14, 0.22], [0.14, 0.22], [-0.14, -0.22], [0.14, -0.22]]) legs.push(M(G.cyl(0.045, 0.04), pink, lx, 0.15, lz, g, 1, 0.3, 1)); }
+    else if (kind === "goat") { M(G.sph(), fur, 0, 0.7, 0, g, 0.22, 0.24, 0.45); M(G.sph(), fur, 0, 0.98, 0.4, g, 0.12, 0.13, 0.17); for (const s of [-1, 1]) { const hn = M(G.cone(5), std(0x5a4a3a), s * 0.07, 1.14, 0.34, g, 0.03, 0.2, 0.03); hn.rotation.x = -0.7; } M(G.cone(4), std(0xe8e0d0), 0, 0.82, 0.5, g, 0.04, 0.12, 0.04).rotation.x = Math.PI;
+      for (const [lx, lz] of [[-0.1, 0.25], [0.1, 0.25], [-0.1, -0.25], [0.1, -0.25]]) legs.push(M(G.cyl(0.03, 0.025), fur, lx, 0.25, lz, g, 1, 0.5, 1)); }
+    else if (kind === "fox") { M(G.sph(), fur, 0, 0.3, 0, g, 0.14, 0.14, 0.32); M(G.sph(), fur, 0, 0.42, 0.32, g, 0.11); M(G.cone(4), fur, 0, 0.42, 0.46, g, 0.05, 0.12, 0.05).rotation.x = Math.PI / 2; for (const s of [-1, 1]) M(G.cone(4), fur, s * 0.06, 0.55, 0.3, g, 0.035, 0.09, 0.02); const tl = M(G.sph(), fur, 0, 0.3, -0.42, g, 0.08, 0.08, 0.24); M(G.sph(), std(0xffffff), 0, 0.3, -0.62, g, 0.05);
+      for (const [lx, lz] of [[-0.07, 0.18], [0.07, 0.18], [-0.07, -0.18], [0.07, -0.18]]) legs.push(M(G.cyl(0.025, 0.02), std(0x2a1a14), lx, 0.1, lz, g, 1, 0.2, 1)); }
+    else if (kind === "duck") { M(G.sph(), fur, 0, 0.2, 0, g, 0.14, 0.12, 0.2); M(G.sph(), std(0x2a6a3a, { r: 0.4 }), 0, 0.36, 0.14, g, 0.08); M(G.box(), std(0xf2a030), 0, 0.34, 0.24, g, 0.06, 0.02, 0.08); legs.push(M(G.cyl(0.01, 0.01), std(0xf2a030), 0.04, 0.05, 0, g, 1, 0.1, 1), M(G.cyl(0.01, 0.01), std(0xf2a030), -0.04, 0.05, 0, g, 1, 0.1, 1)); }
     shadows(g, true, false); g.position.set(x, world.h(x, z), z); group.add(g);
-    const a = { kind, g, legs, x, z, home: [x, z], rad: opts.rad || 8, tgt: null, wait: r() * 3, spd: { chicken: 0.9, cat: 1.6, dog: 2.2, deer: 1.4, rabbit: 2.4 }[kind], t: r() * 10, face: r() * TAU, flee: kind === "deer" || kind === "rabbit" };
+    const a = { kind, g, legs, x, z, home: [x, z], rad: opts.rad || 8, tgt: null, wait: r() * 3, spd: { chicken: 0.9, cat: 1.6, dog: 2.2, deer: 1.4, rabbit: 2.4, sheep: 0.8, cow: 0.7, horse: 1.8, pig: 0.9, goat: 1.2, fox: 2.6, duck: 0.7 }[kind], t: r() * 10, face: r() * TAU, flee: kind === "deer" || kind === "rabbit" || kind === "fox" };
     animals.push(a); return a;
   };
   const browns = [0x8a5a32, 0x6a4a2a, 0xc8a070, 0x2a2a2a, 0xe8e0d0, 0xd88a40];
@@ -5636,6 +5647,13 @@ function floraFauna(group) {
   for (let k = 0; k < 6; k++) { const c = COMPASS[(k * 3) % 8], t = 40 + r() * 50; mkAnimal(k < 3 ? "cat" : "dog", Math.cos(c.a) * t, Math.sin(c.a) * t, { col: browns[k % browns.length], rad: 10 }); }
   for (let k = 0; k < 7; k++) { const a = -1.2 + k * 0.4, d = 172 + r() * 12, x = Math.cos(a) * d, z = Math.sin(a) * d; if (x > 140) continue; mkAnimal("deer", -Math.abs(x), z, { col: 0x9a6a3a, antlers: k % 2 === 0, rad: 14 }); }
   for (let k = 0; k < 10; k++) { const a = r() * TAU, d = 60 + r() * 110, x = Math.cos(a) * d, z = Math.sin(a) * d; if (!free(x, z, 0.5)) continue; mkAnimal("rabbit", x, z, { col: [0xb8b0a8, 0x8a6a4a, 0xf0ece4][k % 3], rad: 7 }); }
+  // the countryside: flocks, herds and wild things
+  const near = (cx, cz, n, kind, opts, spread = 10) => { for (let k = 0; k < n; k++) { const x = cx + (r() - 0.5) * spread * 2, z = cz + (r() - 0.5) * spread * 2; if (Math.hypot(x, z) > 270 || x > 140) continue; mkAnimal(kind, x, z, Object.assign({ rad: spread, col: 0xc8b8a0 }, opts)); } };
+  near(92, -62, 8, "sheep", {}, 12); near(56, -88, 5, "cow", { col: 0x3a2a22 }, 12); near(60, -30, 4, "pig", {}, 6); near(-80, 112, 5, "sheep", {}, 12); near(40, 112, 4, "cow", { col: 0x8a5a32 }, 10);
+  for (const [cx, cz] of [[-60, -200], [86, -190], [-200, -100], [-210, 30], [-185, 110], [0, -215], [-150, -160], [-215, -40]]) { near(cx, cz, 3, "goat", { col: [0xe8e0d0, 0x6a5a4a, 0x2a2a2a][Math.floor(r() * 3)] }, 14); near(cx * 0.92, cz * 0.92, 2, "horse", { col: [0x6a4a2a, 0x2a1a14, 0xe8e0d0, 0x9a6a3a][Math.floor(r() * 4)] }, 8); }
+  for (let k = 0; k < 8; k++) { const a = r() * TAU, d = 120 + r() * 110, x = Math.cos(a) * d, z = Math.sin(a) * d; if (x > 135 || !free(x, z, 0.5)) continue; mkAnimal("fox", x, z, { col: 0xd8602a, rad: 12 }); }
+  for (const [cx, cz] of [[47.7, 70.3], [LAKE.x, LAKE.z]]) near(cx, cz, 5, "duck", { col: 0xd8c8a0 }, 9);
+  for (let k = 0; k < 8; k++) { const c = COMPASS[(k * 5) % 8], t = 60 + r() * 90; mkAnimal(k % 2 ? "cat" : "dog", Math.cos(c.a) * t, Math.sin(c.a) * t, { col: browns[(k + 2) % browns.length], rad: 12 }); }
   // birds wheeling over the town and gulls over the docks
   const flocks = [];
   for (let f = 0; f < 5; f++) { const gull = f >= 3, cx = gull ? 165 + f * 6 : (r() - 0.5) * 160, cz = gull ? (f - 3) * 20 : (r() - 0.5) * 160, birds = [];
@@ -5978,6 +5996,12 @@ const CASTLES = [
   { id: "emberforge", name: "Emberforge Citadel", x: -206, z: -122, biome: "volcanic", ground: 0x2a2420, wall: 0x3a302a, roof: 0x6a1a10, banner: 0xff6a2a, tree: "dead" },
   { id: "sandstone", name: "Sandstone Hold", x: -234, z: 34, biome: "desert", ground: 0xe0c080, wall: 0xd8b880, roof: 0xa86a3a, banner: 0xffd060, tree: "cactus" },
   { id: "amethyst", name: "Amethyst Spire", x: -210, z: 118, biome: "crystal", ground: 0x4a3a6a, wall: 0x6a5a8a, roof: 0x8a3aff, banner: 0xd8a0ff, tree: "crystal" },
+  { id: "ivory", name: "Ivory Citadel", x: 0, z: -242, biome: "marble", ground: 0xe8e4dc, wall: 0xf0ece4, roof: 0x3a6aa8, banner: 0xffd040, tree: "pine" },
+  { id: "bloodstone", name: "Bloodstone Fortress", x: -152, z: -186, biome: "canyon", ground: 0x8a3a2a, wall: 0x6a2a22, roof: 0x2a1a18, banner: 0xff3a3a, tree: "dead" },
+  { id: "mirewatch", name: "Mirewatch Keep", x: -242, z: -42, biome: "swamp", ground: 0x3a4a2a, wall: 0x4a5a42, roof: 0x2a3a22, banner: 0x9aff6a, tree: "swamp" },
+  { id: "pebblekeep", name: "Pebblekeep", isle: "pebble", biome: "coral", wall: 0xd8d0c0, roof: 0x6a8a3a, banner: 0xffe060, sea: true },
+  { id: "sirenhold", name: "Siren's Hold", isle: "siren", biome: "coral", wall: 0x9ab8c8, roof: 0x1a5a6a, banner: 0xff8aa0, sea: true },
+  { id: "gildedpalace", name: "The Gilded Palace", isle: "gilded", biome: "coral", wall: 0xe8d8a0, roof: 0xd8a040, banner: 0xffffff, sea: true },
   { id: "coralspire", name: "Coralspire Keep", isle: "palm", biome: "coral", wall: 0xe8d8c8, roof: 0xff8aa0, banner: 0x9affe8, sea: true },
   { id: "tidewatch", name: "Tidewatch Castle", isle: "turtle", biome: "coral", wall: 0xb8c0c8, roof: 0x2a5a7a, banner: 0x40ffd0, sea: true },
   { id: "stormwall", name: "Stormwall Bastion", isle: "ember", biome: "storm", wall: 0x4a4a52, roof: 0x2a2a3a, banner: 0xfff0a0, sea: true }
@@ -6029,6 +6053,12 @@ function buildCastles(group, h) {
     const ch = new THREE.Group(); ch.position.set(tx, ty, tz); group.add(ch); const wood = std(0x5a3a22, { r: 0.8, map: "bark" }), band = std(0xd8b860, { m: 0.9, r: 0.25 });
     M(G.box(), wood, 0, 0.4, 0, ch, 1.4, 0.8, 0.9); for (const sx of [-0.5, 0.5]) M(G.box(), band, sx, 0.45, 0, ch, 0.1, 0.92, 0.94); const gl = glowSprite(C.banner, 2.6, 0.55); gl.position.y = 1; ch.add(gl); C.glow = gl;
     world.interact.push({ x: tx, z: tz, y: ty, r: 2.6, label: `Open the treasury of ${C.name}`, act: () => openCastleTreasury(C) });
+    if (CASTLE_AUCTIONS[C.id]) { const [ax, az] = toW(-6.5, 6.5), ay = world.h(ax, az), H = CASTLE_AUCTIONS[C.id];
+      const A = buildHumanoid({ look: { skin: [0xd9a77f, 0xc99a74, 0xf0d0b0][CASTLES.indexOf(C) % 3], hair: 0x2a1a10, cloth: C.banner, cloth2: 0x2a2a2a }, armour: null, weapon: null }); A.g.position.set(ax, ay, az); A.g.rotation.y = Math.atan2(x - ax, z - az) + Math.PI; group.add(A.g); shadows(A.g, true, false);
+      const pod = M(G.box(), MAT.bark(0x5a3a22), 0, 0, 0, group, 1.4, 1.1, 0.7); const [px, pz] = toW(-6.5, 7.6); pod.position.set(px, world.h(px, pz) + 0.55, pz); pod.rotation.y = A.g.rotation.y;
+      const al = textSprite(`Auctioneer · ${H.name}`, "#ffd166", 0.8); al.position.set(ax, ay + 2.6, az); al.userData.far = 40; group.add(al); world.labels.push(al);
+      world.interact.push({ x: ax, z: az, y: ay, r: 3.2, label: `Bid at the ${H.name}`, act: () => openCastleAuction(C) }); }
+    for (const sx of [-1, 1]) { const [gx2, gz2] = toW(sx * 4.4, 15.6), gy2 = world.h(gx2, gz2), Gd = buildHumanoid({ look: { skin: 0xc99a74, hair: 0x3a2a1a, cloth: C.banner, cloth2: 0x2a2a30 }, armour: "chainshirt", weapon: "boarspear" }); Gd.g.position.set(gx2, gy2, gz2); Gd.g.rotation.y = Math.atan2(gx2 - x, gz2 - z); group.add(Gd.g); shadows(Gd.g, true, false); }
     const [gx, gz] = toW(0, -1.2);
     world.interact.push({ x: gx, z: gz, y: world.h(gx, gz), r: 2.4, label: `Descend into the dungeon of ${C.name}`, act: () => openMap(0) });
     // biome dressing around the land castles
@@ -6463,6 +6493,89 @@ function fireCannons() {
   MUSIC.sfx("thunder"); sh.mesh.rotation.z += 0.04;
 }
 
+/* ---- castle auction houses: live bidding against rival buyers ---- */
+const CASTLE_AUCTIONS = {
+  frostpeak: { name: "Frostpeak Fur and Mail Auction", slots: [["legendary", ["armour"]], ["legendary", ["armour"]], ["epic", ["armour"]]] },
+  thornwood: { name: "Thornwood Blade Auction", slots: [["legendary", ["weapon"]], ["legendary", ["weapon"]], ["epic", ["weapon"]]] },
+  emberforge: { name: "Emberforge Masterwork Auction", slots: [["vaulted", ["weapon"]], ["legendary", ["weapon"]], ["legendary", ["armour"]]] },
+  sandstone: { name: "Sandstone Relic Auction", slots: [["vaulted", ["material"]], ["legendary", ["material"]], ["legendary", ["material"]]] },
+  amethyst: { name: "Amethyst Arcana Auction", slots: [["legendary", ["material"]], ["die", []], ["legendary", ["weapon"]]] },
+  coralspire: { name: "Coralspire Catch Auction", slots: [["legendary", ["fish"]], ["vaulted", ["fish"]], ["epic", ["weapon", "armour"]]] },
+  tidewatch: { name: "Tidewatch Salvage Auction", slots: [["epic", ["weapon"]], ["epic", ["armour"]], ["legendary", ["weapon", "armour"]]] },
+  stormwall: { name: "Stormwall War Auction", slots: [["legendary", ["weapon"]], ["legendary", ["weapon"]], ["vaulted", ["weapon"]]] },
+  ivory: { name: "The Ivory Vault Auction", slots: [["vaulted", ["armour"]], ["vaulted", ["weapon"]], ["legendary", ["armour"]]] },
+  bloodstone: { name: "Bloodstone Arena Auction", slots: [["legendary", ["weapon"]], ["legendary", ["armour"]], ["epic", ["weapon"]], ["epic", ["armour"]]] },
+  mirewatch: { name: "Mirewatch Apothecary Auction", slots: [["legendary", ["potion", "material"]], ["epic", ["material"]], ["die", []]] },
+  pebblekeep: { name: "Pebblekeep Starter Auction", slots: [["rare", ["weapon"]], ["rare", ["armour"]], ["epic", ["weapon", "armour"]]] },
+  sirenhold: { name: "Siren's Hold Pearl Auction", slots: [["legendary", ["fish"]], ["legendary", ["material"]], ["epic", ["material"]]] },
+  gildedpalace: { name: "The Gilded Palace Grand Auction", slots: [["vaulted", ["weapon"]], ["vaulted", ["armour"]], ["vaulted", ["material"]], ["legendary", ["weapon"]]] }
+};
+const BID_BASE = { rare: 6000, epic: 40000, legendary: 260000, vaulted: 4000000 };
+const BIDDERS = ["Valka Stormborn", "House Aurelian", "Merchant Prince Oswin", "Lady Corvane", "Baron Thistlewick", "The Iron Widow", "Old Man Rook", "Countess Mirelle", "Captain Saltbeard", "The Silent Abbot", "Twin Jesters", "Guildmaster Hale"];
+function newLot(spec, taken) {
+  const [rar, cats] = spec; let it;
+  if (rar === "die") it = ITEM.die; else { const pool = ITEMS.filter(i => i.rarity === rar && cats.includes(i.cat) && !i.secret && !taken.includes(i.id)); it = pick(pool.length ? pool : ITEMS.filter(i => i.rarity === rar && cats.includes(i.cat) && !i.secret)); }
+  if (!it) it = ITEM.die;
+  const base = rar === "die" ? 40000 : BID_BASE[it.rarity] || 6000, start = Math.round(base * (0.6 + Math.random() * 0.4) / 100) * 100, now = Date.now();
+  return { id: it.id, bid: start, bidder: null, cap: Math.round(start * (1.3 + Math.random() * 1.1)), endAt: now + (20 + Math.random() * 40) * 60e3, nextRival: now + (1 + Math.random() * 6) * 60e3, done: false, restockAt: 0 };
+}
+function auctionHouse(cid) {
+  S.auctions = S.auctions || {}; const H = CASTLE_AUCTIONS[cid], now = Date.now();
+  let A = S.auctions[cid]; if (!A || !Array.isArray(A.lots)) A = S.auctions[cid] = { lots: [] };
+  H.slots.forEach((spec, i) => { if (!A.lots[i]) A.lots[i] = newLot(spec, A.lots.map(l => l && l.id)); });
+  A.lots.forEach((L, i) => {
+    if (L.done) { if (now >= L.restockAt) A.lots[i] = newLot(H.slots[i], A.lots.map(l => l && l.id)); return; }
+    while (L.nextRival <= now && L.nextRival < L.endAt && L.bid < L.cap) {
+      const raise = Math.round(L.bid * (0.08 + Math.random() * 0.1) / 100) * 100, who = pick(BIDDERS);
+      if (L.bidder === "you") { S.coins += L.bid; if (world && world.kind === "lobby") toast(`<b>Outbid!</b> ${esc(who)} bid ${fmt(L.bid + raise)} on ${esc(ITEM[L.id].name)}. Your ${fmt(L.bid)} coins were returned.`, "legendary"); }
+      L.bid += raise; L.bidder = who; L.nextRival += (2 + Math.random() * 10) * 60e3;
+    }
+    if (now >= L.endAt) { L.done = true; L.restockAt = L.endAt + (60 + Math.random() * 120) * 60e3;
+      if (L.bidder === "you") { gain(ITEM[L.id], null, 1, true); bumpStat("auctionsWon"); toast(`<b>You won the auction!</b> ${esc(ITEM[L.id].name)} for ${fmt(L.bid)} coins.`, ITEM[L.id].rarity); }
+      else if (!L.bidder) L.bidder = "nobody"; }
+  });
+  return A;
+}
+let auctionTickT = 10;
+function auctionTick(dt) { auctionTickT -= dt; if (auctionTickT > 0) return; auctionTickT = 10; for (const cid of Object.keys(CASTLE_AUCTIONS)) if (S.auctions && S.auctions[cid]) auctionHouse(cid); }
+let auctionOpen = null;
+function openCastleAuction(C) {
+  dlgNpc = null; keys.clear(); attackHeld = false; auctionOpen = C;
+  const H = CASTLE_AUCTIONS[C.id], A = auctionHouse(C.id), now = Date.now(); save();
+  $("dlgName").textContent = H.name; $("dlgRole").textContent = `${C.name} · live bidding`;
+  $("dlgText").textContent = `Bid against rival buyers. If you are the top bidder when the hammer falls, the lot is yours. Your bid is held until you win or are outbid. You have ${fmt(S.coins)} coins.`;
+  $("dlgQuest").innerHTML = `<div class="duels">${A.lots.map((L, k) => { const it = ITEM[L.id], next = Math.round(L.bid * 1.1 / 100) * 100, buyout = Math.round(L.cap * 1.25 / 100) * 100, mine = L.bidder === "you";
+    return `<div class="duel" style="--c:${rc(it.rarity)}"><span><b>${esc(it.name)}</b><small>${RNAME[it.rarity]} ${CAT_LABEL[it.cat].toLowerCase()}${it.cat === "weapon" ? ` · ${fmt(it.dmg)} damage` : it.cat === "armour" ? ` · ${fmt(it.hp)} health` : ""}</small>
+      ${L.done ? `<small>${L.bidder === "you" ? "Won by you" : L.bidder === "nobody" ? "No sale" : "Sold to " + esc(L.bidder)} for ${fmt(L.bid)} · new lot in ${dur(L.restockAt - now)}</small>` : `<small class="num">Top bid ${fmt(L.bid)} by ${mine ? "<b>you</b>" : L.bidder ? esc(L.bidder) : "no one yet"} · ends in ${dur(L.endAt - now)}</small>`}</span>
+      ${L.done ? "" : `<span class="row" style="gap:4px;grid-column:1"><button class="btn primary" data-abid="${k}" ${mine || S.coins < next ? "disabled" : ""}>Bid ${fmt(next)}</button><button class="btn" data-abuy="${k}" ${S.coins < buyout ? "disabled" : ""}>Buy now ${fmt(buyout)}</button></span>`}</div>`; }).join("")}</div>`;
+  $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Leave the hall</button>`;
+  $("dialog").hidden = false;
+}
+$("dialog").addEventListener("click", e => {
+  const b = e.target.closest("[data-abid]"), y = e.target.closest("[data-abuy]"); if ((!b && !y) || !auctionOpen) return;
+  const A = auctionHouse(auctionOpen.id), L = A.lots[+(b || y).dataset[b ? "abid" : "abuy"]]; if (!L || L.done) return;
+  if (b) { const next = Math.round(L.bid * 1.1 / 100) * 100; if (L.bidder === "you" || S.coins < next) return; S.coins -= next; L.bid = next; L.bidder = "you"; L.endAt = Math.max(L.endAt, Date.now() + 3 * 60e3); toast(`<b>You bid ${fmt(next)}</b> on ${esc(ITEM[L.id].name)}.`, "rare"); }
+  else { const buyout = Math.round(L.cap * 1.25 / 100) * 100; if (S.coins < buyout) return; if (L.bidder === "you") S.coins += L.bid; S.coins -= buyout; L.bid = buyout; L.bidder = "you"; L.done = true; L.restockAt = Date.now() + 90 * 60e3; gain(ITEM[L.id], null, 1, true); bumpStat("auctionsWon"); toast(`<b>Bought outright:</b> ${esc(ITEM[L.id].name)}.`, ITEM[L.id].rarity); }
+  MUSIC.sfx("chest"); save(); openCastleAuction(auctionOpen);
+});
+/* ---- more townsfolk: all heights, all walks of life ---- */
+(function moreCivilians() {
+  const r = seeded(7272), skins = [0xf0d0b0, 0xe8c0a0, 0xd9a77f, 0xc99a74, 0xb07a52, 0x8a5a3a, 0x6a4430], hairs = [0x1a1a1a, 0x3a2a1a, 0x5a2a12, 0x8a5a2a, 0xc89a5a, 0xd8d8d8, 0xb8401a, 0xe8d8b0];
+  const cloths = [0x7a3a2a, 0x3a5a7a, 0x4a7a3a, 0x7a5a2a, 0x5a3a6a, 0x8a7a5a, 0x2a4a4a, 0xa84a4a, 0x3a3a5a, 0x6a6a3a];
+  const first = ["Ada", "Bryn", "Cole", "Della", "Eamon", "Fay", "Gus", "Hilde", "Ivo", "Juna", "Kester", "Lila", "Mott", "Nessa", "Orrin", "Pia", "Quentin", "Rhea", "Sol", "Tamsin", "Ulric", "Vera", "Wim", "Yara", "Zed", "Bea", "Corin", "Elodie"];
+  const kinds = [["Farmer", 1, ["The turnips are coming up nicely this season.", "Have you seen my goats? They wander up to the castles."]], ["Child", 0.72, ["Are you a real hero? Can I hold your sword?", "I am going to be a Vaulted knight when I grow up!"]],
+    ["Elder", 0.95, ["In my day, the portals only had three islands.", "Mind the dragons out there. They were not always so common."]], ["Merchant", 1.04, ["Buy low, sell high, and never trust a secret dealer.", "The auctions at the castles are where the real money moves."]],
+    ["Guard", 1.1, ["Stay out of trouble.", "Bandits have been seen near Bloodstone Fortress."]], ["Labourer", 1.12, ["Heavy work, honest pay.", "The forge is hiring if you can swing a hammer in time."]], ["Bard", 1, ["I wrote a song about the rainbow portal. Nobody believes me.", "Every castle has an auction. I have bid at none of them."]],
+    ["Shepherd", 0.98, ["The sheep do not care about portals. Lucky sheep.", "A fox took two lambs last week. Sly thing."]], ["Fisher", 1.02, ["Hold the line steady and keep the hook in the green.", "The deeper the storm, the stranger the catch."]], ["Courier", 0.96, ["Letters for every castle, and no horse to ride.", "The Ivory Citadel tips well. Bloodstone does not."]]];
+  const homes = [[0, 60, 30], [40, -40, 20], [-60, 30, 20], [0, -165, 18], [-160, -64, 14], [120, 122, 14], [0, 150, 16], [-70, -60, 18], [70, 40, 18]];
+  for (let k = 0; k < 28; k++) {
+    const [role, sc, lines] = kinds[k % kinds.length], [hx, hz, rad] = homes[k % homes.length];
+    VILLAGERS.push({ name: first[k], role, scale: sc * (0.95 + r() * 0.1), home: [hx + (r() - 0.5) * 10, hz + (r() - 0.5) * 10], rad, armour: role === "Guard" ? "chainshirt" : null, weapon: role === "Guard" ? "militia" : null,
+      look: { skin: skins[Math.floor(r() * skins.length)], hair: hairs[Math.floor(r() * hairs.length)], cloth: cloths[Math.floor(r() * cloths.length)], cloth2: cloths[Math.floor(r() * cloths.length)] }, lines });
+  }
+  VILLAGERS.forEach((v, i) => { if (!v.scale) v.scale = 0.92 + (i * 37 % 17) / 100; });
+})();
+
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
    and scheduled a fraction of a second ahead. Battle music thickens as more foes
@@ -6780,7 +6893,7 @@ function frame(now) {
 }
 $("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; updateDailyBadge(); if (!dailyInfo().claimed) setTimeout(openDaily, 900); if (coarse || usedTouch) $("joyHint").hidden = false; });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
