@@ -359,7 +359,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 <div id="joyHint" hidden>Drag here<br>to move</div>
 <div id="joyBase" hidden><div id="joyKnob"></div></div>
 <div id="actions">
-  <button class="act small" id="bBlock" aria-label="Block, tap just before a hit to parry"><span>Block</span></button>
+  <button class="act small" id="bBlock" aria-label="Block, tap just before a hit to parry"><span>Block</span><i class="cd" id="cdBlock"></i></button>
   <button class="act small" id="bPotion" aria-label="Drink potion"><span>Potion</span><i class="cd" id="cdPotion"></i></button>
   <button class="act small" id="bArmSpec" aria-label="Armour special" hidden><span id="tArmSpec">Armour</span><i class="cd" id="cdArm"></i></button>
   <button class="act mid" id="bSpecial" aria-label="Weapon special"><span id="tSpecial">Special</span><i class="cd" id="cdSpecial"></i></button>
@@ -517,6 +517,7 @@ const SPECIALS = {
   timeEcho:     { name: "Second Hand",     cd: 15, text: m => `Echoes of your blade strike every foe within 12 m three times, each for ${m}x weapon damage.` },
   singularity:  { name: "Singularity",     cd: 14, text: m => `Hurl a void star that drags foes within 10 m together, then collapses for ${m}x weapon damage.` },
   chainStorm:   { name: "Endless Chain",   cd: 13, text: m => `Whirl a chain of dusk around you for 4 s, striking everything within 6 m sixteen times for ${(m * 0.3).toFixed(1)}x weapon damage each.` },
+  prismNova:    { name: "Prismatic Nova",  cd: 12, text: m => `Burst into seven rings of coloured light, each hitting everything within 6 m for ${m}x weapon damage.` },
   cometRain:    { name: "Comet Rain",      cd: 13, text: m => `Call three comets down in a line ahead, each bursting for ${m}x weapon damage on everything within 4 m.` },
   riptideSpiral:{ name: "Riptide Spiral",  cd: 14, text: m => `Spin a whirlpool around you for 4 s that drags foes within 8 m inward, striking eight times for ${(m * 0.45).toFixed(1)}x weapon damage each.` }
 };
@@ -635,7 +636,28 @@ const WEAPON_DEFS = [
   ["galeflail", "Galewind Flail", "legendary", "flail", 0xcfeeff, 0x7ad8ff, "chainBolt", "The chain hums like wind through rigging."],
   ["crimsonkatana", "Crimson Moon Katana", "legendary", "katana", 0xd8303a, 0xff8a8a, "bladeFan", "Drawn only under a red moon."],
   ["kingsmace", "The King's Morningstar", "legendary", "mace", 0xffd870, 0xe8e0ff, "shockwave", "It still remembers the crown it guarded."],
-  ["cometfall", "Cometfall, the Sky-Breaker", "vaulted", "greatsword", 0x1a1a3a, 0xff9a3a, "cometRain", "Forged from the tail of a falling star."]
+  ["cometfall", "Cometfall, the Sky-Breaker", "vaulted", "greatsword", 0x1a1a3a, 0xff9a3a, "cometRain", "Forged from the tail of a falling star."],
+  ["tidebreaker", "Tidebreaker Longsword", "rare", "sword", 0xcfe8f0, 0x5ab8d8, "riptideSpiral", "Forged to cut through waves."],
+  ["emberfang", "Emberfang Sabre", "epic", "sword", 0xd8603a, 0xffa040, "flameWave", "It hisses when it meets the rain."],
+  ["frostwake", "Frostwake Blade", "epic", "sword", 0xd8f0ff, 0x9ad8ff, "frostNova", "Leaves a trail of rime behind each cut."],
+  ["prismblade", "Prismblade", "legendary", "sword", 0xf0f0ff, 0xff9af8, "bladeFan", "Splits the light into seven edges."],
+  ["sunderer", "The Sunderer", "legendary", "greatsword", 0x6a6a72, 0xffd040, "shockwave", "Built to break shields and the arms behind them."],
+  ["deckcleaver", "Deck Cleaver", "rare", "greatsword", 0x9aa0a8, 0x8a5a3a, "heavyStrike", "A pirate's two-hander, notched from a hundred boardings."],
+  ["mistveil", "Mistveil Katana", "rare", "katana", 0xd8e0e8, 0xbfd8e8, "bladeFan", "Drawn so fast it leaves mist behind."],
+  ["stormedge", "Stormedge Katana", "epic", "katana", 0x5a6a8a, 0xfff0a0, "chainBolt", "Lightning follows the edge like a hound."],
+  ["duelistsong", "Duelist's Song", "rare", "rapier", 0xe8e0d0, 0xffd060, "bladeFan", "It hums a note when it finds a gap."],
+  ["edgeofbeyond", "Rapier of the Beyond", "legendary", "rapier", 0x2a1a4a, 0xc040ff, "timeEcho", "Its point is always a moment ahead of you."],
+  ["harpoonlance", "Harpoon Lance", "rare", "spear", 0xa8acb0, 0x5a3a22, "shockwave", "Made for whales. Works on everything else."],
+  ["stormaxe", "Squallsplitter Axe", "epic", "axe", 0x5a6a8a, 0x9ad8ff, "chainBolt", "Thunder rolls after every chop."],
+  ["beyondstaff", "Staff of the Far Sea", "legendary", "staff", 0x1a2a4a, 0x40ffd0, "vortex", "Cut from driftwood found past the Tempest."],
+  ["anchorflail", "Anchor Flail", "epic", "flail", 0x4a4a52, 0xd8b860, "vaultCrush", "A ship's anchor on a chain. Subtle it is not."],
+  ["anvilfall", "Anvilfall", "legendary", "warhammer", 0x3a3a40, 0xff7a3a, "meteor", "The anvil came first. The handle was an afterthought."],
+  ["tempesttrident", "Tempest Trident", "legendary", "trident", 0x3a4a6a, 0xfff0a0, "chainStorm", "Each tine calls a different storm."],
+  ["eelfang", "Eelfang Dagger", "rare", "dagger", 0x3a6a4a, 0x9affe8, "drainBurst", "Made from a Reef Eel's tooth."],
+  ["tideharvest", "Tideharvest Scythe", "epic", "scythe", 0x1a4a5a, 0x40ffd0, "riptideSpiral", "It reaps the sea instead of wheat."],
+  ["lighthousemace", "Lighthouse Mace", "rare", "mace", 0xe8e0d0, 0xffe060, "heavyStrike", "Its head still glows like the old lamp."],
+  ["aurorablades", "Aurora Twinblades", "legendary", "twinblade", 0xd8f0ff, 0x7affb0, "bladeFan", "Two lights from the northern sky."],
+  ["prismaticedge", "Prismatic Edge of the Beyond", "vaulted", "sword", 0xf8f8ff, 0xff9af8, "prismNova", "Found where the rainbow portal touches the sea."]
 ];
 // [id, name, rarity, weight, metal, cloth, accent, helm, cape, special, description]
 const ARMOUR_DEFS = [
@@ -692,7 +714,19 @@ const ARMOUR_DEFS = [
   ["dawnguard", "Dawnguard Regalia", "legendary", "heavy", 0xfff0c0, 0xd8b860, 0xffd040, "crown", true, null, "The sun rises a little earlier for its wearer."],
   ["voidwalker", "Voidwalker Shroud", "legendary", "light", 0x1a1028, 0x0a0614, 0xb07aff, "hood", true, null, "Footsteps in it make no sound."],
   ["thunderlord", "Thunderlord Mail", "legendary", "medium", 0x5a6a8a, 0x2a3a5a, 0x9ad8ff, "horned", true, null, "Static crackles at every movement."],
-  ["wildheart", "Wildheart Carapace", "legendary", "heavy", 0x4a6a3a, 0x2a3a1a, 0x9aff6a, "helm", false, null, "Moss and bark that never stop growing."]
+  ["wildheart", "Wildheart Carapace", "legendary", "heavy", 0x4a6a3a, 0x2a3a1a, 0x9aff6a, "helm", false, null, "Moss and bark that never stop growing."],
+  ["deckhand", "Deckhand's Vest", "common", "light", 0x7a6a4a, 0x3a5a7a, 0, "none", false, null, "Smells of tar and salt."],
+  ["piratecoat", "Corsair's Longcoat", "rare", "light", 0x5a2a2a, 0x2a1a1a, 0xffd060, "hood", true, null, "Every pocket hides a coin or a knife."],
+  ["coralguard", "Coralguard Mail", "rare", "medium", 0xff8aa0, 0x3a6a7a, 0xffe0e8, "helm", false, null, "Grown, not forged."],
+  ["whalebone", "Whalebone Harness", "rare", "heavy", 0xe8e0d0, 0x5a4a3a, 0xbfd8e8, "horned", false, null, "Light as bone, hard as iron."],
+  ["stormcloak", "Stormcloak Raiment", "epic", "light", 0x3a4a6a, 0x1a2a3a, 0xfff0a0, "hood", true, null, "Rain slides off it like it is afraid."],
+  ["tidewalkerplate", "Tidewalker Plate", "epic", "heavy", 0x2a5a6a, 0x1a2a3a, 0x40ffd0, "visor", true, null, "Worn by the knights who patrol the sea roads."],
+  ["seawolf", "Seawolf Scale", "epic", "medium", 0x5a6a7a, 0x2a3a4a, 0x9ad8ff, "horned", true, null, "A wolf's pelt over sharkskin scales."],
+  ["stormheart", "Stormheart Mail", "legendary", "medium", 0x4a5a8a, 0x1a2a4a, 0xfff0a0, "crown", true, null, "A captured storm still beats in the chest plate."],
+  ["abyssdiver", "Abyssdiver Suit", "legendary", "heavy", 0x1a3a4a, 0x0a1a2a, 0x40ffd0, "visor", false, null, "Built to walk the sea floor."],
+  ["lighthousekeeper", "Lighthouse Keeper's Robes", "legendary", "light", 0xf0e8d8, 0x8a3a2a, 0xffe060, "hood", true, null, "The lamp never went out. Neither does the wearer."],
+  ["maelstromscale", "Maelstrom Scale", "legendary", "heavy", 0x1a2a3a, 0x0a1420, 0x40ffd0, "horned", true, null, "Each scale turns a little, like a whirlpool."],
+  ["prismaticaegis", "Prismatic Aegis", "legendary", "heavy", 0xf0f0ff, 0x8a8aa8, 0xff9af8, "crown", true, null, "It shines every colour when struck."]
 ];
 const ARM_W = { light: { hp: 0.8, def: 0.7, move: 1.05, label: "Light" }, medium: { hp: 1, def: 1, move: 1, label: "Medium" }, heavy: { hp: 1.25, def: 1.35, move: 0.92, label: "Heavy" } };
 const RAR_HP = { common: 30, rare: 80, epic: 180, legendary: 380, vaulted: 750 };
@@ -748,6 +782,67 @@ for (const [id, name, rarity, col, desc] of [
 ]) addItem({ id, name, rarity, cat: "fish", desc, shape: "fish", col });
 addItem({ id: "die", name: "Fortune Die", rarity: "legendary", cat: "special", desc: "Twenty faces, each a different crest. Roll it at the Class Altar to be called to a new class." });
 for (const it of ITEMS) it.value = Math.round(BASE_VALUE[it.rarity] * ((it.cat === "weapon" || it.cat === "armour") ? 1.5 : 1) * (0.85 + (hash(it.id) % 31) / 100));
+/* ---- every sword swings its own way: a form, a grip and an effect, never repeated ---- */
+const SWORD_TYPES = ["sword", "katana", "greatsword", "rapier"];
+// each form: k (0..1) → [shoulder x, shoulder z, elbow x, chest yaw, chest pitch, blade twist]
+const SWORD_FORMS = [
+  { name: "Rising Crescent", f: k => { const e = ease(k); return [lerp(-0.4, -2.6, e), lerp(0.9, -0.8, e), -0.3, lerp(-0.6, 0.6, e), 0, 0]; } },
+  { name: "Falling Diagonal", f: k => { const e = ease(k); return [lerp(-2.5, -0.6, e), lerp(-1.0, 0.9, e), -0.35, lerp(0.7, -0.7, e), 0.05, 0]; } },
+  { name: "Backhand Sweep", f: k => { const e = ease(k); return [-1.5, lerp(1.2, -1.1, e), -0.2, lerp(-0.8, 0.8, e), 0, Math.PI / 2]; } },
+  { name: "Overhead Cleave", f: k => { const e = k < 0.35 ? k / 0.35 : 1, d = k < 0.35 ? 0 : ease((k - 0.35) / 0.65); return [k < 0.35 ? lerp(-0.8, -3.0, e) : lerp(-3.0, -0.4, d), 0, -0.25, 0, k < 0.35 ? -0.12 : lerp(-0.12, 0.22, d), 0]; } },
+  { name: "Double Cut", f: k => { const a = k < 0.5 ? ease(k * 2) : ease((k - 0.5) * 2); return k < 0.5 ? [lerp(-2.4, -0.7, a), lerp(-0.9, 0.8, a), -0.3, lerp(0.6, -0.6, a), 0, 0] : [lerp(-0.7, -2.2, a), lerp(0.8, -0.7, a), -0.3, lerp(-0.6, 0.5, a), 0, 0.4]; } },
+  { name: "Thrust and Flick", f: k => k < 0.45 ? [lerp(-0.6, -1.6, ease(k / 0.45)), 0, lerp(-1.4, 0, ease(k / 0.45)), -0.3 * ease(k / 0.45), 0, 0] : [-1.6, lerp(0, 1.0, ease((k - 0.45) / 0.55)), 0, lerp(-0.3, -0.7, (k - 0.45) / 0.55), 0, 0] },
+  { name: "Low Sweep", f: k => { const e = ease(k); return [-0.8, lerp(-1.0, 1.0, e), -0.15, lerp(0.6, -0.6, e), 0.22, 0]; } },
+  { name: "Draw Cut", f: k => { const e = 1 - Math.pow(1 - k, 4); return [lerp(-0.3, -1.6, e), lerp(1.25, -1.0, e), lerp(-1.2, -0.1, e), lerp(-0.7, 0.7, e), 0.05, 0]; } },
+  { name: "Uppercut", f: k => { const e = ease(k); return [lerp(0.2, -2.8, e), lerp(0.3, -0.2, e), lerp(-1.0, -0.2, e), lerp(-0.3, 0.2, e), lerp(0.15, -0.15, e), 0]; } },
+  { name: "Crossing X", f: k => { const a = k < 0.5 ? ease(k * 2) : ease((k - 0.5) * 2); return k < 0.5 ? [lerp(-2.5, -0.6, a), lerp(-1.0, 0.9, a), -0.3, lerp(0.6, -0.6, a), 0, 0] : [lerp(-2.5, -0.6, a), lerp(0.9, -1.0, a), -0.3, lerp(-0.6, 0.6, a), 0, Math.PI / 2]; } },
+  { name: "Feint and Slash", f: k => k < 0.3 ? [-1.6, lerp(-0.4, -1.1, k / 0.3), -0.6, lerp(0.2, 0.7, k / 0.3), 0, 0] : [-1.6, lerp(-1.1, 1.1, ease((k - 0.3) / 0.7)), -0.15, lerp(0.7, -0.8, ease((k - 0.3) / 0.7)), 0, 0] },
+  { name: "Wheel Cut", f: k => [-1.6 + Math.sin(k * TAU) * 1.1, Math.cos(k * TAU) * 1.0, -0.3, Math.sin(k * TAU) * 0.4, 0, 0] },
+  { name: "Lunge", f: k => { const s = Math.sin(k * Math.PI); return [lerp(-0.9, -1.7, s), -0.15, lerp(-1.5, 0, s), -0.45 * s, 0.12 * s, 0]; } },
+  { name: "Double Thrust", f: k => { const s = Math.abs(Math.sin(k * TAU)); return [lerp(-0.9, -1.65, s), lerp(-0.25, 0.2, k), lerp(-1.4, 0, s), -0.3 * s, 0, 0]; } },
+  { name: "Spiral Thrust", f: k => { const s = Math.sin(k * Math.PI); return [lerp(-0.8, -1.7, s), Math.sin(k * TAU) * 0.35, lerp(-1.4, 0, s), -0.3 * s, 0, k * TAU]; } }
+];
+const SWORD_GRIPS = ["one hand", "two hands", "reverse grip", "high guard"];
+const SWORD_FX = ["sparks", "embers", "frost", "petals", "lightning", "void", "radiance", "tide"];
+const ease = k => 1 - Math.pow(1 - Math.min(1, Math.max(0, k)), 2);
+const SWORD_STYLE = {};
+(function assignSwordStyles() {
+  const fam = { sword: { forms: [0, 1, 2, 4, 6, 9, 10, 11, 3, 8], grips: [0, 3, 1, 2] }, katana: { forms: [7, 1, 9, 6, 0, 10, 2, 4], grips: [1, 2, 0, 3] }, greatsword: { forms: [3, 11, 6, 8, 1, 4, 0, 2], grips: [1, 3] }, rapier: { forms: [12, 13, 14, 5, 0, 2], grips: [0, 3, 2] } };
+  const usedPair = new Set(), usedTriple = new Set(), swords = ITEMS.filter(it => it.cat === "weapon" && SWORD_TYPES.includes(it.type));
+  swords.forEach((w, i) => {
+    const F = fam[w.type], h = hash(w.id); let pick = null;
+    for (const pass of [0, 1]) { if (pick) break;
+      for (let gi = 0; gi < F.grips.length && !pick; gi++) for (let fi = 0; fi < F.forms.length && !pick; fi++) {
+        const form = F.forms[(fi + i) % F.forms.length], grip = F.grips[(gi + (h >> 3)) % F.grips.length];
+        for (let xi = 0; xi < SWORD_FX.length && !pick; xi++) { const fx = (xi + h) % SWORD_FX.length, tri = `${form}|${grip}|${fx}`, pair = `${form}|${grip}`;
+          if (usedTriple.has(tri) || (pass === 0 && usedPair.has(pair))) continue; pick = { form, grip, fx }; usedTriple.add(tri); usedPair.add(pair); } } }
+    SWORD_STYLE[w.id] = pick;
+  });
+})();
+const swordStyleText = id => { const s = SWORD_STYLE[id]; return s ? `${SWORD_FORMS[s.form].name}, held in ${SWORD_GRIPS[s.grip] === "one hand" ? "one hand" : SWORD_GRIPS[s.grip] === "two hands" ? "two hands" : "a " + SWORD_GRIPS[s.grip]}, with ${SWORD_FX[s.fx]}` : ""; };
+function poseSword(R, k, s) {
+  const [sx, sz, ex, cy, cx, tw] = SWORD_FORMS[s.form].f(k);
+  R.shR.rotation.x = sx; R.shR.rotation.z = sz; R.elR.rotation.x = ex; R.chest.rotation.y = cy; R.chest.rotation.x = cx;
+  if (R.weapon) R.weapon.rotation.y = tw;
+  if (R.shL) { if (s.grip === 1) { R.shL.rotation.x = sx * 0.85; R.shL.rotation.z = -sz * 0.4 + 0.35; R.elL.rotation.x = ex - 0.5; } else if (s.grip === 3) { R.shL.rotation.x = -0.9; R.shL.rotation.z = 0.5; R.elL.rotation.x = -1.4; } else { R.shL.rotation.x = 0.3; R.shL.rotation.z = 0.25; R.elL.rotation.x = -0.4; } }
+}
+function swordIdle(R, s, sw) {
+  if (s.grip === 1 && R.shL) { R.shR.rotation.x = -0.75; R.shR.rotation.z = 0.35; R.elR.rotation.x = -1.0; R.shL.rotation.x = -0.75; R.shL.rotation.z = -0.35; R.elL.rotation.x = -1.1; }
+  else if (s.grip === 3) { R.shR.rotation.x = -1.6 + sw * 0.1; R.shR.rotation.z = -0.3; R.elR.rotation.x = -1.4; }
+  else if (s.grip === 2) { R.shR.rotation.x = -0.25 + sw * 0.3; R.elR.rotation.x = -0.6; }
+}
+function swordFx(s, w) {
+  const f = new V3(Math.sin(P.face), 0, Math.cos(P.face)), at = P.pos.clone().addScaledVector(f, 1.6).add(new V3(0, 1.2, 0)), col = w.accent || 0xffffff, kind = SWORD_FX[s.fx];
+  if (kind === "sparks") { burstFx(at, 0.9, 0xffd27a, 0.22); for (let k = 0; k < 6; k++) { const p = glowSprite(0xffe0a0, 0.25, 1); p.position.copy(at); const v = new V3(rand(-3, 3), rand(1, 4), rand(-3, 3)); addFx(p, 0.4, (o, q) => { o.position.addScaledVector(v, 0.016); v.y -= 0.25; o.material.opacity = 1 - q; }); } }
+  else if (kind === "embers") { ringFx(at.clone().setY(P.pos.y), 1.6, 0xff7a2a, 0.35); burstFx(at, 1.1, 0xff8a3a, 0.3); }
+  else if (kind === "frost") { for (let k = 0; k < 5; k++) { const sh = M(G.oct(), glowMat(0xbfe8ff, 0.9), 0, 0, 0, null, 0.08, 0.22, 0.08); sh.position.copy(at); const v = f.clone().multiplyScalar(4).add(new V3(rand(-2, 2), rand(0, 1.5), rand(-2, 2))); addFx(sh, 0.45, (o, q) => { o.position.addScaledVector(v, 0.016); o.rotation.y += 0.3; o.scale.setScalar(1 - q); }); } }
+  else if (kind === "petals") { for (let k = 0; k < 8; k++) { const p = glowSprite(k % 2 ? 0xff9ad8 : 0xffd0e8, 0.35, 0.9); p.position.copy(at); const v = new V3(rand(-2, 2), rand(0.5, 2), rand(-2, 2)); addFx(p, 0.8, (o, q) => { o.position.addScaledVector(v, 0.012); o.position.y -= q * 0.01; o.material.opacity = 0.9 * (1 - q); }); } }
+  else if (kind === "lightning") { boltFx(at.clone().addScaledVector(f, -0.8), at.clone().addScaledVector(f, 1.6), 0xfff0a0, 0.18); boltFx(at, at.clone().add(new V3(rand(-1, 1), 1.2, rand(-1, 1))), 0xd8f0ff, 0.15); }
+  else if (kind === "void") { const g = glowSprite(0x8a3aff, 2.2, 0.8); g.position.copy(at); addFx(g, 0.35, (o, q) => { o.scale.setScalar(2.2 * (1 - q)); }); ringFx(at.clone().setY(P.pos.y), 1.3, 0xb07aff, 0.3); }
+  else if (kind === "radiance") { pillarFx(at.clone().setY(P.pos.y), 0xfff0c0, 3, 0.3); burstFx(at, 0.8, 0xffffff, 0.2); }
+  else { ringFx(at.clone().setY(P.pos.y), 1.8, 0x7ad8ff, 0.4); burstFx(at, 1, 0x9ae8ff, 0.3); }
+  burstFx(at, 0.5, col, 0.18);
+}
 const CAT_LABEL = { weapon: "Weapon", armour: "Armour", potion: "Potion", material: "Material", special: "Relic", fish: "Fish" };
 
 /* ---------- classes ---------- */
@@ -900,7 +995,7 @@ ISLANDS.push(
     bosses: [["Ny'tharos, the Unlit Choir", "void", 0x05030f, 0xb07aff, "voidPull"], ["Ny'tharos, Hymn of Nothing", "void", 0x0a0418, 0xff70ff, "voidPull"], ["Ny'tharos, the Last Silence", "void", 0x000000, 0xffffff, "voidPull"]] },
   { name: "The Leviathan's Trench", raid: true, dark: true, tree: "coral", sky: [0x01121a, 0x0a3a4a], fog: 0x062a34, fogNear: 30, ground: [0x0a2a30, 0x1a3a3a, 0x2a4a4a], water: 0x20c8d0, glowWater: true, grass: null, map: [0, 0], col: "#40ffd0", blurb: "The deepest trench in the world. Watch for the tide line.",
     enemies: [["Trench Crawler", "crab", "melee", 0x1a3a3a, 0x40ffd0], ["Deep Eel", "serpent", "skirm", 0x0a2a3a, 0x40ffd0], ["Abyssal Gaze", "void", "ranged", 0x01121a, 0x40ffd0]],
-    more: [["Pressure Slime", "slime", "melee", 0x1a6a6a, 0x9affe8], ["Angler Bat", "bat", "ranged", 0x0a1a2a, 0xffe060], ["Coral Mantis", "mantis", "melee", 0xff8aa0, 0x40ffd0], ["Kelp Horror", "treant", "melee", 0x1a3a2a, 0x40ffd0], ["Trench Weaver", "spider", "skirm", 0x0a2a30, 0x9affe8], ["Drowned Knight", "humanoid", "melee", 0x1a4a4a, 0x40ffd0]],
+    more: [["Pressure Slime", "slime", "melee", 0x1a6a6a, 0x9affe8], ["Angler Bat", "bat", "ranged", 0x0a1a2a, 0xffe060], ["Pearl-eye Mantis", "mantis", "melee", 0xff8aa0, 0x40ffd0], ["Kelp Horror", "treant", "melee", 0x1a3a2a, 0x40ffd0], ["Trench Weaver", "spider", "skirm", 0x0a2a30, 0x9affe8], ["Drowned Knight", "humanoid", "melee", 0x1a4a4a, 0x40ffd0]],
     bosses: [["Thalassor, the Coiled Deep", "serpent", 0x0a2a3a, 0x40ffd0, "tide"], ["Thalassor, Breaker of Hulls", "serpent", 0x1a3a4a, 0x9affe8, "tide"], ["Thalassor, the World Serpent", "serpent", 0x01121a, 0xffffff, "tide"]] },
   { name: "The World-Root Hollow", raid: true, dark: true, tree: "swamp", sky: [0x0a1408, 0x2a4a1a], fog: 0x1a2a10, fogNear: 30, ground: [0x2a2a14, 0x3a4a1a, 0x4a4a2a], water: 0x6aff4a, glowWater: true, grass: 0x3a5a1a, map: [0, 0], col: "#9aff6a", blurb: "Under the oldest tree alive. Roots erupt and poison pools spread.",
     enemies: [["Root Strangler", "treant", "melee", 0x3a2a1a, 0x9aff6a], ["Spore Slime", "slime", "melee", 0x8aa83a, 0xffe060], ["Thorn Mantis", "mantis", "skirm", 0x4a6a2a, 0x9aff6a]],
@@ -918,7 +1013,81 @@ function rosterFor(I, level) {
   const mix = level === 4 ? [I.enemies[0], m[1], m[5]] : [m[0], I.enemies[2], m[4]];
   return mix.map(d => [(level === 4 ? "Elder " : "Dread ") + d[0], d[1], d[2], d[3], d[4]]);
 }
-const roster = () => rosterFor(ISLANDS[run.idx], run.level);
+const roster = () => waveWindow(ISLANDS[run.idx], waveIndex());
+/* ---- three more foes per island, so every wave can bring a new one ---- */
+const EXTRA_FOES = [
+  [["Hill Giant", "giant", "melee", 0xc8a07a, 0x9aff6a], ["Stag Beetle", "beetle", "skirm", 0x3a2a1a, 0x9aff6a], ["Thornback Badger", "beast", "melee", 0x6a6a5a, 0xd8ff8a]],
+  [["Reef Giant", "giant", "melee", 0x6aa8b8, 0xffe0a0], ["Sand Scarab", "beetle", "skirm", 0xd8b880, 0x9affff], ["Shoreline Seal", "beast", "melee", 0x8a8a9a, 0xd8ffff]],
+  [["Magma Giant", "giant", "melee", 0x5a2a1a, 0xff6a1a], ["Fire Beetle", "beetle", "skirm", 0x2a1414, 0xff8a2a], ["Lava Salamander", "beast", "skirm", 0xd8401a, 0xffd060]],
+  [["Frost Giant", "giant", "melee", 0xbfe0ff, 0x7ad8ff], ["Ice Beetle", "beetle", "skirm", 0x9ad8ff, 0xffffff], ["Snow Bear", "beast", "melee", 0xf0f4ff, 0x9ad8ff]],
+  [["Bog Giant", "giant", "melee", 0x4a5a3a, 0xb8ff6a], ["Leech Beetle", "beetle", "skirm", 0x2a3a1a, 0xff5a5a], ["Marsh Toad", "slime", "melee", 0x5a7a3a, 0xffe060]],
+  [["Desert Giant", "giant", "melee", 0xc89060, 0xffe060], ["Dung Scarab", "beetle", "skirm", 0x3a2a1a, 0xffd060], ["Dune Jackal", "beast", "skirm", 0xd8b070, 0xff8a3a]],
+  [["Cloud Giant", "giant", "melee", 0xe8f0ff, 0x6ac8ff], ["Storm Beetle", "beetle", "skirm", 0x5a6a8a, 0xfff0a0], ["Mountain Goat", "beast", "melee", 0xd8d8d0, 0x9ad8ff]],
+  [["Crystal Giant", "giant", "melee", 0x9a7ad8, 0xffffff], ["Jewel Beetle", "beetle", "skirm", 0x3aa8a0, 0xff9af8], ["Geode Tortoise", "beast", "melee", 0x5a5a6a, 0x7ae8ff]],
+  [["Grave Giant", "giant", "melee", 0x8a8a7a, 0x9aff9a], ["Deathwatch Beetle", "beetle", "skirm", 0x2a2a22, 0x9aff9a], ["Ghoul Hound", "beast", "skirm", 0x4a4a3e, 0xffd060]],
+  [["Tide Giant", "giant", "melee", 0x3a7a8a, 0x40ffd0], ["Shell Beetle", "beetle", "skirm", 0xff8aa0, 0x40ffd0], ["Sea Lion", "beast", "melee", 0x8a6a4a, 0x9affe8]],
+  [["Iron Giant", "giant", "melee", 0x8a8478, 0xffd070], ["Cog Beetle", "beetle", "skirm", 0xb8a070, 0x9ae8ff], ["Brass Hound", "beast", "skirm", 0xd8a040, 0xffe8a0]],
+  [["Star Giant", "giant", "melee", 0x2a1a4a, 0xc040ff], ["Comet Beetle", "beetle", "skirm", 0x1a0a2a, 0xffffff], ["Rift Stalker", "beast", "skirm", 0x0a0614, 0xff70ff]],
+  [["Obsidian Giant", "giant", "melee", 0x1a1014, 0xff5a2a], ["Ember Scarab", "beetle", "skirm", 0x2a1414, 0xffd08a], ["Hellhound", "beast", "skirm", 0x1a0808, 0xff5a2a]],
+  [["Drowned Giant", "giant", "melee", 0x1a4a4a, 0x40ffd0], ["Altar Beetle", "beetle", "skirm", 0x0a2a30, 0xffffff], ["Chapel Hound", "beast", "skirm", 0x2a4a4a, 0x9affe8]],
+  [["Moon Giant", "giant", "melee", 0x8a7aff, 0xffffff], ["Lunar Beetle", "beetle", "skirm", 0x2a2440, 0xd8c8ff], ["Moon Hare", "beast", "skirm", 0xe8e0ff, 0xb07aff]],
+  [["Ash Giant", "giant", "melee", 0x5a5450, 0xff8a40], ["Cinder Scarab", "beetle", "skirm", 0x3a3430, 0xff6a20], ["Ash Wolf", "beast", "skirm", 0x6a6460, 0xff8a40]],
+  [["Golden Giant", "giant", "melee", 0xd8b860, 0xffffff], ["Gilded Scarab", "beetle", "skirm", 0xffd040, 0xffffff], ["Treasure Hound", "beast", "skirm", 0x6a5a30, 0xffd040]],
+  [["Silk Giant", "giant", "melee", 0xe8e0c8, 0xff4a2a], ["Brood Beetle", "beetle", "skirm", 0x2a2018, 0xff7a3a], ["Cave Rat King", "beast", "skirm", 0x4a3a2a, 0xff5a3a]],
+  [["Void Colossus", "giant", "melee", 0x1a1428, 0xb07aff], ["Null Beetle", "beetle", "skirm", 0x05030f, 0xd8a0ff], ["Shadow Hound", "beast", "skirm", 0x0a0814, 0xb07aff]],
+  [["Trench Giant", "giant", "melee", 0x1a3a4a, 0x40ffd0], ["Barnacle Beetle", "beetle", "skirm", 0x3a4a4a, 0x9affe8], ["Great Shark", "beast", "melee", 0x4a5a6a, 0xffffff]],
+  [["Moss Giant", "giant", "melee", 0x4a6a2a, 0x9aff6a], ["Bark Beetle", "beetle", "skirm", 0x3a2a1a, 0xffe060], ["Thornback Elk", "beast", "melee", 0x5a4a32, 0x9aff6a]]
+];
+EXTRA_FOES.forEach((m, i) => { ISLANDS[i].extra = m; });
+/* ten more raids, each with twelve foes of its own */
+const RAID_ARCH = [["spider", "Weaver", "skirm"], ["humanoid", "Knight", "melee"], ["floater", "Wisp", "ranged"], ["slime", "Ooze", "melee"], ["bat", "Wing", "ranged"], ["giant", "Colossus", "melee"],
+  ["beetle", "Carapace", "skirm"], ["serpent", "Coil", "skirm"], ["mantis", "Reaper", "melee"], ["void", "Gazer", "ranged"], ["golem", "Sentinel", "melee"], ["beast", "Stalker", "skirm"]];
+const RAIDS2 = [
+  ["The Tempest Spire", "Tempest", 0x4a5a7a, 0xfff0a0, "pine", [0x1a2438, 0x5a6a8a], 0x3a4a6a, "Lightning lances down the tower. Keep moving.", ["Volkaar, Lord of the Tempest", "bat", "lightning"]],
+  ["The Blood Moon Coliseum", "Bloodmoon", 0x4a0a14, 0xff3a4a, "dead", [0x14040a, 0x5a1420], 0x3a0a14, "A red-lit arena where the crowd is never quiet.", ["Sanguira, the Red Champion", "giant", "spikes"]],
+  ["The Clockfall Foundry", "Gearbound", 0x8a7a5a, 0xffc040, "gear", [0x2a241e, 0x8a6a3a], 0x5a4a32, "Gears the size of houses. Mind the falling ones.", ["The Tick-Tock Tyrant", "mantis", "spikes"]],
+  ["The Dreamthorn Garden", "Dreamthorn", 0x6a3a8a, 0xff9af8, "oak", [0x1a0a2a, 0x8a5aa8], 0x4a2a5a, "Roses that hum lullabies. Do not fall asleep.", ["Lady Somnia, the Sleeping Rose", "treant", "poison"]],
+  ["The Sunforge Crucible", "Sunforged", 0xd8a040, 0xffe8a0, "cactus", [0x3a2008, 0xffb040], 0x8a5a22, "A forge built inside a captured sun.", ["Helion, the Forge Sun", "golem", "meteor"]],
+  ["The Bonefrost Crypt", "Bonefrost", 0xd8e0e8, 0x7ad8ff, "icepine", [0x0a1420, 0x5a7a9a], 0x3a4a5a, "Frozen kings sleep here. Something is waking them.", ["Morhgal, the Frozen Wyrm", "serpent", "frost"]],
+  ["The Hall of Mirrors", "Mirror", 0xc8d0e0, 0xffffff, "crystal", [0x14141e, 0x8a8aa8], 0x5a5a6a, "Every reflection fights back.", ["Narcissa, Queen of Reflections", "humanoid", "shards"]],
+  ["The Plague Bog", "Plaguerot", 0x5a6a2a, 0xd8ff4a, "swamp", [0x101408, 0x4a5a1a], 0x3a4a1a, "The air itself is sick. Stay out of the green.", ["Grubmother Vel'koth", "slime", "poison"]],
+  ["The Celestial Observatory", "Celestial", 0x1a2a5a, 0xffe8a0, "obelisk", [0x02040f, 0x2a3a7a], 0x1a2a4a, "Stars fall where the astronomers point.", ["Astrael, the Falling Star", "floater", "lightning"]],
+  ["The Abyssal Maw", "Abyssborn", 0x10081a, 0xff4a8a, "coral", [0x05020a, 0x3a0a2a], 0x2a0a1a, "The bottom of the world has teeth.", ["Oblivar, the Devouring Carapace", "beetle", "tide"]]
+];
+RAIDS2.forEach(([name, pre, col, acc, tree, sky, grd, blurb, boss], r) => {
+  const tint = (k) => new THREE.Color(col).lerp(new THREE.Color(acc), (k % 4) * 0.12).getHex();
+  const foes = RAID_ARCH.map((_, k) => RAID_ARCH[(k + r * 5) % 12]).map(([b, noun, role], k) => [`${pre} ${noun}`, b, role, tint(k), acc]);
+  const hx = "#" + new THREE.Color(acc).getHexString();
+  ISLANDS.push({ name, raid: true, dark: true, tree, sky, fog: sky[0], fogNear: 30, ground: [grd, new THREE.Color(grd).multiplyScalar(1.3).getHex(), new THREE.Color(grd).multiplyScalar(1.7).getHex()], water: acc, glowWater: true, grass: null, map: [0, 0], col: hx, blurb,
+    enemies: foes.slice(0, 3), more: foes.slice(3, 9), extra: foes.slice(9, 12),
+    bosses: [[boss[0], boss[1], col, acc, boss[2]], [boss[0].replace(/,.*$/, "") + ", Ascended", boss[1], new THREE.Color(col).multiplyScalar(0.7).getHex(), acc, boss[2]], [boss[0].replace(/,.*$/, "") + ", the Undying", boss[1], 0x0a0a0a, acc, boss[2]]] });
+});
+const RAID_COUNT = ISLANDS.length - RAID_START;
+BODY_SIG.giant = "spikes"; BODY_SIG.beetle = "tide";
+/* the rolling roster: each wave keeps two foes and brings one new one */
+function seqOf(I) { return [...I.enemies, ...(I.more || []), ...(I.extra || [])]; }
+function waveWindow(I, n) {
+  const q = seqOf(I), L = q.length, out = [];
+  for (let j = 0; j < 3; j++) { const i = n + j, cyc = Math.floor(i / L), d = q[i % L]; out.push(cyc ? [(cyc === 1 ? "Elder " : cyc === 2 ? "Dread " : "Ancient ") + d[0], d[1], d[2], d[3], d[4]] : d); }
+  return out;
+}
+const waveIndex = () => (run.level - 1) * STAGES[run.stage].waves + Math.max(0, run.wave - 1);
+/* ---- rare sea portals: each leads to an island of its own ---- */
+const RARE_START = ISLANDS.length;
+const RARE_PORTALS = [
+  { id: "goldp", isle: "Gilded Gate Rock", name: "Gilded Portal", chance: 0.35, dist: 760, c1: 0x5a3a08, c2: 0xffd040, hex: "#ffd040", sri: 9, reward: "gold", rar: "Rare", pre: "Gilded", tree: "palm", sky: [0x2a1a04, 0xd8a040], grd: 0x6a5a30, blurb: "A portal of beaten gold. The island behind it is paved with coins." },
+  { id: "bloodp", isle: "Red Tide Skerry", name: "Blood Moon Portal", chance: 0.18, dist: 1250, c1: 0x3a0408, c2: 0xff2a3a, hex: "#ff4a5a", sri: 11, reward: "blood", rar: "Epic", pre: "Bloodtide", tree: "dead", sky: [0x14040a, 0x8a1a2a], grd: 0x3a141a, blurb: "It only opens under a red moon. The fighting beyond is fierce and the spoils richer." },
+  { id: "astralp", isle: "Starfall Spire", name: "Astral Portal", chance: 0.08, dist: 1700, c1: 0x0a0a3a, c2: 0x9ad8ff, hex: "#9ad8ff", sri: 12.5, reward: "astral", rar: "Legendary", pre: "Astral", tree: "crystal", sky: [0x02040f, 0x3a4a9a], grd: 0x1a1a3a, blurb: "A door into the night sky itself. Legendary gear drifts in the starlight." },
+  { id: "rainbowp", isle: "The Prism at the Edge", name: "Prismatic Rainbow Portal", chance: 0.03, dist: 2150, c1: 0xff3a5a, c2: 0x3affd8, hex: "#ff9af8", sri: 13.5, reward: "rainbow", rar: "Vaulted", pre: "Prismatic", tree: "crystal", sky: [0x1a0a2a, 0xff9af8], grd: 0x3a2a4a, rainbow: true, blurb: "The rarest door in the world, every colour at once. Beyond it, Vaulted gear is almost common." }
+];
+RARE_PORTALS.forEach((R, r) => {
+  const arch = RAID_ARCH.map((_, k) => RAID_ARCH[(k * 5 + r * 3) % 12]);
+  const foes = arch.map(([b, noun, role], k) => [`${R.pre} ${noun}`, b, role, new THREE.Color(R.grd).lerp(new THREE.Color(R.c2), 0.15 + (k % 4) * 0.12).getHex(), R.c2]);
+  ISLANDS.push({ name: R.isle.replace(/ Rock$| Skerry$| Spire$/, "") + " (beyond the " + R.name + ")", special: R.id, sri: R.sri, rainbow: !!R.rainbow, dark: true, tree: R.tree, sky: R.sky, fog: R.sky[0], fogNear: 34, ground: [R.grd, new THREE.Color(R.grd).multiplyScalar(1.4).getHex(), new THREE.Color(R.grd).multiplyScalar(1.9).getHex()], water: R.c2, glowWater: true, grass: null, map: [0, 0], col: R.hex, blurb: R.blurb,
+    enemies: foes.slice(0, 3), more: foes.slice(3, 9), extra: foes.slice(9, 12),
+    bosses: [[`${R.pre} Warden`, arch[5][0], R.grd, R.c2, BODY_SIG[arch[5][0]]], [`${R.pre} Sovereign`, arch[10][0], R.grd, R.c2, BODY_SIG[arch[10][0]]], [`${R.pre} Godbeast`, arch[0][0] === "spider" ? "serpent" : "giant", 0x0a0a0a, R.c2, R.rainbow ? "shards" : "meteor"]] });
+  R.idx = RARE_START + r;
+});
 const ROLE_BASE = {
   melee:  { hp: 42, dmg: 7, spd: 3.3, range: 1.7, cd: 1.25, xp: 6, coins: 6 },
   skirm:  { hp: 28, dmg: 5, spd: 5.0, range: 1.5, cd: 0.9, xp: 5, coins: 5 },
@@ -1525,6 +1694,7 @@ function poseHumanoid(R, t, move, swing, style, air, spin) {
   R.chest.rotation.y = 0; R.chest.rotation.x = 0;
   if (air) { R.hipL.rotation.x = -0.6; R.hipR.rotation.x = 0.25; R.kneeL.rotation.x = 0.9; R.kneeR.rotation.x = 0.4; }
   if (R.weapon && style !== "twin") R.weapon.rotation.z = 0;
+  if (R.weapon) { R.weapon.rotation.y = 0; R.weapon.rotation.x = R.sword && R.sword.grip === 2 ? Math.PI : 0; }
   if (swing > 0) {
     const k = 1 - swing; // 0 → 1 over the swing
     if (style === "thrust") { R.shR.rotation.x = lerp(-0.6, -1.65, Math.sin(k * Math.PI)); R.elR.rotation.x = lerp(-1.4, 0, Math.sin(k * Math.PI)); R.chest.rotation.y = -0.3 * Math.sin(k * Math.PI); }
@@ -1534,11 +1704,12 @@ function poseHumanoid(R, t, move, swing, style, air, spin) {
     else if (style === "nunchaku") { const f = Math.sin(k * Math.PI * 2); R.shR.rotation.x = -1.3; R.shR.rotation.z = f * 0.7; R.elR.rotation.x = -1.3 + f * 0.9; R.chest.rotation.y = f * 0.18; }
     else if (style === "chain") { const sn = Math.sin(k * Math.PI); R.shR.rotation.x = lerp(-1.0, -1.9, sn); R.elR.rotation.x = lerp(-1.5, 0, sn); R.shR.rotation.z = lerp(-0.4, 0.4, k); R.chest.rotation.y = -0.25 * sn; }
     else if (style === "twin") { R.shR.rotation.x = -1.2; R.elR.rotation.x = -0.8; if (R.shL) { R.shL.rotation.x = -1.1; R.elL.rotation.x = -0.9; } if (R.weapon) R.weapon.rotation.z = k * TAU * 1.5; R.chest.rotation.y = Math.sin(k * Math.PI) * 0.15; }
+    else if (style === "sword" && R.sword) poseSword(R, k, R.sword);
     else if (style === "light" || style === "slash") { const e2 = 1 - Math.pow(1 - k, 2); R.shR.rotation.x = lerp(-2.3, -0.9, e2); R.shR.rotation.z = lerp(-1.1, 0.95, e2); R.elR.rotation.x = -0.35; R.chest.rotation.y = lerp(0.75, -0.75, e2); }
     else if (style === "heavy") { R.shR.rotation.x = k < 0.45 ? lerp(-0.4, -3.0, k / 0.45) : lerp(-3.0, -0.5, (k - 0.45) / 0.55); R.shL.rotation.x = R.shR.rotation.x * 0.8; R.elR.rotation.x = -0.3; R.elL.rotation.x = -0.5; R.chest.rotation.x = k < 0.45 ? -0.15 : 0.25; }
     else { R.shR.rotation.x = lerp(-2.6, -0.3, k); R.shR.rotation.z = lerp(-0.6, 0.5, k); R.elR.rotation.x = -0.4; R.chest.rotation.y = lerp(0.5, -0.5, k); }
   } else {
-    R.shR.rotation.x = -0.35 + sw * 0.3; R.shR.rotation.z = 0; R.elR.rotation.x = -0.9; R.chest.rotation.x = 0;
+    R.shR.rotation.x = -0.35 + sw * 0.3; R.shR.rotation.z = 0; R.elR.rotation.x = -0.9; R.chest.rotation.x = 0; if (R.sword) swordIdle(R, R.sword, sw);
   }
   R.hips.rotation.y = spin || 0;
   if (R.cape) R.cape.rotation.x = 0.15 + move * 0.45 + Math.sin(t * 3) * 0.05;
@@ -1672,6 +1843,24 @@ function buildCreature(body, col, acc, scale, boss) {
     for (const sx of [-1, 1]) { const arm = new THREE.Group(); arm.position.set(0.36 * sx, 1.75, 0); inner.add(arm); const b = M(G.cyl(0.07, 0.11, 7), bark, 0.25 * sx, -0.3, 0, arm, 1, 0.9, 1); b.rotation.z = 0.5 * sx; M(G.ico(), leaf, 0.5 * sx, -0.75, 0, arm, 0.22); R.parts[sx < 0 ? "armL" : "armR"] = arm; }
     R.legs = [];
     for (const sx of [-1, 1]) { const l = new THREE.Group(); l.position.set(0.22 * sx, 0.3, 0); inner.add(l); for (let k = 0; k < 3; k++) { const rt = M(G.cone(5), bark, (k - 1) * 0.12, -0.15, 0.1 * (k - 1), l, 0.08, 0.5, 0.08); rt.rotation.z = (k - 1) * 0.6; rt.rotation.x = Math.PI; } R.legs.push(l); }
+  } else if (body === "giant") {
+    const H = buildHumanoid({ look: { skin: col, hair: acc, cloth: new THREE.Color(col).multiplyScalar(0.45).getHex(), cloth2: 0x2a1e14 }, armour: null, weapon: null });
+    H.g.scale.set(1.55, 1.5, 1.55); inner.add(H.g); R.hum = H;
+    const club = new THREE.Group(); M(lathe("gclub", [[0.03, 0], [0.04, 0.3], [0.09, 0.7], [0.12, 0.95], [0.001, 1.02]], 10), MAT.bark(0x3a2818), 0, 0, 0, club);
+    for (let k = 0; k < 6; k++) M(G.cone(5), std(0xd8d0c0, { r: 0.4 }), Math.cos(k * 1.1) * 0.1, 0.7 + k * 0.045, Math.sin(k * 1.1) * 0.1, club, 0.03, 0.09, 0.03).rotation.z = Math.cos(k * 1.1) * 1.4;
+    H.hold.add(club);
+    M(G.tor(0.17, 0.04), std(0x5a3a22, { r: 0.8 }), 0, 0.02, 0, H.hips, 1, 1, 0.8).rotation.x = Math.PI / 2;
+    for (const sx of [-1, 1]) { const gs = glowSprite(acc, 0.16, 0.9); gs.position.set(0.042 * sx, 0.018, 0.12); H.head.add(gs); }
+  } else if (body === "beetle") {
+    const sh2 = std(col, { r: 0.25, m: 0.35, env: 1.4, map: "rock", rep: 1 });
+    for (const sx of [-1, 1]) { const half = M(blobGeo("bshell", v => new V3(Math.abs(v.x) * 0.32, v.y > 0 ? v.y * 0.36 : v.y * 0.08, v.z * 0.62)), sh2, 0.17 * sx, 0.7, -0.08, inner); half.scale.x = sx; }
+    M(G.box(), std(acc, { e: acc, ei: 0.9 }), 0, 0.98, -0.08, inner, 0.02, 0.04, 1.1);
+    const head = new THREE.Group(); head.position.set(0, 0.62, 0.6); inner.add(head); R.parts.head = head;
+    M(G.sph(), sh2, 0, 0, 0, head, 0.22, 0.17, 0.2);
+    const hornM = M(G.cone(6), std(new THREE.Color(col).multiplyScalar(0.8).getHex(), { r: 0.3, m: 0.4 }), 0, 0.2, 0.2, head, 0.07, 0.5, 0.07); hornM.rotation.x = 0.6;
+    eyes(head, 0.12, 0.05, 0.14, 0.035);
+    R.legs = [];
+    for (let k = 0; k < 6; k++) { const sx = k < 3 ? -1 : 1, z = 0.3 - (k % 3) * 0.3; const l = new THREE.Group(); l.position.set(0.3 * sx, 0.55, z); inner.add(l); const s1 = M(G.cyl(0.03, 0.02, 6), sh2, 0.15 * sx, -0.2, 0, l, 1, 0.5, 1); s1.rotation.z = 0.9 * sx; R.legs.push(l); }
   } else {
     const H = buildHumanoid({ look: { skin: col, hair: acc, cloth: new THREE.Color(col).multiplyScalar(0.6).getHex(), cloth2: 0x222226 }, armour: null, weapon: null });
     inner.add(H.g); R.hum = H;
@@ -1680,7 +1869,7 @@ function buildCreature(body, col, acc, scale, boss) {
     for (const sx of [-1, 1]) { const gs = glowSprite(acc, 0.12, 0.9); gs.position.set(0.042 * sx, 0.018, 0.12); H.head.add(gs); }
   }
   if (boss) {
-    const crown = new THREE.Group(); crown.position.set(0, ({ golem: 2.42, floater: 2.15, humanoid: 1.98, spider: 1.25, void: 2.2, serpent: 2.55, slime: 1.0, bat: 2.25, mantis: 2.15, treant: 2.95 })[body] || 1.38, body === "beast" ? 0.85 : body === "serpent" ? 0.3 : 0); inner.add(crown);
+    const crown = new THREE.Group(); crown.position.set(0, ({ golem: 2.42, floater: 2.15, humanoid: 1.98, spider: 1.25, void: 2.2, serpent: 2.55, slime: 1.0, bat: 2.25, mantis: 2.15, treant: 2.95, giant: 3.0, beetle: 1.15 })[body] || 1.38, body === "beast" ? 0.85 : body === "serpent" ? 0.3 : 0); inner.add(crown);
     const gold = MAT.metal(0xf2c044, 0.22);
     M(G.tor(0.2, 0.025), gold, 0, 0, 0, crown).rotation.x = Math.PI / 2;
     for (let k = 0; k < 7; k++) M(G.cone(6), gold, Math.cos(k * TAU / 7) * 0.2, 0.09, Math.sin(k * TAU / 7) * 0.2, crown, 0.035, 0.18, 0.035);
@@ -1959,7 +2148,7 @@ function buildLobby() {
   world.clouds = addClouds(group, 0xffffff);
   // distant mountains
   for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 380, s = 80 + (k % 4) * 28; if (Math.cos(a) > 0.2) continue; const m = M(G.cone(7), std(0x5a6a7a, { flat: true, r: 0.9 }), Math.cos(a) * d, s * 0.45, Math.sin(a) * d, group, s, s * 1.1, s); M(G.cone(7), std(0xf0f4ff, { flat: true, r: 0.7 }), Math.cos(a) * d, s * 0.82, Math.sin(a) * d, group, s * 0.35, s * 0.35, s * 0.35); }
-  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); seaWorld(group); boatDealer(group); floraFauna(group); lobbyRaidPortal(group);
+  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); const isleBase = group.children.length; seaWorld(group); rarePortals(group); groupIsles(group, isleBase); boatDealer(group); floraFauna(group); lobbyRaidPortal(group); buildQuarters(group);
 }
 
 function buildIsland(idx) {
@@ -2016,6 +2205,7 @@ let hero = null;
 function rebuildHero() {
   if (hero) { scene.remove(hero.g); }
   hero = buildHumanoid({ look: CLASS[S.cls].look, armour: S.equip.armour, weapon: S.equip.weapon });
+  hero.sword = SWORD_STYLE[S.equip.weapon] || null;
   scene.add(hero.g);
   computeStats(); P.hp = Math.min(P.hp, ST.maxHp);
   P.dashQ = P.dashQ.slice(0, ST.dashes);
@@ -2132,6 +2322,7 @@ function damageEnemy(e, amount, dir, kb, o = {}) {
   if (!o.silent && o.canCrit !== false && worldT - lastHitSfx > 0.06) { lastHitSfx = worldT; MUSIC.sfx("hit", { crit }); }
   if (e.dummy) { dummyHit(e, dmg, crit, o); return; }
   if (e.duelist && e.guard > worldT) { dmg *= 0.3; if (!o.silent) floatText(e.pos, "Blocked", "#a1abc4"); }
+  if (e.vulnUntil > worldT) { dmg *= 1.6; o = Object.assign({}, o, { color: o.color || "#ffd166" }); }
   e.hp -= dmg; e.flash = 0.12;
   if (run && run.boons && o.canCrit !== false && !o.noProc && !e.dead) boonProcs(e, dmg);
   if (!o.silent) floatText(e.pos, Math.round(dmg) + (crit ? "!" : ""), o.color || (crit ? "#ffd166" : "#fff2c8"), crit);
@@ -2206,7 +2397,7 @@ function nearestEnemy(pos, r, dirV, cone) {
 function attack() {
   if (P.atkT > 0 || P.dead || P.dashT > 0) return;
   const w = ITEM[S.equip.weapon];
-  P.atkT = 1 / ST.atkSpd; P.swing = 1; P.swingStyle = swingStyleFor(w); P.swingDur = Math.min(0.55, 0.9 / ST.atkSpd); swingFx(w); MUSIC.sfx("swing", { w });
+  P.atkT = 1 / ST.atkSpd; P.swing = 1; P.swingStyle = swingStyleFor(w); P.swingDur = Math.min(0.55, 0.9 / ST.atkSpd); swingFx(w); if (SWORD_STYLE[w.id]) { const ss = SWORD_STYLE[w.id]; later(P.swingDur * 0.45, () => swordFx(ss, w)); } MUSIC.sfx("swing", { w });
   const t = nearestEnemy(P.pos, ST.reach + 2.5);
   if (t) P.face = Math.atan2(t.pos.x - P.pos.x, t.pos.z - P.pos.z);
   const f = fwd();
@@ -2247,6 +2438,7 @@ function castSpecial() {
   const D = mult * base;
   P.swing = 1; P.swingStyle = w.weight; P.swingDur = 0.45;
   switch (w.special) {
+    case "prismNova": { for (let k = 0; k < 7; k++) later(0.12 * k, () => { const c = new THREE.Color().setHSL(k / 7, 1, 0.6).getHex(); ringFx(P.pos, 2 + k * 0.6, c, 0.45); burstFx(P.pos.clone().add(new V3(0, 1, 0)), 1.5 + k * 0.3, c, 0.3); for (const e of enemiesNear(P.pos, 6)) damageEnemy(e, D * 0.5, e.pos.clone().sub(P.pos), w.kb * 0.4); }); break; }
     case "cometRain": { for (let k = 0; k < 3; k++) later(0.25 * k, () => { const at = P.pos.clone().addScaledVector(f, 4 + k * 4.5); at.y = world.h(at.x, at.z); pillarFx(at, col, 16, 0.5); ringFx(at, 4, col, 0.5); burstFx(at.clone().add(new V3(0, 0.8, 0)), 3, 0xffc070, 0.4); for (const e of enemiesNear(at, 4)) damageEnemy(e, D, e.pos.clone().sub(at), w.kb * 1.5); }); break; }
     case "riptideSpiral": { let n = 0; const iv = () => { if (n++ >= 8 || P.dead) return; const p0 = P.pos.clone(); ringFx(p0, 8, col, 0.4); ringFx(p0, 4, 0x9affe8, 0.3); for (const e of enemiesNear(p0, 8)) { if (!e.boss && !e.dummy) e.kb.copy(p0.clone().sub(e.pos).setY(0).multiplyScalar(1.4)); damageEnemy(e, D * 0.45, null, 0); } later(0.5, iv); }; iv(); break; }
     case "chainStorm": { let n = 0; P.spinT = 0.45; const iv = () => { if (n++ >= 16 || P.dead) return; const p0 = P.pos.clone(); ringFx(p0, 6, col, 0.25); for (const e of enemiesNear(p0, 6)) damageEnemy(e, D * 0.3, e.pos.clone().sub(p0), 0.4); later(0.25, iv); }; iv(); break; }
@@ -2342,7 +2534,7 @@ const ENEMY_DMG = 0.55; // enemies hit 45% softer than before
 function spawnEnemy(def, role, boss, scaleBoost = 1) {
   const I = ISLANDS[run.idx], st = STAGES[run.stage];
   const base = ROLE_BASE[boss ? "boss" : role];
-  const ri = I.raid ? 13 : run.idx >= 12 ? 12.5 : run.idx, isl = Math.pow(1.5, ri), lv = 1 + 0.15 * (run.level - 1);
+  const ri = I.raid ? 13 : I.sri ? I.sri : run.idx >= 12 ? 12.5 : run.idx, isl = Math.pow(1.5, ri), lv = 1 + 0.15 * (run.level - 1);
   const hpMult = isl * st.hp * lv * (boss ? (1 + 0.25 * (run.level - 1)) : 1) * (1 + 0.35 * (run.party - 1));
   const dmgMult = ENEMY_DMG * Math.pow(1.32, ri) * st.dmg * (1 + 0.06 * (run.level - 1));
   const body = def[1], col = boss ? (typeof def[2] === "number" ? def[2] : I.enemies[run.stage % 3][3]) : def[3], acc = boss ? (typeof def[3] === "number" ? def[3] : I.enemies[(run.stage + 1) % 3][4]) : def[4];
@@ -2355,7 +2547,7 @@ function spawnEnemy(def, role, boss, scaleBoost = 1) {
   p.y = world.h(p.x, p.z);
   const name = boss ? def[0] : def[0];
   const e = { R, name, role: boss ? "boss" : role, boss, base, pos: p, kb: new V3(), hp: base.hp * hpMult, maxHp: base.hp * hpMult, dmg: base.dmg * dmgMult, spd: base.spd * (boss ? 1 : 1),
-    atkT: rand(0.5, 1.5), dead: false, flash: 0, accent: acc, col, hgt: ({ treant: 2.9, serpent: 2.6, void: 2.4, bat: 2.3, mantis: 2.1, slime: 1.25, spider: 1.45 })[body] || 1.9, scale, radius: 0.5 * scale, t: rand(0, 10), atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, bossT: 3, summoned: false, enrage: 1 };
+    atkT: rand(0.5, 1.5), dead: false, flash: 0, accent: acc, col, hgt: ({ treant: 2.9, serpent: 2.6, void: 2.4, bat: 2.3, mantis: 2.1, slime: 1.25, spider: 1.45, giant: 3.0, beetle: 1.2 })[body] || 1.9, scale, radius: 0.5 * scale, t: rand(0, 10), atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, bossT: 3, summoned: false, enrage: 1 };
   if (!boss) { e.label = textSprite(name, "#" + new THREE.Color(acc).getHexString(), 0.9); scene.add(e.label); }
   const bar = new THREE.Group(); M(G.box(), new THREE.MeshBasicMaterial({ color: 0x1a0a10 }), 0, 0, 0, bar, 1.1, 0.09, 0.01); e.fg = M(G.box(), new THREE.MeshBasicMaterial({ color: 0xe0505f }), 0, 0, 0.01, bar, 1.1, 0.09, 0.01); if (!boss) { scene.add(bar); e.bar = bar; }
   enemies.push(e);
@@ -2390,7 +2582,7 @@ function nextWave() {
   const count = 4 + run.level + run.wave + run.stage * 2 + (run.party - 1);
   const R3 = roster(); for (let k = 0; k < count; k++) { const def = R3[k % 3]; spawnEnemy(def, def[2], false); }
   run.state = "waves";
-  toast(`<b>Wave ${run.wave} of ${st.waves}</b> ${count} foes`, "");
+  toast(`<b>Wave ${run.wave} of ${st.waves}</b> ${count} foes${run.wave + run.level > 2 ? ` · new foe: <b>${esc(R3[2][0])}</b>` : ""}`, "");
 }
 function spawnBoss() {
   const I = ISLANDS[run.idx];
@@ -2398,7 +2590,7 @@ function spawnBoss() {
   const final = run.level === run.levels;
   let name, e;
   if (final) { const d = I.bosses[run.stage]; name = d[0]; e = spawnEnemy([name, d[1], d[2], d[3]], "boss", true, (1 + 0.06 * run.level) * (I.raid ? 1.35 : 1)); e.sig = d[4] || BODY_SIG[d[1]]; }
-  else { const d = roster()[(run.level - 1) % 3]; name = `${LT_TITLE[(run.idx * 3 + run.level + run.stage) % LT_TITLE.length]} ${d[0].replace(/^(Elder|Dread) /, "")}`; e = spawnEnemy([name, d[1], d[3], d[4]], "boss", true, 0.8); e.sig = BODY_SIG[d[1]]; }
+  else { const d = roster()[2]; name = `${LT_TITLE[(run.idx * 3 + run.level + run.stage) % LT_TITLE.length]} ${d[0].replace(/^(Elder|Dread) /, "")}`; e = spawnEnemy([name, d[1], d[3], d[4]], "boss", true, 0.8); e.sig = BODY_SIG[d[1]]; }
   if (final && I.raid) { e.raidBoss = true; e.phase = 0; e.summoned = true; e.hp = e.maxHp = e.maxHp * 2.5; }
   run.boss = e;
   banner(name, final ? (I.raid ? "Raid boss · three phases" : `Boss of ${I.name}`) : `Lieutenant of level ${run.level}`);
@@ -2431,6 +2623,7 @@ function stageComplete(xp) {
   const next = run.idx + 1;
   if (first && next < 12 && prog.normal && prog.hard && (st.id === "normal" || st.id === "hard")) text += ` ${ISLANDS[next].name} has been discovered on the map.`;
   if (I.raid) { S.coins += bonus * 2; const got = raidHoard(); text += ` Raid hoard: ${fmt(bonus * 2)} more coins, ${got.join(", ")}.`; }
+  if (I.special) { const got = rareSpoils(I); text += ` Portal spoils: ${got.join(", ")}.`; }
   run.state = "done"; save(); MUSIC.sting("victory");
   showResult(`${st.name} cleared`, I.name, text, "var(--good)");
 }
@@ -2730,6 +2923,7 @@ function detailHtml(it) {
     h += meterRow("Attack speed", stNew.atkSpd.toFixed(2) + " /s", stNew.atkSpd / 2.2, "#58a8f2", cmp(stNew.atkSpd, stCur.atkSpd));
     h += meterRow("Knockback", it.kb.toFixed(1) + " m", it.kb / 5, "#b8a070", cmp(it.kb, cur.kb));
     h += meterRow("Your move speed", stNew.move.toFixed(2) + " m/s", stNew.move / 9, "#7fd69a", cmp(stNew.move, stCur.move));
+    if (SWORD_STYLE[it.id]) h += `<div class="special" style="--c:${rc(it.rarity)}"><b>Swing: ${esc(SWORD_FORMS[SWORD_STYLE[it.id].form].name)}</b><span>${esc(swordStyleText(it.id))}. No other sword swings this way.</span></div>`;
     h += `<div class="special" style="--c:${rc(it.rarity)}"><b>Special: ${esc(SPECIALS[it.special].name)}</b><span>${esc(SPECIALS[it.special].text(it.specMult.toFixed(1)))} Recharges in ${SPECIALS[it.special].cd} s.</span></div>`;
     h += `<p class="desc">${esc(it.desc)}</p>`;
     h += `<div class="row" style="justify-content:center"><button class="btn primary" data-equip="${it.id}" ${eq ? "disabled" : ""}>${eq ? "Equipped" : "Equip"}</button><button class="btn" data-sell="${it.id}" ${eq && S.inv[it.id] < 2 ? "disabled" : ""}>Sell for ${fmt(sellPrice(it))}</button></div>`;
@@ -2939,7 +3133,7 @@ function update(dt) {
   const move = new V3().addScaledVector(cf, -iy).addScaledVector(cr, ix); if (move.lengthSq() > 1e-4) move.normalize().multiplyScalar(mag);
   const jumpPressed = edge.jump || (gp && gp.jump), jumpDown = jumpHeld || keys.has(" ") || (gp && gp.jumpHeld);
   const blockDown = !P.dead && (keys.has("f") || blockHeld || !!(gp && gp.block));
-  if (blockDown && !P.blocking) { P.blocking = true; P.blockStart = worldT; } if (!blockDown) P.blocking = false;
+  if (blockDown && !P.blocking && worldT >= (P.blockReady || 0)) { P.blocking = true; P.blockStart = worldT; } if (!blockDown && P.blocking) { P.blocking = false; P.blockReady = worldT + BLOCK_CD; }
   if (fishing) fishControl(mag, !!(attackHeld || attackTap || keys.has("j") || keys.has("e") || edge.use || (gp && (gp.attack || gp.use))));
   if (!P.dead && !fishing) {
     if (!P.blocking && (attackHeld || keys.has("j") || attackTap || (gp && gp.attack))) attack();
@@ -3137,7 +3331,7 @@ function updateHud() {
   const w = ITEM[S.equip.weapon], a = ITEM[S.equip.armour];
   $("cdSpecial").style.height = (P.specT > 0 ? 100 * P.specT / (SPECIALS[w.special].cd * ST.specCd) : 0) + "%";
   if (a.special) $("cdArm").style.height = (P.armT > 0 ? 100 * P.armT / (ARM_SPECIALS[a.special].cd * ST.specCd) : 0) + "%";
-  $("cdPotion").style.height = (P.potT > 0 ? 100 * P.potT / 4 : 0) + "%";
+  $("cdPotion").style.height = (P.potT > 0 ? 100 * P.potT / 4 : 0) + "%"; $("cdBlock").style.height = (worldT < (P.blockReady || 0) ? 100 * (P.blockReady - worldT) / BLOCK_CD : 0) + "%";
   const pips = $("dashPips").children, avail = ST.dashes - P.dashQ.length; for (let k = 0; k < pips.length; k++) pips[k].className = k < avail ? "full" : "";
   const it = isPaused() ? null : nearestInteract(), pr = $("prompt");
   if (it) { pr.hidden = false; pr.innerHTML = `<kbd>E</kbd>${esc(it.label)}`; } else pr.hidden = true;
@@ -3495,7 +3689,7 @@ function lobbyExtras(group, h) {
     return { R, lbl };
   };
   world.npcs = [];
-  QUEST_NPCS.forEach(def => {
+  QUEST_NPCS.filter(d => !d.quarter).forEach(def => {
     const [x, z] = def.pos, o = mk(def, x, z, def.face);
     const marks = { offer: markSprite("!", "#ffd166"), ready: markSprite("?", "#7fd69a") };
     for (const m of Object.values(marks)) { m.position.set(x, world.h(x, z) + 3.15, z); group.add(m); m.visible = false; }
@@ -3813,11 +4007,11 @@ function duelEnd(won, why) {
 }
 
 /* ---- blocking and parrying ---- */
-const PARRY_WINDOW = 0.3;
+const PARRY_WINDOW = 0.3, BLOCK_CD = 0.65, PARRY_VULN = 0.85;
 let blockHeld = false;
 function parryHit(src) {
   floatText(P.pos, "Parry!", "#ffd166", true); ringFx(P.pos, 1.8, 0xffd166, 0.35); burstFx(P.pos.clone().add(new V3(0, 1.2, 0)), 1.2, 0xffd166, 0.25);
-  if (src && !src.dead && !src.dummy) { src.stunUntil = worldT + 1; src.atkT = Math.max(src.atkT || 0, 1); src.windup = null; src.charging = null; if (src.tell) src.tell.visible = false; floatText(src.pos, "Stunned", "#ffd166"); }
+  if (src && !src.dead && !src.dummy) { src.stunUntil = worldT + PARRY_VULN; src.vulnUntil = worldT + PARRY_VULN; src.atkT = Math.max(src.atkT || 0, PARRY_VULN); src.windup = null; src.charging = null; if (src.tell) src.tell.visible = false; floatText(src.pos, "Vulnerable", "#ffd166"); const vr = ringFx(src.pos, 1.4 * (src.scale || 1), 0xffd166, PARRY_VULN); }
   if (src && !src.dead && !src.dummy && run && run.boons && run.boons.riposte) damageEnemy(src, ST.hit * 3 * run.boons.riposte, null, 0, { noProc: true, color: "#ffe0a0" });
   MUSIC.sfx("parry"); bumpStat("parries"); P.invuln = 0.15; P.parryFlash = 0.3; P.blockStart = -99;
 }
@@ -4657,14 +4851,90 @@ const ISLES = [
   { id: "titan", name: "Titan's Rest", x: 1300, z: 200, r: 26, h: 7, kind: "guard", n: 8, guard: [["Stone Titan", "golem", "melee", 0x7a7468, 0xffd070], ["Titan Wisp", "floater", "ranged", 0xffe8a0, 0xffffff]] },
   { id: "edge", name: "World's Edge", x: 1360, z: -300, r: 16, h: 3, kind: "treasure" }
 ];
-const stormAt = (x, z) => x < 130 ? 0 : clamp((Math.hypot(x - DOCK.x, z - DOCK.z) - 90) / 1000, 0, 1) * 100;
+const stormAt = (x, z) => { if (x < 130) return 0; const d = Math.hypot(x - DOCK.x, z - DOCK.z); return d <= 1090 ? clamp((d - 90) / 10, 0, 100) : Math.min(200, 100 + (d - 1090) / 12); };
+/* ---- the wide sea: many more islands, rare portals, and storms past Tempest ---- */
+const SEA_GUARDS = [
+  [["Beach Crab", "crab", "melee", 0xd8603a, 0xffb08a], ["Sand Slime", "slime", "melee", 0xe0c890, 0xffe0a0], ["Gull Harpy", "bat", "ranged", 0xe8e0d0, 0xffd080], ["Pirate Deckhand", "humanoid", "skirm", 0x8a6a4a, 0xffd060]],
+  [["Pirate Cutthroat", "humanoid", "melee", 0x5a3a2a, 0xff7a3a], ["Reef Spider", "spider", "skirm", 0x1a6a8a, 0x9affe8], ["Kelp Walker", "treant", "melee", 0x2a4a3a, 0x40ffd0], ["Tide Wisp", "floater", "ranged", 0x5ad8e8, 0xffffff]],
+  [["Coral Golem", "golem", "melee", 0xff8aa0, 0xffe0e8], ["Saltwing Bat", "bat", "ranged", 0x3a4a5a, 0x9affe8], ["Brine Mantis", "mantis", "melee", 0x3a8a8a, 0xd8ffff], ["Shellback Beetle", "beetle", "skirm", 0x5a7a8a, 0x9affe8]],
+  [["Storm Giant", "giant", "melee", 0x5a6a8a, 0xfff0a0], ["Squall Serpent", "serpent", "skirm", 0x3a4a6a, 0x9ad8ff], ["Thunder Eye", "void", "ranged", 0x2a3a5a, 0xfff0a0], ["Wrecker Captain", "humanoid", "melee", 0x2a2a3a, 0xffd060]],
+  [["Tempest Colossus", "giant", "melee", 0x3a4a6a, 0x9ad8ff], ["Gale Reaper", "mantis", "melee", 0x8aa8d8, 0xffffff], ["Lightning Ooze", "slime", "melee", 0x6a8aff, 0xfff0a0], ["Hurricane Wisp", "floater", "ranged", 0xcfeeff, 0xffffff]],
+  [["Maelstrom Knight", "humanoid", "melee", 0x1a2a4a, 0x40ffd0], ["Whirlpool Coil", "serpent", "skirm", 0x0a3a4a, 0x40ffd0], ["Drowned Watcher", "void", "ranged", 0x0a1a2a, 0x40ffd0], ["Abyss Crab", "crab", "melee", 0x1a2a3a, 0x40ffd0]],
+  [["Cataclysm Titan", "golem", "melee", 0x3a1a14, 0xff5a2a], ["Ashwing Wyvern", "bat", "ranged", 0x2a1414, 0xff7a3a], ["Molten Carapace", "beetle", "skirm", 0x3a1a14, 0xffa040], ["Doom Weaver", "spider", "skirm", 0x1a0a0a, 0xff3a2a]],
+  [["Beyond Herald", "void", "ranged", 0x05030f, 0xffffff], ["Starless Giant", "giant", "melee", 0x1a1428, 0xc040ff], ["Unmade Reaper", "mantis", "melee", 0x0a0614, 0xff70ff], ["Edge Ooze", "slime", "melee", 0x2a1a4a, 0xff9af8]]
+];
+(function seaArchipelago() {
+  const r = seeded(4242), free = (x, z, rad, pad) => !ISLES.some(I => Math.hypot(I.x - x, I.z - z) < I.r + rad + pad);
+  // the rare portal islands first, at fixed distances so the rarest is the farthest
+  RARE_PORTALS.forEach((R, k) => { for (let t = 0; t < 400; t++) { const a = -1.2 + ((t * 0.37 + k * 0.9) % 2.4), x = DOCK.x + Math.cos(a) * R.dist, z = DOCK.z + Math.sin(a) * R.dist; if (free(x, z, 18, 60)) { ISLES.push({ id: R.id, name: R.isle, x: Math.round(x), z: Math.round(z), r: 18, h: 4, kind: "rare", rare: R }); break; } } });
+  const A = ["Gull", "Kelp", "Rook", "Brine", "Shell", "Drift", "Salt", "Mist", "Pearl", "Tern", "Otter", "Siren", "Wreck", "Storm", "Thunder", "Gale", "Squall", "Fog", "Ember", "Frost", "Moon", "Sun", "Star", "Bone", "Ghost", "Raven", "Serpent", "Whale", "Shark", "Lantern", "Anchor", "Compass", "Tide", "Urchin", "Dolphin", "Albatross", "Cutlass", "Doubloon", "Mariner", "Barnacle", "Squid", "Hook", "Plank", "Rum", "Parrot", "Cannon", "Beacon", "Hollow"];
+  const B = ["Key", "Cay", "Rock", "Atoll", "Isle", "Holm", "Reef", "Spit", "Skerry", "Islet", "Bank", "Shoal", "Crag", "Point", "Haven", "Rest", "Teeth", "Crown", "Cove", "Spire"];
+  const used = new Set(ISLES.map(i => i.name)); let made = 0, tries = 0;
+  while (made < 120 && tries++ < 9000) {
+    const ang = -1.45 + r() * 2.9, dist = 200 + Math.pow(r(), 0.85) * 2100, x = DOCK.x + Math.cos(ang) * dist, z = DOCK.z + Math.sin(ang) * dist;
+    if (x < 240 || Math.hypot(x, z) > 2380) continue;
+    const rad = Math.round(9 + r() * 14); if (!free(x, z, rad, 34)) continue;
+    let name = null; for (let k = 0; k < 30; k++) { const n = `${A[Math.floor(r() * A.length)]} ${B[Math.floor(r() * B.length)]}`; if (!used.has(n)) { name = n; break; } } if (!name) continue; used.add(name);
+    const st = stormAt(x, z), guard = r() < 0.42, I = { id: "p" + made, name, x: Math.round(x), z: Math.round(z), r: rad, h: 2.5 + r() * 4, kind: guard ? "guard" : "treasure", proc: true };
+    if (guard) { const pool = SEA_GUARDS[Math.min(SEA_GUARDS.length - 1, Math.floor(st / 25))], a = Math.floor(r() * 4); I.guard = [pool[a], pool[(a + 1 + Math.floor(r() * 3)) % 4]]; I.n = 3 + Math.floor(st / 45) + Math.floor(r() * 2); }
+    ISLES.push(I); made++;
+  }
+})();
+const ISLE_GRID = new Map();
+for (const I of ISLES) { const R = I.r * 1.25; for (let gx = Math.floor((I.x - R) / 64); gx <= Math.floor((I.x + R) / 64); gx++) for (let gz = Math.floor((I.z - R) / 64); gz <= Math.floor((I.z + R) / 64); gz++) { const k = gx * 10007 + gz; if (!ISLE_GRID.has(k)) ISLE_GRID.set(k, []); ISLE_GRID.get(k).push(I); } }
+const islesNear = (x, z) => ISLE_GRID.get(Math.floor(x / 64) * 10007 + Math.floor(z / 64)) || [];
+const portalAwake = R => seeded(hash(R.id) + Math.floor(Date.now() / 3.6e6))() < R.chance;
+const isleKindLabel = I => I.kind === "rare" ? (portalAwake(I.rare) ? `${I.rare.name} · ${I.rare.rar}` : `${I.rare.name} · dormant`) : I.kind === "guard" ? "guarded treasure" : I.kind === "portal" ? "Rift Portal" : "treasure";
+// put each island in its own group so far islands can be hidden
+function groupIsles(group, before) {
+  const moved = group.children.slice(before);
+  for (const I of ISLES) { I.grp = new THREE.Group(); group.add(I.grp); }
+  for (const c of moved) { let best = null, bd = 1e9; for (const I of islesNear(c.position.x, c.position.z)) { const d = Math.hypot(c.position.x - I.x, c.position.z - I.z); if (d < bd) { bd = d; best = I; } } if (best && bd < best.r * 1.6 + 14) best.grp.add(c); }
+}
+let isleCullT = 0;
+function cullIsles(dt) {
+  isleCullT -= dt; if (isleCullT > 0) return; isleCullT = 0.4;
+  const ref = sailing && !sailing.anchored ? sailing.pos : P.pos;
+  for (const I of ISLES) if (I.grp) I.grp.visible = Math.hypot(ref.x - I.x, ref.z - I.z) < 480;
+}
+function rarePortals(group) {
+  for (const I of ISLES) if (I.kind === "rare") {
+    const R = I.rare, awake = portalAwake(R), y = world.h(I.x, I.z), pg = new THREE.Group(); pg.position.set(I.x, y + 0.05, I.z); group.add(pg);
+    for (let k = 0; k < 12; k++) { const a = k / 12 * TAU, st = M(G.box(), std(R.rainbow ? 0xf0f0ff : 0x2a2028, { r: 0.4, m: 0.5, flat: true }), Math.cos(a) * 4.2, 1.8, Math.sin(a) * 4.2, pg, 0.7, 3.6 + (k % 3) * 0.9, 0.7); st.rotation.y = -a;
+      M(G.sph(), glowMat(R.rainbow ? new THREE.Color().setHSL(k / 12, 1, 0.6).getHex() : R.c2, 0.95), Math.cos(a) * 4.2, 4 + (k % 3) * 0.9, Math.sin(a) * 4.2, pg, 0.22); }
+    const disc = portalDisc(R.c1, R.c2); disc.rotation.x = -Math.PI / 2; disc.position.y = 0.12; disc.scale.setScalar(3.4); pg.add(disc); disc.visible = awake;
+    const gl = glowSprite(R.c2, 14, awake ? 0.55 : 0.12); gl.position.y = 2; pg.add(gl);
+    const beam = M(G.cyl(0.8, 2.6, 16, 1), new THREE.MeshBasicMaterial({ color: lin(R.c2), transparent: true, opacity: 0.18, depthWrite: false, blending: THREE.AdditiveBlending }), 0, 40, 0, pg, 1, 80, 1); beam.visible = awake;
+    world.animated.push(t => { disc.material.uniforms.t.value = t * 1.6; if (R.rainbow) { disc.material.uniforms.a.value.setHSL((t * 0.15) % 1, 1, 0.5); disc.material.uniforms.b.value.setHSL((t * 0.15 + 0.5) % 1, 1, 0.6); beam.material.color.setHSL((t * 0.1) % 1, 1, 0.55); gl.material.color.setHSL((t * 0.1) % 1, 1, 0.6); } });
+    world.interact.push({ x: I.x, z: I.z, y, r: 4.6, label: awake ? `Step into the ${R.name}` : `${R.name} (dormant)`, act: () => openRarePortal(R) });
+  }
+}
+function openRarePortal(R) {
+  if (run) return; dlgNpc = null; keys.clear(); attackHeld = false;
+  const awake = portalAwake(R), i = R.idx, I = ISLANDS[i];
+  $("dlgName").textContent = R.name; $("dlgRole").textContent = `${R.rar} portal · surfaces about ${Math.round(R.chance * 100)}% of hours`;
+  $("dlgText").textContent = awake ? R.blurb : "The stones are cold and the portal is shut. Rare portals surface at random, and this one is not awake this hour. Come back later and try your luck.";
+  $("dlgQuest").innerHTML = awake ? `<div class="duels"><div class="duel" style="--c:${R.hex}"><span><b>${esc(I.name)}</b><small>Foes: ${seqOf(I).map(e => esc(e[0])).join(", ")}</small><small class="num">${STAGES.map(s => `${s.name} ${S.prog[i][s.id] ? "cleared" : "not cleared"}`).join(" · ")}</small></span>
+    <span class="row" style="gap:4px;grid-column:1">${STAGES.map((s, k) => `<button class="btn ${k ? "" : "primary"}" data-rare="${i}:${k}">${s.name}</button>`).join("")}</span></div></div>` : "";
+  $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Step back</button>`;
+  $("dialog").hidden = false;
+}
+$("dialog").addEventListener("click", e => { const b = e.target.closest("[data-rare]"); if (!b) return; const [i, k] = b.dataset.rare.split(":").map(Number); $("dialog").hidden = true; if (sailing) removeBoat(); bumpStat("rarePortals"); startRun(i, k, []); });
+function rareSpoils(I) {
+  const got = [], t = dropTable(12.5, run.stage, true);
+  if (I.special === "goldp") { const c = Math.round(20000 * (1 + run.stage)); S.coins += c; got.push(`${fmt(c)} coins`); }
+  if (I.special === "bloodp") for (let k = 0; k < 2 + run.stage; k++) { const it = rollItemOf(rollRarity(Object.assign({}, t, { common: 0, rare: 0 }))); gain(it, P.pos); got.push(it.name); }
+  if (I.special === "astralp") { for (let k = 0; k < 2 + run.stage; k++) { const it = rollItemOf("legendary"); gain(it, P.pos); got.push(it.name); } if (Math.random() < 0.12) { const v = rollOfCats("vaulted", ["material"]); gain(v, P.pos); got.push(v.name); } }
+  if (I.special === "rainbowp") { for (let k = 0; k < 3; k++) { const it = rollItemOf("legendary"); gain(it, P.pos); got.push(it.name); } if (Math.random() < 0.3 + 0.1 * run.stage) { const v = rollOfCats("vaulted", ["weapon", "armour"]); gain(v, P.pos); got.push(v.name); } }
+  return got;
+}
 ISLES.forEach(i => { i.storm = stormAt(i.x, i.z); });
 function seaTerrain(x, z, y) {
   if (x > 150) { const k = smooth(150, 188, x); y = lerp(y, -12, k); }
-  for (const I of ISLES) { const d = Math.hypot(x - I.x, z - I.z); if (d < I.r * 1.25) { const top = I.h + Math.sin(x * 0.3) * Math.cos(z * 0.27) * 0.4; y = Math.max(y, lerp(-6, top, smooth(I.r * 1.25, I.r * 0.62, d))); } }
+  for (const I of islesNear(x, z)) { const d = Math.hypot(x - I.x, z - I.z); if (d < I.r * 1.25) { const top = I.h + Math.sin(x * 0.3) * Math.cos(z * 0.27) * 0.4; y = Math.max(y, lerp(-6, top, smooth(I.r * 1.25, I.r * 0.62, d))); } }
   return y;
 }
-const STORM_NAMES = [[20, "Calm"], [40, "Breezy"], [60, "Rough"], [80, "Stormy"], [101, "Tempest"]];
+const STORM_NAMES = [[20, "Calm"], [40, "Breezy"], [60, "Rough"], [80, "Stormy"], [100, "Tempest"], [125, "Maelstrom"], [150, "Cataclysm"], [175, "Worldbreaker"], [1e9, "The Beyond"]];
 let stormLevel = 0, sailing = null, lastFlash = 0;
 const rain = (() => {
   const N = 1600, arr = new Float32Array(N * 3); for (let i = 0; i < N; i++) { arr[i * 3] = (Math.random() - 0.5) * 70; arr[i * 3 + 1] = Math.random() * 40; arr[i * 3 + 2] = (Math.random() - 0.5) * 70; }
@@ -4680,7 +4950,7 @@ function seaWorld(group) {
     const r = seeded(hash(I.id));
     if (I.kind !== "portal") for (let k = 0; k < 3 + Math.floor(I.r / 6); k++) { const a = r() * TAU, d = r() * I.r * 0.6, x = I.x + Math.cos(a) * d, z = I.z + Math.sin(a) * d; const t = makeTree("palm", r); t.position.set(x, world.h(x, z) - 0.1, z); t.rotation.y = r() * TAU; group.add(t); addCircle(x, z, 0.4, 6); }
     for (let k = 0; k < 6; k++) { const a = r() * TAU, d = I.r * (0.75 + r() * 0.3), x = I.x + Math.cos(a) * d, z = I.z + Math.sin(a) * d; makeRock(group, x, world.h(x, z), z, 0.6 + r() * 1.4, I.kind === "portal" ? 0x1a1820 : 0x8a8680, r); }
-    const lbl = textSprite(`${I.name} · ${I.kind === "guard" ? "guarded treasure" : I.kind === "portal" ? "Rift Portal" : "treasure"}`, I.kind === "portal" ? "#d8b0ff" : I.kind === "guard" ? "#ffb0a0" : "#ffe2a0", 2.2); lbl.position.set(I.x, I.h + 9, I.z); group.add(lbl); world.labels.push(lbl);
+    const lbl = textSprite(`${I.name} · ${isleKindLabel(I)}`, I.kind === "portal" ? "#d8b0ff" : I.kind === "guard" ? "#ffb0a0" : "#ffe2a0", 2.2); lbl.position.set(I.x, I.h + 9, I.z); group.add(lbl); world.labels.push(lbl);
     if (I.wreck) { const w = buildBoat(BOAT.galley, 1); w.position.set(I.x + I.r * 0.4, world.h(I.x + I.r * 0.4, I.z) - 0.6, I.z); w.rotation.set(0.5, 1.2, 0.35); group.add(w); }
     if (I.lighthouse) { const lh = new THREE.Group(); lh.position.set(I.x - 4, world.h(I.x - 4, I.z - 3), I.z - 3); group.add(lh); M(G.cyl(1.4, 2, 12), std(0xf0ece4, { r: 0.8 }), 0, 6, 0, lh, 1, 12, 1); M(G.cyl(1.1, 1.1, 12), std(0xffe8a0, { e: 0xffd060, ei: 2 }), 0, 12.6, 0, lh, 1, 1.2, 1); M(G.cone(12), std(0xc03a2a), 0, 13.8, 0, lh, 1.4, 1.2, 1.4); const bm = glowSprite(0xffe0a0, 9, 0.6); bm.position.y = 12.6; lh.add(bm); addCircle(I.x - 4, I.z - 3, 2, 14); }
     if (I.kind === "treasure" || I.kind === "guard") {
@@ -4737,12 +5007,12 @@ function disembark() {
 function sailUpdate(dt, ix, iy) {
   const sh = sailing, def = sh.def;
   if (sh.sink > 0) { sh.sink += dt; sh.mesh.position.y = SEA - sh.sink * 0.8; sh.mesh.rotation.z = sh.sink * 0.25; if (sh.sink > 3) removeBoat(); return; }
-  const thr = clamp(-iy, -0.4, 1), turn = clamp(ix, -1, 1), top = def.speed * (1 - stormLevel / 300);
+  const thr = clamp(-iy, -0.4, 1), turn = clamp(ix, -1, 1), top = def.speed * (1 - Math.min(stormLevel, 140) / 300);
   sh.speed = lerp(sh.speed, thr * top, 1 - Math.exp(-1.2 * dt));
   sh.yaw -= turn * (0.45 + 0.6 * Math.min(1, Math.abs(sh.speed) / 8)) * dt;
   const f = new V3(Math.sin(sh.yaw), 0, Math.cos(sh.yaw)), next = sh.pos.clone().addScaledVector(f, sh.speed * dt);
   const bow = next.clone().addScaledVector(f, Math.sign(sh.speed || 1) * sh.mesh.userData.len * 0.5);
-  if (world.h(bow.x, bow.z) > SEA - 0.9 || Math.hypot(next.x, next.z) > 1560 || (bow.x < 168 && Math.abs(bow.z) < 4)) { sh.speed *= -0.25; }
+  if (world.h(bow.x, bow.z) > SEA - 0.9 || Math.hypot(next.x, next.z) > 2460 || (bow.x < 168 && Math.abs(bow.z) < 4)) { sh.speed *= -0.25; }
   else sh.pos.copy(next);
   if (stormLevel > 50) sh.pos.addScaledVector(new V3(Math.sin(worldT * 0.3), 0, Math.cos(worldT * 0.27)), stormLevel * 0.006 * dt);
   const wave = 0.08 + stormLevel * 0.006;
@@ -4759,7 +5029,7 @@ function hurtHull(n) {
 }
 
 /* ---- treasure and guardians ---- */
-const isleTier = I => I.storm < 25 ? 0 : I.storm < 55 ? 1 : I.storm < 80 ? 2 : 3;
+const isleTier = I => I.storm < 25 ? 0 : I.storm < 55 ? 1 : I.storm < 80 ? 2 : I.storm < 120 ? 3 : I.storm < 160 ? 4 : 5;
 function openTreasure(I) {
   S.isleLoot = S.isleLoot || {}; const now = Date.now(), last = S.isleLoot[I.id] || 0;
   if (now - last < 30 * 60e3) { toast(`The chest of ${esc(I.name)} is empty. It refills in ${dur(30 * 60e3 - (now - last))}.`, ""); return; }
@@ -4789,23 +5059,37 @@ function despawnGuardians(I) { for (const e of I.guards || []) if (!e.dead) { e.
 
 /* ---- sea beasts ---- */
 const BEASTS = [
+  { name: "Reef Eel", min: 12, kind: "serpent", hp: 4, dmg: 0.05, hull: 6, col: 0x3a6a4a, sc: 0.8 },
+  { name: "Ironshell Turtle", min: 28, kind: "turtle", hp: 9, dmg: 0.06, hull: 8, col: 0x4a6a3a, sc: 1.3 },
   { name: "Stormjaw Shark", min: 40, kind: "shark", hp: 7, dmg: 0.07, hull: 10, col: 0x5a6a7a },
   { name: "Krakenling", min: 60, kind: "kraken", hp: 11, dmg: 0.09, hull: 14, col: 0x8a3a5a },
-  { name: "Abyssal Serpent", min: 80, kind: "serpent", hp: 16, dmg: 0.11, hull: 18, col: 0x1a5a4a }
+  { name: "Abyssal Serpent", min: 80, kind: "serpent", hp: 16, dmg: 0.11, hull: 18, col: 0x1a5a4a },
+  { name: "Tempest Ray", min: 95, kind: "ray", hp: 13, dmg: 0.1, hull: 16, col: 0x3a4a6a, sc: 1.5 },
+  { name: "Ghost Whale", min: 115, kind: "whale", hp: 22, dmg: 0.12, hull: 22, col: 0xc8d8e8, sc: 1.6, ghost: true },
+  { name: "Maelstrom Kraken", min: 135, kind: "kraken", hp: 26, dmg: 0.13, hull: 26, col: 0x3a1a4a, sc: 2.2 },
+  { name: "Leviathan of the Beyond", min: 160, kind: "serpent", hp: 34, dmg: 0.15, hull: 30, col: 0x0a2a3a, sc: 2.1 },
+  { name: "Prismatic Wyrm", min: 182, kind: "serpent", hp: 40, dmg: 0.16, hull: 32, col: 0xff9af8, sc: 2.2, rainbow: true }
 ];
 function beastModel(B) {
-  const g = new THREE.Group(), skin = std(B.col, { r: 0.45, m: 0.2 }), belly = std(0xd8d8c8, { r: 0.6 }), eye = std(0xffe060, { e: 0xffc020, ei: 1.5 }), parts = [];
-  if (B.kind === "shark") { M(G.sph(), skin, 0, 0, 0, g, 0.9, 0.7, 2.6); M(G.sph(), belly, 0, -0.25, 0.3, g, 0.7, 0.4, 2); const fin = M(G.cone(4), skin, 0, 0.9, -0.2, g, 0.1, 1.2, 0.7); const tail = M(G.cone(4), skin, 0, 0.2, -2.7, g, 0.12, 1.4, 0.9); tail.rotation.x = Math.PI / 2; parts.push(tail); for (const s of [-1, 1]) M(G.sph(), eye, s * 0.55, 0.2, 1.9, g, 0.1); }
-  else if (B.kind === "kraken") { M(G.sph(), skin, 0, 0.6, 0, g, 1.6, 1.8, 1.6); for (const s of [-1, 1]) M(G.sph(), eye, s * 0.7, 0.9, 1.3, g, 0.22); for (let k = 0; k < 6; k++) { const a = k / 6 * TAU, t = new THREE.Group(); t.position.set(Math.cos(a) * 1.2, 0, Math.sin(a) * 1.2); t.rotation.y = -a; g.add(t); M(G.cyl(0.08, 0.3, 8), skin, 1.6, 0.4, 0, t, 1, 3.2, 1).rotation.z = -1.2; parts.push(t); } }
+  const g = new THREE.Group(), skin = B.rainbow || B.ghost ? new THREE.MeshStandardMaterial({ color: lin(B.col), roughness: 0.35, metalness: 0.2, transparent: !!B.ghost, opacity: B.ghost ? 0.7 : 1, emissive: lin(B.ghost ? 0x6a8aa8 : B.col), emissiveIntensity: B.ghost ? 0.5 : 0.3 }) : std(B.col, { r: 0.45, m: 0.2 });
+  const belly = std(0xd8d8c8, { r: 0.6 }), eye = std(0xffe060, { e: 0xffc020, ei: 1.5 }), parts = [];
+  if (B.kind === "shark") { M(G.sph(), skin, 0, 0, 0, g, 0.9, 0.7, 2.6); M(G.sph(), belly, 0, -0.25, 0.3, g, 0.7, 0.4, 2); M(G.cone(4), skin, 0, 0.9, -0.2, g, 0.1, 1.2, 0.7); const tail = M(G.cone(4), skin, 0, 0.2, -2.7, g, 0.12, 1.4, 0.9); tail.rotation.x = Math.PI / 2; parts.push(tail); for (const s of [-1, 1]) M(G.sph(), eye, s * 0.45, 0.25, 1.9, g, 0.1); }
+  else if (B.kind === "kraken") { M(G.sph(), skin, 0, 0.6, 0, g, 1.6, 1.8, 1.6); for (const s of [-1, 1]) M(G.sph(), eye, s * 0.7, 0.9, 1.3, g, 0.22); for (let k = 0; k < 6; k++) { const a = k / 6 * TAU, t = new THREE.Group(); t.position.set(Math.cos(a) * 1.2, 0, Math.sin(a) * 1.2); t.rotation.y = -a; g.add(t); M(G.cyl(0.08, 0.3, 8), skin, 1.2, 0.6, 0, t, 1, 2.6, 1).rotation.z = -1.1; parts.push(t); } }
+  else if (B.kind === "turtle") { M(G.sph(), std(0x5a4a2a, { r: 0.6, map: "rock" }), 0, 0.35, 0, g, 1.5, 0.75, 1.8); M(G.sph(), skin, 0, 0.1, 0, g, 1.4, 0.4, 1.7); const head = M(G.sph(), skin, 0, 0.35, 2.0, g, 0.45, 0.4, 0.55); for (const s of [-1, 1]) M(G.sph(), eye, s * 0.22, 0.5, 2.35, g, 0.07);
+    for (const [x, z] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) { const f = new THREE.Group(); f.position.set(x * 1.3, 0.1, z * 1.1); g.add(f); M(G.sph(), skin, x * 0.4, 0, 0, f, 0.6, 0.1, 0.3); parts.push(f); } }
+  else if (B.kind === "ray") { M(G.sph(), skin, 0, 0, 0, g, 1.0, 0.25, 1.4); for (const s of [-1, 1]) { const w = new THREE.Group(); w.position.set(s * 0.8, 0, 0); g.add(w); M(G.cone(3), skin, s * 1.2, 0, 0, w, 0.9, 2.4, 0.08).rotation.z = -s * Math.PI / 2; parts.push(w); }
+    const tail = M(G.cyl(0.04, 0.01, 6), skin, 0, 0, -2.4, g, 1, 3, 1); tail.rotation.x = Math.PI / 2; M(G.oct(), glowMat(0xfff0a0, 0.95), 0, 0, -3.9, g, 0.18); for (const s of [-1, 1]) M(G.sph(), eye, s * 0.35, 0.2, 1.1, g, 0.08); }
+  else if (B.kind === "whale") { M(G.sph(), skin, 0, 0.3, 0, g, 1.5, 1.3, 4); for (const s of [-1, 1]) { M(G.sph(), eye, s * 1.05, 0.4, 2.6, g, 0.15); M(G.sph(), skin, s * 1.4, -0.2, 1.4, g, 0.9, 0.1, 0.4); }
+    const tail = new THREE.Group(); tail.position.set(0, 0.3, -3.8); g.add(tail); for (const s of [-1, 1]) M(G.sph(), skin, s * 0.9, 0, -0.5, tail, 1.0, 0.1, 0.5); parts.push(tail); const gw = glowSprite(0x9ad8ff, 9, 0.3); gw.position.y = 0.6; g.add(gw); }
   else { for (let k = 0; k < 9; k++) { const s = M(G.sph(), skin, 0, 0, -k * 1.1, g, 0.9 - k * 0.06); parts.push(s); } M(G.cone(6), skin, 0, 0.9, 0.4, g, 0.3, 1, 0.3).rotation.x = -0.5; for (const s of [-1, 1]) M(G.sph(), eye, s * 0.5, 0.3, 0.7, g, 0.14); }
-  g.userData.parts = parts; shadows(g, true, false); return g;
+  g.userData.parts = parts; g.userData.skin = skin; shadows(g, true, false); return g;
 }
 function spawnBeast() {
-  const pool = BEASTS.filter(b => stormLevel >= b.min); if (!pool.length) return; const B = pick(pool);
+  const pool = BEASTS.filter(b => stormLevel >= b.min).slice(-4); if (!pool.length) return; const B = pick(pool);
   const g = beastModel(B); scene.add(g);
   const a = rand(0, TAU), pos = P.pos.clone().add(new V3(Math.cos(a) * 34, 0, Math.sin(a) * 34)); pos.y = SEA - 0.3;
   const hp = Math.max(ST.maxHp, ST.dps * B.hp) * (1 + stormLevel / 200), dmg = ST.maxHp * B.dmg / Math.max(0.15, 1 - ST.dr);
-  const e = { R: { g }, name: B.name, B, role: "beast", boss: false, base: { xp: 60, coins: 120 }, pos, kb: new V3(), hp, maxHp: hp, dmg, spd: 7, atkT: 1.5, dead: false, flash: 0, accent: B.col, scale: B.kind === "kraken" ? 1.6 : 1.4, radius: B.kind === "serpent" ? 1.4 : 1.2, t: 0, atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, seaBeast: true };
+  const e = { R: { g }, name: B.name, B, role: "beast", boss: false, base: { xp: 60, coins: 120 }, pos, kb: new V3(), hp, maxHp: hp, dmg, spd: 7, atkT: 1.5, dead: false, flash: 0, accent: B.col, scale: B.sc || (B.kind === "kraken" ? 1.6 : 1.4), radius: B.kind === "serpent" ? 1.4 : 1.2, t: 0, atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, seaBeast: true };
   e.label = textSprite(B.name, "#ff9a8a", 1.1); scene.add(e.label);
   const bar = new THREE.Group(); M(G.box(), new THREE.MeshBasicMaterial({ color: 0x1a0a10 }), 0, 0, 0, bar, 1.1, 0.09, 0.01); e.fg = M(G.box(), new THREE.MeshBasicMaterial({ color: 0xe0505f }), 0, 0, 0.01, bar, 1.1, 0.09, 0.01); scene.add(bar); e.bar = bar;
   enemies.push(e); MUSIC.sfx("beast"); banner(B.name, "rises from the deep!");
@@ -4824,9 +5108,12 @@ function seaBeastUpdate(e, dt) {
   e.atkAnim = Math.max(0, e.atkAnim - dt * 2);
   e.pos.y = SEA - 0.3 + Math.sin(e.t * 2) * 0.15 + e.atkAnim * 0.9;
   const g = e.R.g; g.position.copy(e.pos); g.rotation.y = e.face || 0; g.scale.setScalar(e.scale * (e.flash > 0 ? 1.06 : 1));
-  const parts = g.userData.parts;
+  const parts = g.userData.parts; if (e.B.rainbow) g.userData.skin.color.setHSL((e.t * 0.2) % 1, 0.9, 0.6);
   if (e.B.kind === "shark") parts[0].rotation.y = Math.sin(e.t * 8) * 0.4;
   else if (e.B.kind === "kraken") parts.forEach((p, k) => { p.rotation.z = Math.sin(e.t * 3 + k) * 0.35; });
+  else if (e.B.kind === "turtle") parts.forEach((p, k) => { p.rotation.y = Math.sin(e.t * 3 + k * 1.6) * 0.5; });
+  else if (e.B.kind === "ray") parts.forEach((p, k) => { p.rotation.z = Math.sin(e.t * 4) * 0.5 * (k ? -1 : 1); });
+  else if (e.B.kind === "whale") parts[0].rotation.x = Math.sin(e.t * 2) * 0.35;
   else parts.forEach((p, k) => { p.position.x = Math.sin(e.t * 3 - k * 0.6) * 0.6; p.position.y = Math.cos(e.t * 2 - k * 0.5) * 0.25 + (k === 0 ? e.atkAnim * 0.6 : 0); });
 }
 function seaBeastGone(e) { e.dead = true; scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar); }
@@ -4835,6 +5122,7 @@ function seaBeastDie(e) {
   const coins = Math.round((150 + stormLevel * 12) * (1 + BEASTS.indexOf(e.B) * 0.6)); S.coins += coins; floatText(e.pos, `+${fmt(coins)}`, "#e6b85c"); addXp(40 + stormLevel * 2);
   bumpStat("seaBeasts"); bumpStat("kills");
   if (Math.random() < 0.4) grantChest(stormLevel > 80 ? 2 : stormLevel > 60 ? 1 : 0, 11);
+  if (stormLevel > 120 && Math.random() < 0.35) gain(rollItemOf(rollRarity(dropTable(12.5, 2, true))), e.pos);
   if (Math.random() < 0.5) gain(rollOfCats(stormLevel > 80 ? "epic" : "rare", ["material"]), e.pos);
   if (Math.random() < 0.25) gain(rollFish(1.6), e.pos);
   if (Math.random() < 0.5) gain(ITEM[pick(stormLevel > 80 ? ["sirenscale", "thunderpearl", "krakenink", "stormglass"] : ["seashell", "coralbranch", "krakenink", "stormglass", "driftwood"])], e.pos);
@@ -4858,16 +5146,16 @@ let beastT = 8, lastHitSfx = 0;
 function seaTick(dt) {
   if (!world || world.kind !== "lobby") { stormLevel = 0; return; }
   const ref = sailing && !sailing.anchored ? sailing.pos : P.pos;
-  stormLevel = stormAt(ref.x, ref.z);
-  world.radius = (sailing || P.pos.x > 120) ? 1600 : 290;
+  stormLevel = stormAt(ref.x, ref.z); cullIsles(dt);
+  world.radius = (sailing || P.pos.x > 120) ? 2500 : 290;
   // breath
   P.breathMax = 12; if (P.breath === undefined) P.breath = P.breathMax;
   if (P.swimming && !P.dead) { P.breath -= dt; if (P.breath < 0) { P.breath = 0; P.hp -= ST.maxHp * 0.14 * dt; if (Math.random() < dt * 2) floatText(P.pos, "Drowning", "#9ad8ff"); if (P.hp <= 0) heroDown(); } }
   else P.breath = Math.min(P.breathMax, P.breath + dt * 4);
   // hull wear in a storm the boat was not built for
-  if (sailing && !sailing.anchored && !sailing.sink && stormLevel > sailing.def.storm) hurtHull((stormLevel - sailing.def.storm) * 0.12 * dt);
+  if (sailing && !sailing.anchored && !sailing.sink) { const wear = Math.max(0, Math.min(stormLevel, 100) - sailing.def.storm) * 0.12 + Math.max(0, stormLevel - Math.max(100, sailing.def.storm)) * 0.035; if (wear > 0) hurtHull(wear * dt); }
   // sea beasts
-  const beasts = enemies.filter(e => e.seaBeast && !e.dead).length, cap = stormLevel > 85 ? 3 : stormLevel > 65 ? 2 : stormLevel > 45 ? 1 : 0;
+  const beasts = enemies.filter(e => e.seaBeast && !e.dead).length, cap = stormLevel > 150 ? 5 : stormLevel > 110 ? 4 : stormLevel > 85 ? 3 : stormLevel > 55 ? 2 : stormLevel > 12 ? 1 : 0;
   if ((sailing && !sailing.anchored || P.swimming) && beasts < cap) { beastT -= dt; if (beastT <= 0) { beastT = rand(12, 20) * (1.4 - stormLevel / 140); spawnBeast(); } }
   if (Math.random() < dt * 0.2) enemies = enemies.filter(e => !(e.dead && (e.seaBeast || e.guardian)));
   // guardians wake when you land and sleep when you leave
@@ -4885,15 +5173,15 @@ function seaTick(dt) {
   if (stormLevel > 70 && worldT - lastFlash > rand(5, 14) * (1.5 - stormLevel / 200)) { lastFlash = worldT; const f = $("flash"); f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); setTimeout(() => MUSIC.sfx("thunder"), 400 + Math.random() * 900); }
 }
 function stormVisuals() {
-  const lobby = world && world.kind === "lobby", k = lobby ? stormLevel / 100 : 0;
-  if (lobby && scene.fog) { scene.fog.near = lerp(90, 22, k); scene.fog.far = lerp(480, 150, k); scene.fog.color.lerp(new THREE.Color(0x3a4048), k * 0.75); skyUniforms.top.value.lerp(new THREE.Color(0x2a2e36), k * 0.8); skyUniforms.horizon.value.lerp(new THREE.Color(0x4a5058), k * 0.8); sun.intensity *= 1 - k * 0.65; }
+  const lobby = world && world.kind === "lobby", k = lobby ? Math.min(1, stormLevel / 100) : 0;
+  if (lobby && scene.fog) { scene.fog.near = lerp(90, 22, k); scene.fog.far = lerp(480, 150, k); scene.fog.color.lerp(new THREE.Color(0x3a4048), k * 0.75); skyUniforms.top.value.lerp(new THREE.Color(0x2a2e36), k * 0.8); skyUniforms.horizon.value.lerp(new THREE.Color(0x4a5058), k * 0.8); sun.intensity *= 1 - k * 0.65; if (stormLevel > 100) { const kb = Math.min(1, (stormLevel - 100) / 100); scene.fog.color.lerp(new THREE.Color(0x3a1048), kb * 0.6); skyUniforms.top.value.lerp(new THREE.Color(0x200830), kb * 0.7); skyUniforms.horizon.value.lerp(new THREE.Color(0x6a2a5a), kb * 0.5); } }
   rain.visible = k > 0.3; if (rain.visible) { rain.material.opacity = Math.min(0.75, (k - 0.3) * 1.6); rain.position.set(camera.position.x, camera.position.y - 20, camera.position.z); const a = rain.geometry.attributes.position, n = Math.floor(400 + k * 1200); rain.geometry.setDrawRange(0, n); for (let i = 0; i < n; i++) { let y = a.getY(i) - (24 + k * 20) * 0.016; if (y < 0) y += 40; a.setY(i, y); a.setX(i, a.getX(i) + k * 0.06); if (a.getX(i) > 35) a.setX(i, a.getX(i) - 70); } a.needsUpdate = true; }
   if (lobby && world.water && world.water.userData.water) world.water.userData.water.offset.set(performance.now() / 1000 * (0.012 + k * 0.05), performance.now() / 1000 * (0.008 + k * 0.03));
   // the sea hud
   const show = lobby && (P.pos.x > 120 || sailing), hud = $("seaHud"); hud.hidden = !show;
   if (show) {
     const nm = STORM_NAMES.find(([v]) => stormLevel < v)[1];
-    $("stormName").textContent = nm; $("stormBar").style.width = Math.max(3, stormLevel) + "%";
+    $("stormName").textContent = nm; $("stormBar").style.width = Math.max(3, stormLevel / 2) + "%"; $("stormBar").style.background = stormLevel > 175 ? "linear-gradient(90deg,#ff5a7a,#ffd040,#7aff9a,#5ac8ff,#b07aff)" : stormLevel > 100 ? "linear-gradient(90deg,#9ad8ff,#b07aff,#ff4a8a)" : "";
     const sh = sailing && !sailing.anchored; $("hullRow").hidden = !sh; if (sh) { $("hullBar").style.width = (100 * sailing.hull / sailing.def.hull) + "%"; $("hullT").textContent = `${esc(sailing.def.name)} · hull ${Math.ceil(sailing.hull)} / ${sailing.def.hull}${stormLevel > sailing.def.storm ? " · storm too strong for this boat!" : ""}`; }
     const br = P.swimming || P.breath < P.breathMax; $("breathRow").hidden = !br; if (br) $("breathBar").style.width = (100 * P.breath / P.breathMax) + "%";
   }
@@ -5060,7 +5348,7 @@ function townInfill(group) {
    ===================================================================== */
 /* ---- a trail that follows the weapon's own edge ---- */
 const SWING_BY_TYPE = { rapier: "thrust", spear: "thrust", trident: "thrust", scythe: "reap", halberd: "polearm", flail: "flail", nunchaku: "nunchaku", chainsickle: "chain", twinblade: "twin" };
-const swingStyleFor = w => SWING_BY_TYPE[w.type] || (w.weight === "heavy" ? "heavy" : "slash");
+const swingStyleFor = w => SWORD_STYLE[w.id] ? "sword" : SWING_BY_TYPE[w.type] || (w.weight === "heavy" ? "heavy" : "slash");
 const TRAIL = (() => {
   const N = 18, pos = new Float32Array(N * 2 * 3), col = new Float32Array(N * 2 * 3), idx = [];
   for (let i = 0; i < N - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
@@ -5176,15 +5464,15 @@ function mapPlaces() {
     ["Barracks", -41, -69, "place"], ["Chapel of Dawn", -84, -18, "place"], ["Adventurers' Guild", -68, 46, "place"], ["Mirror Pond", 47.7, 70.3, "place"], ["Lantern Row", 75, 0, "place"],
     ["Bell Tower", ...at(-1.9635), "place"], ["The Salted Anchor", ...at(1.1781), "place"], ["Map Library", ...at(0.3927), "place"], ["Windmill", ...at(-0.3927), "place"]
   ].map(([name, x, z, kind]) => ({ name, x, z, kind }));
-  for (const I of ISLES) L.push({ name: I.name, x: I.x, z: I.z, kind: I.kind === "portal" ? "portal" : I.kind === "guard" ? "guard" : "treasure" });
+  for (const I of ISLES) L.push({ name: I.name, x: I.x, z: I.z, kind: I.kind === "portal" || I.kind === "rare" ? "portal" : I.kind === "guard" ? "guard" : "treasure" });
   return L;
 }
 let mapView = "town", waypoint = null, mapTimer = null;
-const MAPV = { town: [-215, -215, 430, 430], world: [-240, -720, 1680, 1440] };
+const MAPV = { town: [-215, -215, 430, 430], world: [-240, -2300, 2800, 4600] };
 function renderWorldMap() {
   const v = MAPV[mapView], places = mapPlaces(), sc = mapView === "town" ? 1 : 2.2;
   const kc = { town: "#ffe2a0", service: "#cfeeff", place: "#f4ead2", treasure: "#ffd166", guard: "#ff8a7a", portal: "#c08aff" };
-  const storms = [[20, "Calm"], [40, "Breezy"], [60, "Rough"], [80, "Stormy"]].map(([s, n]) => [90 + s / 100 * 1000, n]);
+  const storms = [[20, "Calm"], [40, "Breezy"], [60, "Rough"], [80, "Stormy"], [100, "Tempest"], [125, "Maelstrom"], [150, "Cataclysm"], [175, "Worldbreaker"]].map(([s, n]) => [s <= 100 ? 90 + s * 10 : 1090 + (s - 100) * 12, n]);
   const svg = `<svg viewBox="${v.join(" ")}" role="img" aria-label="World map">
     <rect x="-2000" y="-2000" width="4000" height="4000" fill="#1d4f6e"/>
     <rect x="-2000" y="-2000" width="2161" height="4000" fill="#4a6e3a"/>
@@ -5194,7 +5482,7 @@ function renderWorldMap() {
     ${COMPASS.map(c => `<line x1="${Math.cos(c.a) * 26}" y1="${Math.sin(c.a) * 26}" x2="${Math.cos(c.a) * c.len}" y2="${Math.sin(c.a) * c.len}" stroke="#c8b89a" stroke-width="${c.w * 0.9}" stroke-linecap="round"/>`).join("")}
     <circle cx="0" cy="0" r="27" fill="#d8ccb4"/><circle cx="0" cy="0" r="4.6" fill="#6ab0d0"/>
     ${COMPASS.map(c => `<text x="${Math.cos(c.a) * (c.len + 10 * sc)}" y="${Math.sin(c.a) * (c.len + 10 * sc) + 4}" text-anchor="middle" fill="#fff" font-weight="800" font-size="${10 * sc}">${c.k}</text>`).join("")}
-    ${ISLES.map(I => `<circle cx="${I.x}" cy="${I.z}" r="${I.r}" fill="${I.kind === "portal" ? "#1a1420" : "#d8c890"}" stroke="${kc[I.kind === "guard" ? "guard" : I.kind]}" stroke-width="${2 * sc}"/>`).join("")}
+    ${ISLES.map(I => `<circle cx="${I.x}" cy="${I.z}" r="${I.r}" fill="${I.kind === "portal" ? "#1a1420" : "#d8c890"}" stroke="${kc[I.kind === "guard" ? "guard" : I.kind === "rare" ? "portal" : I.kind]}" stroke-width="${2 * sc}"/>`).join("")}
     ${places.map((p, i) => `<g class="mp" data-mp="${i}" tabindex="0" role="button" aria-label="${esc(p.name)}"><circle cx="${p.x}" cy="${p.z}" r="${4 * sc}" fill="${kc[p.kind]}" stroke="#000" stroke-width="${0.8 * sc}"/><text x="${p.x}" y="${p.z - 6 * sc}" text-anchor="middle" fill="#fff" font-size="${(mapView === "town" ? 7 : 9) * sc}" style="paint-order:stroke;stroke:#000;stroke-width:${2.2 * sc}px">${esc(p.name)}</text></g>`).join("")}
     ${QUEST_NPCS.filter(n => npcStatus(n) === "offer" || npcStatus(n) === "ready").map(n => `<text x="${n.pos[0]}" y="${n.pos[1] + 3 * sc}" text-anchor="middle" fill="${npcStatus(n) === "ready" ? "#7fd69a" : "#ffd166"}" font-weight="900" font-size="${9 * sc}" style="paint-order:stroke;stroke:#000;stroke-width:${2 * sc}px">${npcStatus(n) === "ready" ? "?" : "!"}</text>`).join("")}
     ${waypoint ? `<circle cx="${waypoint.x}" cy="${waypoint.z}" r="${8 * sc}" fill="none" stroke="#ffd166" stroke-width="${2.5 * sc}"/>` : ""}
@@ -5317,7 +5605,7 @@ function sigAttack(e, tgt, st, speedUp) {
 }
 
 /* the raid hall: a floating sanctum with four raid gates */
-const RAID_GATES = [[0, -22], [22, 0], [-22, 0], [0, 22]];
+const RAID_GATES = Array.from({ length: RAID_COUNT }, (_, k) => { const a = k / RAID_COUNT * TAU - Math.PI / 2; return [Math.round(Math.cos(a) * 24 * 10) / 10, Math.round(Math.sin(a) * 24 * 10) / 10]; });
 function raidPortalMesh(parent, x, z, c1, c2, label, labelCol, i) {
   const pg = new THREE.Group(); pg.position.set(x, 0, z); parent.add(pg);
   const ring = M(new THREE.TorusGeometry(2.4, 0.3, 12, 48), std(0x2a2026, { r: 0.5, m: 0.4, map: "rock" }), 0, 0.15, 0, pg); ring.rotation.x = Math.PI / 2;
@@ -5367,7 +5655,7 @@ function buildRaidHall() {
   RAID_GATES.forEach(([x, z], k) => { const I = ISLANDS[RAID_START + k], c = new THREE.Color(I.col).getHex();
     raidPortalMesh(group, x, z, new THREE.Color(c).multiplyScalar(0.25).getHex(), c, `${I.name} · raid`, I.col, 100 + k); });
   // the way home
-  raidPortalMesh(group, 16, 16, 0x0a2a6a, 0x7af0ff, "Back to town", "#cfeeff", 98);
+  raidPortalMesh(group, 0, 12, 0x0a2a6a, 0x7af0ff, "Back to town", "#cfeeff", 98);
   world.clouds = addClouds(group, 0x2a1a3a);
   const pg = new THREE.BufferGeometry(), arr = new Float32Array(400 * 3);
   for (let k = 0; k < 400; k++) { arr[k * 3] = rand(-60, 60); arr[k * 3 + 1] = rand(-20, 25); arr[k * 3 + 2] = rand(-60, 60); }
@@ -5377,17 +5665,17 @@ function buildRaidHall() {
 function enterRaidHall() {
   closeAllModals(); if (sailing) removeBoat(); stopFishing();
   buildRaidHall();
-  P.pos.set(0, 0, 9); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.onPortal = -1; P.kb.set(0, 0, 0);
+  P.pos.set(0, 0, 6); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.onPortal = -1; P.kb.set(0, 0, 0);
   updateModeUi(); MUSIC.setMode("portal", 0, "The Raid Hall");
-  banner("The Raid Hall", "Four raids. Bring everything you have.");
+  banner("The Raid Hall", `${RAID_COUNT} raids. Bring everything you have.`);
 }
 function leaveRaidHall() { goLobby(); P.pos.set(15, 0, -14); P.face = Math.PI * 0.75; P.onPortal = 99; }
 function openRaidBoard(k) {
   if (run) return; dlgNpc = null; keys.clear(); attackHeld = false;
-  const list = k >= 0 ? [k] : [0, 1, 2, 3];
+  const list = k >= 0 ? [k] : Array.from({ length: RAID_COUNT }, (_, q) => q);
   $("dlgName").textContent = k >= 0 ? ISLANDS[RAID_START + k].name : "The Raid Roll of Honour"; $("dlgRole").textContent = "Raid · your whole party fights";
-  $("dlgText").textContent = k >= 0 ? ISLANDS[RAID_START + k].blurb + " All three allies march with you. The raid boss has three phases, and every clear pays out a raid hoard." : "Four raids wait behind the gates. Each has two levels of new foes and a raid boss that changes phase at two thirds and one third health.";
-  $("dlgQuest").innerHTML = `<div class="duels">${list.map(r => { const i = RAID_START + r, I = ISLANDS[i]; return `<div class="duel" style="--c:${I.col}"><span><b>${esc(I.name)}</b><small>Foes: ${[...I.enemies, ...I.more].map(e => esc(e[0])).join(", ")}</small><small>Raid boss: ${esc(I.bosses[0][0])}</small><small class="num">${STAGES.map(s => `${s.name} ${S.prog[i][s.id] ? "cleared" : "not cleared"}`).join(" · ")}</small></span>
+  $("dlgText").textContent = k >= 0 ? ISLANDS[RAID_START + k].blurb + " All three allies march with you. The raid boss has three phases, and every clear pays out a raid hoard." : `${RAID_COUNT} raids wait behind the gates. Each has two levels of new foes and a raid boss that changes phase at two thirds and one third health.`;
+  $("dlgQuest").innerHTML = `<div class="duels">${list.map(r => { const i = RAID_START + r, I = ISLANDS[i]; return `<div class="duel" style="--c:${I.col}"><span><b>${esc(I.name)}</b><small>Foes: ${seqOf(I).map(e => esc(e[0])).join(", ")}</small><small>Raid boss: ${esc(I.bosses[0][0])}</small><small class="num">${STAGES.map(s => `${s.name} ${S.prog[i][s.id] ? "cleared" : "not cleared"}`).join(" · ")}</small></span>
     <span class="row" style="gap:4px;grid-column:1">${STAGES.map((s, q) => `<button class="btn ${q ? "" : "primary"}" data-raid="${i}:${q}">${s.name}</button>`).join("")}</span></div>`; }).join("")}</div>`;
   $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Step back</button>`;
   $("dialog").hidden = false;
@@ -5397,6 +5685,80 @@ function raidHoard() {
   const t = dropTable(12.5, run.stage, true); t.common = 0; t.rare *= 0.3; const got = [];
   for (let k = 0; k < 3 + run.stage; k++) { const it = rollItemOf(rollRarity(t)); gain(it, P.pos); got.push(it.name); }
   return got;
+}
+
+/* ---- three new districts with houses, townsfolk and quest givers ---- */
+const QUARTERS = [
+  { name: "Northwatch Quarter", sign: [10, -150], houses: [[-50, -176, 0], [-34, -176, 0], [-18, -178, 0], [18, -178, 0], [34, -176, 0], [50, -174, 0], [-42, -156, Math.PI], [-24, -158, Math.PI], [26, -158, Math.PI], [44, -156, Math.PI], [64, -164, -0.5]] },
+  { name: "Willowmere Hamlet", sign: [-150, -60], houses: [[-176, -84, 1.2], [-180, -64, 1.4], [-176, -44, 1.7], [-160, -92, 0.6], [-156, -36, 2.4], [-140, -80, 0.2]] },
+  { name: "Saltgate Lane", sign: [124, 112], houses: [[104, 92, -0.7], [118, 100, -0.7], [132, 110, -0.7], [108, 124, -2.2], [122, 134, -2.2], [138, 128, -2.0], [112, 146, -2.4], [128, 152, -2.4]] }
+];
+const QUARTER_NPCS = [
+  { id: "odile", name: "Harbourmistress Odile", role: "Charts and sea lore", pos: [124, 118], face: -2.2, quarter: true, look: { skin: 0xd8a880, hair: 0x2a2a2a, cloth: 0x2a5a7a, cloth2: 0x1a2a3a }, armour: "saltscale", weapon: null,
+    hello: "Past Tempest the charts stop making sense. I want to know what is out there. Will you sail it for me?", bye: "You have charted more of the sea than any captain I have known.",
+    quests: [{ id: "od1", title: "Every Cove a Chest", ask: "Open 10 island treasures out at sea.", stat: "treasures", n: 10, reward: { coins: 2500, chest: 1 } },
+      { id: "od2", title: "Monsters of the Deep", ask: "Defeat 12 sea beasts. The bigger the storm, the better.", stat: "seaBeasts", n: 12, reward: { coins: 6000, items: { tidesilk: 4, thunderpearl: 2 } } },
+      { id: "od3", title: "Through the Rare Door", ask: "Step through any rare portal at sea once. They only surface some hours.", stat: "rarePortals", n: 1, reward: { coins: 12000, items: { tidewalkerplate: 1 } } }] },
+  { id: "garrick", name: "Garrick Ironhand", role: "Retired raider", pos: [-10, -164], face: 0, quarter: true, look: { skin: 0xb07a52, hair: 0x8a8a8a, cloth: 0x4a3a2a, cloth2: 0x2a2018 }, armour: "ironplate", weapon: "warlordaxe",
+    hello: "I raided the Hall for thirty years. My knees are done, but my advice is free and my gold is not.", bye: "You have done the Hall proud. Drinks are on me.",
+    quests: [{ id: "ga1", title: "First Raid", ask: "Clear any raid in the Raid Hall.", stat: "raidClears", n: 1, reward: { coins: 8000, chest: 2 } },
+      { id: "ga2", title: "Raid Veteran", ask: "Clear 5 raids, any difficulty.", stat: "raidClears", n: 5, reward: { coins: 25000, items: { stormheart: 1 } } },
+      { id: "ga3", title: "Lieutenant Hunter", ask: "Defeat 20 bosses or lieutenants.", stat: "bosses", n: 20, reward: { coins: 15000, items: { die: 1 } } }] },
+  { id: "pell", name: "Sister Pell", role: "Northwatch healer", pos: [10, -168], face: 0, quarter: true, look: { skin: 0xf0d0b0, hair: 0xe8e0d0, cloth: 0xe8e0d0, cloth2: 0x8a7a5a }, armour: null, weapon: null,
+    hello: "Blocking is a prayer, child. Parrying is an answer. Learn both and you will live long.", bye: "Go well. I will light a lamp for you.",
+    quests: [{ id: "pe1", title: "The Patient Guard", ask: "Parry 15 attacks. Block just before the hit lands.", stat: "parries", n: 15, reward: { coins: 2000, items: { draught: 3 } } },
+      { id: "pe2", title: "Turn the Blade", ask: "Parry 60 attacks.", stat: "parries", n: 60, reward: { coins: 9000, items: { dawnguard: 1 } } }] },
+  { id: "quill", name: "Quill", role: "Beast tracker", pos: [-158, -66], face: 1.4, quarter: true, look: { skin: 0x8a5a3a, hair: 0x3a2a1a, cloth: 0x4a6a3a, cloth2: 0x3a3022 }, armour: "leather", weapon: "huntknife",
+    hello: "Spiders, slimes, giants, beetles. Every island breeds something new. I want them all in my book.", bye: "My book is full. Thank you, hunter.",
+    quests: [{ id: "qu1", title: "Fresh Tracks", ask: "Defeat 150 foes on the islands.", stat: "kills", n: 150, reward: { coins: 3500, items: { ironwoodlog: 4 } } },
+      { id: "qu2", title: "Night Hunt", ask: "Defeat 40 foes at night.", stat: "nightKills", n: 40, reward: { coins: 5000, items: { nightfang: 1 } } },
+      { id: "qu3", title: "The Long Hunt", ask: "Defeat 600 foes.", stat: "kills", n: 600, reward: { coins: 20000, chest: 2 } }] },
+  { id: "mabel", name: "Mabel Thimble", role: "Willowmere tailor", pos: [-166, -52], face: 1.6, quarter: true, look: { skin: 0xe8c0a0, hair: 0xb8401a, cloth: 0x8a3a5a, cloth2: 0x3a2a3a }, armour: null, weapon: null,
+    hello: "Armour, dear, is just clothing that argues back. Bring me cloth from the islands.", bye: "You are the best dressed hero in the realm, and I made sure of it.",
+    quests: [{ id: "ma1", title: "Silk for a Cloak", ask: "Bring me 4 Hemp Rope and 2 Tidesilk.", deliver: { hemp: 4, tidesilk: 2 }, n: 1, reward: { coins: 3000, items: { fieldjack: 1 } } },
+      { id: "ma2", title: "Forge Apprentice", ask: "Craft 8 items at the forge.", stat: "crafts", n: 8, reward: { coins: 6000, items: { frostmail: 1 } } }] },
+  { id: "bastian", name: "Bastian Vane", role: "Northwatch duellist", pos: [40, -166], face: 0, quarter: true, look: { skin: 0xc99a74, hair: 0x1a1a1a, cloth: 0x7a1a2a, cloth2: 0x1a1a1a }, armour: "nightstalker", weapon: "crimsonkatana",
+    hello: "Every sword in this realm swings its own way. Have you learnt yours yet?", bye: "En garde, always. It was an honour.",
+    quests: [{ id: "ba1", title: "Steel Talks", ask: "Win 3 duels in the Grand Arena.", stat: "duels", n: 3, reward: { coins: 4000, items: { duelistsong: 1 } } },
+      { id: "ba2", title: "Show Me Your Special", ask: "Use 50 weapon specials.", stat: "specials", n: 50, reward: { coins: 7000, items: { stormedge: 1 } } }] },
+  { id: "rosalind", name: "Rosalind Marsh", role: "Saltgate merchant", pos: [114, 136], face: -2.3, quarter: true, look: { skin: 0xd8a880, hair: 0xd8b860, cloth: 0x3a6a5a, cloth2: 0x2a3a2a }, armour: null, weapon: null,
+    hello: "Coins make the world go round, and the sea makes the coins. Let us do business.", bye: "Partners for life, you and I.",
+    quests: [{ id: "ro1", title: "Market Day", ask: "Sell 30 items to any merchant.", stat: "sold", n: 30, reward: { coins: 5000, chest: 1 } },
+      { id: "ro2", title: "Big Spender", ask: "Open 25 chests.", stat: "chests", n: 25, reward: { coins: 12000, items: { anchorflail: 1 } } }] },
+  { id: "tomasz", name: "Tomasz the Angler", role: "Saltgate fisherman", pos: [132, 120], face: -2.0, quarter: true, look: { skin: 0xd0a080, hair: 0xd8d8d8, cloth: 0x5a6a7a, cloth2: 0x3a3a3a }, armour: null, weapon: null,
+    hello: "The deeper the storm, the stranger the fish. Bring me something worth bragging about.", bye: "My nets have never been fuller.",
+    quests: [{ id: "to1", title: "Lines in the Water", ask: "Catch 20 fish.", stat: "fish", n: 20, reward: { coins: 2500, items: { hemp: 6 } } },
+      { id: "to2", title: "Rare Catch", ask: "Catch 5 epic or better fish.", stat: "epicFish", n: 5, reward: { coins: 9000, items: { tideharvest: 1 } } }] }
+];
+QUEST_NPCS.push(...QUARTER_NPCS);
+VILLAGERS.push(
+  { name: "Ingrid", role: "Northwatch baker", home: [0, -170], rad: 22, look: { skin: 0xe8c0a0, hair: 0xd8b860, cloth: 0xc8b090, cloth2: 0x8a5a3a }, lines: ["Northwatch bread keeps for a week. Perfect for sailors.", "Garrick says the Raid Hall floats in the sky. I believe him, mostly."] },
+  { name: "Pip", role: "Northwatch lamplighter", home: [30, -164], rad: 20, look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0x3a3a6a, cloth2: 0x2a2a3a }, lines: ["I light every lamp in Northwatch. Even the ones nobody uses.", "There is a portal at sea that shines every colour. Rarest thing alive, they say."] },
+  { name: "Hollis", role: "Willowmere farmer", home: [-160, -64], rad: 16, look: { skin: 0xd0a080, hair: 0x8a5a2a, cloth: 0x6a7a3a, cloth2: 0x4a3a22 }, lines: ["Willowmere grows the best turnips in the realm. That is not a high bar.", "Giants on the islands now. Giants! In my day it was crabs."] },
+  { name: "Elsa", role: "Willowmere weaver", home: [-168, -80], rad: 14, look: { skin: 0xf0d8c0, hair: 0xe8d8b0, cloth: 0x8a5a8a, cloth2: 0x3a2a3a }, lines: ["Mabel takes all the good thread. I am not bitter.", "If you block too much, your arm gets tired. Mabel told me that."] },
+  { name: "Cobb", role: "Saltgate dockhand", home: [120, 126], rad: 18, look: { skin: 0xb07a52, hair: 0x2a1a10, cloth: 0x5a4a3a, cloth2: 0x3a2a1a }, lines: ["Past Tempest the sky goes purple. Past that, nobody comes back to say.", "The Prismatic Wyrm. I saw it once. I was not sober."] },
+  { name: "Nell", role: "Saltgate fishwife", home: [110, 110], rad: 16, look: { skin: 0xe8c0a0, hair: 0x5a2a12, cloth: 0x3a5a7a, cloth2: 0x2a3a4a }, lines: ["Fresh fish! Some of it was even caught today.", "Tomasz brags about his catches. Half of them are mine."] },
+  { name: "Ward", role: "Northwatch guard", home: [-30, -150], rad: 24, armour: "chainshirt", weapon: "militia", look: { skin: 0xc99a74, hair: 0x3a2a1a, cloth: 0x2a4a8a, cloth2: 0x1a2a4a }, lines: ["Northwatch is quiet. I like quiet.", "Sister Pell says parrying is an answer. I still prefer running."] }
+);
+function buildQuarters(group) {
+  const r = seeded(9090), town = new THREE.Group(); group.add(town);
+  for (const Q of QUARTERS) {
+    for (const [x, z, rot] of Q.houses) { if (world.circles.some(c => Math.hypot(x - c.x, z - c.z) < c.r + 4.5)) continue; makeHouse(town, x, z, rot, r); addCircle(x, z, 4.6, 8); }
+    const [sx, sz] = Q.sign, post = new THREE.Group(); post.position.set(sx, world.h(sx, sz), sz); town.add(post);
+    M(G.cyl(0.12, 0.14), MAT.bark(0x4a3222), 0, 1.6, 0, post, 1, 3.2, 1); M(G.box(), MAT.bark(0x7a5536), 0, 2.9, 0, post, 2.6, 0.7, 0.12);
+    const lb = textSprite(Q.name, "#ffe2a0", 1.4); lb.position.set(sx, world.h(sx, sz) + 4.4, sz); group.add(lb); world.labels.push(lb);
+    const lamp = M(G.sph(), std(0xffe0a0, { e: 0xffc060, ei: 2.5 }), sx + 1.6, world.h(sx, sz) + 3.2, sz, group, 0.16);
+  }
+  shadows(town, true, true); mergeStatic(town);
+  for (const def of QUARTER_NPCS) {
+    const [x, z] = def.pos, R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null }), gy = world.h(x, z);
+    R.g.position.set(x, gy, z); R.g.rotation.y = def.face; group.add(R.g); shadows(R.g, true, false);
+    const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, gy + 2.45, z); lbl.userData.far = 34; group.add(lbl); world.labels.push(lbl);
+    const marks = { offer: markSprite("!", "#ffd166"), ready: markSprite("?", "#7fd69a") };
+    for (const m of Object.values(marks)) { m.position.set(x, gy + 3.15, z); group.add(m); m.visible = false; }
+    world.npcs.push({ def, R, lbl, x, z, marks, quest: true }); addCircle(x, z, 0.5, 2);
+    world.interact.push({ x, z, y: gy, r: 2.8, label: `Talk to ${def.name}`, act: () => openDialog(def) });
+  }
 }
 
 /* ---------- music: an original score composed live with Web Audio ----------
@@ -5716,7 +6078,7 @@ function frame(now) {
 }
 $("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; updateDailyBadge(); if (!dailyInfo().claimed) setTimeout(openDaily, 900); if (coarse || usedTouch) $("joyHint").hidden = false; });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { ISLANDS, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
