@@ -1144,12 +1144,14 @@ const CLASS_LIST = [
     perks: [["Pack Leader", "Allies deal 25% more damage."], ["Wild Instinct", "+10% move speed and +8% critical hit chance."]], look: { skin: 0xc99a74, hair: 0x5a3a1a, cloth: 0x6a4a2a, cloth2: 0x3a2a1a, extra: "furcloak" } },
   { id: "chronomancer", name: "Chronomancer", rarity: "legendary", role: "Support", odds: 0.5, desc: "Borrows seconds from tomorrow and spends them today.",
     perks: [["Borrowed Time", "Special attacks recharge 45% faster."], ["Time Slip", "One extra dash, and dashes come back 40% faster."], ["Rewind", "Heal 0.6% of your max health every second."]], look: { skin: 0xe8d8c0, hair: 0xd8d0b8, cloth: 0x2a4a5a, cloth2: 0xd8b860, extra: "clockhalo" } },
+  { id: "seraph", name: "Astral Seraph", rarity: "vaulted", role: "Support", odds: 0.0001775, desc: "A guardian of the high heavens, wreathed in starlight.",
+    perks: [["Wings of the Firmament", "Double jump and glide, and +40% max health."], ["Benediction", "Heal 1% of your max health every second, and allies deal 30% more damage."], ["Starfire", "Special attacks recharge 55% faster and +60% Power."], ["Halo of Judgement", "Critical hits have a 35% chance to call down a beam of light for 120% weapon damage."]], look: { skin: 0xf6e8d8, hair: 0xfff8e0, cloth: 0xf8f6ff, cloth2: 0xd8c890, extra: "seraph" } },
   { id: "sovereign", name: "Voidborn Sovereign", rarity: "vaulted", role: "DPS", odds: 0.0001775, desc: "One in a million. A ruler born from the space between stars.",
     perks: [["Crown of Nothing", "+50% max health and +40% damage."], ["Event Horizon", "Special attacks recharge 50% faster and +50% Power."], ["Starless Wings", "Double jump and glide, two extra dashes, +20% move speed."], ["Absolute", "+20% critical hit chance."]], look: { skin: 0xd8d0e8, hair: 0x0a0814, cloth: 0x0e0a1a, cloth2: 0x2a0a3a, extra: "voidcrown" } }
 ];
 const CLASS = Object.fromEntries(CLASS_LIST.map(c => [c.id, c]));
-{ const tot = CLASS_LIST.filter(c => c.odds && c.id !== "sovereign").reduce((a, c) => a + c.odds, 0); CLASS.sovereign.odds = tot / 1e6; }
-const classPct = c => { const tot = CLASS_LIST.reduce((a, x) => a + (x.odds || 0), 0), p = 100 * c.odds / tot; return p >= 0.1 ? p.toFixed(1) + "%" : p >= 0.01 ? p.toFixed(2) + "%" : "1 in " + fmt(Math.round(100 / p)); };
+{ const tot = CLASS_LIST.filter(c => c.odds && c.rarity !== "vaulted").reduce((a, c) => a + c.odds, 0); for (const c of CLASS_LIST) if (c.rarity === "vaulted") c.odds = tot / 1e6; }
+const classPct = c => { const tot = CLASS_LIST.reduce((a, x) => a + (x.odds || 0), 0), p = 100 * c.odds / tot; return (p >= 0.1 ? p.toFixed(1) : p >= 0.01 ? p.toFixed(2) : p.toFixed(5)) + "%"; };
 const ROLL_COINS = 10000;
 
 /* ---------- islands ---------- */
@@ -1355,6 +1357,23 @@ RARE_PORTALS.forEach((R, r) => {
     bosses: [[`${R.pre} Warden`, arch[5][0], R.grd, R.c2, BODY_SIG[arch[5][0]]], [`${R.pre} Sovereign`, arch[10][0], R.grd, R.c2, BODY_SIG[arch[10][0]]], [`${R.pre} Godbeast`, arch[0][0] === "spider" ? "serpent" : "giant", 0x0a0a0a, R.c2, R.rainbow ? "shards" : "meteor"]] });
   R.idx = RARE_START + r;
 });
+/* ---- the six Sky Realms, reached through the Realm Gate in the Skylands (level 45 and above) ---- */
+const SKY_REALM_START = ISLANDS.length;
+const SKY_REALMS = [
+  { name: "The Halls of Dawn", pre: "Dawn", sky: [0xffd8a0, 0xfff4e0], grd: 0xe8d8b0, c2: 0xffd070, tree: "crystal" },
+  { name: "Stormspire Reach", pre: "Storm", sky: [0x3a4a6a, 0xa8c0e0], grd: 0x6a7a8a, c2: 0x9ae8ff, tree: "dead" },
+  { name: "The Seraph Gardens", pre: "Seraph", sky: [0x8ac8ff, 0xf0f8ff], grd: 0xa8d890, c2: 0xfff0c0, tree: "oak" },
+  { name: "Wyrmwind Heights", pre: "Wyrm", sky: [0xff9a6a, 0xffe0c0], grd: 0xb8704a, c2: 0xff6a2a, tree: "pine" },
+  { name: "The Starlit Bastion", pre: "Astral", sky: [0x1a1a4a, 0x6a5aaa], grd: 0x4a4a7a, c2: 0xd8d8ff, tree: "crystal" },
+  { name: "The Last Cloud", pre: "Aether", sky: [0xd8e8ff, 0xffffff], grd: 0xd8dce8, c2: 0xff9af0, tree: "crystal" }
+];
+SKY_REALMS.forEach((R, r) => {
+  const arch = RAID_ARCH.map((_, k) => RAID_ARCH[(k * 7 + r * 5 + 2) % 12]);
+  const foes = arch.map(([b, noun, role], k) => [`${R.pre} ${noun}`, b, role, new THREE.Color(R.grd).lerp(new THREE.Color(R.c2), 0.15 + (k % 4) * 0.12).getHex(), R.c2]);
+  ISLANDS.push({ name: R.name, skyRealm: true, clouds: true, tree: R.tree, sky: R.sky, fog: R.sky[1], fogNear: 60, ground: [R.grd, new THREE.Color(R.grd).multiplyScalar(1.15).getHex(), new THREE.Color(R.grd).multiplyScalar(1.3).getHex()], water: 0x9ad8ff, glowWater: true, grass: null, map: [0, 0], col: "#" + new THREE.Color(R.c2).getHexString(), blurb: "A realm built on the clouds, high above the Skylands.",
+    enemies: foes.slice(0, 3), more: foes.slice(3, 9), extra: foes.slice(9, 12),
+    bosses: [[`${R.pre} Archon`, "dragon", R.grd, R.c2, "meteor"], [`${R.pre} Seraph-King`, arch[5][0], R.grd, R.c2, BODY_SIG[arch[5][0]] || "lightning"], [`${R.pre} Sky Tyrant`, "hydra", 0x1a1a2a, R.c2, "tide"]] });
+});
 const ROLE_BASE = {
   melee:  { hp: 42, dmg: 7, spd: 3.3, range: 1.7, cd: 1.25, xp: 6, coins: 6 },
   skirm:  { hp: 28, dmg: 5, spd: 5.0, range: 1.5, cd: 0.9, xp: 5, coins: 5 },
@@ -1551,7 +1570,7 @@ function statsFor(weaponId, armourId, clsId) {
   const st = {};
   const eA = 1 + 0.07 * enchLv(armourId), eW = 1 + 0.07 * enchLv(weaponId);
   const gp = guildPerk;
-  st.maxHp = Math.round((100 + 12 * (S.level - 1) + a.hp * eA) * (role.hp || 1) * (id === "warrior" ? 1.2 : 1) * ({ valkyrie: 1.15, dragonknight: 1.25, sovereign: 1.5 }[id] || 1) * (1 + gp("hp")));
+  st.maxHp = Math.round((100 + 12 * (S.level - 1) + a.hp * eA) * (role.hp || 1) * (id === "warrior" ? 1.2 : 1) * ({ valkyrie: 1.15, dragonknight: 1.25, sovereign: 1.5, seraph: 1.4 }[id] || 1) * (1 + gp("hp")));
   st.def = (a.def * eA + 5 * p.defence) * (id === "paladin" ? 1.3 : 1) * ({ knight: 1.25, druid: 1.15, dragonknight: 1.2 }[id] || 1);
   st.dr = st.def / (st.def + 120);
   st.dmgMult = (1 + 0.04 * p.damage) * (role.dmg || 1) * (1 + gp("dmg")) * (id === "sovereign" ? 1.4 : 1);
@@ -1559,16 +1578,16 @@ function statsFor(weaponId, armourId, clsId) {
   st.atkSpd = w.spd * (id === "samurai" ? 1.25 : 1) * (id === "monk" ? 1.15 : 1);
   st.dps = st.hit * st.atkSpd;
   st.move = 6.0 * w.move * a.move * (1 + 0.025 * p.speed) * (role.move || 1) * (id === "elf" ? 1.15 : 1) * (id === "stormcaller" ? 1.1 : 1) * ({ monk: 1.08, shadowblade: 1.08, beastmaster: 1.1, sovereign: 1.2 }[id] || 1) * (1 + gp("move"));
-  st.power = 0.06 * p.power + (id === "mage" ? 0.2 : 0) + (role.power || 0) + ({ necromancer: 0.2, starseer: 0.3, sovereign: 0.5 }[id] || 0);
-  st.specCd = Math.max(0.5, 1 - 0.015 * p.power) * (id === "mage" ? 0.65 : 1) * (role.cd || 1) * ({ bard: 0.8, starseer: 0.6, chronomancer: 0.55, sovereign: 0.5 }[id] || 1);
+  st.power = 0.06 * p.power + (id === "mage" ? 0.2 : 0) + (role.power || 0) + ({ necromancer: 0.2, starseer: 0.3, sovereign: 0.5, seraph: 0.6 }[id] || 0);
+  st.specCd = Math.max(0.5, 1 - 0.015 * p.power) * (id === "mage" ? 0.65 : 1) * (role.cd || 1) * ({ bard: 0.8, starseer: 0.6, chronomancer: 0.55, sovereign: 0.5, seraph: 0.45 }[id] || 1);
   st.crit = 0.05 + (id === "ranger" ? 0.12 : 0) + (id === "elf" ? 0.1 : 0) + ({ pirate: 0.1, shadowblade: 0.12, beastmaster: 0.08, sovereign: 0.2 }[id] || 0) + gp("crit");
   st.dashes = 3 + (id === "reaper" || id === "valkyrie" || id === "chronomancer" ? 1 : 0) + (id === "sovereign" ? 2 : 0);
   st.dashCd = 1.5 * (id === "ranger" ? 0.8 : 1) * (id === "shadowblade" ? 0.7 : 1) * (id === "chronomancer" ? 0.6 : 1);
   st.reach = w.reach * (id === "reaper" && !w.ranged ? 1.2 : 1);
   st.potion = (id === "alchemist" ? 1.5 : 1) * (role.potion || 1);
   st.kbTaken = id === "skeleton" ? 0.5 : id === "dragonknight" ? 0.6 : 1;
-  st.allyDmg = (role.allyDmg || 1) * (id === "paladin" ? 1.1 : 1) * (id === "bard" ? 1.2 : 1) * (id === "beastmaster" ? 1.25 : 1);
-  st.wings = id === "archangel" || id === "sovereign";
+  st.allyDmg = (role.allyDmg || 1) * (id === "paladin" ? 1.1 : 1) * (id === "bard" ? 1.2 : 1) * (id === "beastmaster" ? 1.25 : 1) * (id === "seraph" ? 1.3 : 1);
+  st.wings = id === "archangel" || id === "sovereign" || id === "seraph";
   st.jump = 8.4 * (id === "elf" ? 1.08 : 1) * (id === "valkyrie" ? 1.12 : 1);
   applyBoons(st);
   return st;
@@ -2180,6 +2199,8 @@ function buildHumanoid(o) {
   if (x === "starcrown") { for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; const st2 = M(G.oct(), glowMat(0xd8e0ff, 1), Math.sin(a) * 0.15, 0.2 + Math.cos(a * 2) * 0.01, Math.cos(a) * 0.15, head, 0.02, 0.03, 0.02); } const gs = glowSprite(0xd8e0ff, 0.6, 0.6); gs.position.set(0, 0.2, 0); head.add(gs); }
   if (x === "furcloak") { for (const sx of [-1, 1]) M(G.sph(), std(0x8a6a4a, { r: 0.95, map: "fur" }), 0.15 * sx, 0.5, -0.02, chest, 0.12, 0.08, 0.12); M(G.box(), std(0x6a4a2a, { r: 0.95, map: "fur", ds: true }), 0, 0.25, -0.15, chest, 0.42, 0.55, 0.04); }
   if (x === "clockhalo") { const ring = new THREE.Group(); ring.position.set(0, 0.05, -0.17); head.add(ring); M(G.tor(0.17, 0.012), std(0xd8b860, { m: 0.9, r: 0.25, e: 0x6a5a20, ei: 0.5 }), 0, 0, 0, ring); for (let k = 0; k < 12; k++) { const a = k / 12 * TAU; M(G.box(), std(0xfff0c0, { e: 0xfff0c0, ei: 0.8 }), Math.cos(a) * 0.17, Math.sin(a) * 0.17, 0, ring, 0.012, 0.03, 0.01).rotation.z = a; } M(G.box(), std(0xd8b860, { m: 0.9 }), 0, 0.06, 0.01, ring, 0.01, 0.12, 0.01); R.halo = ring; }
+  if (x === "seraph") { const h2 = M(G.tor(0.14, 0.016), glowMat(0xfff0a0, 1), 0, 0.3, -0.02, head); h2.rotation.x = Math.PI / 2 - 0.2; R.halo = h2; const gs = glowSprite(0xfff0c0, 0.7, 0.7); gs.position.set(0, 0.3, 0); head.add(gs);
+    for (const sx of [-1, 1]) { const wp = new THREE.Group(); wp.position.set(0.07 * sx, 0.42, -0.14); chest.add(wp); const fm = std(0xffffff, { e: 0xfff0d0, ei: 0.45, r: 0.6 }); for (let k = 0; k < 13; k++) { const f = M(featherGeo(), fm, 0, 0, -k * 0.004, wp, 1.1 + k * 0.09); f.rotation.z = -sx * (0.3 + k * 0.16); f.scale.x = sx * (1.1 + k * 0.09); f.position.x = sx * k * 0.04; f.position.y = -k * 0.012; } wp.rotation.y = 0.5 * sx; R[sx < 0 ? "wingL" : "wingR"] = wp; } }
   if (x === "voidcrown") { for (let k = 0; k < 7; k++) { const a = k / 7 * TAU; const sp = M(G.cone(5), std(0x0a0814, { m: 0.8, r: 0.2, e: 0x8a3aff, ei: 0.6 }), Math.sin(a) * 0.12, 0.17, Math.cos(a) * 0.12, head, 0.018, 0.12 + (k % 2) * 0.05, 0.018); } const gs = glowSprite(0xb07aff, 0.9, 0.7); gs.position.set(0, 0.2, 0); head.add(gs); const orb = M(G.sph(), glowMat(0xff5ad8, 1), 0.3, 0.62, -0.05, chest, 0.045); R.orb = orb; for (const sx of [-1, 1]) { const w = M(featherGeo(), std(0x1a0a2a, { e: 0x6a2aff, ei: 0.4, r: 0.6 }), 0.1 * sx, 0.45, -0.15, chest, 1.4); w.scale.x = 1.4 * sx; w.rotation.z = -sx * 0.6; } }
   if (x === "topknot") { M(G.sph(), hair, 0, 0.15, -0.04, head, 0.035); M(G.tor(0.022, 0.006), std(0xc23b3b), 0, 0.13, -0.035, head).rotation.x = Math.PI / 2; }
   if (x === "hat") { M(lathe("hat", [[0.001, 0.42], [0.03, 0.36], [0.07, 0.24], [0.11, 0.12], [0.125, 0.07], [0.27, 0.06], [0.28, 0.05], [0.001, 0.05]], 28), MAT.cloth(0x2e3a7a), 0, 0.03, 0, head).rotation.x = -0.12; }
@@ -2822,6 +2843,42 @@ const ACH = [
   ["lvl100", "Ascended", "Reach level 100.", () => S.level, 100, "the Ascended", "legendary", 50000, 2],
   ["sky1", "Skywalker", "A secret of the wind.", () => stOf("skyVisits"), 1, "Skywalker", "legendary", 15000, 2],
   ["fest1", "Festivalgoer", "Join a rare festival.", () => stOf("festivals"), 1, "Festivalgoer", "rare", 2000, 1],
+  ["kills25000", "Unending", "Defeat 25,000 foes.", () => stOf("kills"), 25000, "the Unending", "vaulted", 60000, 2],
+  ["boss100", "Tyrant's Bane", "Defeat 100 bosses.", () => stOf("bosses"), 100, "Tyrant's Bane", "legendary", 20000, 2],
+  ["boss500", "Godslayer", "Defeat 500 bosses.", () => stOf("bosses"), 500, "Godslayer", "vaulted", 80000, 2],
+  ["clear100", "Islandmaster", "Clear 100 stages.", () => stOf("clears"), 100, "Islandmaster", "legendary", 25000, 2],
+  ["night25", "Nightmare Lord", "Clear 25 Nightmare stages.", () => stOf("nightmareClears"), 25, "Nightmare Lord", "vaulted", 50000, 2],
+  ["raid15", "Raid Sovereign", "Clear 15 raids.", () => stOf("raidClears"), 15, "Raid Sovereign", "vaulted", 50000, 2],
+  ["rift10", "Riftborn", "Clear 10 rift or rare-portal islands.", () => stOf("riftClears") + stOf("rarePortals"), 10, "Riftborn", "legendary", 20000, 2],
+  ["chest500", "Dragon's Hoard", "Open 500 chests.", () => stOf("chests"), 500, "Dragon's Hoard", "legendary", 25000, 2],
+  ["parry500", "Unbreakable", "Parry 500 attacks.", () => stOf("parries"), 500, "the Unbreakable", "legendary", 20000, 2],
+  ["duel10", "Arena Champion", "Win 10 duels.", () => stOf("duels"), 10, "Arena Champion", "epic", 6000, 1],
+  ["craft25", "Master Smith", "Craft 25 items at the forge.", () => stOf("crafts"), 25, "Master Smith", "epic", 6000, 1],
+  ["ench25", "Archenchanter", "Enchant gear 25 times.", () => stOf("enchants"), 25, "Archenchanter", "epic", 6000, 1],
+  ["fish100", "Master Angler", "Catch 100 fish.", () => stOf("fish"), 100, "Master Angler", "epic", 6000, 1],
+  ["rarefish25", "Sea Whisperer", "Catch 25 rare fish.", () => stOf("rareFish"), 25, "Sea Whisperer", "epic", 8000, 1],
+  ["epicfish15", "Leviathan Caller", "Catch 15 epic fish.", () => stOf("epicFish"), 15, "Leviathan Caller", "legendary", 20000, 2],
+  ["mine2000", "Heart of the Mountain", "Mine 2,000 ore.", () => stOf("mined"), 2000, "Heart of the Mountain", "legendary", 25000, 2],
+  ["night1000", "Moonblade", "Defeat 1,000 foes at night.", () => stOf("nightKills"), 1000, "Moonblade", "epic", 8000, 1],
+  ["beast25", "Kraken's Bane", "Defeat 25 sea beasts.", () => stOf("seaBeasts"), 25, "Kraken's Bane", "legendary", 20000, 2],
+  ["wreck25", "Sunken Fortune", "Find 25 sea treasures.", () => stOf("treasures"), 25, "Sunken Fortune", "epic", 8000, 1],
+  ["bid15", "Patron of the Auctions", "Win 15 castle auctions.", () => stOf("auctionsWon"), 15, "Patron of the Auctions", "epic", 8000, 1],
+  ["cards100", "Twice Blessed", "Take 100 blessings.", () => stOf("cards"), 100, "Twice Blessed", "epic", 6000, 1],
+  ["spec1000", "Arcane Virtuoso", "Use 1,000 weapon specials.", () => stOf("specials"), 1000, "Arcane Virtuoso", "legendary", 15000, 2],
+  ["sold500", "Merchant Prince", "Sell 500 items.", () => stOf("sold"), 500, "Merchant Prince", "epic", 8000, 1],
+  ["sky5", "Cloud Dweller", "Visit the Skylands 5 times.", () => stOf("skyVisits"), 5, "Cloud Dweller", "rare", 3000, 0],
+  ["skyq5", "Friend of the Sky", "Finish 5 quests in the Skylands.", () => stOf("skyQuests"), 5, "Friend of the Sky", "epic", 10000, 1],
+  ["realm1", "Realm Walker", "Clear a stage in one of the six Sky Realms.", () => stOf("skyRealmClears"), 1, "Realm Walker", "epic", 12000, 1],
+  ["realm18", "Lord of the Six Realms", "Clear 18 Sky Realm stages.", () => stOf("skyRealmClears"), 18, "Lord of the Six Realms", "vaulted", 80000, 2],
+  ["fest5", "Life of the Party", "Join 5 festivals.", () => stOf("festivals"), 5, "Life of the Party", "epic", 6000, 1],
+  ["lvl75", "Paragon", "Reach level 75.", () => S.level, 75, "Paragon", "legendary", 30000, 2],
+  ["rich", "Tycoon", "Hold 1,000,000 coins at once.", () => S.coins, 1000000, "the Tycoon", "epic", 0, 2],
+  ["legclass", "Fate's Favourite", "Roll a Legendary class or better.", () => ["legendary", "vaulted"].includes((CLASS[S.cls] || {}).rarity) ? 1 : 0, 1, "Fate's Favourite", "legendary", 15000, 2],
+  ["vaultclass", "Chosen of the Heavens", "Roll a Vaulted class.", () => (CLASS[S.cls] || {}).rarity === "vaulted" ? 1 : 0, 1, "Chosen of the Heavens", "vaulted", 100000, 2],
+  ["guild5", "Guild Champion", "Raise your guild to level 5.", () => (S.guild && S.guild.level) || 0, 5, "Guild Champion", "epic", 8000, 1],
+  ["guild10", "Guild Legend", "Raise your guild to level 10.", () => (S.guild && S.guild.level) || 0, 10, "Guild Legend", "legendary", 25000, 2],
+  ["ach25", "Completionist", "Claim 25 other achievements.", () => Object.keys(S.ach || {}).length, 25, "the Completionist", "legendary", 30000, 2],
+  ["vault10", "Vault Emperor", "Own 10 different Vaulted items.", () => vaultedOwned(), 10, "Vault Emperor", "vaulted", 100000, 2],
   ["vault1", "Vaultbound", "Own a Vaulted item.", () => vaultedOwned(), 1, "Vaultbound", "vaulted", 10000, 2],
   ["vault5", "Keeper of the Vault", "Own 5 different Vaulted items.", () => vaultedOwned(), 5, "Keeper of the Vault", "vaulted", 40000, 2]
 ].map(([id, name, how, val, goal, title, rar, coins, chest]) => ({ id, name, how, val, goal, title, rar, coins, chest }));
@@ -3051,6 +3108,7 @@ function damageEnemy(e, amount, dir, kb, o = {}) {
   if (dir && kb && !e.boss) { const d = dir.clone().setY(0); if (d.lengthSq() > 0) e.kb.copy(d.normalize().multiplyScalar(kb * 5)); }
   if (dir && kb && e.boss) { const d = dir.clone().setY(0); if (d.lengthSq() > 0) e.kb.copy(d.normalize().multiplyScalar(kb * 0.8)); }
   if (P.buffs.drain > worldT) heal(dmg * 0.3, true);
+  if (crit && S.cls === "seraph" && !o.noProc && Math.random() < 0.35) later(0.15, () => { if (!e.dead) { pillarFx(e.pos, 0xfff4c0, 16, 0.5); damageEnemy(e, ST.hit * 1.2, null, 0, { noProc: true, canCrit: false, color: "#fff4c0" }); } });
   if (crit && S.cls === "starseer" && !o.noProc && Math.random() < 0.25) later(0.2, () => { if (!e.dead) { pillarFx(e.pos, 0xd8e0ff, 14, 0.5); burstFx(e.pos.clone().add(new V3(0, 1, 0)), 2, 0xd8e0ff, 0.4); damageEnemy(e, ST.hit * 0.8, null, 0, { noProc: true, canCrit: false, color: "#d8e0ff" }); } });
   if (crit && S.cls === "archangel" && !o.noProc) later(0.15, () => { if (!e.dead) { pillarFx(e.pos, 0xfff0a0, 10, 0.4); damageEnemy(e, ST.hit * 0.4, null, 0, { noProc: true, canCrit: false, color: "#fff0a0" }); } });
   if (e.hp <= 0) { if (e.duelist) duelEnd(true); else if (e.seaBeast) seaBeastDie(e); else killEnemy(e); }
@@ -3354,7 +3412,7 @@ function stageComplete(xp) {
   S.coins += bonus;
   let text = `+${fmt(xp)} exp and ${fmt(bonus)} coins.`;
   if (first) { gain(ITEM.die, null, 1, true); text += " First clear: you earned a Fortune Die."; }
-  grantChest(run.stage, Math.min(run.idx, 11)); bumpStat("clears"); if (I.rift) bumpStat("riftClears"); if (I.raid) bumpStat("raidClears"); if (run.stage >= 1) bumpStat("hardClears"); if (run.stage === 2) bumpStat("nightmareClears");
+  grantChest(run.stage, Math.min(run.idx, 11)); bumpStat("clears"); if (I.rift) bumpStat("riftClears"); if (I.skyRealm) bumpStat("skyRealmClears"); if (I.raid) bumpStat("raidClears"); if (run.stage >= 1) bumpStat("hardClears"); if (run.stage === 2) bumpStat("nightmareClears");
   text += ` You received ${article(CHEST_TIERS[run.stage].name)} ${CHEST_TIERS[run.stage].name}. Open it from Chests.`;
   const next = run.idx + 1;
   if (first && next < 12 && prog.normal && prog.hard && (st.id === "normal" || st.id === "hard")) text += ` ${ISLANDS[next].name} has been discovered on the map.`;
@@ -3936,7 +3994,7 @@ function update(dt) {
   if (P.swing > 0) P.swing = Math.max(0, P.swing - dt / (P.swingDur || 0.4));
   if (P.spinT > 0) P.spinT = Math.max(0, P.spinT - dt);
   if (!P.dead) {
-    if (S.cls === "druid") heal(ST.maxHp * 0.007 * dt, true); if (S.cls === "bard") heal(ST.maxHp * 0.005 * dt, true); if (S.cls === "chronomancer") heal(ST.maxHp * 0.006 * dt, true);
+    if (S.cls === "druid") heal(ST.maxHp * 0.007 * dt, true); if (S.cls === "bard") heal(ST.maxHp * 0.005 * dt, true); if (S.cls === "chronomancer") heal(ST.maxHp * 0.006 * dt, true); if (S.cls === "seraph") heal(ST.maxHp * 0.01 * dt, true);
     if (S.cls === "dragonknight") { P.dfT = (P.dfT || 0) - dt; if (P.dfT <= 0 && enemies.some(e => !e.dead && e.pos.distanceTo(P.pos) < 6)) { P.dfT = 10; for (const e of enemiesNear(P.pos, 6)) damageEnemy(e, ST.hit * 2.5, e.pos.clone().sub(P.pos), 2, { color: "#ff9a3a" }); ringFx(P.pos, 6, 0xff6a2a, 0.6); burstFx(P.pos.clone().add(new V3(0, 1, 0)), 5, 0xff7a2a, 0.5); } }
     if (S.cls === "paladin") { heal(ST.maxHp * 0.01 * dt, true); P.consecrateT -= dt; if (P.consecrateT <= 0 && enemies.some(e => !e.dead && e.pos.distanceTo(P.pos) < 5)) { P.consecrateT = 8; for (const e of enemiesNear(P.pos, 5)) damageEnemy(e, ST.hit * 1.5, e.pos.clone().sub(P.pos), 1.5, { color: "#fff0a0" }); ringFx(P.pos, 5, 0xffe8a0, 0.6); } }
     helmTick(dt, ix); if (sailing && !sailing.anchored) sailUpdate(dt, wheelTurn !== null ? wheelTurn : ix, iy); else {
@@ -6988,13 +7046,14 @@ const SKY_FOLK = [
 function buildSkylands() {
   clearWorld();
   const group = new THREE.Group(); scene.add(group);
-  const ISL = [{ x: 0, z: 0, y: 0, r: 26, name: "Sky Citadel" }, { x: 56, z: -14, y: 8, r: 16, name: "Dragon Roost" }, { x: -52, z: -6, y: 4, r: 19, name: "Cloudhaven" }, { x: 8, z: -60, y: 14, r: 13, name: "Star Observatory" }, { x: -8, z: 52, y: -6, r: 15, name: "Hanging Gardens" }, { x: 66, z: 50, y: 6, r: 24, name: "Castle Aerwyn" }, { x: -62, z: 54, y: 10, r: 14, name: "Wizard Spire" }];
-  const BR = [[0, 1], [0, 2], [0, 3], [0, 4], [4, 5], [4, 6]].map(([a, b]) => { const A = ISL[a], B = ISL[b], dx = B.x - A.x, dz = B.z - A.z, L = Math.hypot(dx, dz), ux = dx / L, uz = dz / L; return { ax: A.x + ux * (A.r - 1), az: A.z + uz * (A.r - 1), bx: B.x - ux * (B.r - 1), bz: B.z - uz * (B.r - 1), ay: A.y, by: B.y, ux, uz }; });
+  const ISL = [{ x: 0, z: 0, y: 0, r: 26, name: "Sky Citadel" }, { x: 56, z: -14, y: 8, r: 16, name: "Dragon Roost" }, { x: -52, z: -6, y: 4, r: 19, name: "Cloudhaven" }, { x: 8, z: -60, y: 14, r: 13, name: "Star Observatory" }, { x: -8, z: 52, y: -6, r: 15, name: "Hanging Gardens" }, { x: 66, z: 50, y: 6, r: 24, name: "Castle Aerwyn" }, { x: -62, z: 54, y: 10, r: 14, name: "Wizard Spire" },
+    { x: -64, z: -54, y: 18, r: 15, name: "Angel's Rest" }, { x: 60, z: -70, y: 20, r: 14, name: "Tower Isle" }, { x: -4, z: 104, y: -2, r: 19, name: "Sky Market" }, { x: 104, z: 4, y: 14, r: 22, name: "Castle Highspire" }, { x: -100, z: 12, y: 12, r: 17, name: "The Realm Gate" }];
+  const BR = [[0, 1], [0, 2], [0, 3], [0, 4], [4, 5], [4, 6], [2, 7], [1, 8], [3, 8], [4, 9], [1, 10], [2, 11]].map(([a, b]) => { const A = ISL[a], B = ISL[b], dx = B.x - A.x, dz = B.z - A.z, L = Math.hypot(dx, dz), ux = dx / L, uz = dz / L; return { ax: A.x + ux * (A.r - 1), az: A.z + uz * (A.r - 1), bx: B.x - ux * (B.r - 1), bz: B.z - uz * (B.r - 1), ay: A.y, by: B.y, ux, uz }; });
   const h = (x, z) => { for (const I of ISL) if (Math.hypot(x - I.x, z - I.z) < I.r) return I.y; for (const B of BR) { const L = Math.hypot(B.bx - B.ax, B.bz - B.az), t = ((x - B.ax) * B.ux + (z - B.az) * B.uz) / L, side = Math.abs((x - B.ax) * -B.uz + (z - B.az) * B.ux); if (t >= -0.05 && t <= 1.05 && side < 1.7) return lerp(B.ay, B.by, clamp(t, 0, 1)); } return -400; };
   world = { kind: "sky", group, h, hBase: h, radius: 1e5, circles: [], portals: [], interact: [], animated: [], labels: [], isl: ISL };
-  setSky(0x3f7fe8, 0xffe8c8, 0xd8e8ff, 0xe8f0ff, 90, 420, 0xfff0d8, 2.4, 0.65);
+  setSky(0x3f7fe8, 0xffe8c8, 0xd8e8ff, 0xe8f0ff, 120, 700, 0xfff0d8, 2.4, 0.65);
   world.clouds = addClouds(group, 0xffffff);
-  for (let k = 0; k < 60; k++) { const r2 = seeded(k * 13 + 3), c = glowSprite(0xffffff, 30 + r2() * 40, 0.5); c.position.set((r2() - 0.5) * 420, -50 - r2() * 40, (r2() - 0.5) * 420); group.add(c); }
+  for (let k = 0; k < 22; k++) { const r2 = seeded(k * 13 + 3), c = glowSprite(0xffffff, 26 + r2() * 30, 0.3); c.position.set((r2() - 0.5) * 420, -50 - r2() * 40, (r2() - 0.5) * 420); group.add(c); }
   const grassM = std(0x6ab84a, { r: 0.9, map: "fabric", rep: 6 }), rockM = std(0x9a8a78, { r: 0.9, map: "rock", rep: 3 }), white = std(0xf4f0e8, { r: 0.7, map: "plaster", rep: 2 }), roofM = std(0x3a6ac8, { r: 0.6, flat: true }), gold = std(0xe8c060, { m: 0.9, r: 0.25, e: 0x8a6a20, ei: 0.3 }), wood = MAT.bark(0x6a4a2a);
   for (const I of ISL) {
     const top = new THREE.Mesh(new THREE.CircleGeometry(I.r, 48), grassM); top.rotation.x = -Math.PI / 2; top.position.set(I.x, I.y + 0.02, I.z); top.receiveShadow = true; group.add(top);
@@ -7032,7 +7091,7 @@ function buildSkylands() {
     R.g.position.set(x, y, z); R.g.rotation.y = Math.atan2(-x, -z) + (k % 2 ? 0.6 : -0.6); group.add(R.g); addCircle(x, z, 0.5, 2.2);
     world.animated.push(t => { poseHumanoid(R, t + k, 0, 0, "normal", false); if (R.wingL) { const f = Math.sin(t * 1.6 + k) * 0.12; R.wingL.rotation.y = 0.5 + f; R.wingR.rotation.y = -0.5 - f; } });
     const lb = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.7); lb.position.set(x, y + 2.6, z); lb.userData.far = 30; group.add(lb); world.labels.push(lb);
-    world.interact.push({ x, z, y, r: 2.4, label: k === 0 ? `Sky quests from ${def.name}` : `Speak with ${def.name}`, act: () => k === 0 ? openSkyQuests() : openDialog(def) }); });
+    world.interact.push({ x, z, y, r: 2.4, label: k === 0 ? `Sky quests from ${def.name}` : SKY_NPC_QUESTS.some(q => q.giver === def.name) ? `Quest from ${def.name}` : `Speak with ${def.name}`, act: () => k === 0 ? openSkyQuests() : (SKY_NPC_QUESTS.some(q => q.giver === def.name) ? openNpcQuests(def) : openDialog(def)) }); });
   // Dragon Roost: a nest, a resting dragon, and two more circling the sky
   const D = ISL[1];
   for (let k = 0; k < 16; k++) { const a = k / 16 * TAU; const lg = M(G.cyl(0.25, 0.25, 6), wood, D.x + Math.cos(a) * 5, D.y + 0.5, D.z + Math.sin(a) * 5, group, 1, 4, 1); lg.rotation.z = Math.PI / 2; lg.rotation.y = -a; }
@@ -7075,6 +7134,62 @@ function buildSkylands() {
     world.animated.push(t => { g2.rotation.y = t * 2; g2.position.y = y + 1 + Math.sin(t * 2 + k) * 0.15; });
     const it = { x, z, y, r: 2, label: "Pick up the star shard", act: () => { const q = skyQ(); q.shards[k] = 1; save(); group.remove(g2); world.interact = world.interact.filter(i => i !== it); const n = Object.keys(q.shards).length; floatText(P.pos, `Star shard ${n}/5`, "#fff0a0"); MUSIC.sfx("chest"); } }; world.interact.push(it); });
   world.interact.push({ x: D.x - 1, z: D.z, y: D.y, r: 2.6, label: "Take a dragon egg for the archmage", act: () => { const q = skyQ(); if (q.egg) { toast(q.egg === 1 ? "You are already carrying an egg. Bring it to Archmage Velloran." : "The archmage already has an egg.", ""); return; } q.egg = 1; save(); toast("You lift a warm dragon egg. Bring it to the Wizard Spire.", "rare"); } });
+  // ---------- the world far below, seen past every edge
+  try { group.add(worldBelow()); } catch (err) { reportError(err); }
+  // ---------- Angel's Rest: a temple of white columns, angel statues and hovering angels
+  const AR = ISL[7], marble = std(0xf4f0ea, { r: 0.5, map: "plaster", rep: 2 }), goldT = std(0xe8c060, { m: 0.9, r: 0.25, e: 0x8a6a20, ei: 0.4 });
+  M(G.cyl(7, 7.6, 24), marble, AR.x, AR.y + 0.4, AR.z, group, 1, 0.8, 1); M(G.cyl(6.2, 6.2, 24), marble, AR.x, AR.y + 0.95, AR.z, group, 1, 0.3, 1); solidCyl(AR.x, AR.z, 6.3, 1.1);
+  for (let k = 0; k < 10; k++) { const a = k / 10 * TAU; M(G.cyl(0.45, 0.5, 12), marble, AR.x + Math.cos(a) * 5.4, AR.y + 4.1, AR.z + Math.sin(a) * 5.4, group, 1, 6, 1); }
+  M(G.cyl(6.4, 6.4, 24), marble, AR.x, AR.y + 7.3, AR.z, group, 1, 0.5, 1); const domeA = M(G.sph(), goldT, AR.x, AR.y + 7.5, AR.z, group, 5.6, 3.4, 5.6);
+  const bigHalo = M(G.tor(2.2, 0.15), glowMat(0xfff0a0, 1), AR.x, AR.y + 13, AR.z, group); bigHalo.rotation.x = Math.PI / 2; world.animated.push(t => { bigHalo.rotation.z = t * 0.6; bigHalo.position.y = AR.y + 13 + Math.sin(t) * 0.3; });
+  const angelLook = k => ({ skin: [0xf6e2cc, 0xe8c8a8, 0xc8a080, 0xf0d8c0][k % 4], hair: [0xfff0c0, 0xe8d8a0, 0x3a2a1a, 0xd8d0c8][k % 4], cloth: 0xf8f6f0, cloth2: 0xe8dcc0, extra: "wings" });
+  for (let k = 0; k < 4; k++) { const a = k / 4 * TAU + 0.4, x = AR.x + Math.cos(a) * 10, z = AR.z + Math.sin(a) * 10; M(G.box(), marble, x, AR.y + 0.6, z, group, 1.4, 1.2, 1.4); const st = buildHumanoid({ look: { skin: 0xd8d4cc, hair: 0xd8d4cc, cloth: 0xd8d4cc, cloth2: 0xc8c4bc, extra: "wings" }, armour: null, weapon: null, lite: true }); st.g.position.set(x, AR.y + 1.2, z); st.g.rotation.y = Math.atan2(AR.x - x, AR.z - z); st.g.scale.setScalar(1.25); group.add(st.g); solidCyl(x, z, 0.9, 99); }
+  const angels = [];
+  for (let k = 0; k < 5; k++) { const R = buildHumanoid({ look: angelLook(k), armour: k === 0 ? "seraphplate" : null, weapon: k === 0 ? "sunlance" : null, lite: true }); const hl = M(G.tor(0.14, 0.015), glowMat(0xfff0a0, 1), 0, 0.32, 0, R.head); hl.rotation.x = Math.PI / 2; group.add(R.g); angels.push({ R, k }); }
+  world.animated.push(t => { for (const A of angels) { const k = A.k, a = t * (0.15 + k * 0.03) + k * 1.3, rr = 9 + k * 7, cx = k < 2 ? AR.x : 0, cz = k < 2 ? AR.z : 0, hy = (k < 2 ? AR.y + 8 : 26 + k * 4) + Math.sin(t * 1.3 + k) * 0.8;
+      A.R.g.position.set(cx + Math.cos(a) * rr, hy, cz + Math.sin(a) * rr); A.R.g.rotation.y = -a; poseHumanoid(A.R, t + k, 0, 0, "normal", true); if (A.R.wingL) { const f = Math.sin(t * 6 + k) * 0.35; A.R.wingL.rotation.y = 0.5 + f; A.R.wingR.rotation.y = -0.5 - f; } } });
+  { const R = buildHumanoid({ look: angelLook(1), armour: null, weapon: null, lite: true }); const x = AR.x + 3, z = AR.z + 8.5; R.g.position.set(x, AR.y, z); R.g.rotation.y = Math.atan2(AR.x - x, AR.z - z) + Math.PI; group.add(R.g); addCircle(x, z, 0.5, 2.2); world.animated.push(t => poseHumanoid(R, t, 0, 0, "normal", false));
+    const def = { name: "Seraphine", role: "Angel of the Rest", lines: ["The bells of the sky have gone quiet. Will you help me wake them?", "We watch over the islands below. Most days they do not notice."] };
+    const lb = textSprite(`${def.name} · ${def.role}`, "#fff4c0", 0.7); lb.position.set(x, AR.y + 2.8, z); lb.userData.far = 30; group.add(lb); world.labels.push(lb);
+    world.interact.push({ x, z, y: AR.y, r: 2.4, label: `Quest from ${def.name}`, act: () => openNpcQuests(def) }); }
+  // ---------- Tower Isle: a cluster of spires joined by sky bridges, with beacons on top
+  const TI = ISL[8];
+  const towerSpots = [[0, 0, 2.6, 40], [-6, 5, 1.6, 28], [6, 5, 1.6, 30], [-5, -6, 1.4, 24], [6, -5, 1.5, 26]];
+  for (const [dx, dz, r0, H] of towerSpots) spire(TI.x + dx, TI.z + dz, TI.y, r0, H, std([0x3a6ac8, 0xc84a6a, 0x4aa86a, 0xe8c060, 0x7a4ac8][Math.abs(dx + dz) % 5], { r: 0.6, flat: true }));
+  for (let k = 1; k < towerSpots.length; k++) { const [dx, dz] = towerSpots[k]; branchMesh(group, new V3(TI.x, TI.y + 18, TI.z), new V3(TI.x + dx, TI.y + 16, TI.z + dz), 0.35, 0.35, std(0xf4f0e8, { r: 0.6 })); }
+  // ---------- Sky Market: stalls, houses, a clock tower and shoppers
+  const SM = ISL[9], awn = [0xc83a4a, 0x3a6ac8, 0xe8c040, 0x4aa86a, 0x8a4ac8];
+  for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + 0.2, x = SM.x + Math.cos(a) * 8, z = SM.z + Math.sin(a) * 8, rot = -a - Math.PI / 2, st = new THREE.Group(); st.position.set(x, SM.y, z); st.rotation.y = rot; group.add(st);
+    M(G.box(), std(0x8a5a3a, { r: 0.8, map: "bark" }), 0, 0.55, 0, st, 2.4, 1.1, 1.1); for (const sx of [-1.1, 1.1]) M(G.cyl(0.06, 0.06, 6), std(0x5a3a22), sx, 1.4, -0.4, st, 1, 2.8, 1); M(G.box(), std(awn[k % 5], { r: 0.8, map: "fabric", ds: true }), 0, 2.85, -0.2, st, 2.8, 0.1, 1.6);
+    for (let j = 0; j < 5; j++) M(G.sph(), std([0xd83a3a, 0xf0d060, 0x7ad85a, 0xffa040, 0xc89aff][(j + k) % 5], { r: 0.5 }), -0.8 + j * 0.4, 1.2, 0.1, st, 0.15); solidBox(x, z, 2.4, 1.1, rot, 1.1); }
+  for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + 0.5, x = SM.x + Math.cos(a) * 15, z = SM.z + Math.sin(a) * 15, rot = -a + Math.PI / 2, hg = new THREE.Group(); hg.position.set(x, SM.y, z); hg.rotation.y = rot; group.add(hg);
+    M(G.box(), white, 0, 2, 0, hg, 4, 4, 3.6); M(G.cone(4), std(awn[k % 5], { r: 0.6, flat: true }), 0, 5, 0, hg, 3.4, 2, 3).rotation.y = Math.PI / 4; M(G.box(), WIN_MAT(), 1.01, 2.4, 0, hg, 0.05, 0.9, 0.9); M(G.box(), std(0x5a3a22), 0, 1.1, 1.81, hg, 0.9, 2, 0.05); solidBox(x, z, 4.2, 3.8, rot, 999); }
+  spire(SM.x, SM.z, SM.y, 1.8, 18, std(0x5a3a2a, { r: 0.7, flat: true })); const clock = M(G.cyl(1.2, 1.2, 20), std(0xfff8e8, { e: 0xfff0c0, ei: 0.4 }), SM.x, SM.y + 14, SM.z + 1.85, group, 1, 0.08, 1); clock.rotation.x = Math.PI / 2;
+  for (let k = 0; k < 6; k++) { const R = buildHumanoid({ look: { skin: [0xf0d0b0, 0xd9a77f, 0xc08a5a][k % 3], hair: [0xe8e0d0, 0x3a2a1a, 0xc89a5a][k % 3], cloth: awn[k % 5], cloth2: 0x3a3a4a, extra: k % 3 === 0 ? "wings" : undefined }, armour: null, weapon: null, lite: true }); group.add(R.g);
+    world.animated.push(t => { const a = t * 0.12 + k * 1.05; R.g.position.set(SM.x + Math.cos(a) * 11.5, SM.y, SM.z + Math.sin(a) * 11.5); R.g.rotation.y = -a; poseHumanoid(R, t + k, 0.5, 0, "normal", false); }); }
+  // ---------- Castle Highspire, with its own court and a dragon on the tallest tower
+  const CH = ISL[10], hsC = { id: "highspire", name: "Castle Highspire", wall: 0xe8e4f0, roof: 0x7a4ac8, banner: 0xd8a0ff, biome: "sky", sea: true };
+  try { const { toW, gRot } = castleModel(group, CH.x, CH.y - 0.2, CH.z, 0.66, hsC); castleCourt(group, hsC, CH.x, CH.y - 0.2, CH.z, 0.66, gRot, toW); } catch (err) { reportError(err); }
+  const perch = buildCreature("dragon", 0x2a3a6a, 0x9ad8ff, 1.3, true); perch.g.position.set(CH.x + 9, CH.y + 12, CH.z - 9); perch.g.rotation.y = 2.4; group.add(perch.g); world.animated.push(t => poseCreature(perch, t, 0, 0));
+  // ---------- more dragons in the open sky
+  const flyers2 = [[0x6a1a1a, 0xffb040, 130, 46, 0.09], [0x1a4a2a, 0x9aff8a, 160, 18, -0.07], [0xd8d0e8, 0xfff0c0, 110, 60, 0.12]].map(([c1, c2, rad, hy, sp]) => { const R = buildCreature("dragon", c1, c2, 2.2, true); group.add(R.g); return { R, rad, hy, sp }; });
+  world.animated.push(t => { for (const f of flyers2) { const a = t * f.sp + f.rad; f.R.g.position.set(Math.cos(a) * f.rad, f.hy + Math.sin(t * 0.5 + f.rad) * 6, Math.sin(a) * f.rad); f.R.g.rotation.y = -a + (f.sp > 0 ? Math.PI : 0); poseCreature(f.R, t * 1.4, 1, 0); } });
+  // ---------- small floating rocks and lone towers drifting between the isles
+  { const rr = seeded(919); for (let k = 0; k < 14; k++) { const a = rr() * TAU, d = 70 + rr() * 90, x = Math.cos(a) * d, z = Math.sin(a) * d, y = -10 + rr() * 50; if (ISL.some(I => Math.hypot(I.x - x, I.z - z) < I.r + 8)) continue;
+      const fr = new THREE.Group(); fr.position.set(x, y, z); group.add(fr); M(G.cone(7), std(0x9a8a78, { r: 0.9, map: "rock" }), 0, -3, 0, fr, 3, 5, 3).rotation.x = Math.PI; M(G.cyl(3, 3, 14), std(0x6ab84a, { r: 0.9, map: "fabric" }), 0, 0.2, 0, fr, 1, 0.4, 1);
+      if (k % 3 === 0) { M(G.cyl(0.9, 1, 10), white, 0, 5, 0, fr, 1, 10, 1); M(G.cone(10), std(0x3a6ac8, { r: 0.6, flat: true }), 0, 11.2, 0, fr, 1.2, 2.4, 1.2); }
+      const ph = rr() * 6; world.animated.push(t => { fr.position.y = y + Math.sin(t * 0.4 + ph) * 1.2; }); } }
+  // ---------- the Realm Gate: four portals to the six Sky Realms, for heroes of level 45 and above
+  const RG = ISL[11];
+  M(G.cyl(9, 9.4, 32), marble, RG.x, RG.y + 0.3, RG.z, group, 1, 0.6, 1); solidCyl(RG.x, RG.z, 9.1, 0.6);
+  const sign = textSprite("The Realm Gate · level 45 and above", "#e8d8ff", 1.2); sign.position.set(RG.x, RG.y + 10, RG.z); group.add(sign); world.labels.push(sign);
+  [0xffd070, 0x9ae8ff, 0xff9af0, 0x9aff8a].forEach((c, k) => { const a = k / 4 * TAU + Math.PI / 4, x = RG.x + Math.cos(a) * 6, z = RG.z + Math.sin(a) * 6, pg = new THREE.Group(); pg.position.set(x, RG.y + 0.6, z); pg.rotation.y = -a + Math.PI / 2; group.add(pg);
+    for (const sx of [-1.6, 1.6]) M(G.cyl(0.3, 0.36, 10), marble, sx, 2.2, 0, pg, 1, 4.4, 1); const ar = M(new THREE.TorusGeometry(1.6, 0.2, 8, 24, Math.PI), goldT, 0, 4.4, 0, pg);
+    const disc = portalDisc(c, 0xffffff); disc.scale.set(1.45, 2, 1); disc.position.set(0, 2.2, 0); pg.add(disc); const gl = glowSprite(c, 4, 0.5); gl.position.set(0, 2.2, 0); pg.add(gl);
+    world.animated.push(t => { if (disc.material.uniforms) disc.material.uniforms.t.value = t + k; });
+    const lb = textSprite(`Realm Portal ${["I", "II", "III", "IV"][k]}`, "#" + new THREE.Color(c).getHexString(), 0.8); lb.position.set(x, RG.y + 6, z); group.add(lb); world.labels.push(lb);
+    let inside = false; world.animated.push(() => { const d = Math.hypot(P.pos.x - x, P.pos.z - z); if (d < 1.6 && !inside && !P.dead) { inside = true; openSkyRealmBoard(k); } if (d > 3) inside = false; }); });
+  try { placeNpcQuestItems(group, ISL, h); } catch (err) { reportError(err); }
   // a safe catch for anyone who falls
   world.animated.push(() => { if (!P.dead && P.pos.y < -60) { P.pos.set(0, 0, 14); P.vy = 0; P.kb.set(0, 0, 0); toast("The wind catches you and sets you down gently.", ""); } });
   shadows(group, false, true);
@@ -7095,7 +7210,64 @@ function openSkyQuests() {
   $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Farewell</button>`; $("dialog").hidden = false;
 }
 $("dialog").addEventListener("click", e => { const b = e.target.closest("[data-skyclaim]"); if (!b) return; const q = skyQ(), Q = SKY_QUESTS.find(x => x.id === b.dataset.skyclaim); if (!Q || q.done[Q.id] || Q.prog(q) < Q.goal) return;
-  q.done[Q.id] = 1; S.coins += Q.coins; const best = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true)); grantChest(Q.chest, Math.min(best, 11)); MUSIC.sfx("chest"); save(); toast(`<b>${esc(Q.name)}</b> complete: ${fmt(Q.coins)} coins and a chest.`, "epic"); openSkyQuests(); });
+  q.done[Q.id] = 1; bumpStat("skyQuests"); S.coins += Q.coins; const best = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true)); grantChest(Q.chest, Math.min(best, 11)); MUSIC.sfx("chest"); save(); toast(`<b>${esc(Q.name)}</b> complete: ${fmt(Q.coins)} coins and a chest.`, "epic"); openSkyQuests(); });
+/* ---- the lobby world painted onto a vast plane far below the Skylands ---- */
+function worldBelow() {
+  const c = document.createElement("canvas"); c.width = c.height = 1024; const x = c.getContext("2d"), S0 = 1024 / 1800, P2 = (wx, wz) => [512 + wx * S0, 512 + wz * S0];
+  let gr = x.createRadialGradient(512, 512, 100, 512, 512, 720); gr.addColorStop(0, "#2f8db4"); gr.addColorStop(1, "#0f3a5a"); x.fillStyle = gr; x.fillRect(0, 0, 1024, 1024);
+  for (let k = 0; k < 300; k++) { x.strokeStyle = `rgba(220,240,255,${0.04 + Math.random() * 0.08})`; x.beginPath(); const a = Math.random() * 1024, b = Math.random() * 1024; x.moveTo(a, b); x.quadraticCurveTo(a + 8, b - 4, a + 16, b); x.stroke(); }
+  for (const I of ISLES || []) { const [ix, iz] = P2(I.x, I.z); x.fillStyle = "#e8d8a0"; x.beginPath(); x.arc(ix, iz, Math.max(2, I.r * S0 * 1.2), 0, TAU); x.fill(); x.fillStyle = "#5a9a3a"; x.beginPath(); x.arc(ix, iz, Math.max(1.5, I.r * S0 * 0.9), 0, TAU); x.fill(); }
+  const [cx0, cz0] = P2(0, 0); x.fillStyle = "#e8d8a0"; x.beginPath(); x.arc(cx0, cz0, 300 * S0, 0, TAU); x.fill();
+  gr = x.createRadialGradient(cx0, cz0, 60 * S0, cx0, cz0, 290 * S0); gr.addColorStop(0, "#6aa84a"); gr.addColorStop(0.62, "#5a9a3a"); gr.addColorStop(0.78, "#7a8a6a"); gr.addColorStop(0.92, "#e8eef4"); gr.addColorStop(1, "#d8e0ea"); x.fillStyle = gr; x.beginPath(); x.arc(cx0, cz0, 290 * S0, 0, TAU); x.fill();
+  for (let k = 0; k < 900; k++) { const a = Math.random() * TAU, d = Math.random() * 280; const [px, pz] = P2(Math.cos(a) * d, Math.sin(a) * d); x.fillStyle = d > 200 ? "rgba(255,255,255,0.25)" : `rgba(${30 + Math.random() * 40},${80 + Math.random() * 50},${30 + Math.random() * 30},0.5)`; x.fillRect(px, pz, 2, 2); }
+  if (typeof LAKE !== "undefined") { const [lx, lz] = P2(LAKE.x, LAKE.z); x.fillStyle = "#2f7aa8"; x.beginPath(); x.arc(lx, lz, LAKE.r * S0, 0, TAU); x.fill(); }
+  x.strokeStyle = "#b8a888"; x.lineWidth = 3; for (let k = 0; k < 8; k++) { const a = k / 8 * TAU; x.beginPath(); x.moveTo(cx0, cz0); x.lineTo(cx0 + Math.cos(a) * 160 * S0, cz0 + Math.sin(a) * 160 * S0); x.stroke(); }
+  x.fillStyle = "#c8c0b0"; x.beginPath(); x.arc(cx0, cz0, 70 * S0, 0, TAU); x.fill();
+  for (let k = 0; k < 140; k++) { const a = Math.random() * TAU, d = 20 + Math.random() * 60; const [px, pz] = P2(Math.cos(a) * d, Math.sin(a) * d); x.fillStyle = ["#a83a2a", "#8a3a2a", "#6a4a3a", "#e8e0d0"][k % 4]; x.fillRect(px - 2, pz - 2, 4, 4); }
+  for (const C of CASTLES) { if (C.sea) continue; const [px, pz] = P2(C.x, C.z); x.fillStyle = "#" + new THREE.Color(C.wall).getHexString(); x.fillRect(px - 7, pz - 7, 14, 14); x.fillStyle = "#" + new THREE.Color(C.roof).getHexString(); x.fillRect(px - 3, pz - 3, 6, 6); }
+  const tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding;
+  const g = new THREE.Group(); const plane = new THREE.Mesh(new THREE.PlaneGeometry(1800, 1800), new THREE.MeshBasicMaterial({ map: tex, fog: false })); plane.rotation.x = -Math.PI / 2; plane.position.y = -320; g.add(plane);
+  const haze = new THREE.Mesh(new THREE.PlaneGeometry(1800, 1800), new THREE.MeshBasicMaterial({ color: 0xdfeeff, transparent: true, opacity: 0.28, fog: false, depthWrite: false })); haze.rotation.x = -Math.PI / 2; haze.position.y = -200; g.add(haze);
+  return g;
+}
+function openSkyRealmBoard(portal) {
+  if (run) return; dlgNpc = null; keys.clear(); attackHeld = false;
+  $("dlgName").textContent = `Realm Portal ${["I", "II", "III", "IV"][portal]}`; $("dlgRole").textContent = "Six Sky Realms · level 45 and above";
+  if (S.level < 45) { $("dlgText").textContent = `The portal flickers and will not open. Only heroes of level 45 and above may pass. You are level ${S.level}.`; $("dlgQuest").innerHTML = ""; $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Step back</button>`; $("dialog").hidden = false; return; }
+  $("dlgText").textContent = "Beyond the portal lie six realms built on the clouds, with fierce sky beasts and rich loot. Each realm has Normal, Hard and Nightmare stages.";
+  $("dlgQuest").innerHTML = `<div class="duels">${SKY_REALMS.map((R, r) => { const i = SKY_REALM_START + r, I = ISLANDS[i]; return `<div class="duel" style="--c:#${new THREE.Color(R.c2).getHexString()}"><span><b>${esc(I.name)}</b><small>Foes: ${I.enemies.map(e => esc(e[0])).join(", ")}</small><small class="num">${STAGES.map(s => `${s.name} ${S.prog[i] && S.prog[i][s.id] ? "cleared" : "not cleared"}`).join(" · ")}</small></span>
+    <span class="row" style="gap:4px;grid-column:1">${STAGES.map((s, k) => `<button class="btn ${k ? "" : "primary"}" data-skyrealm="${i}:${k}">${s.name}</button>`).join("")}</span></div>`; }).join("")}</div>`;
+  $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Step back</button>`; $("dialog").hidden = false;
+}
+$("dialog").addEventListener("click", e => { const b = e.target.closest("[data-skyrealm]"); if (!b) return; const [i, k] = b.dataset.skyrealm.split(":").map(Number); $("dialog").hidden = true; startRun(i, k, S.allies.slice()); });
+/* ---- quests from the folk of the Skylands ---- */
+const SKY_NPC_QUESTS = [
+  { id: "beacons", giver: "Old Corwin", name: "Light the Beacons", text: "Light the four beacons at the foot of the spires on Tower Isle.", isl: 8, spots: [[-3, 9], [9, 0], [-9, -1], [2, -9]], verb: "Light the beacon", col: 0xffb050, coins: 9000, chest: 1 },
+  { id: "fruit", giver: "Lark", name: "Snacks for the Dragons", text: "Gather three sun-melons from the Sky Market stalls and the Hanging Gardens.", isl: [9, 4, 9], spots: [[3, -3], [3, 5], [-4, 4]], verb: "Pick up the sun-melon", col: 0xffd040, coins: 7000, chest: 1 },
+  { id: "stars", giver: "Sela", name: "Chart the Night", text: "Read the three star stones on Angel's Rest, Tower Isle and Castle Highspire.", isl: [7, 8, 10], spots: [[-6, -10], [10, 8], [-14, 4]], verb: "Read the star stone", col: 0xd8e0ff, coins: 10000, chest: 2 },
+  { id: "bells", giver: "Seraphine", name: "Wake the Sky Bells", text: "Ring the three golden bells hanging on Angel's Rest, the Sky Market and the Realm Gate.", isl: [7, 9, 11], spots: [[8, -9], [-14, -6], [11, 9]], verb: "Ring the golden bell", col: 0xffe080, coins: 12000, chest: 2 }
+];
+function npcQ(id) { const q = skyQ(); q.npc = q.npc || {}; q.npc[id] = q.npc[id] || { got: {} }; return q.npc[id]; }
+function placeNpcQuestItems(group, ISL, h) {
+  for (const Q of SKY_NPC_QUESTS) Q.spots.forEach(([dx, dz], k) => { const st = npcQ(Q.id); if (st.got[k] || st.done) return; const I = ISL[Array.isArray(Q.isl) ? Q.isl[k] : Q.isl], x = I.x + dx, z = I.z + dz, y = h(x, z);
+    if (y < -100) return; const g = new THREE.Group(); g.position.set(x, y, z); group.add(g);
+    if (Q.id === "beacons") { M(G.cyl(0.5, 0.7, 10), std(0x8a8678, { r: 0.9, map: "rock" }), 0, 0.6, 0, g, 1, 1.2, 1); M(G.cyl(0.7, 0.4, 10), MAT.metal(0x3a3a40, 0.4), 0, 1.4, 0, g, 1, 0.4, 1); }
+    else if (Q.id === "fruit") { M(G.sph(), std(0xffc040, { r: 0.5 }), 0, 0.4, 0, g, 0.45, 0.38, 0.45); M(G.cyl(0.04, 0.05, 5), std(0x3a6a2a), 0, 0.8, 0, g, 1, 0.2, 1); }
+    else if (Q.id === "stars") { M(G.box(), std(0x6a6a7a, { r: 0.8, map: "rock" }), 0, 0.8, 0, g, 1, 1.6, 0.4); M(G.oct(), glowMat(0xd8e0ff, 1), 0, 1.3, 0.22, g, 0.18); }
+    else { M(G.box(), std(0x5a3a22, { r: 0.8 }), 0, 1.6, 0, g, 0.15, 3.2, 0.15); M(G.box(), std(0x5a3a22, { r: 0.8 }), 0.5, 3.1, 0, g, 1.1, 0.12, 0.12); M(lathe("bell", [[0.001, 0.3], [0.12, 0.28], [0.2, 0.1], [0.3, -0.2], [0.32, -0.24], [0.001, -0.24]], 16), std(0xffd060, { m: 0.9, r: 0.25 }), 0.9, 2.75, 0, g); }
+    const gl = glowSprite(Q.col, 1.6, 0.6); gl.position.y = 1.6; g.add(gl);
+    const it = { x, z, y, r: 2.2, label: Q.verb, act: () => { const s2 = npcQ(Q.id); s2.got[k] = 1; save(); MUSIC.sfx("chest"); ringFx(new V3(x, y, z), 1.6, Q.col, 0.5); if (Q.id === "beacons") { const f = glowSprite(0xff9a3a, 3, 0.9); f.position.y = 2; g.add(f); } else group.remove(g); world.interact = world.interact.filter(i => i !== it); floatText(P.pos, `${Q.name}: ${Object.keys(s2.got).length}/${Q.spots.length}`, "#fff0c0"); } };
+    world.interact.push(it); });
+}
+function openNpcQuests(def) {
+  dlgNpc = null; keys.clear(); attackHeld = false; const qs = SKY_NPC_QUESTS.filter(q => q.giver === def.name);
+  $("dlgName").textContent = def.name; $("dlgRole").textContent = def.role; $("dlgText").textContent = pick(def.lines || ["Well met, traveller."]);
+  $("dlgQuest").innerHTML = `<div class="duels">${qs.map(Q => { const st = npcQ(Q.id), n = Object.keys(st.got).length, ready = n >= Q.spots.length && !st.done;
+    return `<div class="duel" style="--c:${ready ? "var(--accent)" : "var(--line)"}"><span><b>${esc(Q.name)}</b><small>${esc(Q.text)}</small><small>${st.done ? "Completed" : `${n} / ${Q.spots.length}`} · Reward: ${fmt(Q.coins)} coins and a ${CHEST_TIERS[Q.chest].name}</small></span><span class="row" style="gap:4px;grid-column:1">${st.done ? "" : `<button class="btn ${ready ? "primary" : ""}" data-npcq="${Q.id}" ${ready ? "" : "disabled"}>${ready ? "Claim reward" : "In progress"}</button>`}</span></div>`; }).join("")}</div>`;
+  $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Farewell</button>`; $("dialog").hidden = false; openNpcQuests.last = def;
+}
+$("dialog").addEventListener("click", e => { const b = e.target.closest("[data-npcq]"); if (!b) return; const Q = SKY_NPC_QUESTS.find(x => x.id === b.dataset.npcq), st = npcQ(Q.id); if (st.done || Object.keys(st.got).length < Q.spots.length) return;
+  st.done = 1; S.coins += Q.coins; const best = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true)); grantChest(Q.chest, Math.min(best, 11)); bumpStat("skyQuests"); MUSIC.sfx("chest"); save(); toast(`<b>${esc(Q.name)}</b> complete: ${fmt(Q.coins)} coins and a chest.`, "epic"); openNpcQuests(openNpcQuests.last); });
 function openSkyChest() {
   const st = skyState(), day = dayKey(); if (st.chestDay === day) { toast("The sky chest is empty. It refills at dawn.", ""); return; }
   st.chestDay = day; const best = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true)), coins = 2500 + best * 800;
@@ -8605,7 +8777,7 @@ $("achList").addEventListener("click", e => { const b = e.target.closest("button
 $("achNow").addEventListener("click", e => { if (e.target.closest("[data-hide]")) { S.title = null; save(); refreshNameTag(); renderAchievements(); } });
 $("startBtn").addEventListener("click", () => { if (S.avatar && S.name) enterLobby(); else openAvatar(true); });
 buildLobby(); rebuildHero(); refreshNameTag(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { festivalTick, currentFestival, get festNow() { return festNow; }, festivalGift, BOONS, heroLight, get nightGlows() { return nightGlows; }, DAY, skyQ, openSkyQuests, get SKYGATE() { return SKYGATE; }, askTravel, fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { openSkyRealmBoard, SKY_REALM_START, SKY_NPC_QUESTS, npcQ, openNpcQuests, ACH, festivalTick, currentFestival, get festNow() { return festNow; }, festivalGift, BOONS, heroLight, get nightGlows() { return nightGlows; }, DAY, skyQ, openSkyQuests, get SKYGATE() { return SKYGATE; }, askTravel, fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
