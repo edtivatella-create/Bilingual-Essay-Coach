@@ -6936,6 +6936,7 @@ function buildSkyGate(group, h) {
   world.animated.push(t => { if (disc.material.uniforms) disc.material.uniforms.t.value = t; clouds.forEach((c, k) => { const a = t * 0.6 + k * 0.8; c.position.set(Math.cos(a) * 3.2, 1 + ((t * 0.5 + k * 0.4) % 6), Math.sin(a) * 1.2); }); });
   const lb = textSprite("Sky Gate · to the Skylands", "#e8f4ff", 1.3); lb.position.set(x, y + 8, z); lb.userData.far = 160; group.add(lb); world.labels.push(lb);
   for (const sx of [-1, 1]) addCircle(x + Math.cos(rot) * 2.4 * sx, z - Math.sin(rot) * 2.4 * sx, 0.55, 6);
+  world.circles.push({ x, z, r: 9, h: 0, ghost: true }); // keep farms, stalls and fields well clear of the gate
   let inside = false;
   world.animated.push(() => { const d = Math.hypot(P.pos.x - x, P.pos.z - z); if (d < 1.8 && !inside && !run && !P.dead) { inside = true; askTravel("Sky Gate", "Rise to the Skylands?", "Floating isles of towers, sky folk, wizards, dragons and waterfalls wait above the clouds. The Wind Well brings you back down.", enterSkylands); } if (d > 3) inside = false; });
 }
@@ -7973,40 +7974,68 @@ function caveTick(dt) {
   el.innerHTML = `<div style="display:flex;justify-content:space-between;gap:10px"><span>Depth</span><b id="caveName"></b><span id="caveDepth"></span></div><div style="height:8px;border-radius:4px;background:#1a1612;margin:5px 0;overflow:hidden"><i id="caveBar" style="display:block;height:100%;background:linear-gradient(90deg,#e6b85c,#ff6a2a,#9a3aff)"></i></div><small id="cavePick" style="opacity:.8"></small>`; document.body.appendChild(el); })();
 /* cave mouths in the hills, and the pickaxe shop with its locked display stands */
 function buildCaveMouths(group, h) {
-  for (const C of CAVES) { const [x, z] = C.at, rot = Math.atan2(-x, -z), cs = Math.cos(rot), sn = Math.sin(rot);
+  for (const C of CAVES) {
+    // slide the hill outward until no building, wall or tree sits inside it
+    C.at0 = C.at0 || C.at.slice(); let [x, z] = C.at0;
+    for (let k = 0; k < 14; k++) { const r0 = Math.atan2(-x, -z), hcx = x + Math.sin(r0) * -15, hcz = z + Math.cos(r0) * -15;
+      const ycx = x + Math.sin(r0) * 6, ycz = z + Math.cos(r0) * 6;
+      if (!world.circles.some(c => !c.ghost && c.r > 0.8 && Math.hypot(c.x - hcx, c.z - hcz) < c.r + 18) && !world.circles.some(c => !c.ghost && (Math.hypot(c.x - x, c.z - z) < c.r + 9 || Math.hypot(c.x - ycx, c.z - ycz) < c.r + 9))) break;
+      const d = Math.hypot(x, z); if (d > 270) break; x *= (d + 6) / d; z *= (d + 6) / d; }
+    C.at = [x, z];
+    const rot = Math.atan2(-x, -z), cs = Math.cos(rot), sn = Math.sin(rot);
     const toW = (lx, lz) => [x + lx * cs + lz * sn, z - lx * sn + lz * cs];
-    const rk = std(C.rock, { r: 0.92, map: "rock", rep: 3 }), grass = std(0x4a6a2a, { r: 0.95, map: "fabric", rep: 4 }), beam = MAT.bark(0x5a3a22), plank = std(0x6a4a2a, { r: 0.85, map: "bark" }), iron = MAT.metal(0x5a5a62, 0.4);
+    const rk = std(C.rock, { r: 0.92, map: "rock", rep: 3 }), rkDark = std(new THREE.Color(C.rock).multiplyScalar(0.7).getHex(), { r: 0.95, map: "rock", rep: 2 }), beam = MAT.bark(0x5a3a22), plank = std(0x6a4a2a, { r: 0.85, map: "bark" }), iron = MAT.metal(0x5a5a62, 0.4), black = std(0x030303, { r: 1 });
+    const turf = std(0x4f7430, { r: 0.97, map: "fabric", rep: 6 }), hillM = std(0x5a6a3a, { r: 0.97, map: "rock", rep: 5 }), lampM = std(0xffe0a0, { e: 0xffb050, ei: 2.2 });
     const g = new THREE.Group(); g.userData.noFoot = true; g.position.set(x, 0, z); g.rotation.y = rot; group.add(g);
-    // the hill itself: a grassy mound with rocky shoulders, sunk well into the ground
-    const [hx, hz] = toW(0, -15), hy = h(hx, hz);
-    const hillM = std(0x46682c, { r: 0.97, map: "rock", rep: 5 }), hillTop = std(0x527a34, { r: 0.97, map: "fabric", rep: 8 });
-    M(G.ico(), hillM, 0, hy - 7, -15, g, 17, 12, 16); M(G.ico(), hillTop, 3, hy - 4, -19, g, 12, 10, 11); M(G.ico(), rk, -9, hy - 4, -12, g, 9, 8, 8); M(G.ico(), rk, 10, hy - 5, -13, g, 8, 8, 8);
-    { const rT = seeded(hash(C.id) + 9); for (let k = 0; k < 7; k++) { const a = rT() * TAU, d = 4 + rT() * 7, lx = Math.cos(a) * d, lz = -17 + Math.sin(a) * d, t2 = makeTree(k % 2 ? "pine" : "oak", rT); t2.position.set(lx, hy + 3.2 - d * 0.35, lz); t2.scale.setScalar(0.8 + rT() * 0.5); g.add(t2); } }
-    for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI - Math.PI / 2; M(rockGeo(k % 5), rk, Math.sin(a) * 15, h(...toW(Math.sin(a) * 15, -15 + Math.cos(a) * 15)) + 0.6, -15 + Math.cos(a) * 15, g, 2.4, 1.8, 2.2); }
-    // the mineshaft: timber frames, plank walls and a rail line running into the hill
-    const y0 = h(x, z);
-    for (let k = 0; k <= 6; k++) { const lz = 3 - k * 2.6, [fx, fz] = toW(0, lz), fy = Math.max(y0, h(fx, fz));
-      for (const sx of [-1.9, 1.9]) M(G.box(), beam, sx, fy + 1.8, lz, g, 0.35, 3.6, 0.35); M(G.box(), beam, 0, fy + 3.7, lz, g, 4.4, 0.4, 0.4);
-      if (k < 6) { for (const sx of [-2.05, 2.05]) M(G.box(), plank, sx, fy + 1.7, lz - 1.3, g, 0.12, 3.4, 2.6); M(G.box(), plank, 0, fy + 3.95, lz - 1.3, g, 4.2, 0.12, 2.6); }
-      M(G.box(), iron, -0.55, fy + 0.06, lz - 1.3, g, 0.08, 0.08, 2.7); M(G.box(), iron, 0.55, fy + 0.06, lz - 1.3, g, 0.08, 0.08, 2.7); M(G.box(), beam, 0, fy + 0.03, lz - 0.6, g, 1.6, 0.06, 0.25);
-      if (k % 2 === 0) { const lt = glowSprite(0xffb050, 1.6, 0.9); lt.position.set(1.6, fy + 3, lz); g.add(lt); M(G.box(), std(0xffe0a0, { e: 0xffb050, ei: 2 }), 1.6, fy + 3, lz, g, 0.18, 0.25, 0.18); } }
-    M(G.box(), std(0x050404, { r: 1 }), 0, y0 + 1.8, -15.4, g, 4, 3.6, 0.2);
-    // a mine cart and the sign at the mouth
-    const [mx, mz] = toW(-0.9, 5.5); const cart = new THREE.Group(); cart.position.set(-0.9 * 0, 0, 0); M(G.box(), std(0x5a4a3a, { r: 0.8 }), 0, h(mx, mz) + 0.8, 5.5, g, 1.4, 0.8, 1.9); for (const [wx2, wz2] of [[-0.75, 4.9], [0.75, 4.9], [-0.75, 6.1], [0.75, 6.1]]) M(G.cyl(0.28, 0.28, 10), iron, wx2, h(mx, mz) + 0.3, wz2, g, 1, 0.12, 1).rotation.z = Math.PI / 2;
-    for (let k = 0; k < 4; k++) M(G.dode(), std(C.crystal, { e: C.crystal, ei: 0.8, r: 0.3 }), (k - 1.5) * 0.3, h(mx, mz) + 1.3, 5.5 + (k % 2) * 0.3, g, 0.25);
-    const [px2, pz2] = toW(2.8, 5); M(G.box(), beam, 2.8, h(px2, pz2) + 1, 5, g, 0.15, 2, 0.15); M(G.box(), std(0x8a6a4a, { r: 0.8 }), 2.8, h(px2, pz2) + 2, 5, g, 1.8, 0.6, 0.1);
-    // the portal at the deep end of the shaft
-    const [qx, qz] = toW(0, -13), qy = Math.max(y0, h(qx, qz));
-    const disc = portalDisc(C.glow, 0x050404); disc.scale.set(1.6, 1.7, 1); disc.position.set(0, qy + 1.8, -13.6); g.add(disc); const pg = glowSprite(C.glow, 5, 0.6); pg.position.set(0, qy + 1.8, -13.2); g.add(pg);
-    world.animated.push(t => { if (disc.material.uniforms) disc.material.uniforms.t.value = t; pg.material.opacity = 0.5 + Math.sin(t * 3) * 0.12; });
-    const lb = textSprite(`${C.name} · mineshaft`, "#ffe2a0", 1.4); lb.position.set(...[hx, hy + 12, hz].map((v, i) => i === 1 ? v : v)); lb.position.set(hx, hy + 11, hz); group.add(lb); world.labels.push(lb);
-    // collisions: the hill all round, and the shaft walls so you walk straight in
-    for (let k = 0; k < 28; k++) { const a = k / 28 * TAU; const lx = Math.sin(a) * 15.5, lz = -15 + Math.cos(a) * 15.5; if (Math.abs(lx) < 3 && lz > -2) continue; const [cx2, cz2] = toW(lx, lz); addCircle(cx2, cz2, 2.6, 30); }
-    for (let k = 0; k < 7; k++) for (const sx of [-2.3, 2.3]) { const [cx2, cz2] = toW(sx, 2 - k * 2.4); addCircle(cx2, cz2, 0.45, 30); }
-    { const [cx2, cz2] = toW(0, -15.6); addCircle(cx2, cz2, 1.8, 30); }
+    const y0 = h(x, z), L = (geo, mat, lx, ly, lz, sx = 1, sy = 1, sz = 1) => M(geo, mat, lx, ly, lz, g, sx, sy, sz), yh0 = (lx, lz) => h(...toW(lx, lz));
+    // the hill behind: layered rock and turf, sunk well into the ground so it never floats
+    const [hx, hz] = toW(0, -17), hy = Math.max(y0, h(hx, hz));
+    L(G.ico(), hillM, 0, hy - 6, -18, 18, 13, 15); L(G.ico(), turf, -4, hy - 2.5, -21, 13, 10, 11); L(G.ico(), turf, 6, hy - 3.5, -16, 10, 9, 9); L(G.ico(), rk, -11, hy - 3, -12, 8, 9, 7); L(G.ico(), rk, 11, hy - 3, -12, 8, 9, 7);
+    const rT = seeded(hash(C.id) + 9);
+    for (let k = 0; k < 8; k++) { const a = rT() * TAU, d = 3 + rT() * 8, lx = Math.cos(a) * d, lz = -20 + Math.sin(a) * d * 0.8, t2 = makeTree(k % 3 ? "pine" : "oak", rT); t2.position.set(lx, hy + 3.5 - d * 0.28, lz); t2.scale.setScalar(0.8 + rT() * 0.5); g.add(t2); }
+    // the cliff face with a carved opening, 4.6 wide and 4.2 tall
+    const lowF = Math.min(y0, ...[-10, -5, 0, 5, 10].map(lx => yh0(lx, 0.5))) - 2;
+    L(G.box(), rk, -7.2, (y0 + 10 + lowF) / 2, -1.6, 10, y0 + 10 - lowF, 3.2); L(G.box(), rk, 7.2, (y0 + 10 + lowF) / 2, -1.6, 10, y0 + 10 - lowF, 3.2); L(G.box(), rk, 0, y0 + 7.4, -1.6, 4.6, 5.2, 3.2);
+    for (let k = 0; k < 12; k++) { const lx = (rT() - 0.5) * 24, ly = y0 + 9 + rT() * 3, s2 = 1.6 + rT() * 2; L(rockGeo(k % 5), rk, lx, ly, -2 - rT() * 2, s2, s2 * 0.7, s2 * 0.8).rotation.y = rT() * 3; }
+    for (let k = 0; k < 6; k++) { const sx = k % 2 ? 1 : -1, lx = sx * (3.4 + rT() * 6); L(rockGeo(k % 5), rkDark, lx, y0 + 0.4, 0.4 + rT(), 1 + rT() * 0.8, 0.6 + rT() * 0.5, 0.9).rotation.y = rT() * 3; }
+    for (let k = 0; k < 3; k++) L(G.cone(5), turf, -9 + k * 9, y0 + 10.6, -1.4, 3, 1.2, 1.8);
+    // the heavy timber portal at the mouth, with braces, a lintel and the mine's sign
+    for (const sx of [-2.5, 2.5]) { L(G.box(), beam, sx, y0 + 2.2, 0.3, 0.5, 4.4, 0.5); const br = L(G.box(), beam, sx * 0.78, y0 + 3.6, 0.3, 0.22, 1.5, 0.22); br.rotation.z = sx > 0 ? 0.75 : -0.75; L(G.box(), iron, sx, y0 + 0.2, 0.3, 0.6, 0.4, 0.6); }
+    L(G.box(), beam, 0, y0 + 4.55, 0.3, 6, 0.5, 0.6); L(G.box(), beam, 0, y0 + 5.05, 0.15, 6.4, 0.25, 0.8);
+    const sign = L(G.box(), std(0x8a6a4a, { r: 0.8, map: "bark" }), 0, y0 + 5.9, 0.55, 4.2, 0.9, 0.12); const st = textSprite(C.name.toUpperCase(), "#ffe2a0", 0.6, null); st.position.set(0, y0 + 5.9, 0.7); g.add(st);
+    for (const sx of [-1.5, 1.5]) { L(G.cyl(0.03, 0.03, 4), iron, sx, y0 + 6.5, 0.55, 1, 0.4, 1); }
+    // inside the shaft: frames, plank walls, a ceiling, rails and lanterns, fading into the dark
+    for (let k = 0; k <= 5; k++) { const lz = -0.8 - k * 2.5, [fx, fz] = toW(0, lz), fy = Math.max(y0, h(fx, fz));
+      for (const sx of [-2, 2]) L(G.box(), beam, sx, fy + 1.9, lz, 0.32, 3.8, 0.32); L(G.box(), beam, 0, fy + 3.85, lz, 4.4, 0.32, 0.4);
+      if (k < 5) { for (const sx of [-2.2, 2.2]) L(G.box(), plank, sx, fy + 1.9, lz - 1.25, 0.12, 3.8, 2.5); L(G.box(), plank, 0, fy + 4.05, lz - 1.25, 4.5, 0.12, 2.5); }
+      if (k % 2 === 0) { L(G.box(), lampM, 1.7, fy + 3.1, lz + 0.2, 0.2, 0.28, 0.2); const lt = glowSprite(0xffb050, 1.8, 0.9); lt.position.set(1.7, fy + 3.1, lz + 0.2); g.add(lt); } }
+    L(G.box(), black, 0, y0 + 2, -14.2, 4.3, 4.1, 0.2);
+    for (let k = 0; k < 10; k++) { const lz = 8 - k * 2.2, [fx, fz] = toW(0, lz), fy = Math.max(y0, h(fx, fz)) + 0.06; L(G.box(), iron, -0.6, fy, lz, 0.08, 0.08, 2.3); L(G.box(), iron, 0.6, fy, lz, 0.08, 0.08, 2.3); for (let j = 0; j < 3; j++) L(G.box(), beam, 0, fy - 0.03, lz - 0.8 + j * 0.8, 1.7, 0.07, 0.22); }
+    // the yard: a cart full of ore, crates, barrels, an ore heap, lantern posts and a headframe on the cliff
+    const yh = (lx, lz) => h(...toW(lx, lz));
+    { const cz = 6.2, cy = yh(0, cz); L(G.box(), std(0x5a4a3a, { r: 0.8, map: "bark" }), 0, cy + 0.85, cz, 1.4, 0.8, 2); for (const [wx, wz] of [[-0.75, cz - 0.6], [0.75, cz - 0.6], [-0.75, cz + 0.6], [0.75, cz + 0.6]]) L(G.cyl(0.28, 0.28, 10), iron, wx, cy + 0.32, wz, 1, 0.12, 1).rotation.z = Math.PI / 2;
+      for (let k = 0; k < 5; k++) L(G.dode(), std(C.crystal, { e: C.crystal, ei: 0.8, r: 0.3 }), (k - 2) * 0.25, cy + 1.35, cz + (k % 2) * 0.3 - 0.15, 0.24); }
+    for (const [lx, lz, s2] of [[-4.6, 3.5, 1], [-5.4, 4.6, 0.8], [4.4, 4, 1], [5.2, 2.6, 0.75]]) L(G.box(), plank, lx, yh(lx, lz) + s2 / 2, lz, s2, s2, s2).rotation.y = lx * 0.3;
+    for (const [lx, lz] of [[4.6, 6.4], [5.4, 6.8]]) { L(G.cyl(0.45, 0.45, 12), std(0x6a4a2a, { r: 0.8, map: "bark" }), lx, yh(lx, lz) + 0.6, lz, 1, 1.2, 1); L(G.tor(0.46, 0.03), iron, lx, yh(lx, lz) + 0.9, lz).rotation.x = Math.PI / 2; }
+    L(G.ico(), rkDark, -6.8, yh(-6.8, 7) + 0.2, 7, 2.2, 1.1, 1.8); for (let k = 0; k < 6; k++) L(G.oct(), std(C.crystal, { e: C.crystal, ei: 0.7 }), -6.8 + (rT() - 0.5) * 2.4, yh(-6.8, 7) + 0.9 + rT() * 0.4, 7 + (rT() - 0.5) * 1.6, 0.2);
+    for (const sx of [-3.6, 3.6]) { const lz = 9, ly = yh(sx, lz); L(G.cyl(0.08, 0.1, 6), beam, sx, ly + 1.6, lz, 1, 3.2, 1); L(G.box(), beam, sx * 0.9, ly + 3.15, lz, 0.9, 0.1, 0.1); L(G.box(), lampM, sx * 0.8, ly + 2.8, lz, 0.22, 0.32, 0.22); const lt = glowSprite(0xffb050, 2.2, 0.9); lt.position.set(sx * 0.8, ly + 2.8, lz); g.add(lt); }
+    { const ty = y0 + 9.6, tz = -3.5; for (const [lx, lz] of [[-1.6, tz - 1.4], [1.6, tz - 1.4], [-1.6, tz + 1.4], [1.6, tz + 1.4]]) { const leg = L(G.box(), beam, lx * 0.8, ty + 2.6, lz, 0.25, 5.4, 0.25); leg.rotation.z = lx > 0 ? -0.08 : 0.08; }
+      L(G.box(), beam, 0, ty + 5.3, tz, 3.4, 0.3, 3.2); const wheel = L(G.tor(1.1, 0.09, 8), iron, 0, ty + 6.2, tz); L(G.cyl(0.1, 0.1, 6), iron, 0, ty + 6.2, tz, 1, 0.6, 1).rotation.x = Math.PI / 2; world.animated.push(t => { wheel.rotation.z = t * 0.8; }); }
+    // the portal glowing at the deep end of the shaft
+    const [qx, qz] = toW(0, -12.8), qy = Math.max(y0, h(qx, qz));
+    const disc = portalDisc(C.glow, 0x050404); disc.scale.set(1.5, 1.6, 1); disc.position.set(0, qy + 1.8, -13.8); disc.material.opacity = 0.75; g.add(disc); const pg = glowSprite(C.glow, 3, 0.35); pg.material = pg.material.clone(); pg.position.set(0, qy + 1.8, -13.4); g.add(pg);
+    world.animated.push(t => { if (disc.material.uniforms) disc.material.uniforms.t.value = t; pg.material.opacity = 0.28 + Math.sin(t * 3) * 0.08; });
+    const lb = textSprite(`${C.name} · mineshaft`, "#ffe2a0", 1.4); lb.position.set(x, y0 + 14, z); group.add(lb); world.labels.push(lb);
+    // collisions: the cliff and the hill, with the shaft walls guiding you straight in
+    solidBox(...toW(-7.2, -1.6), 10, 3.2, rot, 99); solidBox(...toW(7.2, -1.6), 10, 3.2, rot, 99);
+    for (let k = 0; k < 24; k++) { const a = k / 24 * TAU; const lx = Math.sin(a) * 14, lz = -18 + Math.cos(a) * 13; if (lz > -3) continue; const [cx2, cz2] = toW(lx, lz); addCircle(cx2, cz2, 2.6, 30); }
+    for (let k = 0; k < 6; k++) for (const sx of [-2.4, 2.4]) { const [cx2, cz2] = toW(sx, -1.5 - k * 2.4); addCircle(cx2, cz2, 0.45, 30); }
+    { const [cx2, cz2] = toW(0, -15); addCircle(cx2, cz2, 1.8, 30); }
+    for (const [lx, lz] of [[0, 6.2], [-4.6, 3.5], [4.4, 4], [5, 6.6], [-6.8, 7]]) { const [cx2, cz2] = toW(lx, lz); addCircle(cx2, cz2, 1, 1.4); }
     let inside = false;
     world.animated.push(() => { const d = Math.hypot(P.pos.x - qx, P.pos.z - qz); if (d < 1.8 && !inside && !run && !P.dead) { inside = true; askTravel("Mineshaft portal", `Descend into ${C.name}?`, "The portal at the end of the shaft drops you into the cave. A village waits near the entrance, and the deeper you go, the richer and deadlier it gets.", () => enterCave(C.id)); } if (d > 3) inside = false; });
-    C.mouth = toW(0, 7);
+    C.mouth = toW(2.2, 10.5);
+    { const [cx2, cz2] = toW(0, -14); world.circles.push({ x: cx2, z: cz2, r: 18, h: 0, ghost: true }); world.circles.push({ x, z, r: 9, h: 0, ghost: true }); }
   }
   // the pickaxe shop
   const spots = [[-128, 22], [-120, 38], [-140, 30], [-110, -30], [60, 60]]; let sp = spots.find(([x, z]) => !world.circles.some(c => Math.hypot(x - c.x, z - c.z) < c.r + 8)) || spots[0];
