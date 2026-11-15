@@ -156,6 +156,25 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 .card.sel { outline: 2px solid var(--c); outline-offset: 1px; }
 .card.vaulted { background: linear-gradient(135deg, rgba(255,95,143,0.22), rgba(79,227,208,0.16)), var(--panel-2); }
 .col-prev { position: relative; border-radius: 12px; overflow: hidden; background: radial-gradient(circle at 50% 35%, #2a3550, #0f131d 70%); border: 1px solid var(--line); min-height: 300px; }
+#avatar .avBox { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(290px, 380px); gap: 14px; width: min(960px, 96vw); height: min(660px, 92vh); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+#avatar .avPrev { position: relative; border-radius: 12px; overflow: hidden; background: radial-gradient(circle at 50% 40%, #2a3448, #0c1018 75%); min-height: 220px; }
+#avatar .avPrev canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+#avatar .avViews { position: absolute; z-index: 2; left: 10px; top: 10px; display: flex; gap: 6px; }
+#avatar .avViews button, #avatar .avStep button { background: rgba(10,14,22,0.7); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; color: inherit; font-weight: 700; }
+#avatar .avViews button.on { border-color: var(--accent); color: var(--accent); }
+#avatar .avSide { display: flex; flex-direction: column; min-height: 0; }
+#avatar .avSide h2 { margin: 0 0 2px; font-family: var(--f-display); }
+#avatar #avRows { flex: 1; overflow: auto; margin: 8px 0; padding-right: 4px; }
+#avatar .avRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+#avatar .avRow > b { font-size: 13px; }
+#avatar .avStep { display: flex; align-items: center; gap: 6px; }
+#avatar .avStep button { width: 34px; height: 32px; padding: 0; font-size: 16px; }
+#avatar .avStep span { min-width: 100px; text-align: center; font-size: 13px; }
+#avatar .avSw { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; max-width: 220px; }
+#avatar .avSw button { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); padding: 0; }
+#avatar .avSw button.on { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,0,0,0.5) inset; }
+#avatar input[type=range] { width: 170px; }
+@media (max-width: 760px) { #avatar .avBox { grid-template-columns: 1fr; grid-template-rows: 40% 1fr; height: 94vh; } }
 .col-prev canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
 .prev-ui { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; gap: 10px; align-items: center; pointer-events: none; }
 .prev-ui button { pointer-events: auto; width: 40px; height: 40px; border-radius: 50%; background: rgba(16,20,30,0.75); border: 1px solid var(--line); font-size: 18px; font-weight: 800; }
@@ -338,7 +357,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <button class="hbtn warn" id="bLeave" hidden>Leave island</button>
 </div>
 <div id="menuBar">
-  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
+  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbAvatar">Avatar</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
 <div id="musicPanel" hidden role="dialog" aria-label="Music">
   <div class="mpHead"><b>Music</b><button class="hbtn" id="mpClose">Close</button></div>
@@ -435,7 +454,18 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
       <li><b>Level up</b> from fights and spend stat points on Speed, Damage, Defence or Power.</li>
       <li><b>Open the Armoury</b> to turn your weapons and armour around in 3D and compare their stats.</li>
     </ul>
-    <div class="row"><button class="btn primary" id="startBtn">Enter the lobby</button><span class="muted" id="introNote"></span></div>
+    <div class="row"><button class="btn primary" id="startBtn">Enter the lobby</button><button class="btn" id="avEditBtn">Edit avatar</button><span class="muted" id="introNote"></span></div>
+  </div>
+</div>
+<div class="modal" id="avatar" hidden role="dialog" aria-label="Create your hero">
+  <div class="avBox">
+    <div class="avPrev" id="avPrev"><div class="avViews"><button data-v="face">Face</button><button data-v="body">Full body</button><button data-v="gear">Try gear</button></div></div>
+    <div class="avSide">
+      <h2>Create your hero</h2>
+      <span class="muted">Drag the preview to turn it. You can change this later from Avatar.</span>
+      <div id="avRows"></div>
+      <div class="row"><button class="btn" id="avRand">Randomise</button><button class="btn primary" id="avDone">Enter the lobby</button></div>
+    </div>
   </div>
 </div>
 
@@ -693,6 +723,46 @@ const WEAPON_DEFS = [
   ["thunderheadmaul", "Thunderhead Maul", "legendary", "warhammer", 0x3a4a6a, 0xfff0a0, "chainStorm", "Every blow rolls like thunder."],
   ["hollowstarreaper", "Reaper of Hollow Stars", "legendary", "scythe", 0x0a0614, 0xc8b0ff, "vortex", "Its blade is a sliver of night with stars still in it."],
   ["coralcrowntrident", "Coralcrown Trident", "epic", "trident", 0xff8aa0, 0x9affe8, "riptideSpiral", "Grown from a living reef."],
+  ["brineedge", "Brine-edge Sword", "common", "sword", 0xb8c8cc, 0x3a6a7a, "heavyStrike", "Salt has etched little maps into the steel."],
+  ["lanternguard", "Lanternguard Sword", "rare", "sword", 0xe8d8b0, 0xffb040, "flameWave", "A tiny lantern burns inside the hollow guard."],
+  ["galecutter", "Galecutter Sabre", "epic", "sword", 0xd8f0f0, 0x7affd8, "bladeStorm", "It whistles a different note for every swing."],
+  ["obsidianoath", "Obsidian Oath", "legendary", "sword", 0x14101a, 0xff4a8a, "eclipse", "Sworn on a volcano. The volcano kept the promise."],
+  ["meadowkatana", "Meadowlark Katana", "common", "katana", 0xd8dcc8, 0x8ab84a, "bladeFan", "The scabbard smells faintly of cut grass."],
+  ["thunderbloom", "Thunderbloom Katana", "epic", "katana", 0xf0e8ff, 0xc8a0ff, "chainBolt", "Lightning flowers along the hamon when drawn."],
+  ["eventideodachi", "Eventide Odachi", "legendary", "katana", 0x2a1a3a, 0xffa070, "timeEcho", "Drawn only at dusk, when shadows run longest."],
+  ["gravestone", "Gravestone Greatsword", "rare", "greatsword", 0x8a8a90, 0x5a6a5a, "earthsplitter", "It was a headstone first. Nobody asks whose."],
+  ["solarflare", "Solarflare Zweihander", "epic", "greatsword", 0xffd890, 0xff7a20, "sunburst", "Too bright to look at for long."],
+  ["worldrend", "Worldrend Greatblade", "vaulted", "greatsword", 0x0a0a14, 0x9affff, "riftCollapse", "It cut a hole in the sky once. The hole is still there."],
+  ["duelistsrose", "Duelist's Rose", "rare", "rapier", 0xe8e0e8, 0xff4a6a, "bladeFan", "A rose is etched on the cup hilt, one petal per duel."],
+  ["glimmerpoint", "Glimmerpoint Estoc", "legendary", "rapier", 0xf8f8ff, 0x7ad8ff, "lightLance", "Its tip leaves a thread of light in the air."],
+  ["saltpick", "Salt Pick Knife", "common", "dagger", 0xc8ccd0, 0x7a6a4a, "bladeFan", "Used to chip salt. And other things."],
+  ["nightjar", "Nightjar Dagger", "epic", "dagger", 0x1a1a2a, 0x8a7aff, "timeEcho", "Named for a bird that is heard but never seen."],
+  ["cinderstilettos", "Cinder Stilettos", "rare", "twinblade", 0x5a2a1a, 0xff8a3a, "flameWave", "A matched pair, warm as fresh coals."],
+  ["tidalfangs", "Tidal Fangs", "legendary", "twinblade", 0x1a5a7a, 0x60ffe8, "riptideSpiral", "They cut like the tide comes in: all at once."],
+  ["ironbark", "Ironbark Axe", "common", "axe", 0x8a8a8a, 0x6a4a2a, "whirl", "The haft is from a tree that blunted a hundred axes."],
+  ["skullsplitter", "Skullsplitter", "epic", "axe", 0xd8d0c0, 0xa82a2a, "heavyStrike", "Its name is a warning, not a boast."],
+  ["glacierhorn", "Glacierhorn Greataxe", "rare", "greataxe", 0xc8e8ff, 0x5a8ab8, "frostNova", "Two curved blades like the horns of an ice ram."],
+  ["doomcleaver", "Doomcleaver", "vaulted", "greataxe", 0x2a0a0a, 0xff2a2a, "vaultCrush", "It has never needed a second swing."],
+  ["shepherdscrook", "Shepherd's Crook Club", "common", "club", 0x8a6a4a, 0xd8c8a0, "heavyStrike", "Herds sheep. Also herds bandits."],
+  ["thunderknot", "Thunderknot Club", "epic", "club", 0x4a3a2a, 0xfff0a0, "chainBolt", "Struck by lightning and kept the charge."],
+  ["templebell", "Temple Bell Mace", "rare", "mace", 0xd8a050, 0xfff0c0, "shockwave", "Every hit rings out like a call to prayer."],
+  ["starfallmace", "Starfall Mace", "legendary", "mace", 0x2a2a5a, 0xd8d8ff, "starfall", "Its head is a stone that fell from the night sky."],
+  ["thornchain", "Thornchain Flail", "common", "flail", 0x6a7a5a, 0x4a6a2a, "whirl", "A ball of knotted thorn on a vine-wrapped chain."],
+  ["comettail", "Comet-tail Flail", "legendary", "flail", 0xc8d8ff, 0xff9a4a, "cometRain", "The ball streaks fire behind it like a comet."],
+  ["riverrods", "River Reed Rods", "rare", "nunchaku", 0x8aa86a, 0x3a7a8a, "bladeFan", "Light and quick as reeds in a current."],
+  ["voidlinks", "Voidlink Nunchaku", "epic", "nunchaku", 0x10061e, 0xc85aff, "vortex", "The chain disappears between swings."],
+  ["moonreaver", "Moonreaver Chain Sickle", "legendary", "chainsickle", 0xd8e0ff, 0x9ab8ff, "eclipse", "The sickle is a crescent moon on a silver chain."],
+  ["harbourglaive", "Harbourwatch Glaive", "common", "halberd", 0xb8bcc4, 0x3a4a6a, "heavyStrike", "Standard issue for the harbour guard."],
+  ["dragonspine", "Dragonspine Halberd", "epic", "halberd", 0xc8402a, 0xffd040, "dragonBreath", "Its shaft is a single dragon vertebra, polished."],
+  ["tuskwing", "Tuskwing Boar Spear", "common", "spear", 0xa8a8a8, 0x6a4a2a, "heavyStrike", "Wings on the blade stop a charging boar. Mostly."],
+  ["sunlance", "Sunlance", "legendary", "spear", 0xfff0c0, 0xffc040, "lightLance", "Point it at the dark and the dark steps back."],
+  ["kelpcrown", "Kelpcrown Trident", "common", "trident", 0x7a9a8a, 0x3a7a5a, "tidal", "A fisherman's trident, crowned with dried kelp."],
+  ["abysstrident", "Trident of the Abyss", "vaulted", "trident", 0x04141a, 0x20ffd0, "abyssTide", "Pulled from the bottom of a trench that has no bottom."],
+  ["anvilmaul", "Anvil Maul", "rare", "warhammer", 0x5a5a62, 0xff8a3a, "earthsplitter", "Literally an anvil on a stick."],
+  ["oakheartstaff", "Oakheart Staff", "rare", "staff", 0x6a4a2a, 0x8aff6a, "drainBurst", "Cut from the heart of an oak that still grows leaves."],
+  ["auroracane", "Aurora Cane", "legendary", "staff", 0x2a3a5a, 0x7affc8, "prismNova", "The northern lights are trapped in its crystal."],
+  ["harvestscythe", "Harvester's Scythe", "common", "scythe", 0x9a9a8a, 0x8a6a3a, "whirl", "Wheat, mostly. Sometimes weeds with teeth."],
+  ["soulreaper", "Soulreaper", "epic", "scythe", 0x1a1a24, 0x9affd8, "drainBurst", "It weighs a little more after every fight."],
   ["mossgrip", "Mossgrip Shortsword", "common", "sword", 0x9aa89a, 0x4a7a3a, "heavyStrike", "Left in a forest so long the hilt grew moss."],
   ["harbourcutlass", "Harbour Cutlass", "rare", "sword", 0xc8ccd4, 0x2a5a8a, "bladeFan", "Curved for cutting rope, sails and the occasional pirate."],
   ["amberwake", "Amberwake Blade", "epic", "sword", 0xe8a040, 0xffd890, "sunburst", "A bead of amber in the guard holds a frozen spark."],
@@ -801,6 +871,26 @@ const ARMOUR_DEFS = [
   ["prismaticaegis", "Prismatic Aegis", "legendary", "heavy", 0xf0f0ff, 0x8a8aa8, 0xff9af8, "crown", true, null, "It shines every colour when struck."],
   ["veilofthefox", "Veil of the Fox", "legendary", "light", 0xd8603a, 0x2a1a14, 0xffe0a0, "hood", true, null, "Russet, quiet and impossible to pin down."],
   ["starlitdiadem", "Starlit Diadem Regalia", "legendary", "medium", 0x2a2a5a, 0x1a1a3a, 0xd8d8ff, "crown", true, null, "Stars were sewn into the hem by a child who fell from the sky."],
+  ["fishermansoilskin", "Fisherman's Oilskin", "common", "light", 0x8a7a3a, 0x3a4a5a, 0, "hood", false, null, "Waxed against the rain. Smells of the docks."],
+  ["quarrymail", "Quarryman's Mail", "common", "medium", 0x8a8a84, 0x5a4a3a, 0, "helm", false, null, "Heavy enough to shrug off falling stones."],
+  ["bastionplate", "Town Bastion Plate", "common", "heavy", 0x9a9aa2, 0x3a4a6a, 0, "visor", false, null, "Issued to the gate guard and polished every morning."],
+  ["foxglove", "Foxglove Jerkin", "rare", "light", 0x8a4a7a, 0x3a2a3a, 0xff8ad8, "hood", true, null, "Pretty, poisonous, and very hard to catch."],
+  ["coralmail", "Coralplate Mail", "rare", "medium", 0xff8a7a, 0x2a4a5a, 0x9affe8, "helm", false, null, "Grown, not forged, on a living reef."],
+  ["emberguard", "Emberguard Plate", "rare", "heavy", 0x6a3a2a, 0x2a1a14, 0xff8a3a, "horned", true, null, "Warm in winter. Very warm in summer."],
+  ["mossweave", "Mossweave Cloak", "rare", "light", 0x4a6a3a, 0x2a3a1a, 0x9aff6a, "hood", true, null, "Living moss keeps it soft and quiet."],
+  ["thunderscale", "Thunderscale Hauberk", "epic", "medium", 0x4a5a7a, 0x1a2a3a, 0xfff0a0, "horned", true, null, "Each scale holds a spark that snaps when struck."],
+  ["moonwardens", "Moonwarden's Plate", "epic", "heavy", 0xc8d0e8, 0x2a2a4a, 0x9ab8ff, "visor", true, null, "Worn by the watch that guards the night."],
+  ["sandstrider", "Sandstrider Wraps", "epic", "light", 0xd8c090, 0x8a5a3a, 0xffd890, "hood", false, null, "Layered linen that never lets the sand in."],
+  ["frostfang", "Frostfang Brigandine", "epic", "medium", 0xbfe0f8, 0x3a5a7a, 0x7ad8ff, "helm", true, null, "Lined with wolf fur and edged with frost."],
+  ["dragonhide", "Dragonhide Armour", "legendary", "medium", 0x8a2a1a, 0x2a1410, 0xffb040, "horned", true, null, "Tanned from a dragon that lost an argument."],
+  ["seraphplate", "Seraph Plate", "legendary", "heavy", 0xf0ecff, 0xd8c890, 0xfff0c0, "crown", true, null, "Feathered pauldrons that shine at dawn."],
+  ["nightprowl", "Nightprowl Leathers", "legendary", "light", 0x1a1a24, 0x0a0a14, 0x8a7aff, "hood", true, null, "You hear it creak only after it has passed."],
+  ["verdantking", "Verdant King's Regalia", "legendary", "medium", 0x3a6a2a, 0x1a3a14, 0x9aff6a, "crown", true, null, "Woven with living vines that bloom in spring."],
+  ["obsidianward", "Obsidian Warplate", "legendary", "heavy", 0x14101a, 0x2a1a2a, 0xff4a8a, "visor", true, null, "Glass-black plates that turn a blade aside."],
+  ["tempestcrown", "Tempest Crown Regalia", "vaulted", "medium", 0x2a3a5a, 0x10182a, 0x9ae8ff, "crown", true, "stormmantle", "The storm itself bows to whoever wears it."],
+  ["eclipsemantle", "Eclipse Mantle", "vaulted", "light", 0x0a0814, 0x1a1028, 0xffd890, "hood", true, "wraithveil", "Half sun, half shadow, never both at once."],
+  ["worldoak", "Worldoak Bulwark", "vaulted", "heavy", 0x4a3a24, 0x2a3a1a, 0x8aff6a, "horned", true, "titanShell", "Carved from the oldest tree on the oldest island."],
+  ["chronoregalia", "Chronowarden Regalia", "vaulted", "medium", 0xd8c890, 0x2a2a3a, 0xc8f0ff, "crown", true, "chronoShift", "The clockwork in its collar runs a little ahead."],
   ["cartographercoat", "Cartographer's Greatcoat", "legendary", "light", 0x6a5a3a, 0x3a2a1a, 0xffe060, "hood", true, null, "Every pocket holds a map of somewhere that does not exist yet."]
 ];
 const ARM_W = { light: { hp: 0.8, def: 0.7, move: 1.05, label: "Light" }, medium: { hp: 1, def: 1, move: 1, label: "Medium" }, heavy: { hp: 1.25, def: 1.35, move: 0.92, label: "Heavy" } };
@@ -1268,7 +1358,7 @@ const ROLE_AI = {
   summoner(e, tgt, toT, dist, spd, dt) {
     const mv = keepAway(e, toT, dist, spd, dt, 9, 13); e.atkT -= dt;
     if (e.atkT <= 0 && run) { e.atkT = e.base.cd; const mine = enemies.filter(o => !o.dead && o.owner === e).length;
-      if (mine < 3) { ringFx(e.pos, 3, e.accent, 0.6); const base = ISLANDS[run.idx].enemies[0]; for (let k = 0; k < 2; k++) { const m = spawnEnemy([`Summoned ${base[0]}`, base[1], "skirm", e.accent, e.accent], "skirm", false, 0.7); m.pos.copy(e.pos).add(new V3(rand(-2, 2), 0, rand(-2, 2))); m.hp = m.maxHp = m.maxHp * 0.4; m.owner = e; m.base = Object.assign({}, m.base, { xp: 1, coins: 1 }); } }
+      if (mine < 3) { ringFx(e.pos, 3, e.accent, 0.6); const base = ISLANDS[run.idx].enemies[0]; for (let k = 0; k < 2; k++) { const m = spawnEnemy([`Summoned ${base[0]}`, base[1], "skirm", e.accent, e.accent], "skirm", false, 0.7); m.pos.copy(e.pos).add(new V3(rand(-2, 2), 0, rand(-2, 2))); m.hp = m.maxHp = m.maxHp * 0.4; m.owner = e; m.minion = true; m.base = Object.assign({}, m.base, { xp: 1, coins: 1 }); } }
       else if (dist < 15) shoot(e.pos.clone().add(new V3(0, 1.5, 0)), tgt.pos.clone().add(new V3(0, 1, 0)), e.accent, e.dmg, 1, "enemy", { src: e, speed: 11, life: 1.8, size: 0.25 }); }
     return mv;
   },
@@ -1778,6 +1868,86 @@ function hornGeo() {
     g.computeVertexNormals(); return g;
   });
 }
+/* ---- the avatar: a face, hair and body the player chooses before entering the lobby ---- */
+const AV = {
+  body: ["Masculine", "Feminine"],
+  skin: [0xf6dcc4, 0xf0c8a0, 0xd9a77f, 0xc08a5a, 0x9a6a42, 0x6a4430, 0x3e271a],
+  eyes: ["Round", "Almond", "Wide", "Sleepy", "Fierce", "Bright"],
+  eyeCol: [0x3a2a1a, 0x6a4a2a, 0x3a6a9a, 0x4a8a4a, 0x7a7a8a, 0x8a5aa8, 0xc89a3a],
+  brows: ["Straight", "Arched", "Thick", "Thin", "Angled", "Soft"],
+  nose: ["Small", "Pointed", "Broad", "Button", "Long", "Hooked"],
+  mouth: ["Calm", "Smile", "Grin", "Frown", "Full lips", "Smirk"],
+  facial: ["None", "Stubble", "Moustache", "Goatee", "Short beard", "Full beard", "Sideburns"],
+  hair: ["Short", "Long", "Buzz cut", "Bald", "Ponytail", "Top bun", "Mohawk", "Curly", "Braids", "Swept fringe"],
+  hairCol: [0x1a1410, 0x3a2618, 0x6a4a2a, 0xb8803a, 0xe8cc80, 0xb8401a, 0xdcdcdc, 0x3a5aa8, 0xc85a9a],
+  build: ["Slim", "Average", "Athletic", "Heavy"]
+};
+const AV_DEFAULT = { body: 0, skin: 2, eyes: 0, eyeCol: 0, brows: 0, nose: 0, mouth: 0, facial: 0, hair: 0, hairCol: 1, build: 1, height: 1, size: 1 };
+function avatarBody(A) {
+  const fem = A.body === 1, W = [0.9, 1, 1.05, 1.17][A.build] || 1;
+  return { w: (A.size || 1) * W * (fem ? 0.94 : 1), h: (A.height || 1) * (fem ? 0.97 : 1), sh: (fem ? 0.92 : 1) * (A.build === 2 ? 1.06 : 1), hip: fem ? 1.08 : 1 };
+}
+function buildFace(head, A, skin, hair, L, helm) {
+  const fem = A.body === 1, white = std(0xf4f0ea, { r: 0.3 }), iris = std(AV.eyeCol[A.eyeCol] || 0x3a2a1a, { r: 0.15 }), dark = std(0x1a1210, { r: 0.6 });
+  const skinC = new THREE.Color(AV.skin[A.skin] ?? L.skin), lipC = skinC.clone().multiplyScalar(0.72).lerp(new THREE.Color(fem ? 0xb04a5a : 0x8a4a40), fem ? 0.45 : 0.2);
+  const lip = std(lipC.getHex(), { r: 0.45 }), lid = MAT.skin(skinC.getHex());
+  // eyes
+  const E = [[0.017, 0.016, 0.009, 0], [0.02, 0.011, 0.008, 0.14], [0.021, 0.017, 0.01, 0], [0.019, 0.01, 0.008, 0], [0.019, 0.01, 0.008, -0.28], [0.018, 0.016, 0.0095, 0]][A.eyes] || [0.018, 0.013, 0.008, 0];
+  const es = fem ? 1.08 : 1;
+  for (const sx of [-1, 1]) {
+    const ey = M(G.sph(), white, 0.042 * sx, 0.018, 0.104, head, E[0] * es, E[1] * es, 0.011); ey.rotation.z = E[3] * sx;
+    M(G.sph(), iris, 0.042 * sx, 0.018, 0.112, head, E[2] * es); M(G.sph(), dark, 0.042 * sx, 0.018, 0.1195, head, E[2] * es * 0.45);
+    if (A.eyes === 5) M(G.sph(), std(0xffffff, { e: 0xffffff, ei: 0.6 }), 0.039 * sx + 0.003, 0.022, 0.1215, head, 0.0025);
+    if (A.eyes === 3) { const l = M(G.sph(), lid, 0.042 * sx, 0.024, 0.106, head, E[0] * 1.08, 0.01, 0.0115); l.rotation.z = E[3] * sx; }
+    if (fem) { const lash = M(G.box(), dark, 0.044 * sx, 0.018 + E[1] * es * 0.9, 0.113, head, 0.03, 0.003, 0.004); lash.rotation.z = -0.15 * sx; }
+    // brows
+    const by = 0.046 + (A.eyes === 2 ? 0.003 : 0), B = [[0.04, 0.008, -0.05], [0.04, 0.007, 0], [0.044, 0.013, -0.08], [0.038, 0.0045, -0.1], [0.04, 0.009, 0.32], [0.036, 0.006, -0.25]][A.brows] || [0.04, 0.008, -0.12];
+    if (A.brows === 1) { for (const [ox, rz] of [[-0.011, 0.32], [0.011, -0.32]]) { const b = M(G.box(), hair, 0.043 * sx + ox * sx, by + 0.004, 0.111, head, 0.022, 0.007, 0.012); b.rotation.z = rz * sx; } }
+    else { const b = M(G.box(), hair, 0.043 * sx, by, 0.111, head, B[0] * (fem ? 0.92 : 1), B[1] * (fem ? 0.8 : 1), 0.012); b.rotation.z = B[2] * sx; }
+    M(G.sph(), skin, 0.118 * sx, 0.005, -0.005, head, 0.014, 0.03, 0.022);
+  }
+  // nose
+  const N = A.nose;
+  if (N === 3) M(G.sph(), skin, 0, -0.01, 0.121, head, 0.016, 0.014, 0.013);
+  else { const S2 = [[0.012, 0.03, 0.016, 0.35, 0], [0.013, 0.05, 0.026, 0.55, 0], [0.024, 0.042, 0.022, 0.35, 0], null, [0.015, 0.062, 0.022, 0.32, -0.008], [0.015, 0.05, 0.024, 0.45, 0]][N] || [0.016, 0.045, 0.02, 0.35, 0];
+    const n = M(G.cone(10), skin, 0, -0.005 + S2[4], 0.118, head, S2[0], S2[1], S2[2]); n.rotation.x = S2[3];
+    if (N === 2) for (const sx of [-1, 1]) M(G.sph(), skin, 0.013 * sx, -0.022, 0.118, head, 0.009);
+    if (N === 5) M(G.sph(), skin, 0, 0.012, 0.126, head, 0.008, 0.012, 0.008); }
+  // mouth
+  const my = -0.052, mz = 0.109, Mo = A.mouth;
+  const seg = (x, y, w, rz, mat = lip, h = 0.006) => { const b = M(G.box(), mat, x, y, mz, head, w, h, 0.01); b.rotation.z = rz; return b; };
+  if (Mo === 1) { seg(0, my, 0.024, 0); seg(-0.016, my + 0.003, 0.012, -0.45); seg(0.016, my + 0.003, 0.012, 0.45); }
+  else if (Mo === 2) { seg(0, my - 0.001, 0.034, 0, std(0xf4f0ea, { r: 0.4 }), 0.01); seg(0, my - 0.007, 0.034, 0); seg(-0.021, my + 0.002, 0.012, -0.5); seg(0.021, my + 0.002, 0.012, 0.5); }
+  else if (Mo === 3) { seg(0, my, 0.022, 0); seg(-0.015, my - 0.003, 0.012, 0.45); seg(0.015, my - 0.003, 0.012, -0.45); }
+  else if (Mo === 4) { M(G.sph(), lip, 0, my + 0.004, mz - 0.002, head, 0.02, 0.006, 0.008); M(G.sph(), lip, 0, my - 0.005, mz - 0.002, head, 0.019, 0.008, 0.009); seg(0, my, 0.036, 0, dark, 0.002); }
+  else if (Mo === 5) { seg(-0.004, my, 0.026, 0); seg(0.018, my + 0.003, 0.012, 0.45); }
+  else seg(0, my, 0.036, 0, fem ? lip : std(lipC.getHex(), { r: 0.5 }), 0.007);
+  // facial hair (a visor hides it)
+  const F = A.facial, beardM = std(new THREE.Color(AV.hairCol[A.hairCol] ?? L.hair).getHex(), { r: 0.85, map: "fur", rep: [2, 2] });
+  if (helm !== "visor" && F) {
+    const jaw = (r, tube, op) => { const m = op < 1 ? std(beardM.color.getHex(), { r: 0.9, op }) : beardM; const t = new THREE.Mesh(geo(`jaw${r}_${tube}`, () => new THREE.TorusGeometry(r, tube, 8, 20, Math.PI)), m); t.rotation.x = Math.PI / 2; t.position.set(0, -0.086, 0.012); t.scale.set(0.95, 1.1, 1.08); head.add(t); return t; };
+    if (F === 1) jaw(0.091, 0.014, 0.4);
+    if (F === 2 || F === 5) for (const sx of [-1, 1]) { const m = M(G.sph(), beardM, 0.014 * sx, my + 0.012, mz + 0.003, head, 0.017, 0.006, 0.006); m.rotation.z = -0.25 * sx; }
+    if (F === 3) { M(G.sph(), beardM, 0, -0.09, 0.094, head, 0.018, 0.026, 0.014); for (const sx of [-1, 1]) M(G.box(), beardM, 0.017 * sx, my - 0.012, mz - 0.002, head, 0.004, 0.028, 0.006); }
+    if (F === 4) { jaw(0.09, 0.016, 1); M(G.sph(), beardM, 0, -0.112, 0.08, head, 0.03, 0.02, 0.022); }
+    if (F === 5) { jaw(0.092, 0.022, 1); M(G.sph(), beardM, 0, -0.13, 0.07, head, 0.04, 0.042, 0.03); }
+    if (F === 6) for (const sx of [-1, 1]) M(G.box(), beardM, 0.112 * sx, -0.03, 0.03, head, 0.014, 0.06, 0.03);
+  }
+}
+function buildHairStyle(head, A, hair, R) {
+  const H = A.hair, fem = A.body === 1;
+  const cap = s => M(hairGeo(s), hair, 0, 0, 0, head);
+  if (H === 3) return; // bald
+  if (H === 2) { const c = cap("short"); c.scale.set(0.97, 0.93, 0.97); c.position.y = -0.004; return; }
+  if (H === 6) { const c = cap("short"); c.scale.set(0.96, 0.9, 0.96); for (let k = 0; k < 7; k++) { const a = -0.9 + k * 0.32; M(G.cone(6), hair, 0, Math.cos(a) * 0.13 + 0.01, Math.sin(a) * 0.13, head, 0.012, 0.05, 0.022).rotation.x = a; } return; }
+  cap(H === 1 || H === 8 ? "long" : "short");
+  if (H === 1) { M(G.box(), hair, 0, -0.1, -0.09, head, 0.2, 0.22, 0.05); }
+  if (H === 4) { const t = M(G.cyl(0.02, 0.012), hair, 0, -0.08, -0.15, head, 1, 0.2, 1); t.rotation.x = 0.35; M(G.tor(0.022, 0.006), std(0x8a2a2a), 0, 0.02, -0.14, head).rotation.x = 1.2; }
+  if (H === 5) { M(G.sph(), hair, 0, 0.17, -0.03, head, 0.045); M(G.tor(0.03, 0.007), std(0x8a2a2a), 0, 0.14, -0.025, head).rotation.x = Math.PI / 2; }
+  if (H === 7) for (let k = 0; k < 30; k++) { const a = k * 2.39996, y = 0.03 + (k % 6) * 0.024, rr = 0.122 * Math.cos(Math.min(1.3, (y - 0.02) * 4.2)); if (Math.cos(a) > 0.35 && y < 0.1) continue; M(G.sph(), hair, Math.sin(a) * rr, y, Math.cos(a) * rr, head, 0.021); }
+  if (H === 8) for (const sx of [-1, 1]) { for (let k = 0; k < 5; k++) M(G.sph(), hair, 0.1 * sx, -0.06 - k * 0.04, 0.03 - k * 0.006, head, 0.018); }
+  if (H === 9) { const f = M(G.box(), hair, 0.03, 0.095, 0.085, head, 0.17, 0.035, 0.05); f.rotation.z = -0.35; f.rotation.x = -0.3; }
+}
 function buildHumanoid(o) {
   // o: { look:{skin,hair,cloth,cloth2,extra}, armour, weapon, scale }
   const L = o.look, a = o.armour ? ITEM[o.armour] : null;
@@ -1824,6 +1994,8 @@ function buildHumanoid(o) {
   // head
   const head = new THREE.Group(); head.position.y = 0.73; chest.add(head); R.head = head;
   M(headGeo(), skin, 0, 0, 0, head);
+  if (o.face && !bony) buildFace(head, o.face, skin, hair, L, a ? a.helm : "none");
+  else {
   const white = std(0xf4f0ea, { r: 0.3 }), iris = std(L.extra === "reaperhood" ? 0xff3050 : bony ? 0x111111 : 0x3a2a1a, { r: 0.2, e: L.extra === "reaperhood" ? 0xff3050 : 0, ei: 1.5 });
   for (const sx of [-1, 1]) {
     if (!bony) M(G.sph(), white, 0.042 * sx, 0.018, 0.104, head, 0.018, 0.013, 0.011);
@@ -1833,8 +2005,10 @@ function buildHumanoid(o) {
   }
   const nose = M(G.cone(10), skin, 0, -0.005, 0.118, head, 0.016, 0.045, 0.02); nose.rotation.x = 0.35;
   M(G.box(), std(new THREE.Color(L.skin).multiplyScalar(0.7).getHex(), { r: 0.5 }), 0, -0.052, 0.108, head, 0.036, 0.007, 0.01);
+  }
   const helm = a ? a.helm : "none";
-  if (helm === "none" || helm === "crown") M(hairGeo(L.extra === "ears" || L.extra === "wings" ? "long" : "short"), hair, 0, 0, 0, head);
+  if ((helm === "none" || helm === "crown") && !(o.face && !bony)) M(hairGeo(L.extra === "ears" || L.extra === "wings" ? "long" : "short"), hair, 0, 0, 0, head);
+  if ((helm === "none" || helm === "crown") && o.face && !bony) buildHairStyle(head, o.face, hair, R);
   if (helm === "helm" || helm === "horned") {
     M(lathe("helmopen", BODY.helm, 26, 0.75, TAU - 1.5), std(a.metal, { m: 0.92, r: 0.28, bump: "scratch", bs: 0.004, rep: 1, ds: true }), 0, 0, 0, head, 1, 1, 1.02);
     M(G.box(), metal, 0, 0.02, 0.15, head, 0.022, 0.12, 0.02);
@@ -1902,6 +2076,7 @@ function buildHumanoid(o) {
   if (a && !o.lite) armourBulk(R, a);
   if (!o.lite) { head.scale.setScalar(1.1); g.scale.set(1.05, 1, 1.05); }
   if (o.scale) g.scale.setScalar(o.scale);
+  if (o.face) { const F = avatarBody(o.face); g.scale.set(1.05 * F.w, F.h, 1.05 * F.w); head.scale.set(1.1 / F.w, 1.1 / F.h, 1.1 / F.w); R.shL.position.x *= F.sh; R.shR.position.x *= F.sh; R.hips.scale.x = F.hip; R.chest.scale.x = 1 / F.hip; }
   shadows(g);
   return R;
 }
@@ -2476,9 +2651,10 @@ function buildIsland(idx) {
 const P = { pos: new V3(0, 0, 8), vy: 0, face: Math.PI, onGround: true, hp: 100, atkT: 0, specT: 0, armT: 0, potT: 0, swing: 0, swingStyle: "normal",
   dashQ: [], dashT: 0, dashDir: new V3(), dashHit: new Set(), invuln: 0, jumps: 0, kb: new V3(), dead: false, walk: 0, hits: 0, buffs: {}, flags: {}, spinT: 0, consecrateT: 0 };
 let hero = null;
+function avatarLook(look, A = S.avatar) { if (!A || look.extra === "bones") return look; return Object.assign({}, look, { skin: AV.skin[A.skin] ?? look.skin, hair: AV.hairCol[A.hairCol] ?? look.hair }); }
 function rebuildHero() {
   if (hero) { scene.remove(hero.g); }
-  hero = buildHumanoid({ look: CLASS[S.cls].look, armour: S.equip.armour, weapon: S.equip.weapon });
+  hero = buildHumanoid({ look: avatarLook(CLASS[S.cls].look), face: S.avatar || null, armour: S.equip.armour, weapon: S.equip.weapon });
   hero.sword = SWORD_STYLE[S.equip.weapon] || null;
   scene.add(hero.g);
   computeStats(); P.hp = Math.min(P.hp, ST.maxHp);
@@ -2612,6 +2788,11 @@ function killEnemy(e) {
   e.dead = true; e.hp = 0;
   scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar); freeEnemy(e); if (e.onDeath) { try { e.onDeath(e); } catch (er) { reportError(er); } }
   burstFx(e.pos.clone().add(new V3(0, 1, 0)), 2 * e.scale, e.accent, 0.4);
+  // helpers called in by a boss or summoner fall with their master; dismissing them pays nothing
+  const servants = enemies.filter(m => !m.dead && m.minion && (m.owner === e || (e.boss && m.owner && m.owner.boss)));
+  for (const m of servants) if (!m.dead) { m.minion = true; ringFx(m.pos, 1.2, m.accent, 0.35); killEnemy(m); }
+  if (servants.length) floatText(e.pos.clone().add(new V3(0, 2, 0)), "Its servants fade away", "#c8b0ff");
+  if (e.minion) { bumpStat("kills"); save(); return; } // no coins, exp or drops for helpers
   const isl = run ? Math.min(run.idx, 12.5) : 0, si = run ? run.stage : 0;
   const xp = e.base.xp * Math.pow(1.3, isl) * (1 + 0.5 * si);
   const coins = Math.round(e.base.coins * Math.pow(1.35, isl) * (1 + 0.6 * si) * rand(0.8, 1.2));
@@ -2946,12 +3127,12 @@ function bossAttack(e) {
   if ((e.raidBoss || e.namedBoss) && e.phase < 2 && e.hp < e.maxHp * (e.phase ? 0.34 : 0.67)) {
     e.phase++; e.enrage *= 0.75; banner(e.name, `Phase ${e.phase + 1}${e.phase === 2 ? " · enraged" : ""}`);
     const at = e.pos.clone(); ringFx(at, 12, e.accent, 0.8); pillarFx(at, e.accent, 20, 0.8); for (const t of heroTargets()) { const d = t.pos.clone().sub(at).setY(0); if (d.length() < 10 && t.isHero) P.kb.addScaledVector(d.normalize(), 12); }
-    const R3 = roster(); for (let k = 0; k < 3 + st + e.phase; k++) spawnEnemy(R3[k % 3], R3[k % 3][2], false);
+    const R3 = roster(); for (let k = 0; k < 3 + st + e.phase; k++) { const m = spawnEnemy(R3[k % 3], R3[k % 3][2], false); m.minion = true; m.owner = e; }
     e.R.g.scale.multiplyScalar(1.08); return;
   }
   if (!e.summoned && e.hp < e.maxHp * 0.5) {
     e.summoned = true; banner(e.name, "calls for help");
-    const R3 = roster(); for (let k = 0; k < 3 + st; k++) spawnEnemy(R3[k % 3], R3[k % 3][2], false);
+    const R3 = roster(); for (let k = 0; k < 3 + st; k++) { const m = spawnEnemy(R3[k % 3], R3[k % 3][2], false); m.minion = true; m.owner = e; }
     return;
   }
   if (e.sig && roll < (e.raidBoss ? 0.55 : 0.42)) { sigAttack(e, tgt, st, speedUp * (e.raidBoss ? Math.max(0.75, e.enrage) : 1)); e.atkAnim = 1; return; }
@@ -3085,7 +3266,8 @@ function frameObject(obj, cam, tilt = 0.12) {
 function previewModel(kind, id) {
   if (kind === "weapon") { const w = buildWeapon(ITEM[id]); const g = new THREE.Group(); w.rotation.z = -0.35; g.add(w); return g; }
   if (kind === "armour") { const H = buildHumanoid({ look: { skin: 0x9a9aa8, hair: 0x6a6a78, cloth: 0x4a4a58, cloth2: 0x3a3a48 }, armour: id, weapon: null }); H.shL.rotation.z = 0.12; H.shR.rotation.z = -0.12; H.elL.rotation.x = H.elR.rotation.x = -0.15; const g = new THREE.Group(); g.add(H.g); g.userData.R = H; return g; }
-  if (kind === "class") { const c = CLASS[id]; const H = buildHumanoid({ look: c.look, armour: S.equip.armour, weapon: S.equip.weapon }); H.shR.rotation.x = -0.5; H.elR.rotation.x = -1.0; const g = new THREE.Group(); g.add(H.g); g.userData.R = H; return g; }
+  if (kind === "avatar") { const H = buildHumanoid({ look: avatarLook(CLASS[S.cls].look, AVED.a), face: AVED.a, armour: AVED.gear ? S.equip.armour : null, weapon: null }); H.shL.rotation.z = 0.1; H.shR.rotation.z = -0.1; const g = new THREE.Group(); g.add(H.g); g.userData.R = H; return g; }
+  if (kind === "class") { const c = CLASS[id]; const H = buildHumanoid({ look: avatarLook(c.look), face: S.avatar || null, armour: S.equip.armour, weapon: S.equip.weapon }); H.shR.rotation.x = -0.5; H.elR.rotation.x = -1.0; const g = new THREE.Group(); g.add(H.g); g.userData.R = H; return g; }
   if (kind === "item") {
     const it = ITEM[id], g = new THREE.Group();
     if (it.cat === "potion") { const c = { common: 0xe0505f, rare: 0xff6a8a, epic: 0xb37cf4, legendary: 0xffb040 }[it.rarity]; M(G.sph(), std(0xdff4ff, { r: 0.05, m: 0, op: 0.45 }), 0, 0, 0, g, 0.5); M(G.sph(), std(c, { e: c, ei: 0.6, r: 0.2 }), 0, -0.05, 0, g, 0.42); M(G.cyl(0.14, 0.18), std(0xdff4ff, { r: 0.05, op: 0.5 }), 0, 0.55, 0, g, 1, 0.4, 1); M(G.cyl(0.16, 0.13), std(0x7a5536, { r: 0.8 }), 0, 0.8, 0, g, 1, 0.16, 1); }
@@ -3135,7 +3317,7 @@ function thumb(id) {
    ===================================================================== */
 let menuTab = "weapons", selItem = { weapon: null, armour: null, items: null }, selClass = null, rollResult = null;
 const MENU_TABS = [["weapons", "Weapons"], ["armour", "Armour"], ["items", "Potions and materials"], ["chests", "Chests"], ["forge", "Forge"], ["fishing", "Fishing"], ["enchant", "Enchant"], ["auction", "Vault Auction"], ["boats", "Boats"], ["quests", "Quests"], ["classes", "Classes"], ["stats", "Stats"], ["shop", "Shop"]];
-const isPaused = () => !$("intro").hidden || !$("dialog").hidden || !$("daily").hidden || !$("worldMap").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
+const isPaused = () => !$("intro").hidden || !$("avatar").hidden || !$("dialog").hidden || !$("daily").hidden || !$("worldMap").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
 function openMenu(tab) { menuTab = tab; rollResult = null; lastLoot = null; if (prevCanvas.parentNode && ["chests", "forge", "quests", "fishing", "enchant", "auction", "boats"].includes(tab)) prevCanvas.remove(); $("menu").hidden = false; keys.clear(); attackHeld = false; renderMenu(); }
 function closeMenu() { $("menu").hidden = true; if (prevCanvas.parentNode) prevCanvas.remove(); }
 function closeAllModals() { closeMenu(); $("dialog").hidden = true; $("mapModal").hidden = true; $("confirmLeave").hidden = true; }
@@ -3608,7 +3790,7 @@ function animate(dt, paused) {
     f.el.style.left = ((v.x + 1) / 2 * window.innerWidth) + "px"; f.el.style.top = ((1 - v.y) / 2 * window.innerHeight) + "px"; f.el.style.opacity = String(1 - Math.max(0, f.t - 0.6) / 0.5);
   }
   // preview turntable
-  if (!$("menu").hidden && prevR && prevObj && prevCanvas.parentNode) {
+  if ((!$("menu").hidden || !$("avatar").hidden) && prevR && prevObj && prevCanvas.parentNode) {
     if (prevAuto) prevYaw += dt * 0.5;
     prevObj.rotation.y = prevYaw;
     const R = prevObj.children[0] && prevObj.children[0].userData.R; if (R) poseHumanoid(R, t, 0, 0, "normal", false);
@@ -5930,7 +6112,7 @@ function sigAttack(e, tgt, st, speedUp) {
   } else if (sig === "summon") {
     banner(e.name, "raises its servants");
     const base = e.name.split(/[ ,]/)[e.name.startsWith("The ") ? 1 : 0];
-    for (let k = 0; k < 2 + st; k++) spawnEnemy([`${base}'s Servant`, e.R.body, "skirm", e.col, e.accent], "skirm", false, 0.8);
+    for (let k = 0; k < 2 + st; k++) { const m = spawnEnemy([`${base}'s Servant`, e.R.body, "skirm", e.col, e.accent], "skirm", false, 0.8); m.minion = true; m.owner = e; }
   }
 }
 
@@ -6196,7 +6378,7 @@ const DOOR_FX = [
   { name: "Gambler's Door", text: "A coin toss: two extra chests, or foes with 30% more health.", apply: () => { if (Math.random() < 0.5) { run.bonusChest = (run.bonusChest || 0) + 2; toast("<b>Gambler's Door:</b> you won. Two extra chests wait at the end.", "epic"); } else { run.foeHpStage = 1.3; toast("<b>Gambler's Door:</b> you lost. The next foes are tougher.", ""); } } }
 ];
 const lvKey = () => run.level * 100 + (run.sub || 1);
-function levelCleared() { run.state = "between"; run.doorNext = "sub"; banner(`Level ${run.sub} cleared`, "Take a blessing, then pick one of the two doors."); heal(ST.maxHp * 0.15); const n = (Math.random() < 0.35 ? 1 : 0) + (run.bonusChest || 0); run.bonusChest = 0; for (let k = 0; k < n; k++) grantChest(run.stage, Math.min(run.idx, 11)); if (n) toast(`<b>${n} chest${n > 1 ? "s" : ""}</b> for clearing level ${run.sub}.`, "rare"); offerCards(); openDoors(); }
+function levelCleared() { run.state = "between"; run.doorNext = "sub"; banner(`Level ${run.sub} cleared`, "Take a blessing, then pick one of the two doors."); heal(ST.maxHp * 0.15); const n = (Math.random() < 0.22 ? 1 : 0) + (run.bonusChest || 0); run.bonusChest = 0; for (let k = 0; k < n; k++) grantChest(run.stage, Math.min(run.idx, 11)); if (n) toast(`<b>${n} chest${n > 1 ? "s" : ""}</b> for clearing level ${run.sub}.`, "rare"); offerCards(); openDoors(); }
 const wavesNow = () => Math.max(1, STAGES[run.stage].waves - (run.quiet === run.level ? 1 : 0));
 let fadeEl = null;
 function fadeThrough(fn) {
@@ -7463,9 +7645,40 @@ function frame(now) {
   try { renderer.render(scene, camera); } catch (err) { reportError(err); }
   saveT += dt; if (saveT > 6) { saveT = 0; save(); }
 }
-$("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; if (S.runCk) setTimeout(offerResume, 300); updateDailyBadge(); if (!dailyInfo().claimed) setTimeout(openDaily, 900); if (coarse || usedTouch) $("joyHint").hidden = false; });
+function enterLobby() { MUSIC.init(); $("intro").hidden = true; if (S.runCk) setTimeout(offerResume, 300); updateDailyBadge(); if (!dailyInfo().claimed) setTimeout(openDaily, 900); if (coarse || usedTouch) $("joyHint").hidden = false; }
+const AVED = { a: null, view: "body", first: false, gear: false };
+const AV_ROWS = [["body", "Body"], ["skin", "Skin", "sw"], ["height", "Height", "range", 0.88, 1.12], ["size", "Size", "range", 0.9, 1.12], ["build", "Build"], ["eyes", "Eyes"], ["eyeCol", "Eye colour", "sw"], ["brows", "Eyebrows"], ["nose", "Nose"], ["mouth", "Mouth"], ["facial", "Facial hair"], ["hair", "Hair"], ["hairCol", "Hair colour", "sw"]];
+function openAvatar(first) {
+  AVED.a = Object.assign({}, AV_DEFAULT, S.avatar || {}); AVED.first = !!first; AVED.gear = false; AVED.view = first ? "face" : "body";
+  $("intro").hidden = true; $("avatar").hidden = false; $("avDone").textContent = first ? "Enter the lobby" : "Save"; prevYaw = 0;
+  renderAvatarRows(); refreshAvatar();
+}
+function renderAvatarRows() {
+  const A = AVED.a;
+  $("avRows").innerHTML = AV_ROWS.map(([k, label, type, lo, hi]) => {
+    if (type === "sw") return `<div class="avRow"><b>${label}</b><div class="avSw">${AV[k].map((c, i) => `<button data-k="${k}" data-i="${i}" class="${A[k] === i ? "on" : ""}" style="background:#${c.toString(16).padStart(6, "0")}" aria-label="${label} ${i + 1}"></button>`).join("")}</div></div>`;
+    if (type === "range") return `<div class="avRow"><b>${label}</b><input type="range" data-k="${k}" min="${lo}" max="${hi}" step="0.01" value="${A[k]}" aria-label="${label}"></div>`;
+    return `<div class="avRow"><b>${label}</b><div class="avStep"><button data-k="${k}" data-d="-1" aria-label="Previous ${label}">&lsaquo;</button><span>${AV[k][A[k]]}</span><button data-k="${k}" data-d="1" aria-label="Next ${label}">&rsaquo;</button></div></div>`;
+  }).join("");
+  for (const b of document.querySelectorAll("#avatar .avViews button")) b.classList.toggle("on", b.dataset.v === AVED.view || (b.dataset.v === "gear" && AVED.gear));
+}
+function refreshAvatar() {
+  const yaw = prevYaw; showPreview("avatar", JSON.stringify(AVED.a) + AVED.view + AVED.gear, $("avPrev")); prevAuto = false; prevYaw = yaw;
+  if (AVED.view === "face" && prevObj) { prevObj.rotation.y = prevYaw; prevObj.updateMatrixWorld(true); const R = prevObj.children[0].children[0].userData.R || prevObj.children[0].userData.R; if (R) { const hp = new V3(); R.head.getWorldPosition(hp); prevCam.position.set(0, hp.y + 0.04, 1.12); prevCam.lookAt(0, hp.y + 0.01, 0); } }
+}
+$("avRows").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; const k = b.dataset.k, A = AVED.a;
+  if (b.dataset.d) A[k] = (A[k] + Number(b.dataset.d) + AV[k].length) % AV[k].length; else A[k] = Number(b.dataset.i);
+  if (["eyes", "eyeCol", "brows", "nose", "mouth", "facial"].includes(k) && AVED.view === "body") AVED.view = "face";
+  renderAvatarRows(); refreshAvatar(); });
+$("avRows").addEventListener("input", e => { const r = e.target; if (r.dataset.k) { AVED.a[r.dataset.k] = Number(r.value); if (AVED.view === "face") AVED.view = "body"; refreshAvatar(); for (const b of document.querySelectorAll("#avatar .avViews button")) b.classList.toggle("on", b.dataset.v === AVED.view || (b.dataset.v === "gear" && AVED.gear)); } });
+for (const b of document.querySelectorAll("#avatar .avViews button")) b.addEventListener("click", () => { if (b.dataset.v === "gear") { AVED.gear = !AVED.gear; if (AVED.view === "face") AVED.view = "body"; } else AVED.view = b.dataset.v; renderAvatarRows(); refreshAvatar(); });
+$("avRand").addEventListener("click", () => { const A = AVED.a, pick = k => Math.floor(Math.random() * AV[k].length); for (const k of ["body", "skin", "eyes", "eyeCol", "brows", "nose", "mouth", "hair", "hairCol", "build"]) A[k] = pick(k); A.facial = A.body === 1 || Math.random() < 0.4 ? 0 : pick("facial"); A.height = Math.round((0.9 + Math.random() * 0.2) * 100) / 100; A.size = Math.round((0.93 + Math.random() * 0.15) * 100) / 100; renderAvatarRows(); refreshAvatar(); });
+$("avDone").addEventListener("click", () => { S.avatar = Object.assign({}, AVED.a); save(); rebuildHero(); $("avatar").hidden = true; if (AVED.first) enterLobby(); else toast("<b>Avatar saved.</b>", "rare"); });
+$("avEditBtn").addEventListener("click", () => openAvatar(true));
+$("mbAvatar").addEventListener("click", () => openAvatar(false));
+$("startBtn").addEventListener("click", () => { if (S.avatar) enterLobby(); else openAvatar(true); });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
