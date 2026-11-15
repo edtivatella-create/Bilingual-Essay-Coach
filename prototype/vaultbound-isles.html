@@ -156,6 +156,26 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 .card.sel { outline: 2px solid var(--c); outline-offset: 1px; }
 .card.vaulted { background: linear-gradient(135deg, rgba(255,95,143,0.22), rgba(79,227,208,0.16)), var(--panel-2); }
 .col-prev { position: relative; border-radius: 12px; overflow: hidden; background: radial-gradient(circle at 50% 35%, #2a3550, #0f131d 70%); border: 1px solid var(--line); min-height: 300px; }
+#achBoard .achBox { width: min(900px, 96vw); height: min(680px, 92vh); display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+#achBoard .achHead { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+#achBoard .achHead h2 { margin: 0; font-family: var(--f-display); }
+#achBoard .achNow { margin: 8px 0 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+#achBoard .achTabs { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+#achBoard .achTabs button, #achBoard .achCard button { background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; color: inherit; font-weight: 700; }
+#achBoard .achTabs button.on { border-color: var(--accent); color: var(--accent); }
+#achBoard #achList { flex: 1; overflow: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; align-content: start; padding-right: 4px; }
+#achBoard .achCard { border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 5px; background: rgba(255,255,255,0.02); }
+#achBoard .achCard.done { border-color: var(--c); box-shadow: 0 0 12px -6px var(--c); }
+#achBoard .achCard.locked { opacity: 0.72; }
+#achBoard .achCard b { font-size: 14px; }
+#achBoard .achCard .t { color: var(--c); font-family: var(--f-display); font-weight: 700; font-size: 13px; }
+#achBoard .achCard small { color: var(--muted); }
+#achBoard .achBar { height: 6px; border-radius: 4px; background: rgba(255,255,255,0.08); overflow: hidden; }
+#achBoard .achBar i { display: block; height: 100%; background: var(--c); }
+#achBoard .achCard button.claim { border-color: var(--accent); color: var(--accent); }
+#achBoard .achCard button.show.on { background: var(--accent); color: #111; }
+#menuBar #mbAch.ready { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 14px -2px var(--accent); }
+#avatar .avName { width: 170px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,0.25); color: inherit; font: inherit; }
 #avatar .avBox { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(290px, 380px); gap: 14px; width: min(960px, 96vw); height: min(660px, 92vh); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
 #avatar .avPrev { position: relative; border-radius: 12px; overflow: hidden; background: radial-gradient(circle at 50% 40%, #2a3448, #0c1018 75%); min-height: 220px; }
 #avatar .avPrev canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
@@ -357,7 +377,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <button class="hbtn warn" id="bLeave" hidden>Leave island</button>
 </div>
 <div id="menuBar">
-  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbAvatar">Avatar</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
+  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbAch">Achievements</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
 <div id="musicPanel" hidden role="dialog" aria-label="Music">
   <div class="mpHead"><b>Music</b><button class="hbtn" id="mpClose">Close</button></div>
@@ -455,6 +475,14 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
       <li><b>Open the Armoury</b> to turn your weapons and armour around in 3D and compare their stats.</li>
     </ul>
     <div class="row"><button class="btn primary" id="startBtn">Enter the lobby</button><button class="btn" id="avEditBtn">Edit avatar</button><span class="muted" id="introNote"></span></div>
+  </div>
+</div>
+<div class="modal" id="achBoard" hidden role="dialog" aria-label="Achievements">
+  <div class="achBox">
+    <div class="achHead"><h2>Achievements</h2><span class="muted" id="achCount"></span><div class="row"><button class="btn" id="achAvatar">Edit avatar</button><button class="btn" id="achClose">Close</button></div></div>
+    <div class="achNow" id="achNow"></div>
+    <div class="achTabs"><button data-f="all" class="on">All</button><button data-f="ready">Ready to claim</button><button data-f="claimed">Claimed titles</button><button data-f="locked">In progress</button></div>
+    <div id="achList"></div>
   </div>
 </div>
 <div class="modal" id="avatar" hidden role="dialog" aria-label="Create your hero">
@@ -1665,8 +1693,8 @@ function axeHead(w, h, back = 0.12) {
   const s = new THREE.Shape(); s.moveTo(0, -h * 0.25); s.lineTo(back, -h * 0.18); s.quadraticCurveTo(w * 0.6, -h * 0.65, w, -h * 0.55); s.quadraticCurveTo(w * 0.8, 0, w, h * 0.55); s.quadraticCurveTo(w * 0.6, h * 0.62, back, h * 0.18); s.lineTo(0, h * 0.25); s.lineTo(0, -h * 0.25);
   return s;
 }
-function buildWeapon(it) {
-  const g = new THREE.Group(); g.userData.motes = [];
+function buildWeapon(it, lite) {
+  const g = new THREE.Group(); g.userData.motes = []; g.userData.sway = [];
   const R = RANK[it.rarity], gi = glowFor(it.rarity);
   const blade = std(it.blade, { m: 0.92, r: R >= 3 ? 0.18 : 0.28, e: R >= 2 ? it.accent : 0, ei: R >= 2 ? 0.08 + R * 0.04 : 1 });
   const accent = std(it.accent, { m: 0.75, r: 0.3, e: R >= 1 ? it.accent : 0, ei: gi * 0.6 });
@@ -1797,10 +1825,13 @@ function buildWeapon(it) {
   }
   shadows(g);
   weaponDecor(g, it);
+  if (!lite) weaponFlourish(g, it);
   return g;
 }
 function animateWeapon(g, t) {
   if (g.userData.spin) g.userData.spin.rotation.y = t * 1.5;
+  if (g.userData.sway) for (const s2 of g.userData.sway) s2.rotation.z = s2.userData.z0 + Math.sin(t * 2.2 + s2.userData.ph) * 0.18;
+  if (g.userData.orbit) for (const o of g.userData.orbit) { const a = t * 0.9 + o.userData.ph; o.position.set(Math.cos(a) * o.userData.r, o.userData.y + Math.sin(t * 1.7 + o.userData.ph) * 0.03, Math.sin(a) * o.userData.r); o.rotation.y = t * 2; }
   const tip = g.userData.tip || 1;
   for (const m of g.userData.motes) { const k = m.userData.k, a = t * 1.6 + k * TAU / 6; m.position.set(Math.cos(a) * 0.12, ((t * 0.35 + k / 6) % 1) * tip, Math.sin(a) * 0.12); }
 }
@@ -2043,7 +2074,7 @@ function buildHumanoid(o) {
     R[sx < 0 ? "shL" : "shR"] = sh; R[sx < 0 ? "elL" : "elR"] = el;
   }
   const hold = new THREE.Group(); hold.position.set(0, -0.3, 0.02); hold.rotation.x = Math.PI / 2; R.elR.add(hold); R.hold = hold;
-  if (o.weapon) { R.weapon = buildWeapon(ITEM[o.weapon]); hold.add(R.weapon); }
+  if (o.weapon) { R.weapon = buildWeapon(ITEM[o.weapon], o.lite); hold.add(R.weapon); }
   R.carryBack = !!(o.weapon && BACK_TYPES.includes(ITEM[o.weapon].type)); carrySocket(R);
   if (a && a.cape) {
     const cg = new THREE.PlaneGeometry(0.44, 0.9, 4, 8); cg.translate(0, -0.45, 0);
@@ -2650,6 +2681,100 @@ function buildIsland(idx) {
    ===================================================================== */
 const P = { pos: new V3(0, 0, 8), vy: 0, face: Math.PI, onGround: true, hp: 100, atkT: 0, specT: 0, armT: 0, potT: 0, swing: 0, swingStyle: "normal",
   dashQ: [], dashT: 0, dashDir: new V3(), dashHit: new Set(), invuln: 0, jumps: 0, kb: new V3(), dead: false, walk: 0, hits: 0, buffs: {}, flags: {}, spinT: 0, consecrateT: 0 };
+/* ---- usernames, achievements and showcase titles ---- */
+const cleanName = v => String(v || "").replace(/[^A-Za-z0-9 _\-']/g, "").replace(/\s+/g, " ").trim().slice(0, 16);
+const TCOL = { common: "#d8dce4", rare: "#6fb6ff", epic: "#c98cff", legendary: "#ffc04a", vaulted: "#ff6ad8" };
+const stOf = k => (S.stats && S.stats[k]) || 0;
+const vaultedOwned = () => Object.keys(S.inv).filter(id => ITEM[id] && ITEM[id].rarity === "vaulted").length;
+// [id, name, how, value(), goal, title, title rarity, coins, chest tier or -1]
+const ACH = [
+  ["kills1", "First Blood", "Defeat your first foe.", () => stOf("kills"), 1, "Fresh Blade", "common", 100, -1],
+  ["kills50", "Brawler", "Defeat 50 foes.", () => stOf("kills"), 50, "Brawler", "common", 300, -1],
+  ["kills500", "Monster Hunter", "Defeat 500 foes.", () => stOf("kills"), 500, "Monster Hunter", "rare", 1500, 0],
+  ["kills2500", "Scourge of the Isles", "Defeat 2,500 foes.", () => stOf("kills"), 2500, "Scourge of the Isles", "epic", 6000, 1],
+  ["kills10000", "Endless Tide", "Defeat 10,000 foes.", () => stOf("kills"), 10000, "The Endless Tide", "legendary", 25000, 2],
+  ["boss1", "Giant Slayer", "Defeat a boss.", () => stOf("bosses"), 1, "Giant Slayer", "common", 250, -1],
+  ["boss10", "Bossbreaker", "Defeat 10 bosses.", () => stOf("bosses"), 10, "Bossbreaker", "rare", 1500, 0],
+  ["boss50", "Doom of Tyrants", "Defeat 50 bosses.", () => stOf("bosses"), 50, "Doom of Tyrants", "epic", 8000, 1],
+  ["clear1", "Islander", "Clear your first stage.", () => stOf("clears"), 1, "Islander", "common", 200, -1],
+  ["clear10", "Stage Runner", "Clear 10 stages.", () => stOf("clears"), 10, "Stage Runner", "rare", 1200, 0],
+  ["clear30", "Conqueror", "Clear 30 stages.", () => stOf("clears"), 30, "Conqueror", "epic", 5000, 1],
+  ["hard3", "Hardened", "Clear 3 Hard or Nightmare stages.", () => stOf("hardClears"), 3, "the Hardened", "rare", 1500, 0],
+  ["night1", "Nightmare Walker", "Clear a Nightmare stage.", () => stOf("nightmareClears"), 1, "Nightmare Walker", "epic", 4000, 1],
+  ["night10", "Dreadless", "Clear 10 Nightmare stages.", () => stOf("nightmareClears"), 10, "the Dreadless", "legendary", 20000, 2],
+  ["raid1", "Raider", "Clear a raid.", () => stOf("raidClears"), 1, "Raider", "epic", 5000, 1],
+  ["raid5", "Raid Lord", "Clear 5 raids.", () => stOf("raidClears"), 5, "Raid Lord", "legendary", 20000, 2],
+  ["rift1", "Rift Seeker", "Clear a sea rift or a rare portal.", () => stOf("riftClears") + stOf("rarePortals"), 1, "Rift Seeker", "rare", 1500, 0],
+  ["chest10", "Treasure Hunter", "Open 10 chests.", () => stOf("chests"), 10, "Treasure Hunter", "common", 400, -1],
+  ["chest100", "Hoarder", "Open 100 chests.", () => stOf("chests"), 100, "the Hoarder", "epic", 5000, 1],
+  ["parry10", "Riposte", "Parry 10 attacks.", () => stOf("parries"), 10, "Riposte", "common", 400, -1],
+  ["parry100", "Iron Wall", "Parry 100 attacks.", () => stOf("parries"), 100, "the Iron Wall", "epic", 5000, 1],
+  ["duel3", "Duellist", "Win 3 duels.", () => stOf("duels"), 3, "Duellist", "rare", 1200, 0],
+  ["craft5", "Tinkerer", "Craft 5 items at the forge.", () => stOf("crafts"), 5, "Tinkerer", "common", 500, -1],
+  ["ench5", "Enchanter", "Enchant gear 5 times.", () => stOf("enchants"), 5, "Enchanter", "rare", 1200, 0],
+  ["fish10", "Angler", "Catch 10 fish.", () => stOf("fish"), 10, "Angler", "common", 400, -1],
+  ["rarefish5", "Deep Fisher", "Catch 5 rare fish.", () => stOf("rareFish"), 5, "Deep Fisher", "rare", 1200, 0],
+  ["epicfish3", "Myth Catcher", "Catch 3 epic fish.", () => stOf("epicFish"), 3, "Myth Catcher", "epic", 4000, 1],
+  ["mine50", "Prospector", "Mine 50 ore.", () => stOf("mined"), 50, "Prospector", "common", 600, -1],
+  ["mine500", "Deep Delver", "Mine 500 ore.", () => stOf("mined"), 500, "Deep Delver", "epic", 5000, 1],
+  ["night100", "Night Stalker", "Defeat 100 foes at night.", () => stOf("nightKills"), 100, "Night Stalker", "rare", 1500, 0],
+  ["beast5", "Leviathan Hunter", "Defeat 5 sea beasts.", () => stOf("seaBeasts"), 5, "Leviathan Hunter", "epic", 5000, 1],
+  ["wreck5", "Wreck Diver", "Find 5 sea treasures.", () => stOf("treasures"), 5, "Wreck Diver", "rare", 1500, 0],
+  ["bid3", "High Bidder", "Win 3 castle auctions.", () => stOf("auctionsWon"), 3, "High Bidder", "rare", 1500, 0],
+  ["cards20", "Blessed", "Take 20 blessings.", () => stOf("cards"), 20, "the Blessed", "rare", 1200, 0],
+  ["spec100", "Spellblade", "Use 100 weapon specials.", () => stOf("specials"), 100, "Spellblade", "rare", 1500, 0],
+  ["sold50", "Merchant", "Sell 50 items.", () => stOf("sold"), 50, "Merchant", "common", 800, -1],
+  ["lvl10", "Seasoned", "Reach level 10.", () => S.level, 10, "Seasoned", "common", 500, -1],
+  ["lvl25", "Veteran", "Reach level 25.", () => S.level, 25, "Veteran", "rare", 2500, 0],
+  ["lvl50", "Champion", "Reach level 50.", () => S.level, 50, "Champion", "epic", 10000, 1],
+  ["lvl100", "Ascended", "Reach level 100.", () => S.level, 100, "the Ascended", "legendary", 50000, 2],
+  ["vault1", "Vaultbound", "Own a Vaulted item.", () => vaultedOwned(), 1, "Vaultbound", "vaulted", 10000, 2],
+  ["vault5", "Keeper of the Vault", "Own 5 different Vaulted items.", () => vaultedOwned(), 5, "Keeper of the Vault", "vaulted", 40000, 2]
+].map(([id, name, how, val, goal, title, rar, coins, chest]) => ({ id, name, how, val, goal, title, rar, coins, chest }));
+const ACH_BY = Object.fromEntries(ACH.map(a => [a.id, a]));
+let ACHF = "all";
+const achVal = a => { try { return Number(a.val()) || 0; } catch (e) { return 0; } };
+const achDone = a => achVal(a) >= a.goal;
+function achTick() {
+  S.ach = S.ach || {}; S.achSeen = S.achSeen || {};
+  let n = 0;
+  for (const a of ACH) if (achDone(a) && !S.ach[a.id]) { n++; if (!S.achSeen[a.id]) { S.achSeen[a.id] = 1; if ($("intro").hidden) toast(`Achievement unlocked: <b>${esc(a.name)}</b>. Claim it on the Achievements board.`, a.rar); } }
+  const b = $("mbAch"); if (b) { b.textContent = n ? `Achievements (${n})` : "Achievements"; b.classList.toggle("ready", n > 0); }
+}
+function claimAch(id) {
+  const a = ACH_BY[id]; S.ach = S.ach || {}; if (!a || S.ach[id] || !achDone(a)) return;
+  S.ach[id] = 1; S.coins += a.coins; let txt = `+${fmt(a.coins)} coins`;
+  if (a.chest >= 0) { const best = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true)); grantChest(a.chest, Math.min(best, 11)); txt += ` and ${article(CHEST_TIERS[a.chest].name)} ${CHEST_TIERS[a.chest].name}`; }
+  if (!S.title) S.title = id;
+  save(); refreshNameTag(); achTick(); updateHud();
+  toast(`<b>${esc(a.name)}</b> claimed: ${txt}. New title: <b>${esc(a.title)}</b>.`, a.rar);
+}
+function openAchievements() { achTick(); $("achBoard").hidden = false; renderAchievements(); }
+function renderAchievements() {
+  S.ach = S.ach || {};
+  const claimed = ACH.filter(a => S.ach[a.id]).length;
+  $("achCount").textContent = `${claimed} of ${ACH.length} claimed`;
+  const cur = S.title && ACH_BY[S.title];
+  $("achNow").innerHTML = `<div><span class="muted">${esc(S.name || "Your hero")}'s showcased title</span><br><b style="color:${cur ? TCOL[cur.rar] : "var(--muted)"};font-family:var(--f-display);font-size:18px">${cur ? esc(cur.title) : "None yet. Claim an achievement, then press Showcase."}</b></div>${cur ? `<button class="btn" data-hide="1">Hide title</button>` : ""}`;
+  for (const b of document.querySelectorAll("#achBoard .achTabs button")) b.classList.toggle("on", b.dataset.f === ACHF);
+  const list = ACH.filter(a => { const done = achDone(a), got = S.ach[a.id]; return ACHF === "all" || (ACHF === "ready" && done && !got) || (ACHF === "claimed" && got) || (ACHF === "locked" && !done); });
+  $("achList").innerHTML = list.map(a => {
+    const v = Math.min(a.goal, Math.max(0, achVal(a))), done = v >= a.goal, got = !!S.ach[a.id], c = TCOL[a.rar];
+    const reward = `${fmt(a.coins)} coins${a.chest >= 0 ? ` + ${CHEST_TIERS[a.chest].name}` : ""}`;
+    const btn = got ? `<button class="show ${S.title === a.id ? "on" : ""}" data-show="${a.id}">${S.title === a.id ? "Showcasing" : "Showcase"}</button>` : done ? `<button class="claim" data-claim="${a.id}">Claim reward</button>` : `<small>${fmt(v)} / ${fmt(a.goal)}</small>`;
+    return `<div class="achCard ${done ? "done" : "locked"}" style="--c:${c}"><b>${esc(a.name)}</b><small>${esc(a.how)}</small><div class="achBar"><i style="width:${(100 * v / a.goal).toFixed(1)}%"></i></div><span class="t">Title: ${esc(a.title)}</span><small>Reward: ${reward}</small>${btn}</div>`;
+  }).join("") || `<p class="muted">Nothing here yet.</p>`;
+}
+let nameTag = null;
+function refreshNameTag() {
+  if (nameTag) { scene.remove(nameTag); nameTag = null; }
+  if (!S.name) return;
+  nameTag = new THREE.Group(); scene.add(nameTag);
+  const nm = textSprite(S.name, "#ffffff", 0.42); nm.renderOrder = 10; nameTag.add(nm);
+  const a = S.title && ACH_BY[S.title];
+  if (a) { const tt = textSprite(a.title, TCOL[a.rar], 0.34, "rgba(10,12,20,0.35)"); tt.position.y = 0.3; tt.renderOrder = 10; nameTag.add(tt); }
+}
+setInterval(() => { try { achTick(); } catch (e) {} }, 2500);
 let hero = null;
 function avatarLook(look, A = S.avatar) { if (!A || look.extra === "bones") return look; return Object.assign({}, look, { skin: AV.skin[A.skin] ?? look.skin, hair: AV.hairCol[A.hairCol] ?? look.hair }); }
 function rebuildHero() {
@@ -3317,7 +3442,7 @@ function thumb(id) {
    ===================================================================== */
 let menuTab = "weapons", selItem = { weapon: null, armour: null, items: null }, selClass = null, rollResult = null;
 const MENU_TABS = [["weapons", "Weapons"], ["armour", "Armour"], ["items", "Potions and materials"], ["chests", "Chests"], ["forge", "Forge"], ["fishing", "Fishing"], ["enchant", "Enchant"], ["auction", "Vault Auction"], ["boats", "Boats"], ["quests", "Quests"], ["classes", "Classes"], ["stats", "Stats"], ["shop", "Shop"]];
-const isPaused = () => !$("intro").hidden || !$("avatar").hidden || !$("dialog").hidden || !$("daily").hidden || !$("worldMap").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
+const isPaused = () => !$("intro").hidden || !$("avatar").hidden || !$("achBoard").hidden || !$("dialog").hidden || !$("daily").hidden || !$("worldMap").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
 function openMenu(tab) { menuTab = tab; rollResult = null; lastLoot = null; if (prevCanvas.parentNode && ["chests", "forge", "quests", "fishing", "enchant", "auction", "boats"].includes(tab)) prevCanvas.remove(); $("menu").hidden = false; keys.clear(); attackHeld = false; renderMenu(); }
 function closeMenu() { $("menu").hidden = true; if (prevCanvas.parentNode) prevCanvas.remove(); }
 function closeAllModals() { closeMenu(); $("dialog").hidden = true; $("mapModal").hidden = true; $("confirmLeave").hidden = true; }
@@ -3758,6 +3883,7 @@ function animate(dt, paused) {
   const moving = !paused && !P.dead && P.onGround && P.dashT <= 0 && (Math.abs(touchMove.x) + Math.abs(touchMove.y) > 0.1 || ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].some(k => keys.has(k)));
   P.walk = lerp(P.walk, moving ? 1 : 0, 1 - Math.exp(-10 * dt));
   hero.g.position.copy(P.pos); hero.g.rotation.y = P.face;
+  if (nameTag) { nameTag.position.copy(P.pos); nameTag.position.y += 2.08 * (S.avatar ? avatarBody(S.avatar).h : 1); nameTag.visible = hero.g.visible && !SL.on; }
   poseHumanoid(hero, t, P.walk, P.swing, P.swingStyle, !P.onGround, P.spinT > 0 ? (1 - P.spinT / 0.45) * TAU : 0);
   if (P.blocking && !P.dead) { hero.lastSw = performance.now() / 1000; hero.shR.rotation.x = -1.35; hero.shR.rotation.z = 0.7; hero.elR.rotation.x = -1.3; if (hero.shL) hero.shL.rotation.x = -0.9; }
   trailTick(Math.min(0.05, dt)); waypointTick();
@@ -3800,7 +3926,7 @@ function animate(dt, paused) {
 }
 function updateHud() {
   const c = CLASS[S.cls];
-  $("hLvl").textContent = S.level; $("hName").textContent = c.name; $("hCls").textContent = c.rarity ? `${RNAME[c.rarity]} · ${c.role}` : "Starter";
+  $("hLvl").textContent = S.level; $("hName").textContent = S.name || c.name; $("hCls").textContent = S.name ? (c.rarity ? `${c.name} · ${RNAME[c.rarity]}` : `${c.name} · Starter`) : (c.rarity ? `${RNAME[c.rarity]} · ${c.role}` : "Starter");
   $("hCls").style.setProperty("--c", c.rarity ? rc(c.rarity) : "var(--muted)");
   $("hHp").style.width = (100 * Math.max(0, P.hp) / ST.maxHp) + "%"; $("hHpT").textContent = `${fmt(Math.max(0, Math.ceil(P.hp)))} / ${fmt(ST.maxHp)}`;
   $("hXp").style.width = (100 * S.xp / xpNeed(S.level)) + "%";
@@ -6856,6 +6982,65 @@ function auraTick(R, t) {
   if (R.emblem) R.emblem.rotation.y = t * 1.2;
 }
 /* ---- weapon decoration: wrapped grips, pommel gems, filigree and drifting runes ---- */
+/* ---- whimsical craftsmanship: scrolled quillons, vine filigree, set gems, ribbons, charms and orbiting crystals ---- */
+const WGEO = {
+  curl: () => geo("wcurl", () => { const pts = []; for (let i = 0; i <= 24; i++) { const u = i / 24, a = u * Math.PI * 1.7, r = 0.055 * (1 - u * 0.72); pts.push(new V3(Math.cos(a) * r - 0.055, Math.sin(a) * r, 0)); } return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 28, 0.0075, 6, false); }),
+  leaf: () => geo("wleaf", () => { const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.quadraticCurveTo(0.018, 0.02, 0, 0.05); sh.quadraticCurveTo(-0.018, 0.02, 0, 0); return new THREE.ExtrudeGeometry(sh, { depth: 0.003, bevelEnabled: false }); }),
+  spiral: (L, rr) => geo(`wsp${L.toFixed(2)}_${rr}`, () => { const pts = [], turns = Math.round(L * 7); for (let i = 0; i <= turns * 12; i++) { const u = i / (turns * 12), a = u * turns * TAU; pts.push(new V3(Math.cos(a) * rr, u * L, Math.sin(a) * rr)); } return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), turns * 16, 0.0055, 5, false); }),
+  ribbon: () => geo("wribbon", () => { const g = new THREE.PlaneGeometry(0.035, 0.32, 1, 10); g.translate(0, -0.16, 0); const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i); p.setZ(i, Math.sin(y * 18) * 0.02); } g.computeVertexNormals(); return g; }),
+  star: () => geo("wstar", () => { const sh = new THREE.Shape(); for (let k = 0; k < 10; k++) { const a = k / 10 * TAU + Math.PI / 2, r = k % 2 ? 0.014 : 0.032; k ? sh.lineTo(Math.cos(a) * r, Math.sin(a) * r) : sh.moveTo(Math.cos(a) * r, Math.sin(a) * r); } return new THREE.ExtrudeGeometry(sh, { depth: 0.008, bevelEnabled: true, bevelSize: 0.003, bevelThickness: 0.003, bevelSegments: 1 }); }),
+  heart: () => geo("wheart", () => { const sh = new THREE.Shape(); sh.moveTo(0, -0.03); sh.bezierCurveTo(0.04, 0.0, 0.03, 0.03, 0, 0.015); sh.bezierCurveTo(-0.03, 0.03, -0.04, 0.0, 0, -0.03); return new THREE.ExtrudeGeometry(sh, { depth: 0.008, bevelEnabled: true, bevelSize: 0.003, bevelThickness: 0.003, bevelSegments: 1 }); }),
+  moon: () => geo("wmoon", () => { const sh = new THREE.Shape(); sh.absarc(0, 0, 0.03, 0.4, TAU - 0.4, false); sh.absarc(0.014, 0, 0.024, TAU - 0.7, 0.7, true); return new THREE.ExtrudeGeometry(sh, { depth: 0.008, bevelEnabled: true, bevelSize: 0.002, bevelThickness: 0.002, bevelSegments: 1 }); })
+};
+function weaponFlourish(g, it) {
+  const t = it.type, R = RANK[it.rarity] || 0, hv = hash(it.id + "whim"), tip = g.userData.tip || 1, ac = it.accent || 0xd8c070;
+  const gold = std(R >= 2 ? 0xe8c060 : 0xb89a5a, { m: 0.95, r: 0.22, e: R >= 3 ? ac : 0, ei: 0.15 });
+  const silver = std(0xd8dce4, { m: 0.95, r: 0.18 });
+  const trim = (hv & 1) ? gold : silver, gemM = std(ac, { m: 0.1, r: 0.05, e: ac, ei: 0.45 + R * 0.12 });
+  const ribbonCols = [0xc83a4a, 0x3a6ac8, 0xe8c040, 0x8a4ac8, 0x3aa86a, 0xf0f0f0, 0xff8ab8];
+  const gem = (x, y, z, s = 1) => { M(G.oct(), gemM, x, y, z, g, 0.022 * s, 0.03 * s, 0.022 * s); const bz = M(G.tor(0.022 * s, 0.004 * s), trim, x, y, z, g); bz.rotation.y = Math.PI / 2; };
+  const ribbon = (x, y, col, z0 = 0.2) => { const r = new THREE.Mesh(WGEO.ribbon(), std(col, { r: 0.75, map: "fabric", ds: true })); r.position.set(x, y, 0); r.rotation.z = z0; r.userData.z0 = z0; r.userData.ph = Math.random() * 6; g.add(r); g.userData.sway.push(r); const knot = M(G.sph(), std(col, { r: 0.7 }), x, y, 0, g, 0.016); return r; };
+  const charm = (y) => { const kind = (hv >> 5) % 4, col = [0xffd040, 0xff6a8a, 0xd8e0ff, 0xc8a0ff][kind], cm = std(col, { m: 0.6, r: 0.25, e: col, ei: 0.35 });
+    const cord = M(G.cyl(0.003, 0.003), std(0x3a2a1a, { r: 0.8 }), 0, y - 0.05, 0, g, 1, 0.1, 1);
+    const holder = new THREE.Group(); holder.position.set(0, y - 0.1, 0); holder.userData.z0 = 0; holder.userData.ph = hv % 7; g.add(holder); g.userData.sway.push(holder);
+    if (kind === 3) { M(lathe("wbell", [[0.001, 0.03], [0.012, 0.028], [0.018, 0.012], [0.026, -0.012], [0.028, -0.016], [0.001, -0.016]], 14), cm, 0, -0.02, 0, holder); M(G.sph(), cm, 0, -0.04, 0, holder, 0.007); }
+    else { const m = new THREE.Mesh(kind === 0 ? WGEO.star() : kind === 1 ? WGEO.heart() : WGEO.moon(), cm); m.position.set(0, -0.03, -0.004); holder.add(m); } };
+  const blades = ["sword", "greatsword", "dagger", "rapier", "katana"];
+  if (blades.includes(t)) {
+    const gripLen = t === "greatsword" ? 0.36 : t === "dagger" ? 0.12 : 0.2, gw = t === "greatsword" ? 0.42 : t === "dagger" ? 0.14 : t === "rapier" ? 0.18 : 0.26, bl = tip - gripLen;
+    // scrolled quillon ends
+    if (t !== "katana") for (const sx of [-1, 1]) { const c = new THREE.Mesh(WGEO.curl(), trim); c.position.set(sx * gw / 2, gripLen - 0.02, 0); c.scale.set(sx * (t === "greatsword" ? 1.4 : t === "dagger" ? 0.7 : 1), (hv & 2) ? 1 : -1, 1); g.add(c); }
+    // a set gem in the guard on both faces
+    gem(0, gripLen - 0.02, 0.03, t === "greatsword" ? 1.3 : 1); gem(0, gripLen - 0.02, -0.03, t === "greatsword" ? 1.3 : 1);
+    // vine filigree climbing the ricasso
+    const nv = t === "dagger" ? 3 : 5; for (const fz of [0.012, -0.012]) for (let k = 0; k < nv; k++) { const lf = new THREE.Mesh(WGEO.leaf(), trim), side = k % 2 ? 1 : -1; lf.position.set(side * 0.012, gripLen + 0.03 + k * bl * 0.045, fz * (t === "greatsword" ? 1.8 : 1)); lf.rotation.z = side * -0.8; if (fz < 0) lf.rotation.y = Math.PI; g.add(lf); }
+    // ornate pommel cap and a dangling charm or ribbon
+    M(G.cone(8), trim, 0, -0.135, 0, g, 0.018, 0.04, 0.018).rotation.x = Math.PI;
+    if ((hv >> 3) % 2) charm(-0.14); else ribbon(0.02, gripLen - 0.03, ribbonCols[hv % ribbonCols.length], 0.35);
+  } else if (["spear", "halberd", "trident", "scythe", "staff"].includes(t)) {
+    const L = { spear: 1.85, halberd: 2.1, trident: 1.9, scythe: 1.75, staff: 1.65 }[t], base = -0.25 + (t === "scythe" ? 0.05 : 0);
+    // a spiral inlay winding up the shaft and a capped butt
+    const sp = new THREE.Mesh(WGEO.spiral(0.7, 0.027), trim); sp.position.y = L * 0.25; g.add(sp);
+    M(G.cone(8), trim, 0, base - 0.04, 0, g, 0.03, 0.09, 0.03).rotation.x = Math.PI;
+    for (const y of [L * 0.22, L * 0.62]) { M(G.tor(0.03, 0.007), trim, 0, y, 0, g).rotation.x = Math.PI / 2; }
+    gem(0.03, L * 0.62, 0, 0.8);
+    ribbon(0.02, L - 0.36, ribbonCols[hv % ribbonCols.length], 0.25); if ((hv >> 2) % 2) ribbon(-0.02, L - 0.36, ribbonCols[(hv + 3) % ribbonCols.length], -0.25);
+  } else if (["axe", "greataxe", "warhammer", "mace", "club"].includes(t)) {
+    const L = { axe: 0.8, greataxe: 1.5, warhammer: 1.25, mace: 0.95, club: 1.15 }[t];
+    const sp = new THREE.Mesh(WGEO.spiral(Math.min(0.5, L * 0.4), 0.032), std(0x5a3a22, { r: 0.8 })); sp.position.y = 0.0; g.add(sp);
+    M(G.sph(), trim, 0, -0.07, 0, g, 0.035); M(G.cone(6), trim, 0, -0.13, 0, g, 0.02, 0.06, 0.02).rotation.x = Math.PI;
+    if (t !== "club") { const hy = t === "axe" || t === "greataxe" ? L - 0.24 : L - 0.15; for (const sz of [-1, 1]) { const disc = M(G.cyl(1, 1, 16), trim, 0, hy, sz * (t === "warhammer" ? 0.125 : 0.04), g, 0.05, 0.008, 0.05); disc.rotation.x = Math.PI / 2; gem(0, hy, sz * (t === "warhammer" ? 0.13 : 0.046), 0.7); } }
+    if (t === "warhammer") for (let k = 0; k < 8; k++) M(G.sph(), trim, ((k % 4) - 1.5) * 0.1, L - 0.15 + (k < 4 ? 0.1 : -0.1), 0.125, g, 0.012);
+    if ((hv >> 3) % 2) charm(-0.1); else ribbon(0.03, L * 0.55, ribbonCols[hv % ribbonCols.length], 0.3);
+  } else {
+    // flails, nunchaku, chain sickles and twin blades: studs, a gem and streamers
+    gem(0, 0.08, 0.03, 0.8); gem(0, 0.08, -0.03, 0.8);
+    for (let k = 0; k < 4; k++) M(G.sph(), trim, Math.cos(k * TAU / 4) * 0.03, 0.2, Math.sin(k * TAU / 4) * 0.03, g, 0.008);
+    ribbon(0.02, 0.0, ribbonCols[hv % ribbonCols.length], 0.4);
+  }
+  // little crystals that orbit rarer weapons
+  if (R >= 2) { g.userData.orbit = []; const n = R >= 4 ? 4 : R >= 3 ? 3 : 2; for (let k = 0; k < n; k++) { const c = M(G.oct(), glowMat(ac, 0.9), 0, 0, 0, g, 0.014, 0.024, 0.014); c.userData.r = 0.09 + (k % 2) * 0.03; c.userData.y = tip * (0.45 + k * 0.12); c.userData.ph = k * TAU / n; g.userData.orbit.push(c); } }
+}
 function weaponDecor(g, it) {
   const R = RANK[it.rarity] || 0, ac = it.accent || 0xd8c070, tip = g.userData.tip || 1, wrap = std(0x1a120c, { r: 0.8 }), gold = std(R >= 2 ? ac : 0xc8a860, { m: 0.9, r: 0.25, e: R >= 1 ? ac : 0, ei: 0.2 + R * 0.1 });
   for (let k = 0; k < 4; k++) M(G.tor(0.027, 0.005), wrap, 0, 0.0 + k * 0.045, 0, g).rotation.x = Math.PI / 2;
@@ -7649,13 +7834,13 @@ function enterLobby() { MUSIC.init(); $("intro").hidden = true; if (S.runCk) set
 const AVED = { a: null, view: "body", first: false, gear: false };
 const AV_ROWS = [["body", "Body"], ["skin", "Skin", "sw"], ["height", "Height", "range", 0.88, 1.12], ["size", "Size", "range", 0.9, 1.12], ["build", "Build"], ["eyes", "Eyes"], ["eyeCol", "Eye colour", "sw"], ["brows", "Eyebrows"], ["nose", "Nose"], ["mouth", "Mouth"], ["facial", "Facial hair"], ["hair", "Hair"], ["hairCol", "Hair colour", "sw"]];
 function openAvatar(first) {
-  AVED.a = Object.assign({}, AV_DEFAULT, S.avatar || {}); AVED.first = !!first; AVED.gear = false; AVED.view = first ? "face" : "body";
+  AVED.name = S.name || ""; AVED.a = Object.assign({}, AV_DEFAULT, S.avatar || {}); AVED.first = !!first; AVED.gear = false; AVED.view = first ? "face" : "body";
   $("intro").hidden = true; $("avatar").hidden = false; $("avDone").textContent = first ? "Enter the lobby" : "Save"; prevYaw = 0;
   renderAvatarRows(); refreshAvatar();
 }
 function renderAvatarRows() {
   const A = AVED.a;
-  $("avRows").innerHTML = AV_ROWS.map(([k, label, type, lo, hi]) => {
+  $("avRows").innerHTML = `<div class="avRow"><b>Username</b><input class="avName" id="avName" maxlength="16" placeholder="Choose a name" value="${esc(AVED.name || "")}" aria-label="Username"></div>` + AV_ROWS.map(([k, label, type, lo, hi]) => {
     if (type === "sw") return `<div class="avRow"><b>${label}</b><div class="avSw">${AV[k].map((c, i) => `<button data-k="${k}" data-i="${i}" class="${A[k] === i ? "on" : ""}" style="background:#${c.toString(16).padStart(6, "0")}" aria-label="${label} ${i + 1}"></button>`).join("")}</div></div>`;
     if (type === "range") return `<div class="avRow"><b>${label}</b><input type="range" data-k="${k}" min="${lo}" max="${hi}" step="0.01" value="${A[k]}" aria-label="${label}"></div>`;
     return `<div class="avRow"><b>${label}</b><div class="avStep"><button data-k="${k}" data-d="-1" aria-label="Previous ${label}">&lsaquo;</button><span>${AV[k][A[k]]}</span><button data-k="${k}" data-d="1" aria-label="Next ${label}">&rsaquo;</button></div></div>`;
@@ -7670,15 +7855,20 @@ $("avRows").addEventListener("click", e => { const b = e.target.closest("button"
   if (b.dataset.d) A[k] = (A[k] + Number(b.dataset.d) + AV[k].length) % AV[k].length; else A[k] = Number(b.dataset.i);
   if (["eyes", "eyeCol", "brows", "nose", "mouth", "facial"].includes(k) && AVED.view === "body") AVED.view = "face";
   renderAvatarRows(); refreshAvatar(); });
-$("avRows").addEventListener("input", e => { const r = e.target; if (r.dataset.k) { AVED.a[r.dataset.k] = Number(r.value); if (AVED.view === "face") AVED.view = "body"; refreshAvatar(); for (const b of document.querySelectorAll("#avatar .avViews button")) b.classList.toggle("on", b.dataset.v === AVED.view || (b.dataset.v === "gear" && AVED.gear)); } });
+$("avRows").addEventListener("input", e => { const r = e.target; if (r.id === "avName") { AVED.name = r.value; r.style.borderColor = ""; return; } if (r.dataset.k) { AVED.a[r.dataset.k] = Number(r.value); if (AVED.view === "face") AVED.view = "body"; refreshAvatar(); for (const b of document.querySelectorAll("#avatar .avViews button")) b.classList.toggle("on", b.dataset.v === AVED.view || (b.dataset.v === "gear" && AVED.gear)); } });
 for (const b of document.querySelectorAll("#avatar .avViews button")) b.addEventListener("click", () => { if (b.dataset.v === "gear") { AVED.gear = !AVED.gear; if (AVED.view === "face") AVED.view = "body"; } else AVED.view = b.dataset.v; renderAvatarRows(); refreshAvatar(); });
 $("avRand").addEventListener("click", () => { const A = AVED.a, pick = k => Math.floor(Math.random() * AV[k].length); for (const k of ["body", "skin", "eyes", "eyeCol", "brows", "nose", "mouth", "hair", "hairCol", "build"]) A[k] = pick(k); A.facial = A.body === 1 || Math.random() < 0.4 ? 0 : pick("facial"); A.height = Math.round((0.9 + Math.random() * 0.2) * 100) / 100; A.size = Math.round((0.93 + Math.random() * 0.15) * 100) / 100; renderAvatarRows(); refreshAvatar(); });
-$("avDone").addEventListener("click", () => { S.avatar = Object.assign({}, AVED.a); save(); rebuildHero(); $("avatar").hidden = true; if (AVED.first) enterLobby(); else toast("<b>Avatar saved.</b>", "rare"); });
+$("avDone").addEventListener("click", () => { const nm = cleanName(AVED.name); if (!nm) { const f = $("avName"); if (f) { f.focus(); f.placeholder = "Pick a username first"; f.style.borderColor = "#ff7a85"; f.scrollIntoView({ block: "nearest" }); } return; } S.name = nm; S.avatar = Object.assign({}, AVED.a); save(); refreshNameTag(); updateHud(); rebuildHero(); $("avatar").hidden = true; if (AVED.first) enterLobby(); else toast("<b>Avatar saved.</b>", "rare"); });
 $("avEditBtn").addEventListener("click", () => openAvatar(true));
-$("mbAvatar").addEventListener("click", () => openAvatar(false));
-$("startBtn").addEventListener("click", () => { if (S.avatar) enterLobby(); else openAvatar(true); });
-buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+$("mbAch").addEventListener("click", openAchievements);
+$("achClose").addEventListener("click", () => { $("achBoard").hidden = true; });
+$("achAvatar").addEventListener("click", () => { $("achBoard").hidden = true; openAvatar(false); });
+for (const b of document.querySelectorAll("#achBoard .achTabs button")) b.addEventListener("click", () => { ACHF = b.dataset.f; renderAchievements(); });
+$("achList").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.claim) claimAch(b.dataset.claim); if (b.dataset.show) { S.title = S.title === b.dataset.show ? null : b.dataset.show; save(); refreshNameTag(); toast(S.title ? `Now showcasing <b>${esc(ACH_BY[S.title].title)}</b>.` : "Title hidden.", S.title ? ACH_BY[S.title].rar : "common"); } renderAchievements(); });
+$("achNow").addEventListener("click", e => { if (e.target.closest("[data-hide]")) { S.title = null; save(); refreshNameTag(); renderAchievements(); } });
+$("startBtn").addEventListener("click", () => { if (S.avatar && S.name) enterLobby(); else openAvatar(true); });
+buildLobby(); rebuildHero(); refreshNameTag(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
+window.__game = { buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
