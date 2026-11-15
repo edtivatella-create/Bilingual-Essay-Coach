@@ -104,13 +104,19 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 #joyHint { position: fixed; z-index: 4; left: calc(26px + env(safe-area-inset-left, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); width: 112px; height: 112px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.2); display: grid; place-items: center; color: rgba(255,255,255,0.5); font-size: 12px; text-align: center; pointer-events: none; }
 
 /* action buttons */
-#actions { position: fixed; z-index: 6; right: calc(12px + env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: repeat(4, auto); grid-template-areas: "block potion armspec special" ". jump dash attack"; gap: 8px; align-items: end; justify-items: center; touch-action: none; }
+#actions { position: fixed; z-index: 6; right: calc(12px + env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: repeat(4, auto); grid-template-areas: "block potion armspec special" "fish jump dash attack"; gap: 8px; align-items: end; justify-items: center; touch-action: none; }
 .act { position: relative; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); background: rgba(16,20,30,0.72); font-weight: 800; font-size: 12px; display: grid; place-items: center; overflow: hidden; touch-action: none; line-height: 1.05; text-align: center; padding: 0 4px; }
 .act.on { background: rgba(230,184,92,0.45); }
 .act.big { width: 86px; height: 86px; font-size: 15px; grid-area: attack; border-color: var(--accent); }
 .act.mid { width: 64px; height: 64px; font-size: 9.5px; }
 .act.mid > span { padding: 0; }
 .act.small { width: 54px; height: 54px; font-size: 10.5px; }
+#bFish { grid-area: fish; border-color: rgba(127,214,234,0.7); } #bFish svg { width: 26px; height: 26px; position: relative; z-index: 1; } #bFish.rod { background: rgba(60,140,170,0.55); } #bFish.bite { animation: fishBite 0.18s linear infinite; border-color: #fff; box-shadow: 0 0 22px 6px rgba(140,230,255,0.9); background: rgba(80,190,230,0.75); }
+@keyframes fishBite { 0% { transform: translate(-3px, 0) rotate(-8deg); } 50% { transform: translate(3px, 1px) rotate(8deg); } 100% { transform: translate(-3px, 0) rotate(-8deg); } }
+#pullCue { position: fixed; z-index: 8; left: 50%; top: 38%; transform: translate(-50%, -50%) scale(1); font-family: var(--f-display); font-size: 64px; font-weight: 900; color: #fff; text-shadow: 0 0 18px #6fd6ff, 0 4px 0 #0a2a3a; pointer-events: none; letter-spacing: 0.06em; animation: pullPop 0.35s ease-in-out infinite alternate; }
+@keyframes pullPop { from { transform: translate(-50%, -50%) scale(0.92); } to { transform: translate(-50%, -50%) scale(1.12); } }
+#biteFlash { position: fixed; inset: 0; z-index: 7; pointer-events: none; box-shadow: inset 0 0 90px 30px rgba(120,220,255,0.75); animation: biteFlash 0.25s ease-in-out infinite alternate; }
+@keyframes biteFlash { from { opacity: 0.35; } to { opacity: 1; } }
 #bBlock { grid-area: block; border-color: rgba(154,216,255,0.6); } #bDash { grid-area: dash; } #bJump { grid-area: jump; } #bSpecial { grid-area: special; } #bArmSpec { grid-area: armspec; border-color: var(--r-vaulted); } #bPotion { grid-area: potion; }
 .act .cd { position: absolute; inset: auto 0 0 0; background: rgba(0,0,0,0.6); height: 0; pointer-events: none; }
 .act > span { position: relative; z-index: 1; padding: 0 3px; line-height: 1.05; text-align: center; letter-spacing: -0.01em; }
@@ -398,6 +404,8 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 <div id="joyHint" hidden>Drag here<br>to move</div>
 <div id="joyBase" hidden><div id="joyKnob"></div></div>
 <div id="actions">
+  <button class="act small" id="bFish" aria-label="Fish: take out your rod and cast, then hold to reel"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 28 L24 5" stroke="#e8d0a0" stroke-width="2.6" stroke-linecap="round"/><path d="M24 5 Q30 9 27 20" stroke="#dff4ff" stroke-width="1.2" fill="none"/><circle cx="9" cy="23.5" r="2.6" fill="none" stroke="#c8c8d0" stroke-width="1.6"/><path d="M27 20 v3 q0 3 -2.5 3 q-2 0 -2 -2" stroke="#dff4ff" stroke-width="1.4" fill="none" stroke-linecap="round"/><circle cx="27" cy="16" r="1.8" fill="#ff4a5a"/></svg></button>
+  <div id="pullCue" hidden>PULL!</div><div id="biteFlash" hidden></div>
   <button class="act small" id="bBlock" aria-label="Block, tap just before a hit to parry"><span>Block</span><i class="cd" id="cdBlock"></i></button>
   <button class="act small" id="bPotion" aria-label="Drink potion"><span>Potion</span><i class="cd" id="cdPotion"></i></button>
   <button class="act small" id="bArmSpec" aria-label="Armour special" hidden><span id="tArmSpec">Armour</span><i class="cd" id="cdArm"></i></button>
@@ -406,7 +414,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <button class="act mid" id="bDash" aria-label="Dash"><span>Dash</span><div class="pips" id="dashPips"></div></button>
   <button class="act big" id="bAttack" aria-label="Attack"><span>Attack</span></button>
 </div>
-<div class="keys">WASD move · drag to look · Space jump · Shift dash · J or click attack · K special · R armour special · F or right-click block (just before a hit to parry) · Q potion · E use</div>
+<div class="keys">WASD move · drag to look · Space jump · Shift dash · J or click attack · K special · R armour special · F or right-click block (just before a hit to parry) · Q potion · E use · G fish</div>
 <div id="floaters"></div>
 
 <div class="modal" id="menu" hidden>
@@ -3825,7 +3833,7 @@ $("clLeave").addEventListener("click", () => { $("confirmLeave").hidden = true; 
 
 function updateModeUi() {
   const inLobby = world && world.kind === "lobby";
-  $("bLeave").hidden = inLobby;
+  $("bLeave").hidden = inLobby; $("bFish").hidden = !!run || (world && world.kind !== "lobby");
   $("bLeave").textContent = world && world.kind === "sky" ? "Leave the Skylands" : world && world.kind === "raid" ? "Leave the hall" : world && world.kind === "cave" ? "Leave the cave" : "Leave island";
   if (world && world.kind === "cave") { $("hWhere").textContent = world.cave.name; $("hSub").textContent = "Mine ore. The deeper you go, the richer and the deadlier."; $("bossBar").hidden = true; }
   if (world && world.kind === "sky") { $("hWhere").textContent = "The Skylands"; $("hSub").textContent = "Towers above the clouds. Mind the edges."; $("bossBar").hidden = true; }
@@ -3882,7 +3890,8 @@ function update(dt) {
   const jumpPressed = edge.jump || (gp && gp.jump), jumpDown = jumpHeld || keys.has(" ") || (gp && gp.jumpHeld);
   const blockDown = !P.dead && (keys.has("f") || blockHeld || !!(gp && gp.block));
   if (blockDown && !P.blocking && worldT >= (P.blockReady || 0)) { P.blocking = true; P.blockStart = worldT; } if (!blockDown && P.blocking) { P.blocking = false; P.blockReady = worldT + BLOCK_CD; }
-  if (fishing) fishControl(mag, !!(attackHeld || attackTap || keys.has("j") || keys.has("e") || edge.use || (gp && (gp.attack || gp.use))));
+  if (fishing) fishControl(mag, !!(attackHeld || attackTap || fishHeld || keys.has("j") || keys.has("e") || edge.use || (gp && (gp.attack || gp.use))));
+  else if (rodOut && (attackHeld || attackTap || keys.has("j"))) putRodAway();
   if (!P.dead && !fishing) {
     if (!P.blocking && (attackHeld || keys.has("j") || attackTap || (gp && gp.attack))) attack();
     if (edge.dash || (gp && gp.dash)) dash(move);
@@ -4042,6 +4051,7 @@ function animate(dt, paused) {
   const cp = Math.cos(cam.pitch);
   camera.position.set(camTarget.x + Math.sin(cam.yaw) * cp * cam.dist, camTarget.y + Math.sin(cam.pitch) * cam.dist, camTarget.z + Math.cos(cam.yaw) * cp * cam.dist);
   const gy = (world.hBase || world.h)(camera.position.x, camera.position.z) + 0.6; if (camera.position.y < gy) camera.position.y = gy;
+  if (camShake > 0) { camShake = Math.max(0, camShake - dt); const k = camShake * 0.12; camera.position.x += (Math.random() - 0.5) * k; camera.position.y += (Math.random() - 0.5) * k; }
   camera.lookAt(camTarget);
   sun.position.copy(P.pos).add(SUN_OFF); sun.target.position.copy(P.pos);
   sky.position.copy(camera.position);
@@ -5302,13 +5312,49 @@ function startFishing(sp) {
   P.face = Math.atan2(sp.bx - P.pos.x, sp.bz - P.pos.z); P.swing = 1; P.swingStyle = "normal"; P.swingDur = 0.5;
   const bob = new THREE.Group(); M(G.sph(), std(0xe0303a, { r: 0.4 }), 0, 0.08, 0, bob, 0.14); M(G.sph(), std(0xf4f4f4, { r: 0.4 }), 0, -0.05, 0, bob, 0.13); bob.position.set(sp.bx, sp.by, sp.bz); scene.add(bob);
   const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([P.pos.clone().add(new V3(0, 1.8, 0)), bob.position.clone()]), new THREE.LineBasicMaterial({ color: 0xe8e8e8, transparent: true, opacity: 0.7 })); scene.add(line);
-  fishing = { sp, rod, bob, line, stage: "wait", at: worldT + rand(3, 9) / rod.speed };
-  fishing.rodM = buildRod(rod); if (hero.weapon) hero.weapon.visible = false; hero.hold.add(fishing.rodM); MUSIC.sfx("cast");
+  if (rodOut) putRodAway(true);
+  const at = worldT + rand(3, 7) / rod.speed;
+  fishing = { sp, rod, bob, line, stage: "wait", at, nibs: [at - rand(1.6, 2.4), at - rand(0.6, 1.0)].filter(t => t > worldT + 0.5) };
+  fishing.rodM = buildRod(rod); if (hero.weapon) hero.weapon.visible = false; hero.hold.add(fishing.rodM); MUSIC.sfx("cast"); $("bFish").classList.add("rod");
   ringFx(bob.position, 0.8, 0xffffff, 0.5);
-  fishMsg(`Line cast with your <b>${esc(rod.name)}</b>. Wait for a bite, then press E, J or Attack.`, false);
+  fishMsg(`Line cast with your <b>${esc(rod.name)}</b>. Watch the bobber. When it plunges and the screen shouts <b>PULL!</b>, tap the Fish button.`, false);
 }
+/* ---- the Fish button: rod out in one tap, auto-aim at the nearest water, and a bite you cannot miss ---- */
+let rodOut = null, fishHeld = false, camShake = 0;
+function buzz(pattern) { try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {} }
+function biteAlert(on) {
+  $("pullCue").hidden = !on; $("biteFlash").hidden = !on; $("bFish").classList.toggle("bite", on);
+  if (on) { buzz([120, 60, 160, 60, 200]); camShake = 0.6; }
+}
+function putRodAway(silent) { if (!rodOut) return; hero.hold.remove(rodOut); if (hero.weapon) hero.weapon.visible = true; rodOut = null; $("bFish").classList.remove("rod"); if (!silent) $("fishPanel").hidden = true; }
+function takeRodOut() { if (rodOut || fishing) return; rodOut = buildRod(ROD[S.rod] || ROD.willow); if (hero.weapon) hero.weapon.visible = false; hero.hold.add(rodOut); $("bFish").classList.add("rod"); }
+function findCastSpot() {
+  if (!world) return null;
+  if (world.fishSpots) { let best = null, bd = 12; for (const sp of world.fishSpots) { const d = Math.hypot(sp.x - P.pos.x, sp.z - P.pos.z); if (d < bd) { bd = d; best = sp; } } if (best) return best; }
+  const wet = (x, z) => world.kind === "lobby" ? world.h(x, z) < SEA - 0.7 : (world.water && world.h(x, z) < world.water.position.y - 0.5);
+  if (sailing) { const a = P.face; return { bx: P.pos.x + Math.sin(a) * 5, bz: P.pos.z + Math.cos(a) * 5, by: SEA + 0.05, name: "the open sea", bonus: 1.2 }; }
+  if (world.kind !== "lobby" || run) return null;
+  let best = null, score = 1e9;
+  for (let k = 0; k < 24; k++) { const a = P.face + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * (TAU / 24);
+    for (let d = 2.5; d <= 13; d += 0.75) { const x = P.pos.x + Math.sin(a) * d, z = P.pos.z + Math.cos(a) * d; if (!wet(x, z)) continue; const sc = d + Math.ceil(k / 2) * 0.8; if (sc < score) { score = sc; const far = Math.hypot(x, z) > 170; best = { bx: x, bz: z, by: SEA + 0.05, name: far ? "the open sea" : "the water", bonus: far ? 1.2 : 1.0 }; } break; } }
+  return best;
+}
+function fishButton() {
+  if (fishing) return; // holding the button reels; handled in the main loop
+  if (run || P.dead) { toast("You can fish in the lobby world, by any water.", ""); return; }
+  const sp = findCastSpot();
+  if (!sp) { if (rodOut) { putRodAway(); toast("Rod put away.", ""); } else { takeRodOut(); fishMsg("Rod ready. Walk to the edge of any water and tap <b>Fish</b> to cast.", false); } return; }
+  startFishing(Object.assign({ x: P.pos.x, z: P.pos.z }, sp));
+}
+(() => { const b = $("bFish");
+  b.addEventListener("pointerdown", e => { e.preventDefault(); e.stopPropagation(); fishHeld = true; b.classList.add("on"); if (!fishing) fishButton(); try { b.setPointerCapture(e.pointerId); } catch (err) {} });
+  const end = () => { fishHeld = false; b.classList.remove("on"); };
+  b.addEventListener("pointerup", end); b.addEventListener("pointercancel", end); b.addEventListener("lostpointercapture", end);
+  addEventListener("keydown", e => { if (e.key && e.key.toLowerCase() === "g" && !e.repeat && !/input|textarea/i.test((e.target && e.target.tagName) || "")) { fishHeld = true; if (!fishing) fishButton(); } });
+  addEventListener("keyup", e => { if (e.key && e.key.toLowerCase() === "g") fishHeld = false; });
+})();
 function fishMsg(html, hot) { const el = $("fishPanel"); el.hidden = false; el.classList.toggle("hot", !!hot); $("fishText").innerHTML = html; }
-function stopFishing(msg) { if (!fishing) return; if ($("reelBox")) $("reelBox").hidden = true; if (fishing.rodM) { hero.hold.remove(fishing.rodM); if (hero.weapon) hero.weapon.visible = true; } scene.remove(fishing.bob); scene.remove(fishing.line); fishing.line.geometry.dispose(); fishing = null; if (msg) { fishMsg(msg, false); setTimeout(() => { if (!fishing) $("fishPanel").hidden = true; }, 2600); } else $("fishPanel").hidden = true; }
+function stopFishing(msg) { if (!fishing) return; biteAlert(false); $("bFish").classList.remove("rod"); if ($("reelBox")) $("reelBox").hidden = true; if (fishing.rodM) { hero.hold.remove(fishing.rodM); if (hero.weapon) hero.weapon.visible = true; } scene.remove(fishing.bob); scene.remove(fishing.line); fishing.line.geometry.dispose(); fishing = null; if (msg) { fishMsg(msg, false); setTimeout(() => { if (!fishing) $("fishPanel").hidden = true; }, 2600); } else $("fishPanel").hidden = true; }
 const FISH_W = { common: 60, rare: 28, epic: 9, legendary: 2.6, vaulted: 0.12 };
 function rollFish(luck) {
   const night = DAY.day < 0.35 ? 1.3 : 1, w = {};
@@ -5322,12 +5368,14 @@ function fishControl(mag, reel) {
   const bob = f.bob; bob.position.y = f.sp.by + Math.sin(worldT * 3) * 0.03;
   const pressed = reel && !fishPrev; fishPrev = reel;
   if (f.stage === "wait") {
-    if (pressed) { stopFishing("Too early. The fish swam away."); return; }
-    if (worldT >= f.at) { f.stage = "bite"; f.until = worldT + 0.75 * f.rod.win; MUSIC.sfx("bite"); ringFx(bob.position, 1.2, 0xcfeeff, 0.4); fishMsg("<b>A bite!</b> Reel in now!", true); }
+    if (pressed) fishMsg("Not yet. Small twitches are only nibbles; wait for the big pull.", false);
+    if (f.nibs.length && worldT >= f.nibs[0]) { f.nibs.shift(); f.nibT = worldT + 0.3; ringFx(bob.position, 0.6, 0xcfeeff, 0.3); buzz([25]); fishMsg("A nibble... get ready.", false); }
+    if (f.nibT > worldT) bob.position.y = f.sp.by - 0.06 + Math.sin(worldT * 40) * 0.03;
+    if (worldT >= f.at) { f.stage = "bite"; f.until = worldT + 1.3 * f.rod.win; MUSIC.sfx("bite"); ringFx(bob.position, 1.2, 0xcfeeff, 0.4); burstFx(bob.position.clone(), 0.8, 0xcfeeff, 0.35); fishMsg("<b>A bite!</b> Tap the Fish button now!", true); biteAlert(true); }
   } else if (f.stage === "bite") {
     bob.position.y = f.sp.by - 0.18 + Math.sin(worldT * 30) * 0.06;
-    if (pressed) startReel(f);
-    else if (worldT > f.until) stopFishing("It got away. Watch for the bobber to dip.");
+    if (pressed) { biteAlert(false); startReel(f); }
+    else if (worldT > f.until) { biteAlert(false); stopFishing("It got away. Tap the Fish button as soon as you see PULL!"); }
   } else if (f.stage === "reel") reelTick(f, reel);
   if (fishing) fishing.line.geometry.setFromPoints([fishing.rodM ? fishing.rodM.userData.tip.getWorldPosition(new V3()) : P.pos.clone().add(new V3(0, 1.9, 0)), bob.position.clone()]);
 }
@@ -7122,7 +7170,8 @@ function startReel(f) {
   const luck = f.rod.luck * f.sp.bonus; f.fish = rollFish(luck); const rk = RANK[f.fish.rarity] || 0;
   Object.assign(f, { stage: "reel", prog: 0.3, hook: 0.2, vel: 0, zone: 0.5, zv: 0, zw: Math.max(0.14, 0.34 - rk * 0.045) * (0.9 + f.rod.win * 0.1), rk, zT: 0, last: worldT });
   reelBox().hidden = false;
-  fishMsg(rk >= 2 ? "<b>Something big is pulling!</b> Hold E, J or Attack to raise the hook; let go to drop it. Keep it in the green." : "<b>Fish on!</b> Hold E, J or Attack to raise the hook; let go to drop it. Keep it in the green.", true);
+  buzz(rk >= 2 ? [60, 40, 60, 40, 120] : [60]);
+  fishMsg(rk >= 2 ? "<b>Something big is pulling!</b> Hold the Fish button to raise the hook; let go to drop it. Keep it in the green." : "<b>Fish on!</b> Hold the Fish button to raise the hook; let go to drop it. Keep it in the green.", true);
 }
 function reelTick(f, held) {
   const dt = Math.min(0.05, Math.max(0, worldT - f.last)); f.last = worldT;
@@ -7137,7 +7186,7 @@ function reelTick(f, held) {
 function catchFish(f) {
   const fish = f.fish; reelBox().hidden = true;
   gain(fish, null, 1); S.fishLog = S.fishLog || {}; S.fishLog[fish.id] = (S.fishLog[fish.id] || 0) + 1; MUSIC.sfx("splash"); bumpStat("fish"); if (RANK[fish.rarity] >= 1) bumpStat("rareFish"); if (RANK[fish.rarity] >= 2) bumpStat("epicFish");
-  burstFx(f.bob.position.clone(), 1, 0xcfeeff, 0.4); stopFishing(`You caught ${article(fish.name)} <b style="color:${rc(fish.rarity)}">${esc(fish.name)}</b>! <span class="muted">${RNAME[fish.rarity]} fish. Press E to cast again.</span>`); save();
+  burstFx(f.bob.position.clone(), 1, 0xcfeeff, 0.4); buzz([40, 30, 40]); stopFishing(`You caught ${article(fish.name)} <b style="color:${rc(fish.rarity)}">${esc(fish.name)}</b>! <span class="muted">${RNAME[fish.rarity]} fish. Tap Fish to cast again.</span>`); save();
 }
 /* ---- the helm: a steering wheel, the hull gauge and the cannons ---- */
 let wheelTurn = null, cannonT = 0;
@@ -8217,7 +8266,7 @@ $("achList").addEventListener("click", e => { const b = e.target.closest("button
 $("achNow").addEventListener("click", e => { if (e.target.closest("[data-hide]")) { S.title = null; save(); refreshNameTag(); renderAchievements(); } });
 $("startBtn").addEventListener("click", () => { if (S.avatar && S.name) enterLobby(); else openAvatar(true); });
 buildLobby(); rebuildHero(); refreshNameTag(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
