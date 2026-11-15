@@ -156,26 +156,26 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 .card.sel { outline: 2px solid var(--c); outline-offset: 1px; }
 .card.vaulted { background: linear-gradient(135deg, rgba(255,95,143,0.22), rgba(79,227,208,0.16)), var(--panel-2); }
 .col-prev { position: relative; border-radius: 12px; overflow: hidden; background: radial-gradient(circle at 50% 35%, #2a3550, #0f131d 70%); border: 1px solid var(--line); min-height: 300px; }
-#achBoard .achBox { width: min(900px, 96vw); height: min(680px, 92vh); display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
-#achBoard .achHead { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-#achBoard .achHead h2 { margin: 0; font-family: var(--f-display); }
-#achBoard .achNow { margin: 8px 0 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-#achBoard .achTabs { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
-#achBoard .achTabs button, #achBoard .achCard button { background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; color: inherit; font-weight: 700; }
-#achBoard .achTabs button.on { border-color: var(--accent); color: var(--accent); }
+#achBoard .achBox, #guildBoard .achBox { width: min(900px, 96vw); height: min(680px, 92vh); display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+#achBoard .achHead, #guildBoard .achHead { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+#achBoard .achHead h2, #guildBoard .achHead h2 { margin: 0; font-family: var(--f-display); }
+#achBoard .achNow, #guildBoard .achNow { margin: 8px 0 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+#achBoard .achTabs, #guildBoard .achTabs { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+#achBoard .achTabs button, #achBoard .achCard button, #guildBoard .achTabs button, #guildBoard .achCard button { background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; color: inherit; font-weight: 700; }
+#achBoard .achTabs button.on, #guildBoard .achTabs button.on { border-color: var(--accent); color: var(--accent); }
 #achBoard #achList { flex: 1; overflow: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; align-content: start; padding-right: 4px; }
-#achBoard .achCard { border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 5px; background: rgba(255,255,255,0.02); }
-#achBoard .achCard.done { border-color: var(--c); box-shadow: 0 0 12px -6px var(--c); }
+#achBoard .achCard, #guildBoard .achCard { border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 5px; background: rgba(255,255,255,0.02); }
+#achBoard .achCard.done, #guildBoard .achCard.done { border-color: var(--c); box-shadow: 0 0 12px -6px var(--c); }
 #achBoard .achCard.locked { opacity: 0.72; }
-#achBoard .achCard b { font-size: 14px; }
-#achBoard .achCard .t { color: var(--c); font-family: var(--f-display); font-weight: 700; font-size: 13px; }
-#achBoard .achCard small { color: var(--muted); }
-#achBoard .achBar { height: 6px; border-radius: 4px; background: rgba(255,255,255,0.08); overflow: hidden; }
-#achBoard .achBar i { display: block; height: 100%; background: var(--c); }
-#achBoard .achCard button.claim { border-color: var(--accent); color: var(--accent); }
-#achBoard .achCard button.show.on { background: var(--accent); color: #111; }
+#achBoard .achCard b, #guildBoard .achCard b { font-size: 14px; }
+#achBoard .achCard .t, #guildBoard .achCard .t { color: var(--c); font-family: var(--f-display); font-weight: 700; font-size: 13px; }
+#achBoard .achCard small, #guildBoard .achCard small { color: var(--muted); }
+#achBoard .achBar, #guildBoard .achBar { height: 6px; border-radius: 4px; background: rgba(255,255,255,0.08); overflow: hidden; }
+#achBoard .achBar i, #guildBoard .achBar i { display: block; height: 100%; background: var(--c); }
+#achBoard .achCard button.claim, #guildBoard .achCard button.claim { border-color: var(--accent); color: var(--accent); }
+#achBoard .achCard button.show.on, #guildBoard .achCard button.show.on { background: var(--accent); color: #111; }
 #menuBar #mbAch.ready { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 14px -2px var(--accent); }
-#avatar .avName { width: 170px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,0.25); color: inherit; font: inherit; }
+#avatar .avName, #guildBoard .avName { width: 170px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,0.25); color: inherit; font: inherit; }
 #avatar .avBox { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(290px, 380px); gap: 14px; width: min(960px, 96vw); height: min(660px, 92vh); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
 #avatar .avPrev { position: relative; border-radius: 12px; overflow: hidden; background: radial-gradient(circle at 50% 40%, #2a3448, #0c1018 75%); min-height: 220px; }
 #avatar .avPrev canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
@@ -185,14 +185,14 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 #avatar .avSide { display: flex; flex-direction: column; min-height: 0; }
 #avatar .avSide h2 { margin: 0 0 2px; font-family: var(--f-display); }
 #avatar #avRows { flex: 1; overflow: auto; margin: 8px 0; padding-right: 4px; }
-#avatar .avRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+#avatar .avRow, #guildBoard .avRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
 #avatar .avRow > b { font-size: 13px; }
 #avatar .avStep { display: flex; align-items: center; gap: 6px; }
 #avatar .avStep button { width: 34px; height: 32px; padding: 0; font-size: 16px; }
 #avatar .avStep span { min-width: 100px; text-align: center; font-size: 13px; }
-#avatar .avSw { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; max-width: 220px; }
-#avatar .avSw button { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); padding: 0; }
-#avatar .avSw button.on { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,0,0,0.5) inset; }
+#avatar .avSw, #guildBoard .avSw { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; max-width: 220px; }
+#avatar .avSw button, #guildBoard .avSw button { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); padding: 0; }
+#avatar .avSw button.on, #guildBoard .avSw button.on { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,0,0,0.5) inset; }
 #avatar input[type=range] { width: 170px; }
 @media (max-width: 760px) { #avatar .avBox { grid-template-columns: 1fr; grid-template-rows: 40% 1fr; height: 94vh; } }
 .col-prev canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
@@ -377,7 +377,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <button class="hbtn warn" id="bLeave" hidden>Leave island</button>
 </div>
 <div id="menuBar">
-  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbAch">Achievements</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
+  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses">Classes</button><button id="mbAch">Achievements</button><button id="mbGuild">Guild</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
 <div id="musicPanel" hidden role="dialog" aria-label="Music">
   <div class="mpHead"><b>Music</b><button class="hbtn" id="mpClose">Close</button></div>
@@ -483,6 +483,13 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
     <div class="achNow" id="achNow"></div>
     <div class="achTabs"><button data-f="all" class="on">All</button><button data-f="ready">Ready to claim</button><button data-f="claimed">Claimed titles</button><button data-f="locked">In progress</button></div>
     <div id="achList"></div>
+  </div>
+</div>
+<div class="modal" id="guildBoard" hidden role="dialog" aria-label="Guilds">
+  <div class="achBox" id="achBoardG">
+    <div class="achHead"><h2>Guild Hall</h2><span class="muted">Join a company of adventurers or found your own</span><button class="btn" id="guildClose">Close</button></div>
+    <div class="achTabs" style="margin-top:10px"><button data-g="mine">My guild</button><button data-g="browse">Browse guilds</button><button data-g="create">Found a guild</button></div>
+    <div id="guildBody" style="flex:1;overflow:auto;padding-right:4px"></div>
   </div>
 </div>
 <div class="modal" id="avatar" hidden role="dialog" aria-label="Create your hero">
@@ -1094,7 +1101,27 @@ const CLASS_LIST = [
   { id: "reaper", name: "Reaper", rarity: "legendary", role: "DPS", odds: 0.5, desc: "Death's own harvester, always one dash ahead.",
     perks: [["Soul Harvest", "Every foe you defeat heals 8% of your max health."], ["Death's Reach", "+20% weapon reach."], ["Grim Momentum", "One extra dash charge (4 in total)."]], look: { skin: 0x1c1a22, hair: 0x15131b, cloth: 0x15131b, cloth2: 0x0a0a10, extra: "reaperhood" } },
   { id: "archangel", name: "Arch-angel", rarity: "legendary", role: "Support", odds: 0.5, desc: "A winged guardian whose light protects the whole party.",
-    perks: [["Wings of Dawn", "Double jump, and hold Jump to glide."], ["Radiance", "Allies within 12 m take 15% less damage."], ["Judgement Feather", "Critical hits call down a lance of light for 40% weapon damage."]], look: { skin: 0xf2dcc2, hair: 0xfff0c0, cloth: 0xf0eef8, cloth2: 0xc8c0e0, extra: "wings" } }
+    perks: [["Wings of Dawn", "Double jump, and hold Jump to glide."], ["Radiance", "Allies within 12 m take 15% less damage."], ["Judgement Feather", "Critical hits call down a lance of light for 40% weapon damage."]], look: { skin: 0xf2dcc2, hair: 0xfff0c0, cloth: 0xf0eef8, cloth2: 0xc8c0e0, extra: "wings" } },
+  { id: "monk", name: "Monk", rarity: "common", role: "DPS", odds: 15, desc: "Fists of stone, mind like still water.",
+    perks: [["Swift Palm", "+15% attack speed."], ["Inner Calm", "+8% move speed."]], look: { skin: 0xd9a77f, hair: 0x1a1a1a, cloth: 0xd8802a, cloth2: 0x8a4a1a, extra: "beads" } },
+  { id: "knight", name: "Knight", rarity: "common", role: "Tank", odds: 15, desc: "Sworn to the shield and the realm.",
+    perks: [["Shield Discipline", "Blocking stops 85% of damage instead of 70%."], ["Plate Drill", "+25% defence."]], look: { skin: 0xe0b48c, hair: 0x6a4a2a, cloth: 0x3a4a7a, cloth2: 0x2a2a3a, extra: "plume" } },
+  { id: "pirate", name: "Pirate", rarity: "rare", role: "DPS", odds: 9, desc: "Plunders every isle, and every pocket on it.",
+    perks: [["Plunder", "+25% coins from defeated foes."], ["Dirty Fighting", "+10% critical hit chance."]], look: { skin: 0xc08a5a, hair: 0x2a1a10, cloth: 0x8a1a1a, cloth2: 0x2a2018, extra: "tricorn" } },
+  { id: "druid", name: "Druid", rarity: "rare", role: "Healer", odds: 9, desc: "Speaks for the forest, and the forest heals them.",
+    perks: [["Verdant Pulse", "Heal 0.7% of your max health every second."], ["Barkskin", "+15% defence."]], look: { skin: 0xc99a74, hair: 0x3a5a2a, cloth: 0x4a6a2a, cloth2: 0x5a3a22, extra: "antlers" } },
+  { id: "shadowblade", name: "Shadowblade", rarity: "rare", role: "DPS", odds: 8, desc: "Strikes from the dark between two heartbeats.",
+    perks: [["Veilstep", "Dashes come back 30% faster."], ["Backstab", "+12% critical hit chance and +8% move speed."]], look: { skin: 0xd8b898, hair: 0x101014, cloth: 0x14141c, cloth2: 0x0a0a10, extra: "mask" } },
+  { id: "bard", name: "Bard", rarity: "epic", role: "Support", odds: 5, desc: "Every fight goes better with a song.",
+    perks: [["Battle Hymn", "Allies deal 20% more damage."], ["Soothing Chord", "Heal 0.5% of your max health every second."], ["Encore", "Special attacks recharge 20% faster."]], look: { skin: 0xf0d0b0, hair: 0xc89a5a, cloth: 0x7a3a8a, cloth2: 0xe8c060, extra: "lute" } },
+  { id: "necromancer", name: "Necromancer", rarity: "epic", role: "Support", odds: 4, desc: "Borrows strength from the fallen, and never returns it.",
+    perks: [["Soul Siphon", "Every foe you defeat heals 4% of your max health."], ["Grave Power", "+20% Power."]], look: { skin: 0xb8b8c0, hair: 0x1a1a1a, cloth: 0x2a1a3a, cloth2: 0x101018, extra: "skulls" } },
+  { id: "valkyrie", name: "Valkyrie", rarity: "epic", role: "Tank", odds: 4, desc: "Rides the storm to carry heroes home.",
+    perks: [["Shieldmaiden", "+15% max health."], ["Skyborne", "One extra dash and a higher jump."]], look: { skin: 0xf0d8c0, hair: 0xe8d070, cloth: 0xc8d0e0, cloth2: 0x5a6a8a, extra: "wingedhelm" } },
+  { id: "dragonknight", name: "Dragon Knight", rarity: "legendary", role: "Tank", odds: 0.5, desc: "Bonded to a dragon's heart, and burns like one.",
+    perks: [["Dragonheart", "+25% max health and +20% defence."], ["Dragonfire", "Every 10 s, a burst of flame hits foes within 6 m for 2.5x weapon damage."], ["Scaled Hide", "Take 40% less knockback."]], look: { skin: 0xd8a07a, hair: 0x8a2a1a, cloth: 0x6a1a14, cloth2: 0x2a1410, extra: "dragonhorns" } },
+  { id: "starseer", name: "Starseer", rarity: "legendary", role: "Support", odds: 0.5, desc: "Reads the stars, then throws them.",
+    perks: [["Starlight", "Special attacks recharge 40% faster."], ["Constellation", "+30% Power."], ["Falling Star", "Critical hits have a 25% chance to call down a star for 80% weapon damage."]], look: { skin: 0xe8d8f0, hair: 0xd8e0ff, cloth: 0x1a1a4a, cloth2: 0x0e0e2a, extra: "starcrown" } }
 ];
 const CLASS = Object.fromEntries(CLASS_LIST.map(c => [c.id, c]));
 const ROLL_COINS = 10000;
@@ -1468,29 +1495,55 @@ const islandUnlocked = i => !ISLANDS[i].raid && (i === 0 || (S.prog[i - 1].norma
 
 /* derived stats */
 let ST = {};
+/* ---- guilds: join one of the great companies of the isles, or found your own ---- */
+const GUILD_PERKS = {
+  coins: { name: "Treasure Hunters", text: "more coins from foes", base: 0.06 },
+  dmg: { name: "Warband", text: "more damage", base: 0.04 },
+  hp: { name: "Bulwark", text: "more max health", base: 0.05 },
+  move: { name: "Swiftfoot", text: "more move speed", base: 0.03 },
+  crit: { name: "Sharpshooters", text: "more critical hit chance", base: 0.02 }
+};
+const GUILDS = [
+  { id: "gildedlance", name: "Order of the Gilded Lance", tag: "LNC", col: "#ffc04a", perk: "dmg", motto: "Charge first, ask later.", members: ["Ser Brannick", "Dame Olwen", "Pip the Squire", "Captain Rhea", "Old Garrow"] },
+  { id: "tidewalkers", name: "The Tidewalkers", tag: "TIDE", col: "#4ad8e8", perk: "move", motto: "We go where the current goes.", members: ["Nerys", "Salt Jory", "Wen of the Reef", "Marlo", "Kessa Brine"] },
+  { id: "emberclaw", name: "Emberclaw Company", tag: "EMBR", col: "#ff7a3a", perk: "dmg", motto: "Forged in the caldera.", members: ["Ashka", "Torrin Coal", "Vell", "Brasska", "Smoulder"] },
+  { id: "silverwolves", name: "The Silver Wolves", tag: "WOLF", col: "#c8d0e0", perk: "hp", motto: "The pack survives.", members: ["Fenrick", "Sable", "Grey Ilsa", "Howl", "Moonpaw"] },
+  { id: "starbound", name: "Starbound Circle", tag: "STAR", col: "#c98cff", perk: "crit", motto: "Read the sky, strike true.", members: ["Lyra", "Orrin Vale", "Celes", "Twinkle", "Astra"] },
+  { id: "goldenhoard", name: "The Golden Hoard", tag: "HORD", col: "#ffe060", perk: "coins", motto: "Every coin has a cousin.", members: ["Midas Penn", "Goldie", "Count Tally", "Rook", "Jingle"] }
+];
+const GUILD_COLOURS = ["#ffc04a", "#4ad8e8", "#ff7a3a", "#c8d0e0", "#c98cff", "#ffe060", "#7fd69a", "#ff6a8a"];
+const guildXpNeed = lv => 400 * lv * lv;
+function guildInfo() { const g = S.guild; if (!g) return null; if (g.custom) return g; const base = GUILDS.find(x => x.id === g.id); return base ? Object.assign({}, base, g) : null; }
+function guildPerk(kind) { try { const g = guildInfo(); if (!g || g.perk !== kind) return 0; return GUILD_PERKS[kind].base * (1 + 0.15 * ((g.level || 1) - 1)); } catch (e) { return 0; } }
+function guildXp(n) {
+  const g = S.guild; if (!g) return; g.xp = (g.xp || 0) + n; g.level = g.level || 1;
+  let up = false; while (g.level < 10 && g.xp >= guildXpNeed(g.level)) { g.xp -= guildXpNeed(g.level); g.level++; up = true; }
+  if (up) { computeStats(); toast(`<b>${esc(guildInfo().name)}</b> reached guild level ${g.level}. Your guild bonus grew.`, "epic"); save(); }
+}
 function statsFor(weaponId, armourId, clsId) {
   const w = ITEM[weaponId], a = ITEM[armourId], c = CLASS[clsId || S.cls], role = ROLES[c.role] || {}, p = S.pts, id = c.id;
   const st = {};
   const eA = 1 + 0.07 * enchLv(armourId), eW = 1 + 0.07 * enchLv(weaponId);
-  st.maxHp = Math.round((100 + 12 * (S.level - 1) + a.hp * eA) * (role.hp || 1) * (id === "warrior" ? 1.2 : 1));
-  st.def = (a.def * eA + 5 * p.defence) * (id === "paladin" ? 1.3 : 1);
+  const gp = guildPerk;
+  st.maxHp = Math.round((100 + 12 * (S.level - 1) + a.hp * eA) * (role.hp || 1) * (id === "warrior" ? 1.2 : 1) * ({ valkyrie: 1.15, dragonknight: 1.25 }[id] || 1) * (1 + gp("hp")));
+  st.def = (a.def * eA + 5 * p.defence) * (id === "paladin" ? 1.3 : 1) * ({ knight: 1.25, druid: 1.15, dragonknight: 1.2 }[id] || 1);
   st.dr = st.def / (st.def + 120);
-  st.dmgMult = (1 + 0.04 * p.damage) * (role.dmg || 1);
+  st.dmgMult = (1 + 0.04 * p.damage) * (role.dmg || 1) * (1 + gp("dmg"));
   st.hit = w.dmg * st.dmgMult * eW;
-  st.atkSpd = w.spd * (id === "samurai" ? 1.25 : 1);
+  st.atkSpd = w.spd * (id === "samurai" ? 1.25 : 1) * (id === "monk" ? 1.15 : 1);
   st.dps = st.hit * st.atkSpd;
-  st.move = 6.0 * w.move * a.move * (1 + 0.025 * p.speed) * (role.move || 1) * (id === "elf" ? 1.15 : 1) * (id === "stormcaller" ? 1.1 : 1);
-  st.power = 0.06 * p.power + (id === "mage" ? 0.2 : 0) + (role.power || 0);
-  st.specCd = Math.max(0.5, 1 - 0.015 * p.power) * (id === "mage" ? 0.65 : 1) * (role.cd || 1);
-  st.crit = 0.05 + (id === "ranger" ? 0.12 : 0) + (id === "elf" ? 0.1 : 0);
-  st.dashes = 3 + (id === "reaper" ? 1 : 0);
-  st.dashCd = 1.5 * (id === "ranger" ? 0.8 : 1);
+  st.move = 6.0 * w.move * a.move * (1 + 0.025 * p.speed) * (role.move || 1) * (id === "elf" ? 1.15 : 1) * (id === "stormcaller" ? 1.1 : 1) * ({ monk: 1.08, shadowblade: 1.08 }[id] || 1) * (1 + gp("move"));
+  st.power = 0.06 * p.power + (id === "mage" ? 0.2 : 0) + (role.power || 0) + ({ necromancer: 0.2, starseer: 0.3 }[id] || 0);
+  st.specCd = Math.max(0.5, 1 - 0.015 * p.power) * (id === "mage" ? 0.65 : 1) * (role.cd || 1) * ({ bard: 0.8, starseer: 0.6 }[id] || 1);
+  st.crit = 0.05 + (id === "ranger" ? 0.12 : 0) + (id === "elf" ? 0.1 : 0) + ({ pirate: 0.1, shadowblade: 0.12 }[id] || 0) + gp("crit");
+  st.dashes = 3 + (id === "reaper" || id === "valkyrie" ? 1 : 0);
+  st.dashCd = 1.5 * (id === "ranger" ? 0.8 : 1) * (id === "shadowblade" ? 0.7 : 1);
   st.reach = w.reach * (id === "reaper" && !w.ranged ? 1.2 : 1);
   st.potion = (id === "alchemist" ? 1.5 : 1) * (role.potion || 1);
-  st.kbTaken = id === "skeleton" ? 0.5 : 1;
-  st.allyDmg = (role.allyDmg || 1) * (id === "paladin" ? 1.1 : 1);
+  st.kbTaken = id === "skeleton" ? 0.5 : id === "dragonknight" ? 0.6 : 1;
+  st.allyDmg = (role.allyDmg || 1) * (id === "paladin" ? 1.1 : 1) * (id === "bard" ? 1.2 : 1);
   st.wings = id === "archangel";
-  st.jump = 8.4 * (id === "elf" ? 1.08 : 1);
+  st.jump = 8.4 * (id === "elf" ? 1.08 : 1) * (id === "valkyrie" ? 1.12 : 1);
   applyBoons(st);
   return st;
 }
@@ -2089,6 +2142,16 @@ function buildHumanoid(o) {
   const x = L.extra;
   if (x === "ears") for (const sx of [-1, 1]) { const e = M(G.cone(10), skin, 0.125 * sx, 0.03, -0.01, head, 0.018, 0.11, 0.03); e.rotation.z = -1.1 * sx; e.rotation.x = -0.2; }
   if (x === "horns" && helm !== "horned") for (const sx of [-1, 1]) { const h = M(hornGeo(), std(0xe8dcc0, { r: 0.45 }), 0.11 * sx, 0.08, 0, head, 0.8); h.scale.x = 0.8 * sx; }
+  if (x === "beads") for (let k = 0; k < 12; k++) { const a = k / 12 * TAU; M(G.sph(), std(0x6a3a1a, { r: 0.5 }), Math.sin(a) * 0.075, 0.58 - Math.abs(Math.cos(a)) * 0.04, Math.cos(a) * 0.06 + 0.02, chest, 0.016); }
+  if (x === "plume") { const pl = M(G.cone(8), std(0xc83a3a, { r: 0.8, map: "fur" }), 0, 0.2, -0.04, head, 0.03, 0.2, 0.06); pl.rotation.x = -0.6; }
+  if (x === "tricorn") { M(G.cyl(0.2, 0.2, 3), std(0x1a1410, { r: 0.8 }), 0, 0.12, 0, head, 1, 0.03, 1); M(G.cyl(0.11, 0.13, 12), std(0x1a1410, { r: 0.8 }), 0, 0.17, 0, head, 1, 0.1, 1); M(G.tor(0.2, 0.008, 3), std(0xe8c060, { m: 0.9, r: 0.3 }), 0, 0.13, 0, head).rotation.x = Math.PI / 2; }
+  if (x === "antlers") for (const sx of [-1, 1]) { const b = new THREE.Group(); b.position.set(0.07 * sx, 0.13, -0.01); head.add(b); const am = std(0x8a6a4a, { r: 0.7 }); const m0 = M(G.cyl(0.008, 0.012, 6), am, 0.03 * sx, 0.07, 0, b, 1, 0.16, 1); m0.rotation.z = -0.5 * sx; for (let k = 0; k < 2; k++) { const t2 = M(G.cyl(0.005, 0.008, 5), am, (0.05 + k * 0.03) * sx, 0.1 + k * 0.03, 0.01, b, 1, 0.07, 1); t2.rotation.z = 0.4 * sx; } }
+  if (x === "mask") { M(G.box(), std(0x101014, { r: 0.6 }), 0, -0.03, 0.09, head, 0.2, 0.08, 0.06); M(G.box(), std(0x101014, { r: 0.6 }), 0, 0.04, 0.0, head, 0.25, 0.04, 0.25); }
+  if (x === "lute") { const lu = new THREE.Group(); lu.position.set(0.08, 0.3, -0.16); lu.rotation.z = 0.7; chest.add(lu); M(G.sph(), std(0xc8883a, { r: 0.5, map: "bark" }), 0, 0, 0, lu, 0.09, 0.12, 0.04); M(G.box(), std(0x5a3a22, { r: 0.6 }), 0, 0.2, 0, lu, 0.025, 0.25, 0.015); }
+  if (x === "skulls") for (let k = 0; k < 3; k++) M(G.sph(), std(0xe8e2cc, { r: 0.5 }), -0.08 + k * 0.08, -0.02, 0.13, chest, 0.028, 0.03, 0.025);
+  if (x === "wingedhelm") for (const sx of [-1, 1]) { const w = M(featherGeo(), std(0xf4f0e8, { r: 0.6 }), 0.12 * sx, 0.06, 0, head, 0.25); w.rotation.z = -sx * 0.4; w.scale.x = 0.25 * sx; }
+  if (x === "dragonhorns" && helm !== "horned") for (const sx of [-1, 1]) { const h2 = M(hornGeo(), std(0x2a1410, { r: 0.4, e: 0x6a1a08, ei: 0.3 }), 0.1 * sx, 0.09, -0.02, head, 1.1); h2.scale.x = 1.1 * sx; }
+  if (x === "starcrown") { for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; const st2 = M(G.oct(), glowMat(0xd8e0ff, 1), Math.sin(a) * 0.15, 0.2 + Math.cos(a * 2) * 0.01, Math.cos(a) * 0.15, head, 0.02, 0.03, 0.02); } const gs = glowSprite(0xd8e0ff, 0.6, 0.6); gs.position.set(0, 0.2, 0); head.add(gs); }
   if (x === "topknot") { M(G.sph(), hair, 0, 0.15, -0.04, head, 0.035); M(G.tor(0.022, 0.006), std(0xc23b3b), 0, 0.13, -0.035, head).rotation.x = Math.PI / 2; }
   if (x === "hat") { M(lathe("hat", [[0.001, 0.42], [0.03, 0.36], [0.07, 0.24], [0.11, 0.12], [0.125, 0.07], [0.27, 0.06], [0.28, 0.05], [0.001, 0.05]], 28), MAT.cloth(0x2e3a7a), 0, 0.03, 0, head).rotation.x = -0.12; }
   if (x === "halo") { const h = M(G.tor(0.12, 0.01), glowMat(0xffd75a, 1), 0, 0.27, -0.02, head); h.rotation.x = Math.PI / 2 - 0.2; R.halo = h; const gs = glowSprite(0xffd75a, 0.5); gs.position.set(0, 0.27, -0.02); head.add(gs); }
@@ -2628,7 +2691,7 @@ function buildLobby() {
   world.clouds = addClouds(group, 0xffffff);
   // distant mountains
   for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 380, s = 80 + (k % 4) * 28; if (Math.cos(a) > 0.2) continue; const m = M(G.cone(7), std(0x5a6a7a, { flat: true, r: 0.9 }), Math.cos(a) * d, s * 0.45, Math.sin(a) * d, group, s, s * 1.1, s); M(G.cone(7), std(0xf0f4ff, { flat: true, r: 0.7 }), Math.cos(a) * d, s * 0.82, Math.sin(a) * d, group, s * 0.35, s * 0.35, s * 0.35); }
-  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); const isleBase = group.children.length; seaWorld(group); rarePortals(group); groupIsles(group, isleBase); boatDealer(group); floraFauna(group); lobbyRaidPortal(group); buildQuarters(group); buildCastles(group, h); secretReset(); if (mining) endMining(false); if (caveMine) endCaveMining(false); buildVeins(group, h); buildCaveMouths(group, h); buildTownLife(group, h);
+  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); const isleBase = group.children.length; seaWorld(group); rarePortals(group); groupIsles(group, isleBase); boatDealer(group); floraFauna(group); lobbyRaidPortal(group); buildQuarters(group); buildCastles(group, h); try { buildSkyClues(group, h); } catch (err) { reportError(err); } secretReset(); if (mining) endMining(false); if (caveMine) endCaveMining(false); buildVeins(group, h); buildCaveMouths(group, h); buildTownLife(group, h);
 }
 
 function buildIsland(idx) {
@@ -2728,6 +2791,7 @@ const ACH = [
   ["lvl25", "Veteran", "Reach level 25.", () => S.level, 25, "Veteran", "rare", 2500, 0],
   ["lvl50", "Champion", "Reach level 50.", () => S.level, 50, "Champion", "epic", 10000, 1],
   ["lvl100", "Ascended", "Reach level 100.", () => S.level, 100, "the Ascended", "legendary", 50000, 2],
+  ["sky1", "Skywalker", "A secret of the wind.", () => stOf("skyVisits"), 1, "Skywalker", "legendary", 15000, 2],
   ["vault1", "Vaultbound", "Own a Vaulted item.", () => vaultedOwned(), 1, "Vaultbound", "vaulted", 10000, 2],
   ["vault5", "Keeper of the Vault", "Own 5 different Vaulted items.", () => vaultedOwned(), 5, "Keeper of the Vault", "vaulted", 40000, 2]
 ].map(([id, name, how, val, goal, title, rar, coins, chest]) => ({ id, name, how, val, goal, title, rar, coins, chest }));
@@ -2765,12 +2829,60 @@ function renderAchievements() {
     return `<div class="achCard ${done ? "done" : "locked"}" style="--c:${c}"><b>${esc(a.name)}</b><small>${esc(a.how)}</small><div class="achBar"><i style="width:${(100 * v / a.goal).toFixed(1)}%"></i></div><span class="t">Title: ${esc(a.title)}</span><small>Reward: ${reward}</small>${btn}</div>`;
   }).join("") || `<p class="muted">Nothing here yet.</p>`;
 }
+/* ---- the guild hall board ---- */
+let GTAB = "mine", gForm = { name: "", tag: "", col: GUILD_COLOURS[0], perk: "dmg" };
+const GUILD_COST = 5000;
+function openGuilds() { GTAB = S.guild ? "mine" : "browse"; $("guildBoard").hidden = false; renderGuilds(); }
+function renderGuilds() {
+  for (const b of document.querySelectorAll("#guildBoard .achTabs button")) b.classList.toggle("on", b.dataset.g === GTAB);
+  const g = guildInfo(); let h = "";
+  if (GTAB === "mine") {
+    if (!g) h = `<p class="muted">You are not in a guild yet. Join one of the great companies, or found your own.</p><div class="row"><button class="btn primary" data-gtab="browse">Browse guilds</button><button class="btn" data-gtab="create">Found a guild</button></div>`;
+    else { const lv = g.level || 1, need = guildXpNeed(lv), P2 = GUILD_PERKS[g.perk], members = (g.members || []).slice(0, 8);
+      h = `<div class="achNow" style="--c:${g.col}"><div><b style="color:${g.col};font-family:var(--f-display);font-size:22px">[${esc(g.tag)}] ${esc(g.name)}</b><br><span class="muted">${esc(g.motto || "Founded by " + (S.name || "you"))}</span></div><div style="text-align:right"><b>Guild level ${lv}${lv >= 10 ? " (max)" : ""}</b><br><span class="muted">${esc(P2.name)}: +${(guildPerk(g.perk) * 100).toFixed(1)}% ${esc(P2.text)}</span></div></div>
+        <div class="achBar" style="--c:${g.col};height:10px"><i style="width:${lv >= 10 ? 100 : (100 * (g.xp || 0) / need).toFixed(1)}%"></i></div><small class="muted">${lv >= 10 ? "Your guild is at the highest level." : `${fmt(Math.floor(g.xp || 0))} / ${fmt(need)} guild exp. Earn it by defeating foes and bosses, or donate coins.`}</small>
+        <div class="row" style="margin:10px 0"><button class="btn" data-donate="1000">Donate 1,000 coins (+100 exp)</button><button class="btn" data-donate="10000">Donate 10,000 coins (+1,000 exp)</button><button class="btn" data-leave="1">Leave guild</button></div>
+        <b>Members</b><div id="achList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-top:6px"><div class="achCard done" style="--c:${g.col}"><b>${esc(S.name || "You")}</b><small>${g.custom ? "Guild Master" : "Member"} · ${esc(CLASS[S.cls].name)} · level ${S.level}</small></div>${members.map((m, k) => `<div class="achCard"><b>${esc(m)}</b><small>${["Guild Master", "Officer", "Veteran", "Member", "Recruit"][Math.min(4, k + (g.custom ? 1 : 0))]}</small></div>`).join("")}</div>
+        <p class="muted" style="font-size:12px">Guild mates here are computer-controlled. Playing with real friends needs an online server, which this prototype does not have yet.</p>`; }
+  } else if (GTAB === "browse") {
+    h = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px">${GUILDS.map(x => { const P2 = GUILD_PERKS[x.perk], mine = S.guild && S.guild.id === x.id;
+      return `<div class="achCard ${mine ? "done" : ""}" style="--c:${x.col}"><b style="color:${x.col}">[${x.tag}] ${esc(x.name)}</b><small>"${esc(x.motto)}"</small><span class="t">${esc(P2.name)}: ${esc(P2.text)}</span><small>${x.members.length + 20 + (x.id.length * 7) % 30} members</small>${mine ? `<button class="show on" disabled>Your guild</button>` : `<button class="claim" data-join="${x.id}">${S.guild ? "Switch to this guild" : "Join"}</button>`}</div>`; }).join("")}</div>`;
+  } else {
+    h = `<p class="muted" style="margin-top:0">Found your own guild for ${fmt(GUILD_COST)} coins. You become its Guild Master.</p>
+      <div class="avRow"><b>Guild name</b><input class="avName" id="gName" maxlength="24" placeholder="e.g. Knights of the Dawn" value="${esc(gForm.name)}" style="width:240px"></div>
+      <div class="avRow"><b>Tag (2 to 4 letters)</b><input class="avName" id="gTag" maxlength="4" placeholder="DAWN" value="${esc(gForm.tag)}" style="width:110px;text-transform:uppercase"></div>
+      <div class="avRow"><b>Colour</b><div class="avSw">${GUILD_COLOURS.map(c => `<button data-gcol="${c}" class="${gForm.col === c ? "on" : ""}" style="background:${c}" aria-label="Colour ${c}"></button>`).join("")}</div></div>
+      <div class="avRow"><b>Guild bonus</b><div class="achTabs" style="margin:0;flex-wrap:wrap">${Object.entries(GUILD_PERKS).map(([k, v]) => `<button data-gperk="${k}" class="${gForm.perk === k ? "on" : ""}">${esc(v.name)}</button>`).join("")}</div></div>
+      <p class="muted">${esc(GUILD_PERKS[gForm.perk].name)}: +${(GUILD_PERKS[gForm.perk].base * 100).toFixed(0)}% ${esc(GUILD_PERKS[gForm.perk].text)} at level 1, growing with every guild level.</p>
+      <button class="btn primary" data-found="1">Found guild (${fmt(GUILD_COST)} coins)</button>`;
+  }
+  $("guildBody").innerHTML = h;
+}
+function joinGuild(id) {
+  S.guild = { id, level: 1, xp: 0 }; computeStats(); save(); refreshNameTag(); GTAB = "mine"; renderGuilds(); toast(`Welcome to <b>${esc(guildInfo().name)}</b>.`, "epic");
+}
+$("guildBoard").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.g || b.dataset.gtab) { GTAB = b.dataset.g || b.dataset.gtab; renderGuilds(); return; }
+  if (b.id === "guildClose") { $("guildBoard").hidden = true; return; }
+  if (b.dataset.join) { joinGuild(b.dataset.join); return; }
+  if (b.dataset.leave) { if (!b.dataset.sure) { b.dataset.sure = "1"; b.textContent = "Tap again to leave (progress is lost)"; return; } S.guild = null; computeStats(); save(); refreshNameTag(); GTAB = "browse"; renderGuilds(); toast("You left your guild.", ""); return; }
+  if (b.dataset.donate) { const n = +b.dataset.donate; if (S.coins < n) { toast("Not enough coins.", ""); return; } S.coins -= n; guildXp(n / 10); save(); renderGuilds(); toast(`Donated ${fmt(n)} coins to your guild.`, "rare"); return; }
+  if (b.dataset.gcol) { gForm.col = b.dataset.gcol; renderGuilds(); return; }
+  if (b.dataset.gperk) { gForm.perk = b.dataset.gperk; renderGuilds(); return; }
+  if (b.dataset.found) { const name = cleanName(gForm.name).slice(0, 24), tag = String(gForm.tag || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 4);
+    if (name.length < 3) { toast("Pick a guild name of at least 3 letters.", ""); return; } if (tag.length < 2) { toast("Pick a tag of 2 to 4 letters.", ""); return; }
+    if (S.coins < GUILD_COST) { toast(`Founding a guild costs ${fmt(GUILD_COST)} coins.`, ""); return; }
+    S.coins -= GUILD_COST; S.guild = { custom: true, id: "custom", name, tag, col: gForm.col, perk: gForm.perk, level: 1, xp: 0, motto: `Founded by ${S.name || "a wanderer"}`, members: ["Your first recruit", "A hopeful squire"] };
+    computeStats(); save(); refreshNameTag(); GTAB = "mine"; renderGuilds(); banner(`[${tag}] ${name}`, "Your guild is founded. Fight, donate and grow it."); }
+});
+$("guildBoard").addEventListener("input", e => { if (e.target.id === "gName") gForm.name = e.target.value; if (e.target.id === "gTag") gForm.tag = e.target.value; });
+$("mbGuild").addEventListener("click", openGuilds);
 let nameTag = null;
 function refreshNameTag() {
   if (nameTag) { scene.remove(nameTag); nameTag = null; }
   if (!S.name) return;
   nameTag = new THREE.Group(); scene.add(nameTag);
-  const nm = textSprite(S.name, "#ffffff", 0.42); nm.renderOrder = 10; nameTag.add(nm);
+  const gi = guildInfo(), nm = textSprite(gi ? `[${gi.tag}] ${S.name}` : S.name, "#ffffff", 0.42); nm.renderOrder = 10; nameTag.add(nm);
   const a = S.title && ACH_BY[S.title];
   if (a) { const tt = textSprite(a.title, TCOL[a.rar], 0.34, "rgba(10,12,20,0.35)"); tt.position.y = 0.3; tt.renderOrder = 10; nameTag.add(tt); }
 }
@@ -2906,6 +3018,7 @@ function damageEnemy(e, amount, dir, kb, o = {}) {
   if (dir && kb && !e.boss) { const d = dir.clone().setY(0); if (d.lengthSq() > 0) e.kb.copy(d.normalize().multiplyScalar(kb * 5)); }
   if (dir && kb && e.boss) { const d = dir.clone().setY(0); if (d.lengthSq() > 0) e.kb.copy(d.normalize().multiplyScalar(kb * 0.8)); }
   if (P.buffs.drain > worldT) heal(dmg * 0.3, true);
+  if (crit && S.cls === "starseer" && !o.noProc && Math.random() < 0.25) later(0.2, () => { if (!e.dead) { pillarFx(e.pos, 0xd8e0ff, 14, 0.5); burstFx(e.pos.clone().add(new V3(0, 1, 0)), 2, 0xd8e0ff, 0.4); damageEnemy(e, ST.hit * 0.8, null, 0, { noProc: true, canCrit: false, color: "#d8e0ff" }); } });
   if (crit && S.cls === "archangel" && !o.noProc) later(0.15, () => { if (!e.dead) { pillarFx(e.pos, 0xfff0a0, 10, 0.4); damageEnemy(e, ST.hit * 0.4, null, 0, { noProc: true, canCrit: false, color: "#fff0a0" }); } });
   if (e.hp <= 0) { if (e.duelist) duelEnd(true); else if (e.seaBeast) seaBeastDie(e); else killEnemy(e); }
 }
@@ -2920,10 +3033,10 @@ function killEnemy(e) {
   if (e.minion) { bumpStat("kills"); save(); return; } // no coins, exp or drops for helpers
   const isl = run ? Math.min(run.idx, 12.5) : 0, si = run ? run.stage : 0;
   const xp = e.base.xp * Math.pow(1.3, isl) * (1 + 0.5 * si);
-  const coins = Math.round(e.base.coins * Math.pow(1.35, isl) * (1 + 0.6 * si) * rand(0.8, 1.2));
+  const coins = Math.round(e.base.coins * Math.pow(1.35, isl) * (1 + 0.6 * si) * rand(0.8, 1.2) * (S.cls === "pirate" ? 1.25 : 1) * (1 + guildPerk("coins")));
   S.coins += coins; floatText(e.pos, `+${fmt(coins)}`, "#e6b85c");
   addXp(xp); bumpStat("kills"); if (e.boss) bumpStat("bosses"); if (DAY.day < 0.35) bumpStat("nightKills");
-  if (S.cls === "reaper") heal(ST.maxHp * 0.08);
+  if (S.cls === "reaper") heal(ST.maxHp * 0.08); if (S.cls === "necromancer") heal(ST.maxHp * 0.04); guildXp(e.boss ? 25 : 1);
   const table = dropTable(isl, si, e.boss);
   if (e.boss) {
     const drops = 2 + (run && run.level === run.levels ? 1 : 0) + (e.raidBoss ? 3 : 0);
@@ -2941,7 +3054,7 @@ function addXp(x) {
 function hurtHero(target, amount, from, src) {
   if (target.isHero) {
     if (P.dead || P.invuln > 0 || P.buffs.veil > worldT) return;
-    if (P.blocking) { if (worldT - P.blockStart <= PARRY_WINDOW) { parryHit(src); return; } amount *= 0.3; P.kb.multiplyScalar(0.3); }
+    if (P.blocking) { if (worldT - P.blockStart <= PARRY_WINDOW) { parryHit(src); return; } amount *= S.cls === "knight" ? 0.15 : 0.3; P.kb.multiplyScalar(0.3); }
     let dr = ST.dr;
     if (P.buffs.shield > worldT) dr = 1 - (1 - dr) * (1 - P.buffs.shieldAmt);
     const dmg = P.swimming ? amount * 2 : amount * (1 - dr);
@@ -3442,7 +3555,7 @@ function thumb(id) {
    ===================================================================== */
 let menuTab = "weapons", selItem = { weapon: null, armour: null, items: null }, selClass = null, rollResult = null;
 const MENU_TABS = [["weapons", "Weapons"], ["armour", "Armour"], ["items", "Potions and materials"], ["chests", "Chests"], ["forge", "Forge"], ["fishing", "Fishing"], ["enchant", "Enchant"], ["auction", "Vault Auction"], ["boats", "Boats"], ["quests", "Quests"], ["classes", "Classes"], ["stats", "Stats"], ["shop", "Shop"]];
-const isPaused = () => !$("intro").hidden || !$("avatar").hidden || !$("achBoard").hidden || !$("dialog").hidden || !$("daily").hidden || !$("worldMap").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
+const isPaused = () => !$("intro").hidden || !$("avatar").hidden || !$("achBoard").hidden || !$("guildBoard").hidden || !$("dialog").hidden || !$("daily").hidden || !$("worldMap").hidden || !$("cards").hidden || !$("menu").hidden || !$("mapModal").hidden || !$("reveal").hidden || !$("result").hidden || !$("confirmLeave").hidden;
 function openMenu(tab) { menuTab = tab; rollResult = null; lastLoot = null; if (prevCanvas.parentNode && ["chests", "forge", "quests", "fishing", "enchant", "auction", "boats"].includes(tab)) prevCanvas.remove(); $("menu").hidden = false; keys.clear(); attackHeld = false; renderMenu(); }
 function closeMenu() { $("menu").hidden = true; if (prevCanvas.parentNode) prevCanvas.remove(); }
 function closeAllModals() { closeMenu(); $("dialog").hidden = true; $("mapModal").hidden = true; $("confirmLeave").hidden = true; }
@@ -3633,19 +3746,47 @@ function closeMap() { $("mapModal").hidden = true; if (!run) MUSIC.setMode("lobb
 $("mapClose").addEventListener("click", closeMap);
 function renderMap() {
   $("mapPortal").textContent = `Portal ${["I", "II", "III", "IV"][mapPortal]} · party of up to 4`;
-  const svg = `<svg viewBox="0 0 1000 620" role="img" aria-label="Map of the twelve islands">
-    <defs><radialGradient id="sea" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="#235a7a"/><stop offset="1" stop-color="#0a1d2c"/></radialGradient></defs>
+  const known = ISLANDS.slice(0, 12).map((_, i) => islandUnlocked(i));
+  const R0 = seeded(7), rnd = (a, b) => a + R0() * (b - a);
+  const cloud = (x, y, s, o, dur) => `<g opacity="${o}"><g filter="url(#soft)"><ellipse cx="${x}" cy="${y}" rx="${60 * s}" ry="${18 * s}" fill="#fff"/><ellipse cx="${x - 30 * s}" cy="${y + 4 * s}" rx="${38 * s}" ry="${14 * s}" fill="#fff"/><ellipse cx="${x + 34 * s}" cy="${y - 6 * s}" rx="${36 * s}" ry="${16 * s}" fill="#fff"/></g><animateTransform attributeName="transform" type="translate" values="-30 0; 30 0; -30 0" dur="${dur}s" repeatCount="indefinite"/></g>`;
+  const ship = (x, y, sc, flip, sail) => `<g transform="translate(${x},${y}) scale(${flip ? -sc : sc},${sc})"><path d="M-26,0 Q0,14 26,0 L20,-4 L-22,-4 Z" fill="#6a4a2a" stroke="#2a1a0e" stroke-width="1.5"/><line x1="0" y1="-4" x2="0" y2="-40" stroke="#3a2a1a" stroke-width="2"/><path d="M1,-38 Q18,-24 1,-8 Z" fill="${sail}" stroke="#8a7a6a" stroke-width="1"/><path d="M-1,-34 Q-14,-22 -1,-10 Z" fill="${sail}" opacity="0.85"/><path d="M0,-40 l10,3 l-10,3 z" fill="#c83a3a"/><path d="M-30,6 q8,-3 16,0 t16,0 t16,0 t16,0" stroke="rgba(255,255,255,0.5)" fill="none" stroke-width="1.5"/><animateTransform attributeName="transform" additive="sum" type="rotate" values="-3;3;-3" dur="4s" repeatCount="indefinite"/></g>`;
+  const svg = `<svg viewBox="0 0 1000 620" role="img" aria-label="A painted sea chart of the known islands">
+    <defs>
+      <radialGradient id="sea" cx="40%" cy="38%" r="80%"><stop offset="0" stop-color="#5fc2d8"/><stop offset="0.35" stop-color="#2f8db4"/><stop offset="0.75" stop-color="#1b5a86"/><stop offset="1" stop-color="#0f2f52"/></radialGradient>
+      <radialGradient id="sun" cx="82%" cy="12%" r="40%"><stop offset="0" stop-color="#fff6d0" stop-opacity="0.9"/><stop offset="0.25" stop-color="#ffe2a0" stop-opacity="0.35"/><stop offset="1" stop-color="#ffe2a0" stop-opacity="0"/></radialGradient>
+      <radialGradient id="shallow" r="50%"><stop offset="0.55" stop-color="#9ff0e8" stop-opacity="0.55"/><stop offset="1" stop-color="#9ff0e8" stop-opacity="0"/></radialGradient>
+      <linearGradient id="ray" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff8dc" stop-opacity="0.22"/><stop offset="1" stop-color="#fff8dc" stop-opacity="0"/></linearGradient>
+      <filter id="soft" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="6"/></filter>
+      <filter id="mist" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
+      <pattern id="paper" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="none"/><circle cx="2" cy="3" r="0.6" fill="rgba(255,255,255,0.05)"/></pattern>
+    </defs>
     <rect width="1000" height="620" fill="url(#sea)"/>
-    ${Array.from({ length: 40 }, (_, k) => { const r = seeded(k + 99); return `<path d="M${(r() * 1000).toFixed(0)},${(r() * 620).toFixed(0)} q12,-6 24,0 t24,0" stroke="rgba(160,210,255,0.12)" fill="none" stroke-width="2"/>`; }).join("")}
-    ${ISLANDS.slice(0, 12).map((I, i) => { const pi = ISLANDS[i - 1]; return pi ? `<line x1="${pi.map[0]}" y1="${pi.map[1]}" x2="${I.map[0]}" y2="${I.map[1]}" stroke="${islandUnlocked(i) ? "rgba(230,184,92,0.45)" : "rgba(255,255,255,0.08)"}" stroke-width="3" stroke-dasharray="8 8"/>` : ""; }).join("")}
-    ${ISLANDS.slice(0, 12).map((I, i) => { const un = islandUnlocked(i), p = S.prog[i], c1 = "#" + new THREE.Color(I.ground[1]).getHexString(), c2 = "#" + new THREE.Color(I.ground[0]).getHexString();
-      return `<g class="isle ${mapSel === i ? "sel" : ""}" data-isle="${i}" transform="translate(${I.map[0]},${I.map[1]})" tabindex="0" role="button" aria-label="${un ? esc(I.name) : "Undiscovered island"}">
-        <path class="halo" d="${islandPath(i)}" fill="none" stroke="${mapSel === i ? "#fff" : "transparent"}" stroke-width="4" transform="scale(1.08)"/>
-        <path d="${islandPath(i)}" fill="${un ? c2 : "#040507"}" stroke="${un ? "rgba(0,0,0,0.35)" : "#1b1f2a"}" stroke-width="2"/>
-        ${un ? `<path d="${islandPath(i)}" fill="${c1}" transform="scale(0.72)"/>` : `<text y="10" text-anchor="middle" fill="#5a6278" style="font-size:30px">?</text>`}
-        <text y="${-48 - (i % 3) * 6}" text-anchor="middle" fill="${un ? "#fff" : "#6a7288"}">${un ? esc(I.name) : "Undiscovered"}</text>
-        ${un ? `<g transform="translate(-24,${52 + (i % 3) * 6})">${STAGES.map((s, k) => `<circle cx="${k * 24}" cy="0" r="7" fill="${p[s.id] ? "#7fd69a" : "rgba(255,255,255,0.15)"}" stroke="#000" stroke-opacity="0.5"/>`).join("")}</g>` : ""}
+    <rect width="1000" height="620" fill="url(#paper)"/>
+    ${[0, 1, 2, 3, 4].map(k => `<path d="M${700 + k * 60},0 L${560 + k * 90},620 L${600 + k * 90},620 L${740 + k * 60},0 Z" fill="url(#ray)" opacity="${0.6 - k * 0.08}"/>`).join("")}
+    <rect width="1000" height="620" fill="url(#sun)"/>
+    ${Array.from({ length: 70 }, (_, k) => { const x = rnd(0, 1000), y = rnd(40, 600), w = rnd(14, 34); return `<path d="M${x.toFixed(0)},${y.toFixed(0)} q${w / 2},-${w / 4} ${w},0 t${w},0" stroke="rgba(230,248,255,${(0.08 + R0() * 0.18).toFixed(2)})" fill="none" stroke-width="${(1 + R0() * 1.5).toFixed(1)}" stroke-linecap="round"/>`; }).join("")}
+    ${Array.from({ length: 26 }, () => { const x = rnd(0, 1000), y = rnd(0, 620); return `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${rnd(1, 2.4).toFixed(1)}" fill="#fff"><animate attributeName="opacity" values="0;0.9;0" dur="${rnd(2, 5).toFixed(1)}s" begin="${rnd(0, 4).toFixed(1)}s" repeatCount="indefinite"/></circle>`; }).join("")}
+    <g opacity="0.55"><path d="M120,470 q20,-40 40,0 q20,40 40,0 q20,-40 40,0" stroke="#2a6a5a" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="244" cy="466" r="9" fill="#2a6a5a"/><circle cx="247" cy="463" r="2" fill="#e8f8f0"/><animateTransform attributeName="transform" type="translate" values="0 0; 14 -4; 0 0" dur="7s" repeatCount="indefinite"/></g>
+    <g transform="translate(860,470)" opacity="0.7"><path d="M0,0 q-14,-22 -26,-30 q14,4 26,16 q12,-12 26,-16 q-12,8 -26,30 z" fill="#1d3a54"/><path d="M-40,8 q20,-6 40,0 t40,0" stroke="rgba(255,255,255,0.6)" fill="none" stroke-width="2"/><animateTransform attributeName="transform" additive="sum" type="translate" values="0 0;0 6;0 0" dur="5s" repeatCount="indefinite"/></g>
+    ${ship(520, 120, 1, false, "#f4ecd8")}${ship(250, 560, 0.8, true, "#e8d8c0")}${ship(760, 330, 0.7, false, "#f0e0e8")}
+    ${Array.from({ length: 7 }, (_, k) => { const x = rnd(80, 920), y = rnd(30, 200); return `<path d="M${x.toFixed(0)},${y.toFixed(0)} q6,-6 12,0 q6,-6 12,0" stroke="#203040" stroke-width="2" fill="none"><animateTransform attributeName="transform" type="translate" values="0 0; ${rnd(20, 50).toFixed(0)} ${rnd(-8, 8).toFixed(0)}; 0 0" dur="${rnd(8, 14).toFixed(0)}s" repeatCount="indefinite"/></path>`; }).join("")}
+    ${ISLANDS.slice(0, 12).map((I, i) => known[i] && i && known[i - 1] ? `<line x1="${ISLANDS[i - 1].map[0]}" y1="${ISLANDS[i - 1].map[1]}" x2="${I.map[0]}" y2="${I.map[1]}" stroke="rgba(255,236,190,0.55)" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/>` : "").join("")}
+    ${ISLANDS.slice(0, 12).map((I, i) => { if (!known[i]) return ""; const p = S.prog[i], c1 = "#" + new THREE.Color(I.ground[1]).getHexString(), c2 = "#" + new THREE.Color(I.ground[0]).getHexString(), tr = "#" + new THREE.Color(I.ground[1]).multiplyScalar(0.6).getHexString(), r2 = seeded(i * 31 + 5);
+      return `<g class="isle ${mapSel === i ? "sel" : ""}" data-isle="${i}" transform="translate(${I.map[0]},${I.map[1]})" tabindex="0" role="button" aria-label="${esc(I.name)}">
+        <ellipse rx="92" ry="74" fill="url(#shallow)"/>
+        <path d="${islandPath(i)}" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="3" transform="scale(1.16)"><animate attributeName="stroke-opacity" values="0.15;0.6;0.15" dur="4s" repeatCount="indefinite"/></path>
+        <path class="halo" d="${islandPath(i)}" fill="none" stroke="${mapSel === i ? "#fff6c0" : "transparent"}" stroke-width="4" transform="scale(1.08)"/>
+        <path d="${islandPath(i)}" fill="${c2}" stroke="rgba(60,40,20,0.45)" stroke-width="2"/>
+        <path d="${islandPath(i)}" fill="${c1}" transform="scale(0.72)"/>
+        ${Array.from({ length: 6 }, () => { const x = (r2() - 0.5) * 50, y = (r2() - 0.5) * 34; return `<path d="M${x.toFixed(0)},${(y - 12).toFixed(0)} l-7,13 h14 z" fill="${tr}"/><rect x="${(x - 1).toFixed(0)}" y="${(y + 1).toFixed(0)}" width="2" height="4" fill="#5a3a22"/>`; }).join("")}
+        <text y="${-56 - (i % 3) * 6}" text-anchor="middle" fill="#fffaf0" style="paint-order:stroke;stroke:rgba(20,30,50,0.8);stroke-width:4px">${esc(I.name)}</text>
+        <g transform="translate(-24,${58 + (i % 3) * 6})">${STAGES.map((s, k) => `<circle cx="${k * 24}" cy="0" r="7" fill="${p[s.id] ? "#7fd69a" : "rgba(255,255,255,0.3)"}" stroke="#000" stroke-opacity="0.5"/>`).join("")}</g>
       </g>`; }).join("")}
+    ${cloud(140, 90, 1.1, 0.75, 26)}${cloud(620, 60, 0.9, 0.6, 32)}${cloud(900, 230, 1.2, 0.55, 28)}${cloud(380, 300, 0.8, 0.35, 36)}${cloud(720, 560, 1.3, 0.5, 30)}
+    <g opacity="0.85" filter="url(#mist)">${ISLANDS.slice(0, 12).map((I, i) => known[i] ? "" : `<ellipse cx="${I.map[0]}" cy="${I.map[1]}" rx="${rnd(70, 110).toFixed(0)}" ry="${rnd(40, 60).toFixed(0)}" fill="#eef6ff" opacity="0.32"/>`).join("")}</g>
+    <g transform="translate(905,535)"><circle r="48" fill="rgba(245,232,200,0.85)" stroke="#6a4a2a" stroke-width="2"/><circle r="40" fill="none" stroke="#6a4a2a" stroke-width="1" stroke-dasharray="2 4"/>${[0, 90, 180, 270].map(a => `<path d="M0,-38 L7,0 L0,38 L-7,0 Z" fill="${a % 180 ? "#3a5a7a" : "#a83a2a"}" transform="rotate(${a / 2})" opacity="${a % 180 ? 0.7 : 1}"/>`).join("")}<text y="-50" text-anchor="middle" fill="#fff6e0" style="font-size:16px;paint-order:stroke;stroke:#2a1a0e;stroke-width:3px">N</text><circle r="4" fill="#e6b85c"/></g>
+    <text x="24" y="604" fill="rgba(255,250,235,0.85)" style="font-size:15px;font-style:italic;paint-order:stroke;stroke:rgba(10,20,40,0.6);stroke-width:3px">${known.filter(Boolean).length} of 12 islands charted. The rest lie hidden in the mist.</text>
+    <rect x="6" y="6" width="988" height="608" rx="14" fill="none" stroke="rgba(230,190,110,0.55)" stroke-width="3"/><rect x="14" y="14" width="972" height="592" rx="10" fill="none" stroke="rgba(230,190,110,0.25)" stroke-width="1.5"/>
   </svg>`;
   $("seaMap").innerHTML = svg;
   const i = mapSel, I = ISLANDS[i], un = islandUnlocked(i);
@@ -3680,13 +3821,14 @@ $("mapSide").addEventListener("click", e => {
 });
 $("bLeave").addEventListener("click", () => { $("confirmLeave").hidden = false; });
 $("clStay").addEventListener("click", () => { $("confirmLeave").hidden = true; });
-$("clLeave").addEventListener("click", () => { $("confirmLeave").hidden = true; if (world && world.kind === "cave") leaveCave(); else goLobby(); });
+$("clLeave").addEventListener("click", () => { $("confirmLeave").hidden = true; if (world && world.kind === "cave") leaveCave(); else if (world && world.kind === "sky") leaveSkylands(); else goLobby(); });
 
 function updateModeUi() {
   const inLobby = world && world.kind === "lobby";
   $("bLeave").hidden = inLobby;
-  $("bLeave").textContent = world && world.kind === "raid" ? "Leave the hall" : world && world.kind === "cave" ? "Leave the cave" : "Leave island";
+  $("bLeave").textContent = world && world.kind === "sky" ? "Leave the Skylands" : world && world.kind === "raid" ? "Leave the hall" : world && world.kind === "cave" ? "Leave the cave" : "Leave island";
   if (world && world.kind === "cave") { $("hWhere").textContent = world.cave.name; $("hSub").textContent = "Mine ore. The deeper you go, the richer and the deadlier."; $("bossBar").hidden = true; }
+  if (world && world.kind === "sky") { $("hWhere").textContent = "The Skylands"; $("hSub").textContent = "Towers above the clouds. Mind the edges."; $("bossBar").hidden = true; }
   if (world && world.kind === "raid") { $("hWhere").textContent = "The Raid Hall"; $("hSub").textContent = "Step through a gate to start a raid"; $("bossBar").hidden = true; }
   if (inLobby) { $("hWhere").textContent = "The Lobby"; $("hSub").textContent = "Step onto a portal to choose an island"; $("bossBar").hidden = true; }
 }
@@ -3756,6 +3898,8 @@ function update(dt) {
   if (P.swing > 0) P.swing = Math.max(0, P.swing - dt / (P.swingDur || 0.4));
   if (P.spinT > 0) P.spinT = Math.max(0, P.spinT - dt);
   if (!P.dead) {
+    if (S.cls === "druid") heal(ST.maxHp * 0.007 * dt, true); if (S.cls === "bard") heal(ST.maxHp * 0.005 * dt, true);
+    if (S.cls === "dragonknight") { P.dfT = (P.dfT || 0) - dt; if (P.dfT <= 0 && enemies.some(e => !e.dead && e.pos.distanceTo(P.pos) < 6)) { P.dfT = 10; for (const e of enemiesNear(P.pos, 6)) damageEnemy(e, ST.hit * 2.5, e.pos.clone().sub(P.pos), 2, { color: "#ff9a3a" }); ringFx(P.pos, 6, 0xff6a2a, 0.6); burstFx(P.pos.clone().add(new V3(0, 1, 0)), 5, 0xff7a2a, 0.5); } }
     if (S.cls === "paladin") { heal(ST.maxHp * 0.01 * dt, true); P.consecrateT -= dt; if (P.consecrateT <= 0 && enemies.some(e => !e.dead && e.pos.distanceTo(P.pos) < 5)) { P.consecrateT = 8; for (const e of enemiesNear(P.pos, 5)) damageEnemy(e, ST.hit * 1.5, e.pos.clone().sub(P.pos), 1.5, { color: "#fff0a0" }); ringFx(P.pos, 5, 0xffe8a0, 0.6); } }
     helmTick(dt, ix); if (sailing && !sailing.anchored) sailUpdate(dt, wheelTurn !== null ? wheelTurn : ix, iy); else {
     // horizontal
@@ -4069,7 +4213,7 @@ const QUEST_NPCS = [
 ];
 const VILLAGERS = [
   { name: "Fenna", role: "Baker", look: { skin: 0xe8c0a0, hair: 0xc89a5a, cloth: 0xc8b090, cloth2: 0x8a5a3a }, lines: ["Fresh bread for heroes! Well, it was fresh this morning.", "If you find wheat on the islands, I want to hear about it.", "My oven runs hotter than Brannoc's forge. Do not tell him I said that."] },
-  { name: "Tobin", role: "Errand boy", look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0x4a7a3a, cloth2: 0x3a3022 }, lines: ["Is it true the Vaulted blades sing at night?", "I am going to roll a Reaper one day. Just you wait.", "Captain Maren pays well. Ask her for work!"] },
+  { name: "Tobin", role: "Errand boy", look: { skin: 0x8a5a3a, hair: 0x1a1a1a, cloth: 0x4a7a3a, cloth2: 0x3a3022 }, lines: ["Is it true the Vaulted blades sing at night?", "I am going to roll a Reaper one day. Just you wait.", "Captain Maren pays well. Ask her for work!", "My gran says three feathers sleep just past three far castles, and the wind only listens once it has met all three."] },
   { name: "Old Hesk", role: "Fisherman", look: { skin: 0xd0a080, hair: 0xd8d8d8, cloth: 0x5a6a7a, cloth2: 0x3a3a3a }, lines: ["The water by the fountain glows when a portal opens.", "Saltspray Atoll has the best fish and the worst crabs.", "I once saw a Gilded Vault Chest. Never forgot the shine."] },
   { name: "Wren", role: "Courier", look: { skin: 0xf0d8c0, hair: 0x8a2a1a, cloth: 0x7a2a3a, cloth2: 0x2a1a22 }, lines: ["Sage Ilvara wants to know what is in your chests. Everyone does.", "Four portals, twelve islands, one very tired courier.", "Heard the Forge can make a Fortune Die, if you bring enough starsteel."] }
 ];
@@ -6450,14 +6594,15 @@ function castleModel(parent, x, y, z, sc, C) {
   const toW = (lx, lz) => { const c = Math.cos(gRot), s = Math.sin(gRot); return [x + (lx * c + lz * s) * sc, z + (-lx * s + lz * c) * sc]; };
   for (let k = -S2; k <= S2; k += 2.6) { for (const [lx, lz] of [[k, -S2], [-S2, k], [S2, k]]) { const [wx, wz] = toW(lx, lz); addCircle(wx, wz, 1.4 * sc, 7); } if (Math.abs(k) > 4) { const [wx, wz] = toW(k, S2); addCircle(wx, wz, 1.4 * sc, 7); } }
   { const [kx, kz] = toW(0, -5); addCircle(kx, kz, 6.2 * sc, 14); }
-  return { g, toW };
+  return { g, toW, gRot };
 }
 function buildCastles(group, h) {
   const r = seeded(5150);
   for (const C of CASTLES) {
     let x = C.x, z = C.z, sc = 1;
     if (C.sea) { const I = ISLES.find(i => i.id === C.isle); if (!I) continue; x = I.x - 2; z = I.z - 2; sc = Math.min(0.62, I.r / 26); C.x = x; C.z = z; }
-    const y = world.h(x, z), { toW } = castleModel(group, x, y - 0.2, z, sc, C);
+    const y = world.h(x, z), { toW, gRot } = castleModel(group, x, y - 0.2, z, sc, C);
+    try { castleCourt(group, C, x, y - 0.2, z, sc, gRot, toW); } catch (err) { reportError(err); }
     const lb = textSprite(C.name, "#ffe2a0", 1.8); lb.position.set(x, y + 26 * sc, z); group.add(lb); world.labels.push(lb);
     // treasury inside the keep door, and the dungeon gate
     const [tx, tz] = toW(0, 2.5), ty = world.h(tx, tz);
@@ -6479,6 +6624,210 @@ function buildCastles(group, h) {
     if (C.biome === "snow") world.animated.push(t => { if (C.glow) C.glow.material.opacity = 0.45 + Math.sin(t * 2) * 0.1; });
   }
 }
+/* ---- living castles: a royal court in every courtyard, knights on parade, soldiers on the walls, a camp outside ---- */
+const ROYALS = {
+  frostpeak: ["King Halvard the Pale", "Queen Sigrun"], thornwood: ["King Bramwell", "Queen Ivy of the Thorns"], emberforge: ["King Torvald Ashhand", "Queen Cinder"],
+  sandstone: ["Sultan Amir", "Sultana Zahra"], amethyst: ["King Oberon Violet", "Queen Lys"], ivory: ["High King Aurelian", "Queen Celestine"],
+  bloodstone: ["King Draven Redmark", "Queen Morwen"], mirewatch: ["King Fenwick", "Queen Reedmother"], pebblekeep: ["Lord Pebbleton", "Lady Shellwyn"],
+  sirenhold: ["Prince Marin", "Queen Nerissa"], gildedpalace: ["Emperor Solenne", "Empress Aurea"], coralspire: ["King Coralan", "Queen Perla"],
+  tidewatch: ["Admiral-King Brack", "Queen Undine"], stormwall: ["Warlord Thunn", "Queen Gale"]
+};
+const ROYAL_LINES = [
+  "Kneel if you must, but stand up quickly. There is work for a blade like yours.",
+  "Our walls have stood three hundred winters. With heroes like you, they will stand three hundred more.",
+  "The vault-touched relics are stirring again. Bring me news from the islands.",
+  "My knights speak of you at supper. Mostly kindly.",
+  "A crown is heavier than any helmet. Trust me on that.",
+  "Guard the realm and the realm will remember your name."
+];
+const KNIGHT_LINES = ["Halt. Ah, it is you. Carry on.", "Long live the crown!", "I have stood here since dawn. My feet have opinions.", "No trouble today, traveller.", "The captain says the skies have been restless lately."];
+function castleCourt(group, C, x, y, z, sc, gRot, toW) {
+  const cg = new THREE.Group(); cg.position.set(x, y, z); cg.rotation.y = gRot; cg.scale.setScalar(sc); group.add(cg);
+  const people = new THREE.Group(); group.add(people);
+  const red = std(0x8a1a22, { r: 0.85, map: "fabric" }), gold = std(0xe8c060, { m: 0.9, r: 0.25 }), velvet = std(C.banner, { r: 0.8, map: "fabric" }), wood = MAT.bark(0x5a3a22), stone = std(C.wall, { r: 0.85, map: "rock", rep: 2 }), fire = std(0xffa040, { e: 0xff7a20, ei: 2.4 });
+  const L = (geo, mat, px, py, pz, sx = 1, sy = 1, sz = 1) => M(geo, mat, px, py, pz, cg, sx, sy, sz);
+  const auction = !!CASTLE_AUCTIONS[C.id];
+  // a red carpet from the gate to the keep door, edged in gold
+  L(G.box(), red, 0, 0.03, 7, 2.2, 0.04, 12.4); for (const sx of [-1, 1]) L(G.box(), gold, sx * 1.12, 0.05, 7, 0.08, 0.04, 12.4);
+  // the royal dais and two thrones under a canopy, on the open side of the courtyard
+  const dx = auction ? 8.6 : -8.6, face = auction ? -Math.PI / 2 : Math.PI / 2;
+  L(G.box(), stone, dx, 0.25, 6.5, 4.2, 0.5, 6.2); L(G.box(), stone, dx, 0.6, 6.5, 3.2, 0.3, 5.2); L(G.box(), red, dx, 0.77, 6.5, 2.4, 0.04, 4.6);
+  for (const tz of [5.2, 7.8]) { const th = new THREE.Group(); th.position.set(dx + (auction ? 0.8 : -0.8), 0.75, tz); th.rotation.y = face; cg.add(th);
+    M(G.box(), gold, 0, 0.45, 0, th, 0.9, 0.9, 0.8); M(G.box(), velvet, 0, 0.92, 0.02, th, 0.75, 0.08, 0.65); M(G.box(), gold, 0, 1.45, -0.36, th, 0.9, 1.9, 0.12); M(G.box(), velvet, 0, 1.4, -0.29, th, 0.7, 1.5, 0.04);
+    for (let k = 0; k < 5; k++) M(G.cone(6), gold, -0.36 + k * 0.18, 2.5, -0.36, th, 0.04, 0.16, 0.04); M(G.oct(), glowMat(C.banner, 1), 0, 2.15, -0.29, th, 0.08); }
+  for (const [px, pz] of [[-1.9, 4.1], [1.9, 4.1], [-1.9, 8.9], [1.9, 8.9]]) L(G.cyl(0.08, 0.08, 8), gold, dx + px, 2.1, pz, 1, 3.6, 1);
+  L(G.box(), velvet, dx, 3.95, 6.5, 4.2, 0.12, 5.2); for (let k = 0; k < 9; k++) L(G.cone(4), velvet, dx - 2 + k * 0.5, 3.75, 3.9, 0.22, 0.4, 0.05).rotation.x = Math.PI;
+  // braziers that flicker, a banquet table, a weapon rack and training dummies
+  const flames = [];
+  for (const [bx, bz] of [[-2.3, 3.4], [2.3, 3.4], [-2.3, 11.2], [2.3, 11.2], [dx, 2.6], [dx, 10.4]]) { L(G.cyl(0.35, 0.18, 10), MAT.metal(0x3a3a40, 0.4), bx, 1.15, bz, 1, 0.5, 1); L(G.cyl(0.06, 0.08, 6), MAT.metal(0x3a3a40, 0.4), bx, 0.45, bz, 1, 0.9, 1); L(G.sph(), fire, bx, 1.5, bz, 0.22, 0.3, 0.22); const f = glowSprite(0xff9a3a, 1.6, 0.8); f.position.set(bx, 1.75, bz); cg.add(f); flames.push(f); }
+  const tx = auction ? -7.4 : 7.6; L(G.box(), wood, tx, 0.85, 9.5, 1.3, 0.1, 4.2); for (const [ox, oz] of [[-0.5, -1.8], [0.5, -1.8], [-0.5, 1.8], [0.5, 1.8]]) L(G.box(), wood, tx + ox, 0.42, 9.5 + oz, 0.1, 0.84, 0.1);
+  for (let k = 0; k < 8; k++) { const c = [0xd83a3a, 0xf0d060, 0x7ad85a, 0xe8e0d0, 0xa86a3a][k % 5]; L(G.sph(), std(c, { r: 0.5 }), tx + ((k % 2) - 0.5) * 0.6, 0.98, 8 + k * 0.42, 0.11); if (k % 3 === 0) L(G.cyl(0.05, 0.035, 8), gold, tx + 0.35, 1.02, 8.2 + k * 0.4, 1, 0.16, 1); }
+  L(G.box(), wood, -10.8, 1.1, 1.6, 0.15, 2.2, 3); for (let k = 0; k < 4; k++) { const sp = L(G.cyl(0.03, 0.03, 6), MAT.metal(0xb8bcc4, 0.3), -10.6, 1.3, 0.6 + k * 0.65, 1, 2.2, 1); sp.rotation.x = 0.12; L(G.cone(4), MAT.metal(0xd8dce4, 0.2), -10.6, 2.45, 0.73 + k * 0.65, 0.05, 0.2, 0.05); }
+  for (const dz of [-1.5, 1.5]) { L(G.cyl(0.07, 0.08, 6), wood, 10.6, 0.8, 1.6 + dz, 1, 1.6, 1); L(G.box(), wood, 10.6, 1.3, 1.6 + dz, 0.1, 0.1, 1); L(G.sph(), std(0xd8c090, { r: 0.9, map: "fabric" }), 10.6, 1.75, 1.6 + dz, 0.22, 0.26, 0.22); L(G.cyl(0.25, 0.28, 10), std(0xd8c090, { r: 0.9, map: "fabric" }), 10.6, 1.15, 1.6 + dz, 1, 0.5, 1); }
+  // outside: banner poles along the approach, and a soldiers' camp with tents and a campfire
+  for (let k = 0; k < 4; k++) for (const sx of [-1, 1]) { const bz = 17 + k * 4; L(G.cyl(0.07, 0.08, 6), MAT.metal(0x3a3a40, 0.4), sx * 4.2, 2.5, bz, 1, 5, 1); const fl = L(G.box(), std(C.banner, { r: 0.7, map: "fabric", ds: true }), sx * 4.2 + sx * 0.5, 4.2, bz, 0.9, 1.6, 0.04); fl.rotation.y = 0.2 * sx; L(G.sph(), gold, sx * 4.2, 5.05, bz, 0.12); }
+  for (const [cx2, cz2, rot] of [[-18, 20, 0.4], [-22, 14, 1.1], [18, 21, -0.5]]) { const tg = new THREE.Group(); tg.position.set(cx2, 0, cz2); tg.rotation.y = rot; cg.add(tg);
+    M(G.cone(4), std([0xe8e0c8, C.banner, 0xd8d0b8][Math.abs(cx2) % 3], { r: 0.85, map: "fabric", ds: true }), 0, 1.4, 0, tg, 2, 2.8, 2.4).rotation.y = Math.PI / 4; M(G.box(), std(0x1a1410, { r: 1 }), 0, 0.7, 1.68, tg, 0.7, 1.3, 0.05); M(G.cyl(0.04, 0.04, 6), wood, 0, 3, 0, tg, 1, 1.4, 1); M(G.box(), velvet, 0.3, 3.5, 0, tg, 0.6, 0.35, 0.03); }
+  for (let k = 0; k < 5; k++) { const lg = L(G.cyl(0.1, 0.1, 6), wood, -14 + Math.cos(k * 1.26) * 0.4, 0.15, 22 + Math.sin(k * 1.26) * 0.4, 1, 0.9, 1); lg.rotation.z = Math.PI / 2; lg.rotation.y = k * 1.26; }
+  L(G.sph(), fire, -14, 0.35, 22, 0.3, 0.4, 0.3); const cf = glowSprite(0xff8a2a, 2.4, 0.85); cf.position.set(-14, 0.8, 22); cg.add(cf); flames.push(cf);
+  for (const [bx, bz] of [[16, 15.5], [16.8, 16.2], [15.6, 16.6]]) { L(G.cyl(0.4, 0.45, 10), wood, bx, 0.5, bz, 1, 1, 1); L(G.tor(0.43, 0.03), MAT.metal(0x5a5a62, 0.4), bx, 0.75, bz).rotation.x = Math.PI / 2; }
+  // people: the king and queen, a herald, knights lining the carpet, soldiers on patrol
+  const P2 = (lx, lz, ly = 0) => { const [wx, wz] = toW(lx, lz); return [wx, (world.h ? world.h(wx, wz) : y) + ly * sc, wz]; };
+  const person = (lx, lz, look, armour, weapon, rotLocal, ly = 0) => { const R = buildHumanoid({ look, armour, weapon, lite: true }); const [wx, wy, wz] = P2(lx, lz, ly); R.g.position.set(wx, wy, wz); R.g.rotation.y = gRot + rotLocal; R.shL.rotation.z = 0.08; R.shR.rotation.z = -0.08; people.add(R.g); return R; };
+  const names = ROYALS[C.id] || ["King of the Keep", "Queen of the Keep"], skin = [0xf0d0b0, 0xd9a77f, 0xc08a5a, 0x8a5a3a][CASTLES.indexOf(C) % 4];
+  const talk = (R, name, role, lines) => { const [wx, , wz] = [R.g.position.x, 0, R.g.position.z]; world.interact.push({ x: wx, z: wz, y: R.g.position.y, r: 2.4, label: `Speak with ${name}`, act: () => openDialog({ name, role, lines }) }); const lb = textSprite(`${name} · ${role}`, "#ffe2a0", 0.7); lb.position.set(wx, R.g.position.y + 2.5, wz); lb.userData.far = 30; people.add(lb); world.labels.push(lb); addCircle(wx, wz, 0.45, 2.2); };
+  const throneX = dx + (auction ? 0.8 : -0.8), lookAtGate = auction ? -Math.PI / 2 : Math.PI / 2;
+  const king = person(throneX, 5.2, { skin, hair: 0x3a2a1a, cloth: 0x7a1a2a, cloth2: 0x2a1a1a }, "gildedaegis", "solbrand", lookAtGate, 0.77);
+  const queen = person(throneX, 7.8, { skin, hair: [0x2a1a10, 0xc89a5a, 0x1a1a1a][CASTLES.indexOf(C) % 3], cloth: C.banner, cloth2: 0x3a1a3a }, "tidecrown", null, lookAtGate, 0.77);
+  talk(king, names[0], `Ruler of ${C.name}`, ROYAL_LINES); talk(queen, names[1], `Queen of ${C.name}`, ROYAL_LINES.slice().reverse());
+  const herald = person(dx + (auction ? -2.6 : 2.6), 6.5, { skin: 0xd9b08c, hair: 0x6a4a2a, cloth: C.banner, cloth2: 0xe8e0c8 }, null, null, lookAtGate + Math.PI);
+  talk(herald, "Herald", C.name, [`Hear ye! You stand in ${C.name}, seat of ${names[0]}.`, "The treasury is opened for proven heroes only. Mind your manners in court.", "The banquet is for the knights. Well, perhaps one apple."]);
+  for (let k = 0; k < 3; k++) for (const sx of [-1, 1]) { const kn = person(sx * 2.3, 5.4 + k * 2.6, { skin: 0xc99a74, hair: 0x2a1a10, cloth: C.banner, cloth2: 0x2a2a30 }, k === 1 ? "moonwardens" : "bastionplate", k === 2 ? "ironoath" : "brinewarden", sx > 0 ? -Math.PI / 2 : Math.PI / 2); if (k === 0) talk(kn, sx < 0 ? "Sir Aldous" : "Dame Rowena", "Knight of the Court", KNIGHT_LINES); else addCircle(kn.g.position.x, kn.g.position.z, 0.45, 2.2); }
+  // soldiers walking the back wall and the approach road
+  const patrols = [];
+  for (const [ax, az, bx2, bz2, ly] of [[-11, -13, 11, -13, 6.6], [-6, 15.5, 6, 15.5, 0], [-12, 18, -12, 30, 0]]) {
+    const R = buildHumanoid({ look: { skin: 0xc99a74, hair: 0x3a2a1a, cloth: C.banner, cloth2: 0x2a2a30 }, armour: "chainshirt", weapon: "boarspear", lite: true }); people.add(R.g); patrols.push({ R, a: [ax, az], b: [bx2, bz2], ly, ph: Math.random() * 10 });
+  }
+  world.animated.push(t => {
+    const d = Math.hypot(P.pos.x - x, P.pos.z - z), on = d < 120 * Math.max(0.7, sc); cg.visible = people.visible = on; if (!on) return;
+    for (const f of flames) f.material.opacity = 0.7 + Math.sin(t * 9 + f.position.x) * 0.15;
+    for (const p of patrols) { const u = (Math.sin((t + p.ph) * 0.18) + 1) / 2, lx = lerp(p.a[0], p.b[0], u), lz = lerp(p.a[1], p.b[1], u), dir = Math.cos((t + p.ph) * 0.18) >= 0 ? 1 : -1;
+      const [wx, wy, wz] = P2(lx, lz, p.ly); p.R.g.position.set(wx, p.ly ? y + p.ly * sc : wy, wz); p.R.g.rotation.y = gRot + Math.atan2((p.b[0] - p.a[0]) * dir, (p.b[1] - p.a[1]) * dir); poseHumanoid(p.R, t + p.ph, 0.55, 0, "normal", false); }
+  });
+  shadows(cg, true, true);
+}
+/* =====================================================================
+   THE SKYLANDS: towers above the clouds, sky folk, dragons. The way up is a secret:
+   three weathered feathers rest just beyond three far castles. Touch all three and
+   the wind rises behind the Ivory Citadel.
+   ===================================================================== */
+const SKY_FEATHERS = [["a", "frostpeak", 0.35], ["b", "mirewatch", -0.4], ["c", "amethyst", 0.5]];
+const skySpot = (cid, out, side) => { const C = CASTLES.find(c => c.id === cid), L = Math.hypot(C.x, C.z), ux = C.x / L, uz = C.z / L; return [C.x + ux * out - uz * side, C.z + uz * out + ux * side]; };
+function skyState() { S.sky = S.sky || { f: {} }; S.sky.f = S.sky.f || {}; return S.sky; }
+const skyOpen = () => Object.keys(skyState().f).length >= 3;
+function buildSkyClues(group, h) {
+  const st = skyState(), stone = std(0x8a8678, { r: 0.9, map: "rock" }), featherM = std(0xf4f0e8, { r: 0.6, e: 0xffffff, ei: 0.08 });
+  for (const [id, cid, side] of SKY_FEATHERS) {
+    let [x, z] = skySpot(cid, 21, side * 10);
+    for (let k = 0; k < 12 && (blockedLobby(x, z) || Math.hypot(x, z) > 284); k++) { [x, z] = skySpot(cid, 17 + k, side * (10 - k)); }
+    const y = h(x, z), g = new THREE.Group(); g.position.set(x, y, z); group.add(g);
+    M(G.dode(), stone, 0, 0.25, 0, g, 0.45, 0.35, 0.4); const f = M(featherGeo(), featherM, 0, 0.5, 0, g, 0.6); f.rotation.z = -0.5; f.rotation.y = side * 2;
+    const gl = glowSprite(0xffffff, 0.7, st.f[id] ? 0.05 : 0.22); gl.position.y = 0.7; g.add(gl);
+    world.animated.push(t => { f.rotation.x = Math.sin(t * 1.3 + side) * 0.12; gl.material.opacity = st.f[id] ? 0.04 : 0.14 + Math.sin(t * 2 + side) * 0.08; });
+    world.interact.push({ x, z, y, r: 2.0, label: st.f[id] ? "A feather, still now" : "Touch the weathered feather", act: () => touchFeather(id) });
+  }
+  // the rising wind behind the Ivory Citadel; only there once all three feathers have been touched
+  let [lx, lz] = skySpot("ivory", 24, 0); for (let k = 0; k < 10 && blockedLobby(lx, lz); k++) [lx, lz] = skySpot("ivory", 20 + k, (k % 2 ? 1 : -1) * k * 2);
+  const ly = h(lx, lz), lift = new THREE.Group(); lift.position.set(lx, ly, lz); group.add(lift); world.skyLift = { x: lx, z: lz, y: ly };
+  const motes = []; for (let k = 0; k < 26; k++) { const m = M(featherGeo(), featherM, 0, 0, 0, lift, 0.35); m.userData.k = k; motes.push(m); }
+  const col = glowSprite(0xd8f0ff, 3.4, 0.0); col.position.y = 2; lift.add(col);
+  world.animated.push(t => { const on = skyOpen(); lift.visible = on; if (!on) return;
+    for (const m of motes) { const k = m.userData.k, a = t * 1.8 + k * 0.9, yy = ((t * 1.4 + k * 0.37) % 9); m.position.set(Math.cos(a) * (0.9 + yy * 0.05), yy, Math.sin(a) * (0.9 + yy * 0.05)); m.rotation.set(t + k, a, 0.6); }
+    col.material.opacity = 0.18 + Math.sin(t * 2) * 0.06;
+    if (!run && !P.dead && Math.hypot(P.pos.x - lx, P.pos.z - lz) < 1.6) enterSkylands();
+  });
+}
+function touchFeather(id) {
+  const st = skyState(); if (st.f[id]) { toast("The feather is still. The wind has already heard you here.", ""); return; }
+  st.f[id] = 1; save(); const n = Object.keys(st.f).length; MUSIC.sfx("chest"); ringFx(P.pos, 2.4, 0xffffff, 0.5);
+  if (n < 3) floatText(P.pos, `The wind remembers you (${n}/3)`, "#e8f4ff");
+  else { banner("The wind is rising", "Somewhere far to the north, beyond the whitest walls, the air begins to turn."); }
+}
+const SKY_FOLK = [
+  { name: "Aerin", role: "Sky Warden", lines: ["Few walk up from below. Fewer find the feathers.", "Mind the edges. The wind is kind, but not always fast.", "The dragons here are old friends. Mostly."] },
+  { name: "Pell", role: "Cloud Shepherd", lines: ["I herd clouds. They do not listen, but neither do sheep.", "The waterfall in the gardens never reaches the ground. Nobody knows where it goes."] },
+  { name: "Mira", role: "Windweaver", lines: ["I spin thread from the breeze. It is very light and very hard to hold.", "Have you seen the observatory? On a clear night you can see the islands glowing."] },
+  { name: "Old Corwin", role: "Tower Keeper", lines: ["Nine hundred steps to the top of the spire. I count them every morning.", "Before the Vault was sealed, the whole sky was full of towers like these."] },
+  { name: "Lark", role: "Dragon Groom", lines: ["Ember likes her scales brushed backwards. Do not ask how I learned that.", "If a dragon bows to you, bow back. Slowly."] },
+  { name: "Sela", role: "Star Reader", lines: ["The stars say you climbed a long way to hear this. They are right.", "Come back each day. The sky chest at the observatory refills at dawn."] }
+];
+function buildSkylands() {
+  clearWorld();
+  const group = new THREE.Group(); scene.add(group);
+  const ISL = [{ x: 0, z: 0, y: 0, r: 26, name: "Sky Citadel" }, { x: 56, z: -14, y: 8, r: 16, name: "Dragon Roost" }, { x: -52, z: -6, y: 4, r: 19, name: "Cloudhaven" }, { x: 8, z: -60, y: 14, r: 13, name: "Star Observatory" }, { x: -8, z: 52, y: -6, r: 15, name: "Hanging Gardens" }];
+  const BR = [[0, 1], [0, 2], [0, 3], [0, 4]].map(([a, b]) => { const A = ISL[a], B = ISL[b], dx = B.x - A.x, dz = B.z - A.z, L = Math.hypot(dx, dz), ux = dx / L, uz = dz / L; return { ax: A.x + ux * (A.r - 1), az: A.z + uz * (A.r - 1), bx: B.x - ux * (B.r - 1), bz: B.z - uz * (B.r - 1), ay: A.y, by: B.y, ux, uz }; });
+  const h = (x, z) => { for (const I of ISL) if (Math.hypot(x - I.x, z - I.z) < I.r) return I.y; for (const B of BR) { const L = Math.hypot(B.bx - B.ax, B.bz - B.az), t = ((x - B.ax) * B.ux + (z - B.az) * B.uz) / L, side = Math.abs((x - B.ax) * -B.uz + (z - B.az) * B.ux); if (t >= -0.05 && t <= 1.05 && side < 1.7) return lerp(B.ay, B.by, clamp(t, 0, 1)); } return -400; };
+  world = { kind: "sky", group, h, hBase: h, radius: 1e5, circles: [], portals: [], interact: [], animated: [], labels: [], isl: ISL };
+  setSky(0x3f7fe8, 0xffe8c8, 0xd8e8ff, 0xe8f0ff, 90, 420, 0xfff0d8, 2.4, 0.65);
+  world.clouds = addClouds(group, 0xffffff);
+  for (let k = 0; k < 60; k++) { const r2 = seeded(k * 13 + 3), c = glowSprite(0xffffff, 30 + r2() * 40, 0.5); c.position.set((r2() - 0.5) * 420, -50 - r2() * 40, (r2() - 0.5) * 420); group.add(c); }
+  const grassM = std(0x6ab84a, { r: 0.9, map: "fabric", rep: 6 }), rockM = std(0x9a8a78, { r: 0.9, map: "rock", rep: 3 }), white = std(0xf4f0e8, { r: 0.7, map: "plaster", rep: 2 }), roofM = std(0x3a6ac8, { r: 0.6, flat: true }), gold = std(0xe8c060, { m: 0.9, r: 0.25, e: 0x8a6a20, ei: 0.3 }), wood = MAT.bark(0x6a4a2a);
+  for (const I of ISL) {
+    const top = new THREE.Mesh(new THREE.CircleGeometry(I.r, 48), grassM); top.rotation.x = -Math.PI / 2; top.position.set(I.x, I.y + 0.02, I.z); top.receiveShadow = true; group.add(top);
+    M(G.cyl(1, 1, 40), rockM, I.x, I.y - 1.2, I.z, group, I.r, 2.4, I.r);
+    const und = M(G.cone(12), rockM, I.x, I.y - 2.4 - I.r * 0.7, I.z, group, I.r * 0.95, I.r * 1.4, I.r * 0.95); und.rotation.x = Math.PI;
+    for (let k = 0; k < 5; k++) { const a = k * 1.3, d = I.r * 0.5; const st = M(G.cone(6), rockM, I.x + Math.cos(a) * d, I.y - 6 - (k % 3) * 4, I.z + Math.sin(a) * d, group, 2, 8, 2); st.rotation.x = Math.PI; }
+    const lb = textSprite(I.name, "#fff4d0", 1.4); lb.position.set(I.x, I.y + 9, I.z); lb.userData.far = 90; group.add(lb); world.labels.push(lb);
+  }
+  // rope bridges with planks and posts
+  for (const B of BR) { const L = Math.hypot(B.bx - B.ax, B.bz - B.az), n = Math.ceil(L / 0.9), rot = Math.atan2(B.ux, B.uz);
+    for (let k = 0; k <= n; k++) { const t = k / n, x = lerp(B.ax, B.bx, t), z = lerp(B.az, B.bz, t), y = lerp(B.ay, B.by, t) - 0.08 - Math.sin(t * Math.PI) * 0.0; const pl = M(G.box(), wood, x, y, z, group, 3.2, 0.12, 0.7); pl.rotation.y = rot; if (k % 4 === 0) for (const s2 of [-1, 1]) M(G.cyl(0.06, 0.07, 6), wood, x + -B.uz * 1.7 * s2, y + 0.55, z + B.ux * 1.7 * s2, group, 1, 1.1, 1); }
+    for (const s2 of [-1, 1]) { const a = new V3(B.ax + -B.uz * 1.7 * s2, B.ay + 1.05, B.az + B.ux * 1.7 * s2), b = new V3(B.bx + -B.uz * 1.7 * s2, B.by + 1.05, B.bz + B.ux * 1.7 * s2); branchMesh(group, a, b, 0.03, 0.03, std(0xc8b090, { r: 0.9 })); } }
+  // the citadel: a great spire and four slender towers, joined by arches
+  const spire = (x, z, y0, r, H, roof) => { M(G.cyl(r, r * 1.08, 16), white, x, y0 + H / 2, z, group, 1, H, 1); M(G.cone(16), roof, x, y0 + H + r * 1.4, z, group, r * 1.25, r * 2.8, r * 1.25); M(G.cyl(0.08, 0.08, 6), gold, x, y0 + H + r * 3.1, z, group, 1, 2.2, 1); M(G.sph(), glowMat(0xfff0a0, 1), x, y0 + H + r * 3.4 + 0.6, z, group, 0.35);
+    for (let k = 0; k < Math.floor(H / 4); k++) for (let j = 0; j < 4; j++) { const a = j * Math.PI / 2 + k * 0.4; M(G.box(), WIN_MAT(), x + Math.cos(a) * (r + 0.01), y0 + 3 + k * 4, z + Math.sin(a) * (r + 0.01), group, 0.5, 1, 0.5).rotation.y = -a; }
+    M(G.tor(r * 1.08, 0.12), gold, x, y0 + H * 0.66, z, group).rotation.x = Math.PI / 2; solidCyl(x, z, r * 1.05, 999); };
+  spire(0, -8, 0, 3.2, 46, roofM);
+  for (const [tx, tz] of [[-14, -14], [14, -14], [-16, 8], [16, 8]]) spire(tx, tz, 0, 1.6, 20 + Math.abs(tx) * 0.4, std(0x7a4ac8, { r: 0.6, flat: true }));
+  for (const [ax, az, bx, bz] of [[-14, -14, 0, -8], [14, -14, 0, -8]]) { const mid = new V3((ax + bx) / 2, 16, (az + bz) / 2); branchMesh(group, new V3(ax, 15, az), mid.clone().setY(17), 0.5, 0.5, white); branchMesh(group, mid.clone().setY(17), new V3(bx, 15, bz), 0.5, 0.5, white); }
+  // fountain and flower beds on the citadel green
+  M(G.cyl(3.2, 3.4, 24), white, 0, 0.4, 8, group, 1, 0.8, 1); M(G.cyl(2.9, 2.9, 24), std(0x6ac8ff, { r: 0.05, m: 0.2, e: 0x2a6aa8, ei: 0.3 }), 0, 0.82, 8, group, 1, 0.04, 1); M(G.cyl(0.4, 0.5, 10), white, 0, 1.6, 8, group, 1, 2.4, 1); solidCyl(0, 8, 3.3, 0.8);
+  for (let k = 0; k < 18; k++) { const a = k / 18 * TAU, d = 20; const c = [0xff8ab8, 0xffe060, 0xc8a0ff, 0xffffff][k % 4]; M(G.sph(), std(c, { r: 0.6 }), Math.cos(a) * d, 0.3, Math.sin(a) * d + 2, group, 0.35, 0.25, 0.35); M(G.sph(), std(0x3a8a3a, { r: 0.9 }), Math.cos(a) * d, 0.15, Math.sin(a) * d + 2, group, 0.6, 0.25, 0.6); }
+  // the Wind Well: home again
+  const well = new THREE.Group(); well.position.set(0, 0, 18); group.add(well); M(G.tor(1.6, 0.25), gold, 0, 0.3, 0, well).rotation.x = Math.PI / 2; const wd = portalDisc(0xd8f0ff, 0x7ab8ff); wd.scale.setScalar(1.5); wd.rotation.x = -Math.PI / 2; wd.position.y = 0.12; well.add(wd);
+  world.animated.push(t => { if (wd.material.uniforms) wd.material.uniforms.t.value = t; });
+  const wl = textSprite("Wind Well · down to the lobby", "#d8f0ff", 0.8); wl.position.set(0, 2.4, 18); group.add(wl); world.labels.push(wl);
+  world.interact.push({ x: 0, z: 18, y: 0, r: 2.4, label: "Ride the Wind Well down", act: leaveSkylands });
+  // Cloudhaven: houses and sky folk
+  const V = ISL[2];
+  for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + 0.3, x = V.x + Math.cos(a) * 11, z = V.z + Math.sin(a) * 11, rot = -a + Math.PI / 2;
+    const hg = new THREE.Group(); hg.position.set(x, V.y, z); hg.rotation.y = rot; group.add(hg); M(G.box(), white, 0, 1.6, 0, hg, 4, 3.2, 3.4); M(G.cone(4), std([0x3a6ac8, 0xc84a6a, 0x4aa86a][k % 3], { r: 0.6, flat: true }), 0, 4.1, 0, hg, 3.3, 1.9, 2.9).rotation.y = Math.PI / 4; M(G.box(), WIN_MAT(), 1.01, 1.9, 0, hg, 0.05, 0.9, 0.9); M(G.box(), std(0x5a3a22, { r: 0.8 }), 0, 1, 1.71, hg, 0.9, 1.9, 0.05); solidBox(x, z, 4.2, 3.6, rot, 999); }
+  for (let k = 0; k < 4; k++) { const a = k * 1.7, x = V.x + Math.cos(a) * 5, z = V.z + Math.sin(a) * 5; M(G.cyl(0.07, 0.08, 6), MAT.metal(0x3a3a40, 0.4), x, V.y + 1.4, z, group, 1, 2.8, 1); const lm = glowSprite(0xffe0a0, 1.2, 0.8); lm.position.set(x, V.y + 2.9, z); group.add(lm); }
+  const folkAt = [[V.x + 3, V.z + 2], [V.x - 4, V.z - 3], [V.x + 1, V.z - 6], [ISL[1].x - 4, ISL[1].z + 3], [ISL[3].x + 3, ISL[3].z + 3], [-6, 4]];
+  SKY_FOLK.forEach((def, k) => { const [x, z] = folkAt[k], y = h(x, z); const R = buildHumanoid({ look: { skin: [0xf0d0b0, 0xd9a77f, 0xc08a5a][k % 3], hair: [0xf0e8d8, 0xc89a5a, 0x3a2a1a][k % 3], cloth: [0xe8f0ff, 0xb8d8ff, 0xffe8c8][k % 3], cloth2: 0x8a9ab8, extra: "wings" }, armour: null, weapon: null, lite: true });
+    R.g.position.set(x, y, z); R.g.rotation.y = Math.atan2(-x, -z) + (k % 2 ? 0.6 : -0.6); group.add(R.g); addCircle(x, z, 0.5, 2.2);
+    world.animated.push(t => { poseHumanoid(R, t + k, 0, 0, "normal", false); if (R.wingL) { const f = Math.sin(t * 1.6 + k) * 0.12; R.wingL.rotation.y = 0.5 + f; R.wingR.rotation.y = -0.5 - f; } });
+    const lb = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.7); lb.position.set(x, y + 2.6, z); lb.userData.far = 30; group.add(lb); world.labels.push(lb);
+    world.interact.push({ x, z, y, r: 2.4, label: `Speak with ${def.name}`, act: () => openDialog(def) }); });
+  // Dragon Roost: a nest, a resting dragon, and two more circling the sky
+  const D = ISL[1];
+  for (let k = 0; k < 16; k++) { const a = k / 16 * TAU; const lg = M(G.cyl(0.25, 0.25, 6), wood, D.x + Math.cos(a) * 5, D.y + 0.5, D.z + Math.sin(a) * 5, group, 1, 4, 1); lg.rotation.z = Math.PI / 2; lg.rotation.y = -a; }
+  for (let k = 0; k < 3; k++) M(G.sph(), std([0xe8d8c0, 0xc8e8ff, 0xffc8a0][k], { r: 0.4 }), D.x - 1 + k, D.y + 0.6, D.z + (k - 1) * 0.6, group, 0.5, 0.7, 0.5);
+  const rest = buildCreature("dragon", 0x8a2a1a, 0xffb040, 1.6, true); rest.g.position.set(D.x + 4, D.y, D.z - 4); rest.g.rotation.y = -2.2; group.add(rest.g); solidCyl(D.x + 4, D.z - 4, 3, 999);
+  world.animated.push(t => poseCreature(rest, t, 0, 0));
+  const flyers = [[0x2a6a8a, 0x9ae8ff, 70, 22, 0.16], [0x5a2a8a, 0xd8a0ff, 95, 34, -0.11]].map(([c1, c2, rad, hy, sp]) => { const R = buildCreature("dragon", c1, c2, 2, true); group.add(R.g); return { R, rad, hy, sp }; });
+  world.animated.push(t => { for (const f of flyers) { const a = t * f.sp; f.R.g.position.set(Math.cos(a) * f.rad, f.hy + Math.sin(t * 0.7) * 4, Math.sin(a) * f.rad); f.R.g.rotation.y = -a + (f.sp > 0 ? Math.PI : 0); poseCreature(f.R, t * 1.5, 1, 0); } });
+  // the observatory with its daily sky chest
+  const O = ISL[3];
+  M(G.cyl(4.2, 4.6, 24), white, O.x, O.y + 2, O.z, group, 1, 4, 1); const dome = M(G.sph(), std(0xd8dce8, { m: 0.8, r: 0.3 }), O.x, O.y + 4, O.z, group, 4.2, 3.2, 4.2); solidCyl(O.x, O.z, 4.7, 999);
+  const scope = M(G.cyl(0.45, 0.6, 12), gold, O.x + 1.5, O.y + 6.5, O.z, group, 1, 4.5, 1); scope.rotation.z = -0.8;
+  const [cx2, cz2] = [O.x - 6, O.z + 4], sc2 = new THREE.Group(); sc2.position.set(cx2, O.y, cz2); group.add(sc2); sc2.add(fancyChest(2)); const cgl = glowSprite(0xd8f0ff, 2.4, 0.5); cgl.position.y = 1; sc2.add(cgl);
+  world.interact.push({ x: cx2, z: cz2, y: O.y, r: 2.4, label: "Open the sky chest", act: openSkyChest });
+  // the hanging gardens and a waterfall that falls forever
+  const Gd = ISL[4], rT = seeded(404);
+  for (let k = 0; k < 9; k++) { const a = rT() * TAU, d = 4 + rT() * 8, x = Gd.x + Math.cos(a) * d, z = Gd.z + Math.sin(a) * d; const t2 = makeTree(k % 3 ? "oak" : "pine", rT); t2.position.set(x, Gd.y, z); t2.scale.setScalar(0.9 + rT() * 0.5); group.add(t2); solidCyl(x, z, 0.45, 999); }
+  const fall = M(G.box(), std(0xbfe8ff, { r: 0.1, e: 0x6ab8e8, ei: 0.4, op: 0.55 }), Gd.x, Gd.y - 40, Gd.z + Gd.r - 0.5, group, 3.5, 80, 0.4); const mist = glowSprite(0xffffff, 10, 0.4); mist.position.set(Gd.x, Gd.y - 4, Gd.z + Gd.r + 1); group.add(mist);
+  M(G.cyl(2.2, 2.4, 20), std(0x6ac8ff, { r: 0.05, e: 0x2a6aa8, ei: 0.3 }), Gd.x, Gd.y + 0.1, Gd.z + Gd.r - 4, group, 1, 0.2, 1);
+  world.animated.push(t => { fall.material.opacity = 0.5 + Math.sin(t * 6) * 0.05; mist.material.opacity = 0.3 + Math.sin(t * 2) * 0.1; });
+  // a safe catch for anyone who falls
+  world.animated.push(() => { if (!P.dead && P.pos.y < -60) { P.pos.set(0, 0, 14); P.vy = 0; P.kb.set(0, 0, 0); toast("The wind catches you and sets you down gently.", ""); } });
+  shadows(group, false, true);
+  return world;
+}
+function openSkyChest() {
+  const st = skyState(), day = dayKey(); if (st.chestDay === day) { toast("The sky chest is empty. It refills at dawn.", ""); return; }
+  st.chestDay = day; const best = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true)), coins = 2500 + best * 800;
+  S.coins += coins; grantChest(2, Math.min(best, 11)); if (Math.random() < 0.5) gain(rollItemOf(rollRarity(dropTable(Math.min(best, 11), 2, true))), P.pos);
+  MUSIC.sfx("chest"); pillarFx(P.pos, 0xd8f0ff, 10, 0.8); save(); toast(`<b>Sky chest:</b> ${fmt(coins)} coins and a Gilded Vault Chest. It refills at dawn.`, "legendary");
+}
+function enterSkylands() {
+  if (run || (world && world.kind === "sky")) return; closeAllModals(); if (sailing) removeBoat(); stopFishing(); if (mining) endMining(false);
+  enemies.forEach(e => { scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar); }); enemies = []; projectiles.forEach(q => scene.remove(q.m)); projectiles = [];
+  buildSkylands(); P.pos.set(0, 0, 15); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.kb.set(0, 0, 0); P.onPortal = -1;
+  bumpStat("skyVisits"); updateModeUi(); MUSIC.setMode("portal", 0, "The Skylands");
+  banner("The Skylands", skyState().seen ? "The wind carries you up again." : "You found the hidden way up. Few ever do."); skyState().seen = 1; save();
+}
+function leaveSkylands() { goLobby(); const L = world.skyLift; if (L) { P.pos.set(L.x + 3, 0, L.z + 3); P.pos.y = world.h(P.pos.x, P.pos.z); } }
 function openCastleTreasury(C) {
   S.castleLoot = S.castleLoot || {}; const now = Date.now(), last = S.castleLoot[C.id] || 0;
   if (now - last < 30 * 60e3) { toast(`The treasury of ${esc(C.name)} is empty. It refills in ${dur(30 * 60e3 - (now - last))}.`, ""); return; }
@@ -6924,7 +7273,7 @@ function armourBulk(R, a) {
   const ring = (parent, r, y, z, sc = [1, 1, 1], mat = gold, tube = 0.008) => { const t = M(G.tor(r, tube), mat, 0, y, z, parent, sc[0], sc[1], sc[2]); t.rotation.x = Math.PI / 2; return t; };
   // sculpted breastplate and backplate
   M(G.sph(), plate, 0, 0.37, 0.07, C, 0.17 * b, 0.2, 0.09);
-  M(G.sph(), dark, 0, 0.37, -0.075, C, 0.165 * b, 0.19, 0.075);
+  if (!light) M(G.sph(), plate, 0, 0.36, -0.035, C, 0.158 * b, 0.18, 0.085); // a backplate that follows the torso instead of a hump
   if (!light) for (let k = 0; k < 3; k++) M(G.sph(), plate, 0, 0.17 - k * 0.055, 0.075 - k * 0.004, C, (0.155 - k * 0.006) * b, 0.035, 0.07);
   if (rk >= 1) { ring(C, 0.165 * b, 0.47, 0.0, [1, 1, 0.62], gold, 0.007); for (const sx of [-1, 1]) { const f = M(G.tor(0.05, 0.005), gold, 0.075 * sx, 0.38, 0.16, C); f.rotation.y = 0.3 * sx; } }
   const em = M(G.oct(), rk >= 2 ? glowMat(ac, 0.95) : gold, 0, 0.38, 0.165, C, 0.032, 0.045, 0.018); R.emblem = rk >= 2 ? em : null;
@@ -7868,7 +8217,7 @@ $("achList").addEventListener("click", e => { const b = e.target.closest("button
 $("achNow").addEventListener("click", e => { if (e.target.closest("[data-hide]")) { S.title = null; save(); refreshNameTag(); renderAchievements(); } });
 $("startBtn").addEventListener("click", () => { if (S.avatar && S.name) enterLobby(); else openAvatar(true); });
 buildLobby(); rebuildHero(); refreshNameTag(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
