@@ -431,7 +431,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
       <li><b>Move</b> with the touch joystick, WASD, or a controller. Drag to look around.</li>
       <li><b>Dash</b> up to 3 times in a row. Each dash comes back 1.5 seconds after you use it.</li>
       <li><b>Step on a portal</b> to open the island map. Black islands are undiscovered: clear Normal and Hard on an island to reveal the next.</li>
-      <li><b>Every island</b> has Normal, Hard and Nightmare stages, each made of levels that end in a boss.</li>
+      <li><b>Every island</b> has Normal, Hard and Nightmare stages, each a dungeon of stages and waves. Clear a stage, take a blessing and pick one of two doors.</li>
       <li><b>Level up</b> from fights and spend stat points on Speed, Damage, Defence or Power.</li>
       <li><b>Open the Armoury</b> to turn your weapons and armour around in 3D and compare their stats.</li>
     </ul>
@@ -657,7 +657,12 @@ const WEAPON_DEFS = [
   ["tideharvest", "Tideharvest Scythe", "epic", "scythe", 0x1a4a5a, 0x40ffd0, "riptideSpiral", "It reaps the sea instead of wheat."],
   ["lighthousemace", "Lighthouse Mace", "rare", "mace", 0xe8e0d0, 0xffe060, "heavyStrike", "Its head still glows like the old lamp."],
   ["aurorablades", "Aurora Twinblades", "legendary", "twinblade", 0xd8f0ff, 0x7affb0, "bladeFan", "Two lights from the northern sky."],
-  ["prismaticedge", "Prismatic Edge of the Beyond", "vaulted", "sword", 0xf8f8ff, 0xff9af8, "prismNova", "Found where the rainbow portal touches the sea."]
+  ["prismaticedge", "Prismatic Edge of the Beyond", "vaulted", "sword", 0xf8f8ff, 0xff9af8, "prismNova", "Found where the rainbow portal touches the sea."],
+  ["whisperblade", "Whisperblade", "legendary", "katana", 0x1a1a24, 0xd8d8ff, "timeEcho", "It cuts in total silence. A gift from the Hollow Pilgrim."],
+  ["foxfang", "Foxfang Twinblades", "legendary", "twinblade", 0xd8603a, 0xffe0a0, "bladeFan", "Quick as the Masked Fox, and just as rude."],
+  ["sirenslament", "Siren's Lament", "legendary", "staff", 0x2a6a8a, 0x9affe8, "riptideSpiral", "It sings the sea to sleep."],
+  ["godspark", "Godspark", "vaulted", "greatsword", 0xfff0c0, 0xffd040, "prismNova", "A spark of something that was once worshipped."],
+  ["wanderersoath", "The Wanderer's Oath", "vaulted", "sword", 0xe8e0d0, 0x7affb0, "timeEcho", "Sworn on every road in the realm."]
 ];
 // [id, name, rarity, weight, metal, cloth, accent, helm, cape, special, description]
 const ARMOUR_DEFS = [
@@ -726,7 +731,10 @@ const ARMOUR_DEFS = [
   ["abyssdiver", "Abyssdiver Suit", "legendary", "heavy", 0x1a3a4a, 0x0a1a2a, 0x40ffd0, "visor", false, null, "Built to walk the sea floor."],
   ["lighthousekeeper", "Lighthouse Keeper's Robes", "legendary", "light", 0xf0e8d8, 0x8a3a2a, 0xffe060, "hood", true, null, "The lamp never went out. Neither does the wearer."],
   ["maelstromscale", "Maelstrom Scale", "legendary", "heavy", 0x1a2a3a, 0x0a1420, 0x40ffd0, "horned", true, null, "Each scale turns a little, like a whirlpool."],
-  ["prismaticaegis", "Prismatic Aegis", "legendary", "heavy", 0xf0f0ff, 0x8a8aa8, 0xff9af8, "crown", true, null, "It shines every colour when struck."]
+  ["prismaticaegis", "Prismatic Aegis", "legendary", "heavy", 0xf0f0ff, 0x8a8aa8, 0xff9af8, "crown", true, null, "It shines every colour when struck."],
+  ["veilofthefox", "Veil of the Fox", "legendary", "light", 0xd8603a, 0x2a1a14, 0xffe0a0, "hood", true, null, "Russet, quiet and impossible to pin down."],
+  ["starlitdiadem", "Starlit Diadem Regalia", "legendary", "medium", 0x2a2a5a, 0x1a1a3a, 0xd8d8ff, "crown", true, null, "Stars were sewn into the hem by a child who fell from the sky."],
+  ["cartographercoat", "Cartographer's Greatcoat", "legendary", "light", 0x6a5a3a, 0x3a2a1a, 0xffe060, "hood", true, null, "Every pocket holds a map of somewhere that does not exist yet."]
 ];
 const ARM_W = { light: { hp: 0.8, def: 0.7, move: 1.05, label: "Light" }, medium: { hp: 1, def: 1, move: 1, label: "Medium" }, heavy: { hp: 1.25, def: 1.35, move: 0.92, label: "Heavy" } };
 const RAR_HP = { common: 30, rare: 80, epic: 180, legendary: 380, vaulted: 750 };
@@ -1118,7 +1126,7 @@ try {
     const d = JSON.parse(raw), f = fresh();
     S = Object.assign(f, d);
     S.pts = Object.assign(f.pts, d.pts || {});
-    S.stats = Object.assign(f.stats, d.stats || {}); S.boats = d.boats || {}; S.isleLoot = d.isleLoot || {}; S.rods = Object.assign({ willow: 1 }, d.rods || {}); if (!S.rods[S.rod]) S.rod = "willow"; S.ench = d.ench || {}; S.quests = d.quests && typeof d.quests === "object" ? d.quests : {};
+    S.stats = Object.assign(f.stats, d.stats || {}); S.boats = d.boats || {}; S.isleLoot = d.isleLoot || {}; S.secrets = d.secrets || {}; S.castleLoot = d.castleLoot || {}; S.rods = Object.assign({ willow: 1 }, d.rods || {}); if (!S.rods[S.rod]) S.rod = "willow"; S.ench = d.ench || {}; S.quests = d.quests && typeof d.quests === "object" ? d.quests : {};
     S.chests = Array.isArray(d.chests) ? d.chests.filter(c => c && c.t >= 0 && c.t < 3 && c.i >= 0 && c.i < ISLANDS.length) : [];
     S.prog = ISLANDS.map((_, i) => Object.assign({ normal: false, hard: false, nightmare: false }, (d.prog || [])[i] || {}));
     for (const id of Object.keys(S.inv)) if (!ITEM[id] || S.inv[id] <= 0) delete S.inv[id];
@@ -2080,7 +2088,7 @@ function buildLobby() {
   world = { kind: "lobby", group, h, hBase: baseH, radius: 200, circles: [], portals: [], interact: [], animated: [] };
   setSky(0x3f7fcf, 0xd8e8f4, 0x6a7a5a, 0xd8e8f4, 90, 480, 0xfff0d8, 2.3, 0.55);
   const n = noise2(5);
-  group.add(terrainMesh(640, 210, baseH, (x, z, y, c) => { const d = Math.hypot(x, z); c.set(0x5a8a3a).lerp(new THREE.Color(0x4a7a2e), n(x * 0.05, z * 0.05)); if (y > 8) c.lerp(new THREE.Color(0x7a7a6a), smooth(8, 26, y) * 0.8); if (y < -0.3) c.set(0xc8b888).lerp(new THREE.Color(0x8a7a5a), smooth(-0.3, -6, y)); if (d < 30) c.set(0x8a7a5a); }, 120));
+  group.add(terrainMesh(640, 210, baseH, (x, z, y, c) => { const d = Math.hypot(x, z); c.set(0x5a8a3a).lerp(new THREE.Color(0x4a7a2e), n(x * 0.05, z * 0.05)); if (y > 8) c.lerp(new THREE.Color(0x7a7a6a), smooth(8, 26, y) * 0.8); if (y < -0.3) c.set(0xc8b888).lerp(new THREE.Color(0x8a7a5a), smooth(-0.3, -6, y)); if (d < 30) c.set(0x8a7a5a); castleTint(x, z, y, c); }, 120));
   // plaza tiles
   const plazaTex = TEX.tiles.clone(); plazaTex.needsUpdate = true; plazaTex.repeat.set(9, 9);
   const plaza = new THREE.Mesh(new THREE.CircleGeometry(27, 64), new THREE.MeshStandardMaterial({ map: plazaTex, roughness: 0.85 })); plaza.rotation.x = -Math.PI / 2; plaza.position.y = 0.02; plaza.receiveShadow = true; group.add(plaza);
@@ -2148,7 +2156,7 @@ function buildLobby() {
   world.clouds = addClouds(group, 0xffffff);
   // distant mountains
   for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 380, s = 80 + (k % 4) * 28; if (Math.cos(a) > 0.2) continue; const m = M(G.cone(7), std(0x5a6a7a, { flat: true, r: 0.9 }), Math.cos(a) * d, s * 0.45, Math.sin(a) * d, group, s, s * 1.1, s); M(G.cone(7), std(0xf0f4ff, { flat: true, r: 0.7 }), Math.cos(a) * d, s * 0.82, Math.sin(a) * d, group, s * 0.35, s * 0.35, s * 0.35); }
-  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); const isleBase = group.children.length; seaWorld(group); rarePortals(group); groupIsles(group, isleBase); boatDealer(group); floraFauna(group); lobbyRaidPortal(group); buildQuarters(group);
+  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); const isleBase = group.children.length; seaWorld(group); rarePortals(group); groupIsles(group, isleBase); boatDealer(group); floraFauna(group); lobbyRaidPortal(group); buildQuarters(group); buildCastles(group, h); secretReset();
 }
 
 function buildIsland(idx) {
@@ -2284,10 +2292,10 @@ function rollRarity(table) {
   return pickWeighted({ common: table.common, rare: table.rare, epic: table.epic, legendary: table.legendary });
 }
 function rollItemOf(rarity) {
-  if (rarity === "vaulted") { const pool = ITEMS.filter(i => i.rarity === "vaulted" && !["fish", "rod", "boat"].includes(i.cat) && (i.cat !== "armour" || Math.random() < 0.15)); const un = pool.filter(i => !S.seen[i.id]); return pick(un.length ? un : pool); }
+  if (rarity === "vaulted") { const pool = ITEMS.filter(i => i.rarity === "vaulted" && !i.secret && !["fish", "rod", "boat"].includes(i.cat) && (i.cat !== "armour" || Math.random() < 0.15)); const un = pool.filter(i => !S.seen[i.id]); return pick(un.length ? un : pool); }
   const cat = pickWeighted({ weapon: 4, armour: 3, potion: 2, material: 4 });
-  let pool = ITEMS.filter(i => i.rarity === rarity && i.cat === cat);
-  if (!pool.length) pool = ITEMS.filter(i => i.rarity === rarity && (i.cat === "weapon" || i.cat === "armour"));
+  let pool = ITEMS.filter(i => i.rarity === rarity && i.cat === cat && !i.secret);
+  if (!pool.length) pool = ITEMS.filter(i => i.rarity === rarity && !i.secret && (i.cat === "weapon" || i.cat === "armour"));
   return pick(pool);
 }
 function gain(it, pos, n = 1, quiet) {
@@ -2322,6 +2330,7 @@ function damageEnemy(e, amount, dir, kb, o = {}) {
   if (!o.silent && o.canCrit !== false && worldT - lastHitSfx > 0.06) { lastHitSfx = worldT; MUSIC.sfx("hit", { crit }); }
   if (e.dummy) { dummyHit(e, dmg, crit, o); return; }
   if (e.duelist && e.guard > worldT) { dmg *= 0.3; if (!o.silent) floatText(e.pos, "Blocked", "#a1abc4"); }
+  if (run && run.drumsLevel === run.level) dmg *= 1.2;
   if (e.vulnUntil > worldT) { dmg *= 1.6; o = Object.assign({}, o, { color: o.color || "#ffd166" }); }
   e.hp -= dmg; e.flash = 0.12;
   if (run && run.boons && o.canCrit !== false && !o.noProc && !e.dead) boonProcs(e, dmg);
@@ -2535,7 +2544,7 @@ function spawnEnemy(def, role, boss, scaleBoost = 1) {
   const I = ISLANDS[run.idx], st = STAGES[run.stage];
   const base = ROLE_BASE[boss ? "boss" : role];
   const ri = I.raid ? 13 : I.sri ? I.sri : run.idx >= 12 ? 12.5 : run.idx, isl = Math.pow(1.5, ri), lv = 1 + 0.15 * (run.level - 1);
-  const hpMult = isl * st.hp * lv * (boss ? (1 + 0.25 * (run.level - 1)) : 1) * (1 + 0.35 * (run.party - 1));
+  const hpMult = isl * st.hp * lv * (boss ? (1 + 0.25 * (run.level - 1)) : 1) * (1 + 0.35 * (run.party - 1)) * (run.foeHpStage || 1);
   const dmgMult = ENEMY_DMG * Math.pow(1.32, ri) * st.dmg * (1 + 0.06 * (run.level - 1));
   const body = def[1], col = boss ? (typeof def[2] === "number" ? def[2] : I.enemies[run.stage % 3][3]) : def[3], acc = boss ? (typeof def[3] === "number" ? def[3] : I.enemies[(run.stage + 1) % 3][4]) : def[4];
   const scale = (boss ? 2.3 : ({ floater: 0.95, crab: 0.9, slime: 0.95, bat: 0.95, treant: 1.05, void: 0.95 })[body] || 1) * scaleBoost * (role === "skirm" && !boss ? 0.85 : 1);
@@ -2543,7 +2552,7 @@ function spawnEnemy(def, role, boss, scaleBoost = 1) {
   if (!boss) shadows(R.g, false, false);
   scene.add(R.g);
   let p;
-  for (let k = 0; k < 20; k++) { const a = rand(0, TAU), d = boss ? 16 : rand(14, 26); p = new V3(P.pos.x + Math.cos(a) * d, 0, P.pos.z + Math.sin(a) * d); if (Math.hypot(p.x, p.z) < world.radius - 2 && !blocked(p.x, p.z, 1)) break; p.multiplyScalar(0.6); }
+  for (let k = 0; k < 20; k++) { const a = rand(0, TAU), d = boss ? 16 : rand(14, 26); p = new V3(P.pos.x + Math.cos(a) * d, 0, P.pos.z + Math.sin(a) * d); if ((world.inside ? world.inside(p.x, p.z, 1) : Math.hypot(p.x, p.z) < world.radius - 2) && !blocked(p.x, p.z, 1)) break; p.multiplyScalar(0.6); }
   p.y = world.h(p.x, p.z);
   const name = boss ? def[0] : def[0];
   const e = { R, name, role: boss ? "boss" : role, boss, base, pos: p, kb: new V3(), hp: base.hp * hpMult, maxHp: base.hp * hpMult, dmg: base.dmg * dmgMult, spd: base.spd * (boss ? 1 : 1),
@@ -2559,12 +2568,12 @@ function startRun(idx, stageIdx, allyIds) {
   enemies.forEach(e => { scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar); });
   enemies = []; projectiles.forEach(p => scene.remove(p.m)); projectiles = []; telegraphs.forEach(t => scene.remove(t.mesh)); telegraphs = []; timers = [];
   allies.forEach(a => { scene.remove(a.R.g); scene.remove(a.lbl); }); allies = [];
-  buildIsland(idx);
+  buildDungeon(idx, Math.floor(Math.random() * (ROOMS.length - 1)));
   run = { idx, stage: stageIdx, level: 1, levels: ISLANDS[idx].raid ? 2 : STAGES[stageIdx].levels, wave: 0, state: "intro", party: 1 + allyIds.length, allyIds, boons: {} }; computeStats(); renderBoonBar(); stopFishing(); if (sailing) removeBoat();
-  P.pos.set(0, world.h(0, 22), 22); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.dead = false; P.hp = ST.maxHp; P.flags = {}; P.buffs = {}; P.dashQ = [];
+  P.pos.set(world.entry.x, 0, world.entry.z); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.dead = false; P.hp = ST.maxHp; P.flags = {}; P.buffs = {}; P.dashQ = [];
   allyIds.forEach((id, k) => spawnAlly(ALLY_POOL.find(a => a.id === id), k));
   const I = ISLANDS[idx], st = STAGES[stageIdx];
-  banner(I.name, I.raid ? `Raid · ${st.name} · ${run.levels} levels and a three-phase raid boss` : `${st.name} · ${st.levels} levels`);
+  banner(I.name, I.raid ? `Raid · ${st.name} · ${run.levels} dungeon stages and a three-phase raid boss` : `${st.name} · ${st.levels} dungeon stages`);
   MUSIC.setMode("battle", idx, `${I.name}: battle theme`);
   later(2.4, startLevel);
   updateModeUi();
@@ -2572,7 +2581,7 @@ function startRun(idx, stageIdx, allyIds) {
 function startLevel() {
   if (!run) return;
   run.wave = 0; run.state = "between"; P.flags = {};
-  banner(`Level ${run.level} of ${run.levels}`, `${ISLANDS[run.idx].name} · new foes: ${roster().map(d => d[0]).join(", ")}`);
+  banner(`Stage ${run.level} of ${run.levels} · Wave 1`, `${ISLANDS[run.idx].name} · new foes: ${roster().map(d => d[0]).join(", ")}`);
   later(1.8, nextWave);
 }
 function nextWave() {
@@ -2582,7 +2591,7 @@ function nextWave() {
   const count = 4 + run.level + run.wave + run.stage * 2 + (run.party - 1);
   const R3 = roster(); for (let k = 0; k < count; k++) { const def = R3[k % 3]; spawnEnemy(def, def[2], false); }
   run.state = "waves";
-  toast(`<b>Wave ${run.wave} of ${st.waves}</b> ${count} foes${run.wave + run.level > 2 ? ` · new foe: <b>${esc(R3[2][0])}</b>` : ""}`, "");
+  toast(`<b>Stage ${run.level} · Wave ${run.wave} of ${wavesNow()}</b> ${count} foes${run.wave + run.level > 2 ? ` · new foe: <b>${esc(R3[2][0])}</b>` : ""}`, "");
 }
 function spawnBoss() {
   const I = ISLANDS[run.idx];
@@ -2593,7 +2602,7 @@ function spawnBoss() {
   else { const d = roster()[2]; name = `${LT_TITLE[(run.idx * 3 + run.level + run.stage) % LT_TITLE.length]} ${d[0].replace(/^(Elder|Dread) /, "")}`; e = spawnEnemy([name, d[1], d[3], d[4]], "boss", true, 0.8); e.sig = BODY_SIG[d[1]]; }
   if (final && I.raid) { e.raidBoss = true; e.phase = 0; e.summoned = true; e.hp = e.maxHp = e.maxHp * 2.5; }
   run.boss = e;
-  banner(name, final ? (I.raid ? "Raid boss · three phases" : `Boss of ${I.name}`) : `Lieutenant of level ${run.level}`);
+  banner(name, final ? (I.raid ? "Raid boss · three phases" : `Boss of ${I.name}`) : `Lieutenant of stage ${run.level}`);
   MUSIC.setMode("boss", run.idx, `${name}: boss theme`);
 }
 function checkRunProgress() {
@@ -2602,13 +2611,13 @@ function checkRunProgress() {
   if (alive) return;
   enemies = enemies.filter(e => !e.dead);
   const st = STAGES[run.stage];
-  if (run.state === "waves") { offerCards(); if (run.wave < st.waves) { run.state = "between"; later(1.6, nextWave); } else { run.state = "between"; later(1.8, spawnBoss); } }
+  if (run.state === "waves") { offerCards(); if (Math.random() < 0.5) { grantChest(Math.max(0, run.stage - 1), Math.min(run.idx, 11)); toast("<b>A chest</b> drops as the wave falls.", "rare"); } if (run.wave < wavesNow()) { run.state = "between"; later(1.6, nextWave); } else { run.state = "between"; later(1.8, spawnBoss); } }
   else if (run.state === "boss") {
     run.state = "between";
     const xp = 30 * Math.pow(1.3, run.idx) * (1 + run.stage);
     addXp(xp);
-    if (run.level < run.levels) { banner(`Level ${run.level} cleared`, `+${fmt(xp)} exp. The next level begins shortly.`); heal(ST.maxHp * 0.3); MUSIC.setMode("battle", run.idx, `${ISLANDS[run.idx].name}: battle theme`); run.level++; later(4, startLevel); }
-    else stageComplete(xp);
+    if (run.level < run.levels) { banner(`Stage ${run.level} cleared`, `+${fmt(xp)} exp. Take a blessing, then pick one of the two doors.`); heal(ST.maxHp * 0.3); stageChests(); MUSIC.setMode("battle", run.idx, `${ISLANDS[run.idx].name}: battle theme`); offerCards(); openDoors(); }
+    else { stageChests(true); stageComplete(xp); }
   }
 }
 function stageComplete(xp) {
@@ -3116,6 +3125,7 @@ const camTarget = new V3();
 let last = performance.now(), saveT = 0, timeScale = 1;
 function collide(pos, rad, y) {
   for (const c of world.circles) { if (y - world.h(c.x, c.z) > c.h) continue; const dx = pos.x - c.x, dz = pos.z - c.z, d = Math.hypot(dx, dz), m = c.r + rad; if (d < m && d > 1e-4) { pos.x = c.x + dx / d * m; pos.z = c.z + dz / d * m; } }
+  if (world.clamp) world.clamp(pos, rad);
   const d = Math.hypot(pos.x, pos.z), lim = world.radius; if (d > lim) { pos.x *= lim / d; pos.z *= lim / d; }
 }
 function update(dt) {
@@ -3323,7 +3333,7 @@ function updateHud() {
   if (run) {
     const I = ISLANDS[run.idx], st = STAGES[run.stage];
     $("hWhere").textContent = I.name;
-    $("hSub").textContent = `${I.raid ? "Raid · " : ""}${st.name} · Level ${run.level}/${run.levels} · ${run.state === "boss" ? "Boss fight" : run.state === "waves" || run.state === "between" ? `Wave ${run.wave}/${st.waves}` : "Get ready"}`;
+    $("hSub").textContent = `${I.raid ? "Raid · " : ""}${st.name} · Stage ${run.level}/${run.levels} · ${run.state === "boss" ? "Boss fight" : run.state === "doors" ? "Choose a door" : run.state === "waves" || run.state === "between" ? `Wave ${run.wave}/${wavesNow()}` : "Get ready"}`;
     const b = run.state === "boss" && run.boss && !run.boss.dead ? run.boss : null;
     $("bossBar").hidden = !b;
     if (b) { $("bossName").textContent = b.name; $("bossHp").style.width = (100 * b.hp / b.maxHp) + "%"; $("bossHpT").textContent = `${fmt(b.hp)} / ${fmt(b.maxHp)}`; }
@@ -3352,7 +3362,7 @@ function chestSvg(t) {
 function grantChest(t, i) { S.chests.push({ t, i }); if (S.chests.length > 200) S.chests.shift(); updateChestBadge(); }
 function rollOfCats(rarity, cats) {
   const order = ["vaulted", "legendary", "epic", "rare", "common"];
-  for (let k = order.indexOf(rarity); k < order.length; k++) { const pool = ITEMS.filter(it => it.rarity === order[k] && cats.includes(it.cat) && it.id !== "die" && !(order[k] === "vaulted" && it.cat === "armour" && Math.random() > 0.15)); if (pool.length) return pick(pool); }
+  for (let k = order.indexOf(rarity); k < order.length; k++) { const pool = ITEMS.filter(it => it.rarity === order[k] && cats.includes(it.cat) && it.id !== "die" && !it.secret && !(order[k] === "vaulted" && it.cat === "armour" && Math.random() > 0.15)); if (pool.length) return pick(pool); }
   return ITEM.minor;
 }
 let lastLoot = null;
@@ -3458,7 +3468,7 @@ const questProg = q => { const st = S.quests[q.id]; if (!st || st.s !== "active"
 function npcStatus(npc) { const q = questOf(npc); if (!q) return "done"; const st = S.quests[q.id]; if (!st) return "offer"; return questProg(q) >= q.n ? "ready" : "active"; }
 function bumpStat(k, n = 1) {
   const before = QUEST_NPCS.map(npcStatus);
-  S.stats[k] = (S.stats[k] || 0) + n;
+  S.stats[k] = (S.stats[k] || 0) + n; secretCheck();
   QUEST_NPCS.forEach((npc, i) => { if (before[i] === "active" && npcStatus(npc) === "ready") toast(`<b>Quest complete:</b> ${esc(questOf(npc).title)}. Return to ${esc(npc.name)} in the lobby.`, "epic"); });
 }
 function rewardText(r) {
@@ -4216,7 +4226,7 @@ function lobbyTerrain(x, z, n) {
   y = Math.max(y, MOUNT.top * smooth(MOUNT.foot, MOUNT.flat, Math.hypot(x - MOUNT.x, z - MOUNT.z)));
   const dl = Math.hypot(x - LAKE.x, z - LAKE.z); if (dl < LAKE.r + 6) y -= LAKE.depth * smooth(LAKE.r + 6, LAKE.r - 10, dl);
   if (z > 168) y -= 9 * smooth(168, 192, z) * smooth(140, 90, Math.abs(x));
-  return seaTerrain(x, z, y);
+  return seaTerrain(x, z, castlePad(x, z, y, n));
 }
 function lobbyFeatures(x, z, y) {
   for (const p of PLATFORMS) if (x > p.x0 && x < p.x1 && z > p.z0 && z < p.z1) y = Math.max(y, p.y);
@@ -5145,6 +5155,7 @@ $("dialog").addEventListener("click", e => { const b = e.target.closest("[data-r
 let beastT = 8, lastHitSfx = 0;
 function seaTick(dt) {
   if (!world || world.kind !== "lobby") { stormLevel = 0; return; }
+  secretTick(dt);
   const ref = sailing && !sailing.anchored ? sailing.pos : P.pos;
   stormLevel = stormAt(ref.x, ref.z); cullIsles(dt);
   world.radius = (sailing || P.pos.x > 120) ? 2500 : 290;
@@ -5465,6 +5476,7 @@ function mapPlaces() {
     ["Bell Tower", ...at(-1.9635), "place"], ["The Salted Anchor", ...at(1.1781), "place"], ["Map Library", ...at(0.3927), "place"], ["Windmill", ...at(-0.3927), "place"]
   ].map(([name, x, z, kind]) => ({ name, x, z, kind }));
   for (const I of ISLES) L.push({ name: I.name, x: I.x, z: I.z, kind: I.kind === "portal" || I.kind === "rare" ? "portal" : I.kind === "guard" ? "guard" : "treasure" });
+  for (const C of CASTLES) { const I = C.sea && ISLES.find(i => i.id === C.isle); L.push({ name: C.name, x: I ? I.x : C.x, z: I ? I.z : C.z, kind: "service" }); }
   return L;
 }
 let mapView = "town", waypoint = null, mapTimer = null;
@@ -5760,6 +5772,303 @@ function buildQuarters(group) {
     world.interact.push({ x, z, y: gy, r: 2.8, label: `Talk to ${def.name}`, act: () => openDialog(def) });
   }
 }
+
+/* ---- castles in the mountains and out at sea, each in its own biome ---- */
+const CASTLES = [
+  { id: "frostpeak", name: "Frostpeak Keep", x: -62, z: -226, biome: "snow", ground: 0xeef4ff, wall: 0xc8d0dc, roof: 0x5a7aa8, banner: 0x9ad8ff, tree: "icepine" },
+  { id: "thornwood", name: "Thornwood Bastion", x: 86, z: -214, biome: "forest", ground: 0x2e5a22, wall: 0x6a6a5a, roof: 0x3a5a2a, banner: 0x7aff6a, tree: "pine" },
+  { id: "emberforge", name: "Emberforge Citadel", x: -206, z: -122, biome: "volcanic", ground: 0x2a2420, wall: 0x3a302a, roof: 0x6a1a10, banner: 0xff6a2a, tree: "dead" },
+  { id: "sandstone", name: "Sandstone Hold", x: -234, z: 34, biome: "desert", ground: 0xe0c080, wall: 0xd8b880, roof: 0xa86a3a, banner: 0xffd060, tree: "cactus" },
+  { id: "amethyst", name: "Amethyst Spire", x: -210, z: 118, biome: "crystal", ground: 0x4a3a6a, wall: 0x6a5a8a, roof: 0x8a3aff, banner: 0xd8a0ff, tree: "crystal" },
+  { id: "coralspire", name: "Coralspire Keep", isle: "palm", biome: "coral", wall: 0xe8d8c8, roof: 0xff8aa0, banner: 0x9affe8, sea: true },
+  { id: "tidewatch", name: "Tidewatch Castle", isle: "turtle", biome: "coral", wall: 0xb8c0c8, roof: 0x2a5a7a, banner: 0x40ffd0, sea: true },
+  { id: "stormwall", name: "Stormwall Bastion", isle: "ember", biome: "storm", wall: 0x4a4a52, roof: 0x2a2a3a, banner: 0xfff0a0, sea: true }
+];
+function castlePad(x, z, y, n) {
+  for (const C of CASTLES) { if (C.sea) continue; const d = Math.hypot(x - C.x, z - C.z); if (d > 40) continue;
+    if (C.y === undefined) { const d0 = Math.hypot(C.x, C.z); C.y = clamp(smooth(190, 270, d0) * 30 * (0.55 + n(C.x * 0.012, C.z * 0.012) * 0.9), 3, 15); }
+    y = lerp(y, C.y, smooth(40, 22, d)); }
+  return y;
+}
+function castleTint(x, z, y, c) {
+  for (const C of CASTLES) { if (C.sea) continue; const d = Math.hypot(x - C.x, z - C.z); if (d < 80) c.lerp(new THREE.Color(C.ground), smooth(80, 34, d) * 0.85); }
+}
+function castleModel(parent, x, y, z, sc, C) {
+  const holder = new THREE.Group(); parent.add(holder);
+  const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = Math.atan2(-x, -z); g.scale.setScalar(sc); holder.add(g);
+  const wall = std(C.wall, { r: 0.85, map: "rock", rep: 2 }), roof = std(C.roof, { r: 0.7, flat: true }), flag = std(C.banner, { r: 0.6, e: C.banner, ei: 0.25 }), dark = std(0x1a1410, { r: 1 });
+  const S2 = 13;
+  // curtain walls with a gate gap facing the town
+  for (const [wx, wz, rot, len] of [[0, -S2, 0, 26], [-S2, 0, Math.PI / 2, 26], [S2, 0, Math.PI / 2, 26], [-8.5, S2, 0, 9], [8.5, S2, 0, 9]]) {
+    const w = new THREE.Group(); w.position.set(wx, 0, wz); w.rotation.y = rot; g.add(w); M(G.box(), wall, 0, 3, 0, w, len, 6, 1.6);
+    for (let k = -len / 2 + 1; k < len / 2; k += 2) M(G.box(), wall, k, 6.5, 0, w, 1, 1, 1.7);
+  }
+  for (const [cx, cz] of [[-S2, -S2], [S2, -S2], [-S2, S2], [S2, S2], [-3.4, S2], [3.4, S2]]) { const gate = Math.abs(cx) < 4; M(G.cyl(gate ? 1.6 : 2.4, gate ? 1.8 : 2.7, 10), wall, cx, gate ? 4.5 : 5, cz, g, 1, gate ? 9 : 10, 1); M(G.cone(10), roof, cx, gate ? 10.5 : 12, cz, g, gate ? 2.1 : 3.1, gate ? 3 : 4.2, gate ? 2.1 : 3.1); }
+  M(G.box(), dark, 0, 2.6, S2 + 0.2, g, 4.8, 5.2, 0.4);
+  // the keep
+  M(G.box(), wall, 0, 6, -5, g, 11, 12, 10); M(G.cone(4), roof, 0, 14.6, -5, g, 8.4, 5.2, 7.6).rotation.y = Math.PI / 4;
+  for (const [kx, kz] of [[-5.5, -10], [5.5, -10], [-5.5, 0], [5.5, 0]]) { M(G.cyl(1.2, 1.3, 8), wall, kx, 8, kz, g, 1, 16, 1); M(G.cone(8), roof, kx, 17.6, kz, g, 1.7, 3.2, 1.7); }
+  for (let k = 0; k < 3; k++) M(G.box(), WIN_MAT(), -3 + k * 3, 8, 0.02, g, 1, 1.8, 0.1);
+  M(G.box(), dark, 0, 1.8, 0.05, g, 2.6, 3.6, 0.2);
+  // banners
+  for (const [bx, bz] of [[-S2, S2], [S2, S2], [0, -5]]) { M(G.cyl(0.08, 0.08), dark, bx, bz === -5 ? 20.5 : 15.5, bz, g, 1, 5, 1); M(G.box(), flag, bx + 1, bz === -5 ? 22 : 17, bz, g, 2, 1.2, 0.05); }
+  shadows(g, true, true); g.updateMatrixWorld(true); const gRot = g.rotation.y; mergeStatic(holder);
+  // collisions: wall segments, towers and keep (in world space)
+  const toW = (lx, lz) => { const c = Math.cos(gRot), s = Math.sin(gRot); return [x + (lx * c + lz * s) * sc, z + (-lx * s + lz * c) * sc]; };
+  for (let k = -S2; k <= S2; k += 2.6) { for (const [lx, lz] of [[k, -S2], [-S2, k], [S2, k]]) { const [wx, wz] = toW(lx, lz); addCircle(wx, wz, 1.4 * sc, 7); } if (Math.abs(k) > 4) { const [wx, wz] = toW(k, S2); addCircle(wx, wz, 1.4 * sc, 7); } }
+  { const [kx, kz] = toW(0, -5); addCircle(kx, kz, 6.2 * sc, 14); }
+  return { g, toW };
+}
+function buildCastles(group, h) {
+  const r = seeded(5150);
+  for (const C of CASTLES) {
+    let x = C.x, z = C.z, sc = 1;
+    if (C.sea) { const I = ISLES.find(i => i.id === C.isle); if (!I) continue; x = I.x - 2; z = I.z - 2; sc = Math.min(0.62, I.r / 26); C.x = x; C.z = z; }
+    const y = world.h(x, z), { toW } = castleModel(group, x, y - 0.2, z, sc, C);
+    const lb = textSprite(C.name, "#ffe2a0", 1.8); lb.position.set(x, y + 26 * sc, z); group.add(lb); world.labels.push(lb);
+    // treasury inside the keep door, and the dungeon gate
+    const [tx, tz] = toW(0, 2.5), ty = world.h(tx, tz);
+    const ch = new THREE.Group(); ch.position.set(tx, ty, tz); group.add(ch); const wood = std(0x5a3a22, { r: 0.8, map: "bark" }), band = std(0xd8b860, { m: 0.9, r: 0.25 });
+    M(G.box(), wood, 0, 0.4, 0, ch, 1.4, 0.8, 0.9); for (const sx of [-0.5, 0.5]) M(G.box(), band, sx, 0.45, 0, ch, 0.1, 0.92, 0.94); const gl = glowSprite(C.banner, 2.6, 0.55); gl.position.y = 1; ch.add(gl); C.glow = gl;
+    world.interact.push({ x: tx, z: tz, y: ty, r: 2.6, label: `Open the treasury of ${C.name}`, act: () => openCastleTreasury(C) });
+    const [gx, gz] = toW(0, -1.2);
+    world.interact.push({ x: gx, z: gz, y: world.h(gx, gz), r: 2.4, label: `Descend into the dungeon of ${C.name}`, act: () => openMap(0) });
+    // biome dressing around the land castles
+    if (!C.sea) for (let k = 0; k < 26; k++) { const a = r() * TAU, d = 30 + r() * 40, px = C.x + Math.cos(a) * d, pz = C.z + Math.sin(a) * d; if (blockedLobby(px, pz) || onPath(px, pz, 2) || Math.hypot(px, pz) > 285) continue;
+      if (k % 3 === 2) makeRock(group, px, h(px, pz), pz, 0.6 + r() * 1.6, C.wall, r); else { const t = makeTree(C.tree, r); t.position.set(px, h(px, pz) - 0.1, pz); t.scale.setScalar(0.8 + r() * 0.6); t.rotation.y = r() * TAU; group.add(t); addCircle(px, pz, 0.7, 4); } }
+    if (C.biome === "volcanic") for (let k = 0; k < 8; k++) { const a = r() * TAU, d = 20 + r() * 30, px = C.x + Math.cos(a) * d, pz = C.z + Math.sin(a) * d; const lv = M(new THREE.CircleGeometry(1.6 + r() * 1.4, 18), std(0xff5a1a, { e: 0xff4a10, ei: 2.2 }), px, h(px, pz) + 0.06, pz, group); lv.rotation.x = -Math.PI / 2; const lg = glowSprite(0xff6a2a, 5, 0.45); lg.position.set(px, h(px, pz) + 0.8, pz); group.add(lg); }
+    if (C.biome === "snow") world.animated.push(t => { if (C.glow) C.glow.material.opacity = 0.45 + Math.sin(t * 2) * 0.1; });
+  }
+}
+function openCastleTreasury(C) {
+  S.castleLoot = S.castleLoot || {}; const now = Date.now(), last = S.castleLoot[C.id] || 0;
+  if (now - last < 30 * 60e3) { toast(`The treasury of ${esc(C.name)} is empty. It refills in ${dur(30 * 60e3 - (now - last))}.`, ""); return; }
+  S.castleLoot[C.id] = now; const best = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true)), coins = 1500 + best * 600;
+  S.coins += coins; grantChest(C.sea ? 2 : 1, Math.min(best, 11)); if (Math.random() < 0.35) gain(rollItemOf(rollRarity(dropTable(Math.min(best, 11), 1, true))), P.pos);
+  MUSIC.sfx("chest"); pillarFx(P.pos, C.banner, 10, 0.8); bumpStat("treasures");
+  toast(`<b>${esc(C.name)}</b> treasury: ${fmt(coins)} coins and a chest. It refills in 30 minutes.`, "epic"); save();
+}
+/* =====================================================================
+   DUNGEONS: every stage is a room; clear it, take a blessing, pick a door
+   ===================================================================== */
+const ROOMS = [
+  { name: "Great Hall", W: 50, D: 36, deco: "pillars" },
+  { name: "Round Crypt", R: 22, deco: "tombs" },
+  { name: "Long Gallery", W: 74, D: 26, deco: "statues" },
+  { name: "Pillar Maze", W: 46, D: 46, deco: "grid" },
+  { name: "Sunken Pool", W: 48, D: 40, deco: "pool" },
+  { name: "Bone Pit", R: 24, deco: "pit" },
+  { name: "Forge Chamber", W: 46, D: 34, deco: "forge" },
+  { name: "Collapsed Library", W: 52, D: 38, deco: "shelves" },
+  { name: "Throne Room", W: 40, D: 56, deco: "throne", final: true }
+];
+const DOOR_FX = [
+  { name: "Healer's Spring", text: "Restore 40% of your health now.", apply: () => heal(ST.maxHp * 0.4) },
+  { name: "Treasure Vault", text: "One extra chest when the next stage is cleared, but foes have 15% more health.", apply: () => { run.bonusChest = (run.bonusChest || 0) + 1; run.foeHpStage = 1.15; } },
+  { name: "Shadow Path", text: "Foes in the next stage have 15% less health.", apply: () => { run.foeHpStage = 0.85; } },
+  { name: "War Drums", text: "Deal 20% more damage for the whole next stage.", apply: () => { run.drumsLevel = run.level; } },
+  { name: "Quiet Corridor", text: "The next stage has one wave fewer.", apply: () => { run.quiet = run.level; } },
+  { name: "Gambler's Door", text: "A coin toss: two extra chests, or foes with 30% more health.", apply: () => { if (Math.random() < 0.5) { run.bonusChest = (run.bonusChest || 0) + 2; toast("<b>Gambler's Door:</b> you won. Two extra chests wait at the end.", "epic"); } else { run.foeHpStage = 1.3; toast("<b>Gambler's Door:</b> you lost. The next foes are tougher.", ""); } } }
+];
+const wavesNow = () => Math.max(1, STAGES[run.stage].waves - (run.quiet === run.level ? 1 : 0));
+let fadeEl = null;
+function fadeThrough(fn) {
+  if (!fadeEl) { fadeEl = document.createElement("div"); fadeEl.style.cssText = "position:fixed;inset:0;background:#05040a;opacity:0;pointer-events:none;transition:opacity .35s;z-index:40"; document.body.appendChild(fadeEl); }
+  fadeEl.style.opacity = "1"; setTimeout(() => { fn(); setTimeout(() => { fadeEl.style.opacity = "0"; }, 120); }, 380);
+}
+function buildDungeon(idx, roomIdx) {
+  clearWorld();
+  const I = ISLANDS[idx], Rm = ROOMS[roomIdx], group = new THREE.Group(); scene.add(group);
+  const circ = !!Rm.R, W = Rm.W || Rm.R * 2, D = Rm.D || Rm.R * 2, hw = W / 2, hd = D / 2;
+  const h = () => 0;
+  const inside = (x, z, pad = 0) => circ ? Math.hypot(x, z) < Rm.R - 1 - pad : Math.abs(x) < hw - 1 - pad && Math.abs(z) < hd - 1 - pad;
+  const clampPos = (pos, rad) => { if (circ) { const d = Math.hypot(pos.x, pos.z), lim = Rm.R - 1 - rad; if (d > lim) { pos.x *= lim / d; pos.z *= lim / d; } } else { pos.x = clamp(pos.x, -hw + 1 + rad, hw - 1 - rad); pos.z = clamp(pos.z, -hd + 1 + rad, hd - 1 - rad); } };
+  world = { kind: "island", dungeon: true, idx, room: roomIdx, group, h, hBase: h, radius: Math.hypot(hw, hd), inside, clamp: clampPos, circles: [], portals: [], interact: [], animated: [], walls: [], entry: { x: 0, z: circ ? Rm.R - 4 : hd - 4 } };
+  const acc = I.enemies[2][4], dark = !!I.dark;
+  const fog = new THREE.Color(I.fog).multiplyScalar(0.25).getHex();
+  setSky(new THREE.Color(I.sky[0]).multiplyScalar(0.2).getHex(), fog, 0x050405, fog, 28, 95, 0xffe0c0, 0.55, 0.32);
+  // floor
+  const ft = TEX.tiles.clone(); ft.needsUpdate = true; ft.repeat.set(W / 4, D / 4);
+  const floorCol = new THREE.Color(I.ground[1]).lerp(new THREE.Color(0x8a8278), 0.45);
+  const floor = new THREE.Mesh(circ ? new THREE.CircleGeometry(Rm.R, 56) : new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ map: ft, color: floorCol, roughness: 0.85 }));
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; group.add(floor);
+  // walls that fade when the camera is behind them
+  const wallCol = new THREE.Color(I.ground[2]).lerp(new THREE.Color(0x5a5650), 0.5).getHex(), WH = 5.5;
+  const mkWall = (x, z, rot, len, nx, nz, off) => { const m = new THREE.Mesh(G.box(), new THREE.MeshStandardMaterial({ color: lin(wallCol), roughness: 0.9, transparent: true, opacity: 1 })); m.position.set(x, WH / 2, z); m.rotation.y = rot; m.scale.set(len, WH, 1.2); m.castShadow = m.receiveShadow = true; group.add(m); world.walls.push({ m, nx, nz, off }); };
+  if (circ) { const n = 28; for (let k = 0; k < n; k++) { const a = (k + 0.5) / n * TAU, x = Math.cos(a) * (Rm.R + 0.4), z = Math.sin(a) * (Rm.R + 0.4); mkWall(x, z, -a + Math.PI / 2, TAU * Rm.R / n + 0.4, Math.cos(a), Math.sin(a), Rm.R - 0.5); } }
+  else { mkWall(0, -hd - 0.5, 0, W + 2, 0, -1, hd - 0.5); mkWall(0, hd + 0.5, 0, W + 2, 0, 1, hd - 0.5); mkWall(-hw - 0.5, 0, Math.PI / 2, D + 2, -1, 0, hw - 0.5); mkWall(hw + 0.5, 0, Math.PI / 2, D + 2, 1, 0, hw - 0.5); }
+  world.animated.push(() => { const cx = camera.position.x, cz = camera.position.z, cl = Math.hypot(cx, cz) || 1;
+    for (const w of world.walls) { const out = circ ? (cl > Rm.R - 1.5 && (cx * w.nx + cz * w.nz) / cl > 0.55) : (cx * w.nx + cz * w.nz) > w.off; const want = out ? 0.15 : 1; w.m.material.opacity += (want - w.m.material.opacity) * 0.25; w.m.material.depthWrite = w.m.material.opacity > 0.9; } });
+  // torches along the walls
+  const torchAt = (x, z) => { M(G.cyl(0.06, 0.08), std(0x2a2018), x, 2.6, z, group, 1, 1, 1); const f = glowSprite(acc, 1.6, 0.9); f.position.set(x, 3.3, z); group.add(f); const f2 = glowSprite(0xffb050, 0.9, 1); f2.position.set(x, 3.25, z); group.add(f2); world.animated.push(t => { f.scale.setScalar(1.5 + Math.sin(t * 9 + x) * 0.2); }); };
+  if (circ) for (let k = 0; k < 10; k++) { const a = k / 10 * TAU; torchAt(Math.cos(a) * (Rm.R - 0.4), Math.sin(a) * (Rm.R - 0.4)); }
+  else { for (let x = -hw + 6; x <= hw - 6; x += 10) { torchAt(x, -hd + 0.4); torchAt(x, hd - 0.4); } for (let z = -hd + 8; z <= hd - 8; z += 10) { torchAt(-hw + 0.4, z); torchAt(hw - 0.4, z); } }
+  for (const [lx, lz] of [[0, 0], [-hw * 0.5, -hd * 0.4], [hw * 0.5, hd * 0.4]]) { const l = new THREE.PointLight(lin(acc), 1.1, 40, 2); l.position.set(lx, 4.5, lz); group.add(l); }
+  // decoration per room type, themed by the island
+  const r = seeded(idx * 97 + roomIdx * 13 + (run ? run.level : 0)), stone = std(wallCol, { r: 0.85, map: "rock" }), accM = std(acc, { e: acc, ei: 1.2 });
+  const pillar = (x, z, s = 1) => { M(G.cyl(0.9 * s, 1.05 * s, 10), stone, x, 2.8, z, group, 1, 5.6, 1); M(G.box(), stone, x, 0.25, z, group, 2.4 * s, 0.5, 2.4 * s); addCircle(x, z, 1.1 * s, 6); };
+  const prop = (x, z) => { const t = makeTree(I.tree, r); t.position.set(x, 0, z); t.scale.setScalar(0.45 + r() * 0.25); group.add(t); addCircle(x, z, 0.6, 3); };
+  if (Rm.deco === "pillars") for (const sx of [-1, 1]) for (let z = -hd + 7; z <= hd - 7; z += 7) pillar(sx * hw * 0.55, z);
+  if (Rm.deco === "grid") for (let gx = -1.5; gx <= 1.5; gx++) for (let gz = -1.5; gz <= 1.5; gz++) if (!(Math.abs(gx) < 1 && Math.abs(gz) < 1 && r() < 0.5)) pillar(gx * 10, gz * 10, 0.8);
+  if (Rm.deco === "statues") for (const sx of [-1, 1]) for (let x = -hw + 8; x <= hw - 8; x += 11) { M(G.box(), stone, x, 0.6, sx * (hd - 3), group, 1.6, 1.2, 1.6); M(G.dode(), stone, x, 2.2, sx * (hd - 3), group, 0.6, 1.1, 0.5); addCircle(x, sx * (hd - 3), 1, 3); }
+  if (Rm.deco === "tombs") for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + 0.2, x = Math.cos(a) * 13, z = Math.sin(a) * 13; const tb = M(G.box(), stone, x, 0.55, z, group, 1.6, 1.1, 3); tb.rotation.y = -a; addCircle(x, z, 1.6, 2); }
+  if (Rm.deco === "pool") { const pool = M(new THREE.CircleGeometry(7, 40), new THREE.MeshStandardMaterial({ color: lin(I.water), emissive: lin(I.lava || I.glowWater ? I.water : 0x000000), emissiveIntensity: I.lava ? 1.4 : 0.5, roughness: 0.1, metalness: 0.4, transparent: true, opacity: 0.85 }), 0, 0.04, 0, group); pool.rotation.x = -Math.PI / 2; const rim = M(G.tor(7.2, 0.35), stone, 0, 0.2, 0, group); rim.rotation.x = Math.PI / 2; addCircle(0, 0, 7, 2); }
+  if (Rm.deco === "pit") { const pit = M(new THREE.CircleGeometry(5, 32), std(I.lava ? 0xff5a1a : 0x0a0808, { e: I.lava ? 0xff4a10 : acc, ei: I.lava ? 2 : 0.4 }), 0, 0.03, 0, group); pit.rotation.x = -Math.PI / 2; addCircle(0, 0, 5, 2); for (let k = 0; k < 10; k++) { const a = r() * TAU, d = 8 + r() * 10; M(G.ico(), std(0xe8dcc0, { r: 0.6, flat: true }), Math.cos(a) * d, 0.3, Math.sin(a) * d, group, 0.3 + r() * 0.4); } }
+  if (Rm.deco === "forge") for (let k = 0; k < 4; k++) { const x = (k - 1.5) * 10, z = (k % 2 ? -1 : 1) * hd * 0.4; M(G.box(), std(0x2a2a30, { m: 0.8, r: 0.4 }), x, 0.6, z, group, 2, 1.2, 1.2); const lv = M(G.box(), std(0xff5a1a, { e: 0xff4a10, ei: 2 }), x, 0.05, z + 3, group, 6, 0.1, 1); addCircle(x, z, 1.3, 2); }
+  if (Rm.deco === "shelves") for (let k = 0; k < 6; k++) { const x = -hw + 6 + k * (W - 12) / 5, z = (k % 2 ? -1 : 1) * hd * 0.35; const sh = M(G.box(), MAT.bark(0x4a3020), x, 1.6, z, group, 5, 3.2, 1); sh.rotation.y = r() * 0.4 - 0.2; addCircle(x, z, 2.2, 4); }
+  if (Rm.deco === "throne") { M(G.box(), stone, 0, 0.4, -hd + 7, group, 14, 0.8, 8); M(G.box(), std(0x5a1a2a, { r: 0.8 }), 0, 0.82, -hd + 3, group, 4, 0.04, 30); M(G.box(), accM, 0, 2.4, -hd + 4, group, 2.2, 3.6, 1); for (const sx of [-1, 1]) for (let z = -hd + 12; z <= hd - 8; z += 8) pillar(sx * 9, z); }
+  for (let k = 0; k < 8; k++) { const a = r() * TAU; let x, z; if (circ) { const d = Rm.R - 3; x = Math.cos(a) * d; z = Math.sin(a) * d; } else { x = (r() - 0.5) * (W - 6); z = (r() < 0.5 ? -1 : 1) * (hd - 2.5); } if (Math.hypot(x - world.entry.x, z - world.entry.z) > 6) prop(x, z); }
+  for (let k = 0; k < 14; k++) { const x = (r() - 0.5) * (W - 6), z = (r() - 0.5) * (D - 6); if (inside(x, z, 2) && !blocked(x, z, 2) && Math.hypot(x - world.entry.x, z - world.entry.z) > 6) makeRock(group, x, 0, z, 0.3 + r() * 0.5, I.ground[2], r); }
+  // the way in (sealed behind you) and two doors out on the far wall
+  const doorM = std(0x3a2414, { r: 0.8, map: "bark" }), ironM = MAT.metal(0x5a5a62, 0.4);
+  const entryDoor = new THREE.Group(); entryDoor.position.set(0, 0, circ ? Rm.R - 0.3 : hd - 0.3); group.add(entryDoor); M(G.box(), doorM, 0, 1.9, 0, entryDoor, 3, 3.8, 0.3);
+  world.doors = [];
+  const dpos = circ ? [-0.42, 0.42].map(a => [Math.sin(a) * (Rm.R - 0.3), -Math.cos(a) * (Rm.R - 0.3), a]) : [[-W * 0.24, -hd + 0.3, 0], [W * 0.24, -hd + 0.3, 0]];
+  for (const [dx, dz, rot] of dpos) {
+    const dg = new THREE.Group(); dg.position.set(dx, 0, dz); dg.rotation.y = -rot; group.add(dg);
+    for (const sx of [-1, 1]) M(G.box(), stone, sx * 2, 2.3, 0, dg, 0.8, 4.6, 1.6); M(G.box(), stone, 0, 4.8, 0, dg, 4.8, 0.7, 1.6);
+    const leaf = new THREE.Group(); leaf.position.set(-1.6, 0, 0.2); dg.add(leaf); M(G.box(), doorM, 1.6, 2, 0, leaf, 3.2, 4, 0.25); for (const y of [0.9, 3.1]) M(G.box(), ironM, 1.6, y, 0.15, leaf, 3.2, 0.18, 0.05);
+    const glowP = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 4), new THREE.MeshBasicMaterial({ color: lin(acc), transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); glowP.position.set(0, 2, -0.1); dg.add(glowP);
+    const lbl = textSprite("Sealed", "#a1abc4", 0.9); lbl.position.set(0, 6.3, 0); dg.add(lbl);
+    world.doors.push({ x: dx, z: dz + (circ ? 0 : 1.6) * 1, g: dg, leaf, glowP, lbl, open: false });
+  }
+  world.animated.push(t => { for (const d of world.doors) { if (d.open) { d.leaf.rotation.y = lerp(d.leaf.rotation.y, -1.7, 0.08); d.glowP.material.opacity = 0.45 + Math.sin(t * 3) * 0.12; } } doorTick(); });
+  shadows(group, false, true);
+  return world;
+}
+function openDoors() {
+  if (!world || !world.doors) return;
+  run.state = "doors";
+  const fx = DOOR_FX.slice().sort(() => Math.random() - 0.5).slice(0, 2);
+  const lastStage = run.level + 1 === run.levels;
+  const pool = ROOMS.map((R, i) => i).filter(i => !ROOMS[i].final && i !== world.room).sort(() => Math.random() - 0.5);
+  world.doors.forEach((d, k) => {
+    d.open = true; d.room = lastStage ? ROOMS.findIndex(R => R.final) : pool[k]; d.fx = fx[k];
+    d.g.remove(d.lbl); d.lbl = textSprite(`${ROOMS[d.room].name} · ${d.fx.name}`, "#ffe2a0", 1); d.lbl.position.set(0, 6.3, 0); d.g.add(d.lbl);
+  });
+  toast(`<b>Two doors open.</b> Left: ${esc(world.doors[0].fx.name)}: ${esc(world.doors[0].fx.text)} Right: ${esc(world.doors[1].fx.name)}: ${esc(world.doors[1].fx.text)}`, "rare");
+}
+function doorTick() {
+  if (!run || run.state !== "doors" || !world.doors || isPaused()) return;
+  for (const d of world.doors) if (d.open && Math.hypot(P.pos.x - d.x, P.pos.z - d.z) < 2.4) { enterDoor(d); return; }
+}
+function enterDoor(d) {
+  run.state = "travel";
+  fadeThrough(() => {
+    run.level++; run.foeHpStage = 1; d.fx.apply();
+    projectiles.forEach(p => scene.remove(p.m)); projectiles = []; telegraphs.forEach(t => scene.remove(t.mesh)); telegraphs = [];
+    buildDungeon(run.idx, d.room);
+    P.pos.set(world.entry.x, 0, world.entry.z); P.face = Math.PI; cam.yaw = 0; P.kb.set(0, 0, 0);
+    allies.forEach((a, k) => a.pos.set(P.pos.x + (k - 1) * 2, 0, P.pos.z - 2));
+    banner(ROOMS[d.room].name, `${d.fx.name}: ${d.fx.text}`);
+    run.state = "between"; later(2.2, startLevel);
+  });
+}
+function stageChests(final) {
+  const n = 1 + (Math.random() < 0.5 ? 1 : 0) + (run.bonusChest || 0); run.bonusChest = 0;
+  for (let k = 0; k < n; k++) grantChest(run.stage, Math.min(run.idx, 11));
+  toast(`<b>${n} chest${n > 1 ? "s" : ""}</b> for clearing stage ${run.level}. Open ${n > 1 ? "them" : "it"} from Chests.`, "epic");
+}
+/* ---- secrets: hidden wanderers with secret quests, and secret dealers ---- */
+const SECRET_ITEMS = ["whisperblade", "foxfang", "sirenslament", "godspark", "wanderersoath", "veilofthefox", "starlitdiadem", "cartographercoat"];
+SECRET_ITEMS.forEach(id => { if (ITEM[id]) ITEM[id].secret = true; });
+const SECRET_NPCS = [
+  { id: "pilgrim", name: "The Hollow Pilgrim", role: "a figure in grey", look: { skin: 0x9a9088, hair: 0x2a2a2a, cloth: 0x4a4a4a, cloth2: 0x2a2a2a }, armour: "voidwalker",
+    hello: "You see me. Few do. I walk between the old kings' graves. Bring down their heirs and I will give you a blade that makes no sound.",
+    quest: { title: "Ashes of the Old Kings", ask: "Defeat 8 bosses or lieutenants.", stat: "bosses", n: 8 }, reward: { coins: 25000, items: { whisperblade: 1, die: 1 } } },
+  { id: "fox", name: "The Masked Fox", role: "a grinning stranger", look: { skin: 0xd8a880, hair: 0xd8603a, cloth: 0xd8603a, cloth2: 0x2a1a14 }, armour: "nightstalker",
+    hello: "Oh, you caught me. Clever. Let us dance: turn aside thirty blows with a perfect parry, and the Fox's own gear is yours.",
+    quest: { title: "Dance of the Fox", ask: "Parry 30 attacks.", stat: "parries", n: 30 }, reward: { coins: 15000, items: { foxfang: 1, veilofthefox: 1 } } },
+  { id: "bard", name: "The Drowned Bard", role: "a dripping musician", look: { skin: 0x9ab8b0, hair: 0x2a5a5a, cloth: 0x1a4a5a, cloth2: 0x0a2a3a }, armour: "tidewalkerplate",
+    hello: "I sang to the sea and it took me. It still owes me a song. Slay its monsters for me, and take my staff.",
+    quest: { title: "The Sea's Debt", ask: "Defeat 10 sea beasts.", stat: "seaBeasts", n: 10 }, reward: { coins: 30000, items: { sirenslament: 1, thunderpearl: 3 } } },
+  { id: "starchild", name: "The Star-Touched Child", role: "a glowing child", look: { skin: 0xf0e0ff, hair: 0xd8d8ff, cloth: 0x2a2a5a, cloth2: 0x1a1a3a }, armour: null,
+    hello: "I fell from up there. I need starlight to go home. It only comes when brave people fight at night.",
+    quest: { title: "Starlight Home", ask: "Defeat 60 foes at night.", stat: "nightKills", n: 60 }, reward: { coins: 20000, items: { starlitdiadem: 1, die: 2 } } },
+  { id: "oldgod", name: "A Tired Old Man", role: "who is not what he seems", look: { skin: 0xd0b090, hair: 0xf0f0f0, cloth: 0x8a7a5a, cloth2: 0x5a4a3a }, armour: null,
+    hello: "Once, people built temples to me. Now they walk past. Prove you are worth a blessing: clear three raids.",
+    quest: { title: "Worthy of Worship", ask: "Clear 3 raids in the Raid Hall.", stat: "raidClears", n: 3 }, reward: { coins: 50000, items: { godspark: 1 } } },
+  { id: "cartographer", name: "The Lost Cartographer", role: "surrounded by maps", look: { skin: 0xc99a74, hair: 0x6a4a2a, cloth: 0x6a5a3a, cloth2: 0x3a2a1a }, armour: "leather",
+    hello: "I have mapped every island except the ones I have not found. Open their treasures for me and I will share my coat.",
+    quest: { title: "Ink and Islands", ask: "Open 20 island or castle treasures.", stat: "treasures", n: 20 }, reward: { coins: 40000, items: { cartographercoat: 1 } } },
+  { id: "wanderer", name: "The First Wanderer", role: "the very first hero", look: { skin: 0xc99a74, hair: 0x3a2a1a, cloth: 0x5a4a3a, cloth2: 0x2a2018 }, armour: "fieldjack",
+    hello: "Before the portals had names, I walked them all. Clear 40 stages of any island, and you will carry my oath.",
+    quest: { title: "Every Road", ask: "Clear 40 island stages (whole island runs count as one each).", stat: "clears", n: 40 }, reward: { coins: 100000, items: { wanderersoath: 1, die: 3 } } }
+];
+const SECRET_DEALERS = [
+  { id: "masked", name: "The Masked Merchant", look: { skin: 0xe8e0d0, hair: 0x1a1a1a, cloth: 0x2a1a3a, cloth2: 0x1a0a1a }, armour: "nightstalker", hello: "Shh. You never saw me. But you may buy something." },
+  { id: "crowbone", name: "Old Crowbone", look: { skin: 0xb0a090, hair: 0x2a2a2a, cloth: 0x1a1a1a, cloth2: 0x3a3a3a }, armour: "ravenmail", hello: "Bones, feathers, blades. All very old, all very sharp." },
+  { id: "vesper", name: "Lady Vesper", look: { skin: 0xf0d0c0, hair: 0x5a1a2a, cloth: 0x5a1a2a, cloth2: 0x1a0a14 }, armour: null, hello: "My night market opens once in a blue moon. Tonight, apparently." },
+  { id: "peddler", name: "The Tidewalker Peddler", look: { skin: 0x9ab8b0, hair: 0x1a3a3a, cloth: 0x1a4a4a, cloth2: 0x0a2a2a }, armour: "abyssdiver", hello: "Found it all on the sea floor. Mostly. Do not ask about the rest." }
+];
+let secretNow = null, dealerNow = null, secretCheckT = 30;
+function secretSpots() {
+  const L = [];
+  for (const C of CASTLES) if (!C.sea) L.push([C.x + rand(-6, 6), C.z + rand(-4, 8)]);
+  for (let k = 0; k < 40 && L.length < 14; k++) { const a = rand(0, TAU), d = rand(120, 250), x = Math.cos(a) * d, z = Math.sin(a) * d; if (x > 135 || blockedLobby(x, z) || Math.abs(world.hBase(x, z)) > 18) continue; L.push([x, z]); }
+  for (const I of ISLES) if (I.storm < 45 && I.kind !== "rare") L.push([I.x + rand(-4, 4), I.z + rand(-4, 4)]);
+  return L;
+}
+function placeStranger(def, kind, life) {
+  const spots = secretSpots(), [x, z] = spots[Math.floor(Math.random() * spots.length)], y = world.h(x, z);
+  const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: null }); R.g.position.set(x, y, z); R.g.rotation.y = rand(0, TAU); world.group.add(R.g);
+  const met = kind === "npc" && S.secrets && S.secrets[def.id], lbl = textSprite(kind === "dealer" ? `${def.name} · secret dealer` : met ? def.name : "???", kind === "dealer" ? "#ffd166" : "#d8c8ff", 0.8); lbl.position.set(x, y + 2.5, z); world.group.add(lbl);
+  const gl = glowSprite(kind === "dealer" ? 0xffd166 : 0xb07aff, 3, 0.25); gl.position.set(x, y + 1.2, z); world.group.add(gl);
+  const it = { x, z, y, r: 2.8, label: kind === "dealer" ? `Trade with ${def.name}` : "Speak to the stranger", act: () => kind === "dealer" ? openSecretDealer() : openSecretNpc() };
+  world.interact.push(it);
+  const o = { def, R, lbl, gl, it, until: worldT + life, x, z, stock: kind === "dealer" ? dealerStock() : null };
+  world.animated.push(t => { if (!o.R.g.parent) return; poseHumanoid(o.R, t + x, 0, 0, "normal", false); o.gl.material.opacity = 0.18 + Math.sin(t * 2) * 0.08; });
+  return o;
+}
+function removeStranger(o) { if (!o) return; world.group.remove(o.R.g, o.lbl, o.gl); world.interact = world.interact.filter(i => i !== o.it); }
+function secretTick(dt) {
+  if (run || !world || world.kind !== "lobby") return;
+  if (secretNow && worldT > secretNow.until) { removeStranger(secretNow); secretNow = null; }
+  if (dealerNow && worldT > dealerNow.until) { removeStranger(dealerNow); dealerNow = null; toast("The secret dealer has packed up and vanished.", ""); }
+  secretCheckT -= dt; if (secretCheckT > 0) return; secretCheckT = 40;
+  S.secrets = S.secrets || {};
+  const pool = SECRET_NPCS.filter(d => !(S.secrets[d.id] && S.secrets[d.id].s === "done"));
+  if (!secretNow && pool.length && Math.random() < 0.12) { secretNow = placeStranger(pick(pool), "npc", 240); toast("<i>A strange figure has been glimpsed somewhere in the realm...</i>", "rare"); }
+  if (!dealerNow && Math.random() < 0.04) { dealerNow = placeStranger(pick(SECRET_DEALERS), "dealer", 180); toast("<i>Word on the wind: a secret dealer has set up shop somewhere. They will not stay long.</i>", "legendary"); }
+}
+function secretReset() { secretNow = null; dealerNow = null; }
+function openSecretNpc() {
+  const o = secretNow; if (!o) return; const d = o.def, st = (S.secrets = S.secrets || {})[d.id]; dlgNpc = null; keys.clear(); attackHeld = false;
+  o.until = Math.max(o.until, worldT + 30); o.lbl.visible = false;
+  $("dlgName").textContent = d.name; $("dlgRole").textContent = `Secret · ${d.role}`;
+  const prog = st && st.s === "active" ? Math.min(d.quest.n, (S.stats[d.quest.stat] || 0) - st.base) : 0;
+  $("dlgText").textContent = !st ? d.hello : st.s === "active" ? `You are still on my errand. ${prog} of ${d.quest.n}. The reward will find you when it is done, wherever you are.` : "We are square, you and I.";
+  const r = d.reward, rw = `${fmt(r.coins)} coins${r.items ? " + " + Object.entries(r.items).map(([id, n]) => (n > 1 ? n + " × " : "") + esc(ITEM[id].name)).join(", ") : ""}`;
+  $("dlgQuest").innerHTML = `<div class="duels"><div class="duel" style="--c:#b07aff"><span><b>Secret quest: ${esc(d.quest.title)}</b><small>${esc(d.quest.ask)}</small><small>Reward: ${rw}</small>${st && st.s === "active" ? `<small class="num">${prog} / ${d.quest.n}</small>` : ""}</span></div></div>`;
+  $("dlgBtns").innerHTML = `${!st ? `<button class="btn primary" data-secret="${d.id}">Accept the secret quest</button>` : ""}<button class="btn" data-dlg="close">Step back</button>`;
+  $("dialog").hidden = false;
+}
+function secretCheck() {
+  if (!S.secrets) return;
+  for (const d of SECRET_NPCS) { const st = S.secrets[d.id]; if (!st || st.s !== "active") continue;
+    if ((S.stats[d.quest.stat] || 0) - st.base >= d.quest.n) { st.s = "done"; S.coins += d.reward.coins; for (const [id, n] of Object.entries(d.reward.items || {})) gain(ITEM[id], null, n);
+      banner("Secret quest complete", `${d.name}: ${d.quest.title}`); toast(`<b>${esc(d.name)}</b>'s reward finds you: ${fmt(d.reward.coins)} coins and ${Object.keys(d.reward.items || {}).map(id => esc(ITEM[id].name)).join(", ")}.`, "vaulted"); save(); } }
+}
+function dealerStock() {
+  const L = [], pick1 = (rar, cats) => { const pool = ITEMS.filter(it => it.rarity === rar && cats.includes(it.cat) && !it.secret); return pick(pool); };
+  for (let k = 0; k < 2; k++) { const it = pick1("legendary", ["weapon", "armour"]); L.push({ id: it.id, price: Math.round(it.value * 9 / 100) * 100 }); }
+  const mat = pick1("legendary", ["material"]); if (mat) L.push({ id: mat.id, price: Math.round(mat.value * 6 / 100) * 100 });
+  L.push({ id: "die", price: 60000 });
+  if (Math.random() < 0.3) { const v = pick1("vaulted", ["weapon"]); if (v) L.push({ id: v.id, price: 1500000 }); }
+  return L;
+}
+function openSecretDealer() {
+  const o = dealerNow; if (!o) return; dlgNpc = null; keys.clear(); attackHeld = false; o.until = Math.max(o.until, worldT + 30);
+  $("dlgName").textContent = o.def.name; $("dlgRole").textContent = "Secret dealer · rarer than any portal";
+  $("dlgText").textContent = o.def.hello + ` You have ${fmt(S.coins)} coins.`;
+  $("dlgQuest").innerHTML = `<div class="duels">${o.stock.map((s, k) => { const it = ITEM[s.id]; return `<div class="duel" style="--c:${rc(it.rarity)}"><span><b>${esc(it.name)}</b><small>${RNAME[it.rarity]} ${CAT_LABEL[it.cat].toLowerCase()}${s.sold ? " · sold" : ""}</small><small>${esc(it.desc || "")}</small></span><span class="row" style="gap:4px;grid-column:1"><button class="btn primary" data-sdbuy="${k}" ${s.sold || S.coins < s.price ? "disabled" : ""}>Buy · ${fmt(s.price)}</button></span></div>`; }).join("")}</div>`;
+  $("dlgBtns").innerHTML = `<button class="btn" data-dlg="close">Leave</button>`;
+  $("dialog").hidden = false;
+}
+$("dialog").addEventListener("click", e => {
+  const a = e.target.closest("[data-secret]"); if (a) { const d = SECRET_NPCS.find(x => x.id === a.dataset.secret); S.secrets = S.secrets || {}; S.secrets[d.id] = { s: "active", base: S.stats[d.quest.stat] || 0 }; toast(`<b>Secret quest accepted:</b> ${esc(d.quest.title)}. It is not written in any quest log.`, "legendary"); save(); openSecretNpc(); return; }
+  const b = e.target.closest("[data-sdbuy]"); if (b && dealerNow) { const s = dealerNow.stock[+b.dataset.sdbuy]; if (!s || s.sold || S.coins < s.price) return; S.coins -= s.price; s.sold = true; gain(ITEM[s.id], P.pos); MUSIC.sfx("chest"); save(); openSecretDealer(); }
+});
 
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
@@ -6078,7 +6387,7 @@ function frame(now) {
 }
 $("startBtn").addEventListener("click", () => { MUSIC.init(); $("intro").hidden = true; updateDailyBadge(); if (!dailyInfo().claimed) setTimeout(openDaily, 900); if (coarse || usedTouch) $("joyHint").hidden = false; });
 buildLobby(); rebuildHero(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
