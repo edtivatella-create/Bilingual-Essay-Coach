@@ -6646,12 +6646,15 @@ const SL = { on: false };
 (function lockUi() {
   const b = document.createElement("button"); b.id = "bLock"; b.className = "hbtn"; b.textContent = "Shift lock"; b.title = "Shift lock (L or Ctrl)";
   b.style.cssText = "position:fixed;right:12px;top:118px;z-index:6"; document.body.appendChild(b);
-  const zo = document.createElement("div"); zo.style.cssText = "position:fixed;right:12px;top:156px;z-index:6;display:flex;gap:4px";
-  zo.innerHTML = `<button class="hbtn" id="bZoomIn" aria-label="Zoom in">+</button><button class="hbtn" id="bZoomOut" aria-label="Zoom out">−</button>`; document.body.appendChild(zo);
   const ch = document.createElement("div"); ch.id = "crosshair"; ch.hidden = true; ch.style.cssText = "position:fixed;left:50%;top:46%;width:14px;height:14px;margin:-7px;border:2px solid #fff;border-radius:50%;z-index:6;pointer-events:none;box-shadow:0 0 6px #000"; document.body.appendChild(ch);
   b.addEventListener("click", () => toggleLock());
-  $("bZoomIn").addEventListener("click", () => { cam.dist = clamp(cam.dist - 2, 3, 30); });
-  $("bZoomOut").addEventListener("click", () => { cam.dist = clamp(cam.dist + 2, 3, 30); });
+  // pinch with two fingers anywhere on the game to zoom
+  const pts = new Map(), pin = { d0: 0, dist0: 0 };
+  const span = () => { const v = [...pts.values()]; return Math.hypot(v[0].x - v[1].x, v[0].y - v[1].y); };
+  stage.addEventListener("pointerdown", e => { if (e.pointerType !== "touch" || e.pointerId === joy.id) return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (pts.size === 2) { pin.d0 = span(); pin.dist0 = cam.dist; drag.id = null; } });
+  stage.addEventListener("pointermove", e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (pts.size >= 2 && pin.d0 > 0) { cam.dist = clamp(pin.dist0 * pin.d0 / Math.max(10, span()), 3, 30); drag.id = null; } });
+  const lift = e => { pts.delete(e.pointerId); if (pts.size < 2) pin.d0 = 0; };
+  stage.addEventListener("pointerup", lift); stage.addEventListener("pointercancel", lift);
   window.addEventListener("keydown", e => { if ((e.key === "l" || e.key === "L" || e.key === "Control") && !e.repeat && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") toggleLock(); });
   document.addEventListener("mousemove", e => { if (SL.on && document.pointerLockElement === stage && !isPaused()) { cam.yaw -= e.movementX * 0.0042; cam.pitch = clamp(cam.pitch + e.movementY * 0.0028, 0.05, 1.2); } });
 })();
