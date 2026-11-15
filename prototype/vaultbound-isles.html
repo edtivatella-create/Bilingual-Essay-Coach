@@ -3402,7 +3402,7 @@ function addSolid(o) { (world.solids || (world.solids = [])).push(o); world.circ
 function solidBox(x, z, sx, sz, ry, top, y0 = 0) { return addSolid({ box: true, x, z, hx: sx / 2, hz: sz / 2, c: Math.cos(ry), s: Math.sin(ry), top, y0 }); }
 function solidCyl(x, z, r, top, y0 = 0) { return addSolid({ x, z, r, top, y0 }); }
 function inSolid(o, x, z, rad) { const dx = x - o.x, dz = z - o.z; if (!o.box) return Math.hypot(dx, dz) < o.r + rad; const lx = o.c * dx - o.s * dz, lz = o.s * dx + o.c * dz; return Math.abs(lx) < o.hx + rad && Math.abs(lz) < o.hz + rad; }
-function solidGround(x, z, y) { let g = -1e9; if (world.solids) for (const o of world.solids) if (o.top <= y + STEP && o.top > g && inSolid(o, x, z, 0.12)) g = o.top; return g; }
+function solidGround(x, z, y, step = STEP) { let g = -1e9; if (world.solids) for (const o of world.solids) if (o.top <= y + step && o.top > g && inSolid(o, x, z, 0.12)) g = o.top; return g; }
 function pushSolid(o, pos, rad) {
   const dx = pos.x - o.x, dz = pos.z - o.z;
   if (!o.box) { const d = Math.hypot(dx, dz), m = o.r + rad; if (d < m) { const k = d > 1e-4 ? m / d : 0; if (k) { pos.x = o.x + dx * k; pos.z = o.z + dz * k; } else pos.x = o.x + m; } return; }
@@ -3411,8 +3411,8 @@ function pushSolid(o, pos, rad) {
   if (ex < ez) lx = (lx < 0 ? -1 : 1) * (o.hx + rad); else lz = (lz < 0 ? -1 : 1) * (o.hz + rad);
   pos.x = o.x + o.c * lx + o.s * lz; pos.z = o.z - o.s * lx + o.c * lz;
 }
-function collide(pos, rad, y) {
-  if (world.solids) for (const o of world.solids) { if (y >= o.top - STEP || y + 1.8 < o.y0) continue; pushSolid(o, pos, rad); }
+function collide(pos, rad, y, step = STEP) {
+  if (world.solids) for (const o of world.solids) { if (y >= o.top - step || y + 1.8 < o.y0) continue; pushSolid(o, pos, rad); }
   for (const c of world.circles) { if (c.ghost || y - world.h(c.x, c.z) > c.h) continue; const dx = pos.x - c.x, dz = pos.z - c.z, d = Math.hypot(dx, dz), m = c.r + rad; if (d < m && d > 1e-4) { pos.x = c.x + dx / d * m; pos.z = c.z + dz / d * m; } }
   if (world.clamp) world.clamp(pos, rad);
   const d = Math.hypot(pos.x, pos.z), lim = world.radius; if (d > lim) { pos.x *= lim / d; pos.z *= lim / d; }
@@ -3541,8 +3541,8 @@ function update(dt) {
     }
     // separation
     for (const o of enemies) { if (o === e || o.dead) continue; const d = e.pos.distanceTo(o.pos), m = e.radius + o.radius; if (d < m && d > 1e-3) e.pos.addScaledVector(e.pos.clone().sub(o.pos).setY(0).normalize(), (m - d) * 0.5); }
-    collide(e.pos, e.radius, e.pos.y || 0);
-    e.pos.y = Math.max(world.h(e.pos.x, e.pos.z), solidGround(e.pos.x, e.pos.z, e.pos.y || 0));
+    collide(e.pos, e.radius, e.pos.y || 0, 1.6); // foes clamber over anything low instead of getting boxed in
+    { const ty = Math.max(world.h(e.pos.x, e.pos.z), solidGround(e.pos.x, e.pos.z, e.pos.y || 0, 1.6)); e.pos.y = ty > (e.pos.y || 0) ? lerp(e.pos.y || 0, ty, Math.min(1, dt * 14)) : ty; }
     e.atkAnim = Math.max(0, e.atkAnim - dt * 3);
     e.R.g.position.copy(e.pos);
     poseCreature(e.R, frozen ? 0 : e.t, frozen ? 0 : moving, e.atkAnim);
@@ -6986,6 +6986,12 @@ function buildDungeon(idx, roomIdx) {
   else if (lay === "twin") { add(-17, 4, 18 + r() * 4); add(17, -4, 18 + r() * 4); add(0, 0, 10); add(0, 26, 10); add(0, -26, 10); }
   else if (lay === "ring") { add(0, 0, 30); for (let k = 0; k < 3; k++) { const a = k / 3 * TAU + r(); add(Math.cos(a) * 26, Math.sin(a) * 26, 10); } }
   else { add(0, 18, 12); add(0, -2, 14); add(-18, -18, 12); add(20, -18, 12); add(0, -32, 13); add(-18, 8, 9); add(18, 8, 9); }
+  // every lobe must join an earlier one through an opening at least 8 wide once the wall padding is taken off,
+  // so no doorway that looks open is secretly sealed
+  const neckOf = (A, B, pad) => { const d = Math.hypot(A.x - B.x, A.z - B.z), r1 = A.r - pad, r2 = B.r - pad; if (d >= r1 + r2) return 0; if (d <= Math.abs(r1 - r2) + 1e-6) return 99; const x = (d * d + r1 * r1 - r2 * r2) / (2 * d); return Math.sqrt(Math.max(0, r1 * r1 - x * x)); };
+  for (let k = 1; k < lobes.length; k++) { const A = lobes[k];
+    for (let it = 0; it < 60; it++) { let best = null, bn = -1; for (let j = 0; j < k; j++) { const nk = neckOf(A, lobes[j], 2); if (nk > bn) { bn = nk; best = lobes[j]; } } if (bn >= 4) break;
+      const dx = best.x - A.x, dz = best.z - A.z, d = Math.hypot(dx, dz) || 1; A.x += dx / d; A.z += dz / d; } }
   const inLobe = (x, z, pad) => lobes.some(L => Math.hypot(x - L.x, z - L.z) < L.r - pad);
   const inside = (x, z, pad = 0) => inLobe(x, z, 1 + pad);
   const clampPos = (pos, rad) => { if (sky && pos === P.pos) return; if (inLobe(pos.x, pos.z, 1 + rad)) return; let best = null, bd = 1e9; for (const L of lobes) { const d = Math.hypot(pos.x - L.x, pos.z - L.z) - (L.r - 1 - rad); if (d < bd) { bd = d; best = L; } } const dx = pos.x - best.x, dz = pos.z - best.z, d = Math.hypot(dx, dz) || 1, lim = best.r - 1 - rad; pos.x = best.x + dx / d * lim; pos.z = best.z + dz / d * lim; };
