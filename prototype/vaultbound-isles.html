@@ -678,7 +678,21 @@ const WEAPON_DEFS = [
   ["pearlwhisper", "Pearl Whisper", "rare", "sword", 0xf0ece0, 0xffffff, "frostNova", "Smooth as the inside of a shell."],
   ["bronzehelm", "Bronzehelm Blade", "common", "greatsword", 0xb87a3a, 0xffd0a0, "heavyStrike", "Old bronze, still sharp enough."],
   ["jadeserpent", "Jade Serpent", "epic", "katana", 0x5aa87a, 0xd8ffe8, "chainBolt", "Carved from a single piece of jade."],
-  ["rubyheart", "Rubyheart Longsword", "legendary", "sword", 0x9a0a2a, 0xff4a6a, "flameWave", "A ruby the size of a fist beats in the pommel."]
+  ["rubyheart", "Rubyheart Longsword", "legendary", "sword", 0x9a0a2a, 0xff4a6a, "flameWave", "A ruby the size of a fist beats in the pommel."],
+  ["violetkris", "Viper's Kris", "rare", "dagger", 0x3a8a4a, 0x9aff6a, "drainBurst", "Its wavy blade leaves wounds that will not close."],
+  ["moonstiletto", "Moonstiletto", "epic", "dagger", 0xd8e0ff, 0x9ab8ff, "bladeFan", "Thin as a moonbeam and just as cold."],
+  ["emberkukri", "Ember Kukri", "rare", "dagger", 0xd8602a, 0xffb040, "flameWave", "Bent like a flame mid-flicker."],
+  ["bonefangshiv", "Bonefang Shiv", "common", "dagger", 0xe8dcc0, 0x8a7a5a, "heavyStrike", "Carved from something's tooth."],
+  ["frostbitedirk", "Frostbite Dirk", "epic", "dagger", 0xbfe8ff, 0x7ad8ff, "frostNova", "Leaves frost on everything it nicks."],
+  ["shadowkunai", "Shadow Kunai", "legendary", "dagger", 0x1a1a24, 0xb07aff, "timeEcho", "Thrown once, it seems to hit three times."],
+  ["sunsteelparry", "Sunsteel Parrying Dagger", "rare", "dagger", 0xffd040, 0xfff0a0, "shockwave", "Made to catch blades, not just cut."],
+  ["bloodletter", "The Bloodletter", "legendary", "dagger", 0x8a0a1a, 0xff3a4a, "drainBurst", "It drinks before you do."],
+  ["stormshard", "Stormshard Knife", "epic", "dagger", 0x5a6a8a, 0xfff0a0, "chainBolt", "A splinter of a lightning bolt, sharpened."],
+  ["voidfangtwins", "Voidfang Twin Daggers", "vaulted", "twinblade", 0x10061e, 0xff5ad8, "prismNova", "Two fangs from a mouth that does not exist."],
+  ["glaciergreataxe", "Glacier Greataxe", "epic", "greataxe", 0xbfe0ff, 0x7ad8ff, "frostNova", "Cut from the heart of a moving glacier."],
+  ["thunderheadmaul", "Thunderhead Maul", "legendary", "warhammer", 0x3a4a6a, 0xfff0a0, "chainStorm", "Every blow rolls like thunder."],
+  ["hollowstarreaper", "Reaper of Hollow Stars", "legendary", "scythe", 0x0a0614, 0xc8b0ff, "vortex", "Its blade is a sliver of night with stars still in it."],
+  ["coralcrowntrident", "Coralcrown Trident", "epic", "trident", 0xff8aa0, 0x9affe8, "riptideSpiral", "Grown from a living reef."]
 ];
 // [id, name, rarity, weight, metal, cloth, accent, helm, cape, special, description]
 const ARMOUR_DEFS = [
@@ -1847,17 +1861,20 @@ function buildHumanoid(o) {
     for (let k = 0; k < 11; k++) { const f = M(featherGeo(), fm, 0, 0, -k * 0.004, wp, 1 + k * 0.08); f.rotation.z = -sx * (0.35 + k * 0.17); f.scale.x = sx; f.position.x = sx * k * 0.035; f.position.y = -k * 0.012; }
     wp.rotation.y = 0.5 * sx; R[sx < 0 ? "wingL" : "wingR"] = wp;
   }
+  if (a && !o.lite) armourBulk(R, a);
+  if (!o.lite) { head.scale.setScalar(1.1); g.scale.set(1.05, 1, 1.05); }
   if (o.scale) g.scale.setScalar(o.scale);
   shadows(g);
   return R;
 }
 function poseHumanoid(R, t, move, swing, style, air, spin) {
-  carryTick(R, swing);
+  carryTick(R, swing); auraTick(R, t);
   const sw = move * Math.sin(t * 9.5);
   R.hipL.rotation.x = sw * 0.75; R.hipR.rotation.x = -sw * 0.75;
   R.kneeL.rotation.x = Math.max(0, -Math.sin(t * 9.5)) * move * 0.9; R.kneeR.rotation.x = Math.max(0, Math.sin(t * 9.5)) * move * 0.9;
   R.shL.rotation.x = -sw * 0.6; R.elL.rotation.x = -0.25 - move * 0.2;
-  R.hips.position.y = 0.98 + Math.abs(Math.sin(t * 9.5)) * move * 0.04;
+  R.hips.position.y = 0.98 + Math.abs(Math.sin(t * 9.5)) * move * 0.04 + Math.sin(t * 1.6) * 0.006 * (1 - move);
+  R.hipL.rotation.z = 0.05 * (1 - move); R.hipR.rotation.z = -0.05 * (1 - move); if (R.shL) R.shL.rotation.z = 0;
   R.chest.rotation.y = 0; R.chest.rotation.x = 0;
   if (air) { R.hipL.rotation.x = -0.6; R.hipR.rotation.x = 0.25; R.kneeL.rotation.x = 0.9; R.kneeR.rotation.x = 0.4; }
   if (R.weapon && style !== "twin") R.weapon.rotation.z = 0;
@@ -1876,7 +1893,7 @@ function poseHumanoid(R, t, move, swing, style, air, spin) {
     else if (style === "heavy") { R.shR.rotation.x = k < 0.45 ? lerp(-0.4, -3.0, k / 0.45) : lerp(-3.0, -0.5, (k - 0.45) / 0.55); R.shL.rotation.x = R.shR.rotation.x * 0.8; R.elR.rotation.x = -0.3; R.elL.rotation.x = -0.5; R.chest.rotation.x = k < 0.45 ? -0.15 : 0.25; }
     else { R.shR.rotation.x = lerp(-2.6, -0.3, k); R.shR.rotation.z = lerp(-0.6, 0.5, k); R.elR.rotation.x = -0.4; R.chest.rotation.y = lerp(0.5, -0.5, k); }
   } else {
-    R.shR.rotation.x = -0.35 + sw * 0.3; R.shR.rotation.z = 0; R.elR.rotation.x = -0.9; R.chest.rotation.x = 0; if (R.sword) swordIdle(R, R.sword, sw);
+    R.shR.rotation.x = -0.15 + sw * 0.3; R.shR.rotation.z = 0.14 * (1 - move); R.elR.rotation.x = -0.6; R.chest.rotation.x = Math.sin(t * 1.6) * 0.015 * (1 - move); if (R.shL && move < 0.2) { R.shL.rotation.z = -0.12; R.elL.rotation.x = -0.3; } if (R.sword) swordIdle(R, R.sword, sw);
   }
   R.hips.rotation.y = spin || 0;
   if (R.cape) R.cape.rotation.x = 0.15 + move * 0.45 + Math.sin(t * 3) * 0.05;
@@ -3554,9 +3571,16 @@ const CHEST_TIERS = [
   { name: "Gilded Vault Chest", rarity: "legendary", col: "#5a2a6a", band: "#f2b744", mats: [5, 8], gear: 2, extra: 0.5, potion: 0.8, coins: [520, 1000] }
 ];
 function chestSvg(t) {
-  const c = CHEST_TIERS[t];
-  return `<svg viewBox="0 0 64 56" aria-hidden="true"><path d="M6 24h52v26a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z" fill="${c.col}"/><path d="M6 24c0-11 8-19 26-19s26 8 26 19z" fill="${c.col}" opacity="0.85"/>
-    <path d="M6 24h52v5H6z" fill="${c.band}"/><path d="M14 6.5v46M50 6.5v46" stroke="${c.band}" stroke-width="4"/><rect x="27" y="20" width="10" height="13" rx="2" fill="${c.band}"/><circle cx="32" cy="26" r="2" fill="#141414"/>${t === 2 ? '<path d="M32 9l2 4 4 .5-3 3 .8 4-3.8-2-3.8 2 .8-4-3-3 4-.5z" fill="#fff3b0"/>' : ""}</svg>`;
+  const c = CHEST_TIERS[t], gem = ["#7ad8ff", "#b07cf2", "#ffd040"][t], id = "cg" + t;
+  const rivets = [10, 18, 46, 54].map(x => `<circle cx="${x}" cy="44" r="1.4" fill="${c.band}"/>`).join("");
+  const crystals = t === 2 ? `<path d="M8 22l3-12 4 12z" fill="#d8a0ff"/><path d="M50 22l5-15 3 15z" fill="#e8c0ff"/><path d="M28 7l4-6 4 6z" fill="#fff3b0"/>` : t === 1 ? `<path d="M10 24l2-6 3 6z" fill="#9ad8ff"/><path d="M50 24l3-7 3 7z" fill="#9ad8ff"/>` : "";
+  return `<svg viewBox="0 0 64 56" aria-hidden="true"><defs><radialGradient id="${id}"><stop offset="0" stop-color="${gem}" stop-opacity="${0.35 + t * 0.2}"/><stop offset="1" stop-color="${gem}" stop-opacity="0"/></radialGradient></defs>
+    <ellipse cx="32" cy="30" rx="31" ry="26" fill="url(#${id})"/>${crystals}
+    <path d="M6 24h52v26a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z" fill="${c.col}"/><path d="M6 24c0-11 8-19 26-19s26 8 26 19z" fill="${c.col}" opacity="0.88"/>
+    <path d="M6 33h52M6 42h52" stroke="#000" stroke-opacity=".18"/><path d="M6 24h52v5H6z" fill="${c.band}"/><path d="M14 6.5v46M50 6.5v46" stroke="${c.band}" stroke-width="4"/>
+    <path d="M6 24v-4l5-5M58 24v-4l-5-5M6 50l5 3M58 50l-5 3" stroke="${c.band}" stroke-width="3" fill="none"/>${rivets}
+    <rect x="25" y="19" width="14" height="16" rx="3" fill="${c.band}"/><path d="M32 22l4 5-4 5-4-5z" fill="${gem}"/><circle cx="32" cy="27" r="7" fill="${gem}" opacity=".25"/>
+    ${t === 2 ? '<path d="M32 9l2 4 4 .5-3 3 .8 4-3.8-2-3.8 2 .8-4-3-3 4-.5z" fill="#fff3b0"/>' : ""}</svg>`;
 }
 function grantChest(t, i) { S.chests.push({ t, i }); if (S.chests.length > 200) S.chests.shift(); updateChestBadge(); }
 function rollOfCats(rarity, cats) {
@@ -3893,7 +3917,7 @@ function lobbyExtras(group, h) {
   }
   /* townsfolk */
   const mk = (def, x, z, face) => {
-    const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null }); if (def.scale) R.g.scale.setScalar(def.scale);
+    const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null, lite: true }); if (def.scale) R.g.scale.setScalar(def.scale);
     const gy0 = world.h(x, z); R.g.position.set(x, gy0, z); R.g.rotation.y = face; group.add(R.g); shadows(R.g, true, false);
     const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, gy0 + 2.45, z); lbl.userData.far = 34; group.add(lbl); world.labels.push(lbl);
     return { R, lbl };
@@ -5979,7 +6003,7 @@ function buildQuarters(group) {
   }
   shadows(town, true, true); mergeStatic(town);
   for (const def of QUARTER_NPCS) {
-    const [x, z] = def.pos, R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null }), gy = world.h(x, z);
+    const [x, z] = def.pos, R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: def.weapon || null, lite: true }), gy = world.h(x, z);
     R.g.position.set(x, gy, z); R.g.rotation.y = def.face; group.add(R.g); shadows(R.g, true, false);
     const lbl = textSprite(`${def.name} · ${def.role}`, "#f4ead2", 0.75); lbl.position.set(x, gy + 2.45, z); lbl.userData.far = 34; group.add(lbl); world.labels.push(lbl);
     const marks = { offer: markSprite("!", "#ffd166"), ready: markSprite("?", "#7fd69a") };
@@ -6054,11 +6078,11 @@ function buildCastles(group, h) {
     M(G.box(), wood, 0, 0.4, 0, ch, 1.4, 0.8, 0.9); for (const sx of [-0.5, 0.5]) M(G.box(), band, sx, 0.45, 0, ch, 0.1, 0.92, 0.94); const gl = glowSprite(C.banner, 2.6, 0.55); gl.position.y = 1; ch.add(gl); C.glow = gl;
     world.interact.push({ x: tx, z: tz, y: ty, r: 2.6, label: `Open the treasury of ${C.name}`, act: () => openCastleTreasury(C) });
     if (CASTLE_AUCTIONS[C.id]) { const [ax, az] = toW(-6.5, 6.5), ay = world.h(ax, az), H = CASTLE_AUCTIONS[C.id];
-      const A = buildHumanoid({ look: { skin: [0xd9a77f, 0xc99a74, 0xf0d0b0][CASTLES.indexOf(C) % 3], hair: 0x2a1a10, cloth: C.banner, cloth2: 0x2a2a2a }, armour: null, weapon: null }); A.g.position.set(ax, ay, az); A.g.rotation.y = Math.atan2(x - ax, z - az) + Math.PI; group.add(A.g); shadows(A.g, true, false);
+      const A = buildHumanoid({ look: { skin: [0xd9a77f, 0xc99a74, 0xf0d0b0][CASTLES.indexOf(C) % 3], hair: 0x2a1a10, cloth: C.banner, cloth2: 0x2a2a2a }, armour: null, weapon: null, lite: true }); A.g.position.set(ax, ay, az); A.g.rotation.y = Math.atan2(x - ax, z - az) + Math.PI; group.add(A.g); shadows(A.g, true, false);
       const pod = M(G.box(), MAT.bark(0x5a3a22), 0, 0, 0, group, 1.4, 1.1, 0.7); const [px, pz] = toW(-6.5, 7.6); pod.position.set(px, world.h(px, pz) + 0.55, pz); pod.rotation.y = A.g.rotation.y;
       const al = textSprite(`Auctioneer · ${H.name}`, "#ffd166", 0.8); al.position.set(ax, ay + 2.6, az); al.userData.far = 40; group.add(al); world.labels.push(al);
       world.interact.push({ x: ax, z: az, y: ay, r: 3.2, label: `Bid at the ${H.name}`, act: () => openCastleAuction(C) }); }
-    for (const sx of [-1, 1]) { const [gx2, gz2] = toW(sx * 4.4, 15.6), gy2 = world.h(gx2, gz2), Gd = buildHumanoid({ look: { skin: 0xc99a74, hair: 0x3a2a1a, cloth: C.banner, cloth2: 0x2a2a30 }, armour: "chainshirt", weapon: "boarspear" }); Gd.g.position.set(gx2, gy2, gz2); Gd.g.rotation.y = Math.atan2(gx2 - x, gz2 - z); group.add(Gd.g); shadows(Gd.g, true, false); }
+    for (const sx of [-1, 1]) { const [gx2, gz2] = toW(sx * 4.4, 15.6), gy2 = world.h(gx2, gz2), Gd = buildHumanoid({ look: { skin: 0xc99a74, hair: 0x3a2a1a, cloth: C.banner, cloth2: 0x2a2a30 }, armour: "chainshirt", weapon: "boarspear", lite: true }); Gd.g.position.set(gx2, gy2, gz2); Gd.g.rotation.y = Math.atan2(gx2 - x, gz2 - z); group.add(Gd.g); shadows(Gd.g, true, false); }
     const [gx, gz] = toW(0, -1.2);
     world.interact.push({ x: gx, z: gz, y: world.h(gx, gz), r: 2.4, label: `Descend into the dungeon of ${C.name}`, act: () => openMap(0) });
     // biome dressing around the land castles
@@ -6248,7 +6272,7 @@ function secretSpots() {
 }
 function placeStranger(def, kind, life) {
   const spots = secretSpots(), [x, z] = spots[Math.floor(Math.random() * spots.length)], y = world.h(x, z);
-  const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: null }); R.g.position.set(x, y, z); R.g.rotation.y = rand(0, TAU); world.group.add(R.g);
+  const R = buildHumanoid({ look: def.look, armour: def.armour || null, weapon: null, lite: true }); R.g.position.set(x, y, z); R.g.rotation.y = rand(0, TAU); world.group.add(R.g);
   const met = kind === "npc" && S.secrets && S.secrets[def.id], lbl = textSprite(kind === "dealer" ? `${def.name} · secret dealer` : met ? def.name : "???", kind === "dealer" ? "#ffd166" : "#d8c8ff", 0.8); lbl.position.set(x, y + 2.5, z); world.group.add(lbl);
   const gl = glowSprite(kind === "dealer" ? 0xffd166 : 0xb07aff, 3, 0.25); gl.position.set(x, y + 1.2, z); world.group.add(gl);
   const it = { x, z, y, r: 2.8, label: kind === "dealer" ? `Trade with ${def.name}` : "Speak to the stranger", act: () => kind === "dealer" ? openSecretDealer() : openSecretNpc() };
@@ -6575,6 +6599,57 @@ $("dialog").addEventListener("click", e => {
   }
   VILLAGERS.forEach((v, i) => { if (!v.scale) v.scale = 0.92 + (i * 37 % 17) / 100; });
 })();
+
+/* ---- armour that looks like armour: closed helms, layered plates, glowing trims and auras ---- */
+function armourBulk(R, a) {
+  const rk = RANK[a.rarity] || 0, heavy = a.weight === "heavy", medium = a.weight === "medium", light = a.weight === "light";
+  const metal = std(a.metal, { m: light ? 0.2 : 0.85, r: light ? 0.7 : 0.3, flat: true }), dark = std(new THREE.Color(a.metal).multiplyScalar(0.55).getHex(), { m: 0.6, r: 0.45, flat: true });
+  const cloth = std(a.cloth, { r: 0.85, flat: true }), ac = a.accent || 0xd8c070, trim = rk >= 1 ? glowMat(ac, 0.55 + rk * 0.1) : std(ac, { m: 0.7, r: 0.3 });
+  const C = R.chest, H = R.head, plate = light ? cloth : metal, bulk = heavy ? 1.15 : medium ? 1 : 0.85;
+  // chest plate front and back, with an emblem
+  M(G.box(), plate, 0, 0.34, 0.12, C, 0.36 * bulk, 0.34, 0.07); M(G.box(), dark, 0, 0.34, -0.12, C, 0.36 * bulk, 0.34, 0.07);
+  M(G.box(), dark, 0, 0.13, 0.12, C, 0.3 * bulk, 0.1, 0.06);
+  if (rk >= 1) { for (const sx of [-1, 1]) M(G.box(), trim, 0.15 * bulk * sx, 0.34, 0.158, C, 0.018, 0.3, 0.01); M(G.box(), trim, 0, 0.5, 0.158, C, 0.3 * bulk, 0.018, 0.01); }
+  if (rk >= 2) { const em = M(G.oct(), glowMat(ac, 0.95), 0, 0.36, 0.165, C, 0.06, 0.08, 0.02); const gs = glowSprite(ac, 0.3 + rk * 0.07, 0.55); gs.position.set(0, 0.36, 0.18); C.add(gs); R.emblem = em; }
+  // belt and tassets
+  M(G.box(), std(0x2a1d14, { r: 0.6 }), 0, 0.0, 0, C, 0.34 * bulk, 0.06, 0.26); M(G.box(), rk >= 2 ? glowMat(ac, 0.9) : std(0xc8a860, { m: 0.8, r: 0.3 }), 0, 0.0, 0.135, C, 0.06, 0.05, 0.01);
+  if (!light) for (const sx of [-1, 1]) { const t = M(G.box(), plate, 0.1 * sx, -0.1, 0.07, C, 0.12, 0.16, 0.04); t.rotation.x = 0.12; if (rk >= 1) M(G.box(), trim, 0.1 * sx, -0.18, 0.095, C, 0.12, 0.012, 0.008); }
+  // pauldrons
+  for (const sh of [R.shL, R.shR]) { const sx = sh === R.shL ? -1 : 1, layers = light ? 1 : heavy ? 3 : 2;
+    for (let k = 0; k < layers; k++) { const p = M(G.box(), k ? dark : plate, 0.02 * sx, 0.06 - k * 0.055, 0, sh, (0.2 - k * 0.025) * bulk, 0.07, (0.2 - k * 0.02) * bulk); p.rotation.z = -0.32 * sx; }
+    if (rk >= 1) { const rim = M(G.box(), trim, 0.03 * sx, 0.1, 0, sh, 0.2 * bulk, 0.014, 0.012); rim.rotation.z = -0.32 * sx; }
+    if (rk >= 2) for (let k = 0; k < (rk >= 3 ? 3 : 2); k++) { const sp = M(G.cone(4), rk >= 3 ? std(ac, { e: ac, ei: 0.6, m: 0.5 }) : dark, (0.04 + k * 0.03) * sx, 0.16, (k - 1) * 0.06, sh, 0.025, 0.12 + rk * 0.02, 0.025); sp.rotation.z = -0.5 * sx; } }
+  // gauntlets and greaves
+  for (const el of [R.elL, R.elR]) { M(G.box(), plate, 0, -0.2, 0, el, 0.11 * bulk, 0.16, 0.11 * bulk); if (rk >= 2) M(G.box(), trim, 0, -0.13, 0, el, 0.115 * bulk, 0.014, 0.115 * bulk); }
+  for (const kn of [R.kneeL, R.kneeR]) { M(G.box(), plate, 0, -0.2, 0.01, kn, 0.11 * bulk, 0.24, 0.12 * bulk); M(G.box(), dark, 0, -0.43, 0.04, kn, 0.12, 0.07, 0.2); if (rk >= 1) M(G.box(), trim, 0, -0.08, 0.072, kn, 0.06, 0.04, 0.01); }
+  // a closed helm that covers the face (hoods get a shadowed face with glowing eyes)
+  const helm = a.helm;
+  if (helm === "hood") { M(G.box(), std(0x050507, { r: 1 }), 0, -0.01, 0.09, H, 0.17, 0.16, 0.06); for (const sx of [-1, 1]) M(G.box(), glowMat(rk >= 1 ? ac : 0xffffff, 0.95), 0.042 * sx, 0.02, 0.122, H, 0.03, 0.012, 0.01); }
+  else if (helm !== "none" || heavy) {
+    const hb = M(G.box(), metal, 0, 0.015, 0.005, H, 0.27, 0.28, 0.27); M(G.box(), dark, 0, -0.07, 0.137, H, 0.2, 0.09, 0.01);
+    M(G.box(), std(0x050505, { r: 1 }), 0, 0.03, 0.139, H, 0.19, 0.03, 0.01); M(G.box(), glowMat(rk >= 1 ? ac : 0xd8e0ff, rk >= 1 ? 1 : 0.6), 0, 0.03, 0.142, H, 0.15, 0.012, 0.008);
+    M(G.box(), dark, 0, 0.12, 0, H, 0.03, 0.1, 0.29); if (rk >= 2) M(G.box(), trim, 0, 0.17, 0, H, 0.018, 0.03, 0.3);
+    if (rk >= 3) { for (let k = 0; k < 5; k++) M(G.box(), dark, (k - 2) * 0.05, 0.2 + Math.abs(k - 2) * -0.02, -0.02, H, 0.02, 0.1 - Math.abs(k - 2) * 0.02, 0.02); const hg = glowSprite(ac, 0.6, 0.5); hg.position.set(0, 0.03, 0.16); H.add(hg); }
+    if (helm === "horned") for (const sx of [-1, 1]) { const h = M(hornGeo(), std(rk >= 3 ? ac : 0xe8dcc0, { r: 0.4, e: rk >= 3 ? ac : 0, ei: 0.4 }), 0.15 * sx, 0.1, 0, H, 1.2); h.scale.x = sx * 1.2; }
+    if (helm === "crown") for (let k = 0; k < 7; k++) M(G.cone(4), std(ac, { e: ac, ei: 0.8, m: 0.8 }), Math.sin(k * TAU / 7) * 0.12, 0.2, Math.cos(k * TAU / 7) * 0.12, H, 0.018, 0.09, 0.018);
+  }
+  // auras for the finest pieces
+  if (rk >= 3) {
+    const n = rk >= 4 ? 46 : 26, geo2 = new THREE.BufferGeometry(), arr = new Float32Array(n * 3);
+    for (let k = 0; k < n; k++) { const ang = k / n * TAU * 3, r2 = 0.32 + (k % 5) * 0.04; arr[k * 3] = Math.cos(ang) * r2; arr[k * 3 + 1] = -0.9 + (k / n) * 2.1; arr[k * 3 + 2] = Math.sin(ang) * r2; }
+    geo2.setAttribute("position", new THREE.BufferAttribute(arr, 3));
+    const pts = new THREE.Points(geo2, new THREE.PointsMaterial({ color: lin(ac), size: rk >= 4 ? 0.06 : 0.045, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false })); pts.position.y = 0.3; C.add(pts); R.auraPts = pts;
+    const ring = M(G.tor(0.42, 0.012), glowMat(ac, 0.5), 0, -0.95, 0, C); ring.rotation.x = Math.PI / 2; R.auraRing = ring;
+  }
+  if (rk >= 4) { const halo = M(G.tor(0.2, 0.014), glowMat(ac, 0.9), 0, 0.12, -0.2, H); R.vHalo = halo; for (let k = 0; k < 4; k++) { const sp = glowSprite(0xffffff, 0.25, 1); sp.position.set(Math.cos(k * 1.6) * 0.3, 0.3 + k * 0.15, Math.sin(k * 1.6) * 0.3); C.add(sp); (R.sparks = R.sparks || []).push(sp); } }
+}
+function auraTick(R, t) {
+  if (R.auraPts) { R.auraPts.rotation.y = t * 0.9; R.auraPts.material.opacity = 0.6 + Math.sin(t * 3) * 0.3; }
+  if (R.auraRing) R.auraRing.scale.setScalar(1 + Math.sin(t * 2.2) * 0.08);
+  if (R.vHalo) R.vHalo.rotation.z = t * 1.5;
+  if (R.sparks) R.sparks.forEach((s, i) => { s.material.opacity = Math.max(0, Math.sin(t * 7 + i * 2.3)); });
+  if (R.emblem) R.emblem.rotation.y = t * 1.2;
+}
 
 /* ---------- music: an original score composed live with Web Audio ----------
    Nothing is pre-recorded. Every drum, string, brass and choir note is synthesised
