@@ -382,6 +382,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <div class="money"><span class="chip" id="hClock">Day 08:00</span><span class="chip" id="hFace">Facing N</span></div>
   <button class="hbtn warn" id="bLeave" hidden>Leave island</button>
 </div>
+<div id="festChip" hidden style="position:fixed;z-index:5;right:calc(12px + env(safe-area-inset-right, 0px));top:calc(156px + env(safe-area-inset-top, 0px));padding:5px 12px;border-radius:999px;background:linear-gradient(90deg,#ff8a3a,#ffd040);color:#1a1008;font-weight:800;font-size:12.5px;box-shadow:0 0 18px -4px #ffb050"></div>
 <div id="menuBar">
   <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests" style="display:none">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses" style="display:none">Classes</button><button id="mbAch">Achievements</button><button id="mbGuild">Guild</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
@@ -2719,7 +2720,7 @@ function buildLobby() {
   world.clouds = addClouds(group, 0xffffff);
   // distant mountains
   for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 380, s = 80 + (k % 4) * 28; if (Math.cos(a) > 0.2) continue; const m = M(G.cone(7), std(0x5a6a7a, { flat: true, r: 0.9 }), Math.cos(a) * d, s * 0.45, Math.sin(a) * d, group, s, s * 1.1, s); M(G.cone(7), std(0xf0f4ff, { flat: true, r: 0.7 }), Math.cos(a) * d, s * 0.82, Math.sin(a) * d, group, s * 0.35, s * 0.35, s * 0.35); }
-  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); const isleBase = group.children.length; seaWorld(group); rarePortals(group); groupIsles(group, isleBase); boatDealer(group); floraFauna(group); lobbyRaidPortal(group); buildQuarters(group); buildCastles(group, h); try { buildSkyClues(group, h); buildSkyGate(group, h); } catch (err) { reportError(err); } secretReset(); if (mining) endMining(false); if (caveMine) endCaveMining(false); buildVeins(group, h); buildCaveMouths(group, h); buildTownLife(group, h);
+  const lw = waterPlane(0x2f7aa8, -3); group.add(lw); world.water = lw; oceanPlane(lw); ISLES.forEach(I => { I.guards = null; }); const isleBase = group.children.length; seaWorld(group); rarePortals(group); groupIsles(group, isleBase); boatDealer(group); floraFauna(group); lobbyRaidPortal(group); buildQuarters(group); buildCastles(group, h); try { buildSkyClues(group, h); buildSkyGate(group, h); } catch (err) { reportError(err); } try { buildLanterns(group, h); } catch (err) { reportError(err); } secretReset(); if (mining) endMining(false); if (caveMine) endCaveMining(false); buildVeins(group, h); buildCaveMouths(group, h); buildTownLife(group, h);
 }
 
 function buildIsland(idx) {
@@ -2820,6 +2821,7 @@ const ACH = [
   ["lvl50", "Champion", "Reach level 50.", () => S.level, 50, "Champion", "epic", 10000, 1],
   ["lvl100", "Ascended", "Reach level 100.", () => S.level, 100, "the Ascended", "legendary", 50000, 2],
   ["sky1", "Skywalker", "A secret of the wind.", () => stOf("skyVisits"), 1, "Skywalker", "legendary", 15000, 2],
+  ["fest1", "Festivalgoer", "Join a rare festival.", () => stOf("festivals"), 1, "Festivalgoer", "rare", 2000, 1],
   ["vault1", "Vaultbound", "Own a Vaulted item.", () => vaultedOwned(), 1, "Vaultbound", "vaulted", 10000, 2],
   ["vault5", "Keeper of the Vault", "Own 5 different Vaulted items.", () => vaultedOwned(), 5, "Keeper of the Vault", "vaulted", 40000, 2]
 ].map(([id, name, how, val, goal, title, rar, coins, chest]) => ({ id, name, how, val, goal, title, rar, coins, chest }));
@@ -3034,6 +3036,9 @@ function damageEnemy(e, amount, dir, kb, o = {}) {
   if (o.canCrit !== false && Math.random() < ST.crit) { dmg *= ST.critMult || 1.75; crit = true; }
   if (S.cls === "berserker") dmg *= 1 + 0.5 * (1 - P.hp / ST.maxHp);
   if (e.frozen && e.frozen > worldT && o.shatter) dmg *= 1.5;
+  const RB = run && run.boons;
+  if (RB) { if (RB.laststand && P.hp < ST.maxHp * 0.3) dmg *= 1 + 0.25 * RB.laststand; if (RB.execute && e.hp < e.maxHp * 0.3) dmg *= 1 + 0.5 * RB.execute;
+    if (RB.momentum && !o.noProc) { P.momT = P.momT || 0; P.mom = worldT - P.momT < 2 ? Math.min(10, (P.mom || 0) + 1) : 1; P.momT = worldT; dmg *= 1 + 0.03 * RB.momentum * P.mom; } }
   if (!o.silent && o.canCrit !== false && worldT - lastHitSfx > 0.06) { lastHitSfx = worldT; MUSIC.sfx("hit", { crit }); }
   if (e.dummy) { dummyHit(e, dmg, crit, o); return; }
   if (e.duelist && e.guard > worldT) { dmg *= 0.3; if (!o.silent) floatText(e.pos, "Blocked", "#a1abc4"); }
@@ -3061,9 +3066,10 @@ function killEnemy(e) {
   if (e.minion) { bumpStat("kills"); save(); return; } // no coins, exp or drops for helpers
   const isl = run ? Math.min(run.idx, 12.5) : 0, si = run ? run.stage : 0;
   const xp = e.base.xp * Math.pow(1.3, isl) * (1 + 0.5 * si);
-  const coins = Math.round(e.base.coins * Math.pow(1.35, isl) * (1 + 0.6 * si) * rand(0.8, 1.2) * (S.cls === "pirate" ? 1.25 : 1) * (1 + guildPerk("coins")));
+  const coins = Math.round(e.base.coins * Math.pow(1.35, isl) * (1 + 0.6 * si) * rand(0.8, 1.2) * (S.cls === "pirate" ? 1.25 : 1) * (1 + guildPerk("coins")) * (1 + 0.2 * ((run && run.boons && run.boons.greed) || 0)) * festMult("coins"));
   S.coins += coins; floatText(e.pos, `+${fmt(coins)}`, "#e6b85c");
-  addXp(xp); bumpStat("kills"); if (e.boss) bumpStat("bosses"); if (DAY.day < 0.35) bumpStat("nightKills");
+  addXp(xp * (1 + 0.2 * ((run && run.boons && run.boons.wisdom) || 0)) * festMult("xp")); bumpStat("kills"); if (e.boss) bumpStat("bosses");
+  if (run && run.boons) { const RB = run.boons; if (RB.soulfeed) heal(ST.maxHp * 0.05 * RB.soulfeed); if (RB.explode) { burstFx(e.pos.clone().add(new V3(0, 1, 0)), 3, 0xff7a3a, 0.35); for (const x of enemiesNear(e.pos, 3)) if (x !== e && !x.dead) damageEnemy(x, ST.hit * 0.5 * RB.explode, x.pos.clone().sub(e.pos), 1, { noProc: true, canCrit: false, color: "#ffb070" }); } } if (DAY.day < 0.35) bumpStat("nightKills");
   if (S.cls === "reaper") heal(ST.maxHp * 0.08); if (S.cls === "necromancer") heal(ST.maxHp * 0.04); guildXp(e.boss ? 25 : 1);
   const table = dropTable(isl, si, e.boss);
   if (e.boss) {
@@ -3085,6 +3091,8 @@ function hurtHero(target, amount, from, src) {
     if (P.blocking) { if (worldT - P.blockStart <= PARRY_WINDOW) { parryHit(src); return; } amount *= S.cls === "knight" ? 0.15 : 0.3; P.kb.multiplyScalar(0.3); }
     let dr = ST.dr;
     if (P.buffs.shield > worldT) dr = 1 - (1 - dr) * (1 - P.buffs.shieldAmt);
+    if (run && run.boons && run.boons.laststand && P.hp < ST.maxHp * 0.3) amount *= Math.max(0.4, 1 - 0.15 * run.boons.laststand);
+    if (src && !src.dead && run && run.boons && run.boons.frostguard) src.slow = worldT + 2 * run.boons.frostguard;
     const dmg = P.swimming ? amount * 2 : amount * (1 - dr);
     P.hp -= dmg; floatText(P.pos, `-${Math.round(dmg)}`, "#ff7a85");
     if (src && !src.dead && !src.dummy && run && run.boons && run.boons.thorns) damageEnemy(src, dmg * 0.3 * run.boons.thorns, null, 0, { noProc: true, canCrit: false, color: "#d8ff6a" });
@@ -3092,6 +3100,7 @@ function hurtHero(target, amount, from, src) {
     if (S.cls === "warrior" && !P.flags.secondWind && P.hp > 0 && P.hp < ST.maxHp * 0.3) { P.flags.secondWind = true; heal(ST.maxHp * 0.2); toast("<b>Second Wind</b> healed you.", "common"); }
     if (P.hp <= 0) {
       if (S.cls === "skeleton" && !P.flags.rattle) { P.flags.rattle = true; P.hp = 1; floatText(P.pos, "Bone Rattle!", "#eae4d0"); toast("<b>Bone Rattle</b> kept you standing.", "common"); }
+      else if (run && run.boons && run.boons.angel && (run.angelUsed || 0) < Math.max(1, Math.round(run.boons.angel))) { run.angelUsed = (run.angelUsed || 0) + 1; P.hp = ST.maxHp * 0.3; pillarFx(P.pos, 0xfff4c0, 12, 0.6); floatText(P.pos, "Guardian Angel!", "#fff4c0"); toast("<b>Guardian Angel</b> caught you.", "legendary"); }
       else heroDown();
     }
   } else {
@@ -3935,6 +3944,7 @@ function update(dt) {
     if (P.dashT > 0) {
       P.dashT -= dt; P.pos.addScaledVector(P.dashDir, 30 * dt);
       if (P.dashT <= 0 && P.dashBuf > 0) { P.dashBuf--; const d = move.lengthSq() > 0.01 ? move : (P.dashBufDir || P.dashDir); dash(d); }
+      if (run && run.boons && run.boons.dashblast && S.cls !== "samurai" && !(P.buffs.veil > worldT)) for (const e of enemiesNear(P.pos, 1.6)) if (!P.dashHit.has(e)) { P.dashHit.add(e); damageEnemy(e, ST.hit * 0.4 * run.boons.dashblast, P.dashDir, 1, { color: "#ffb070" }); }
       if (S.cls === "samurai" || P.buffs.veil > worldT) for (const e of enemiesNear(P.pos, 1.6)) if (!P.dashHit.has(e)) { P.dashHit.add(e); damageEnemy(e, ST.hit * (P.buffs.veil > worldT ? 2 : 0.5), P.dashDir, 1, { color: "#cfefff" }); }
       if (Math.random() < 0.5) ghostFx(hero);
     } else {
@@ -4858,9 +4868,10 @@ function dayTick() {
   skyUniforms.sunDir.value.copy(dir); skyUniforms.sunCol.value.copy(B.sunRaw).multiplyScalar(day);
   const light = elev >= 0 ? dir : new V3(-Math.cos(az) * 0.8, Math.max(0.4, -elev), -0.35).normalize();
   SUN_OFF.copy(light).multiplyScalar(70); SUN_OFF.y = Math.max(SUN_OFF.y, 26);
-  sun.intensity = B.sunInt * day + 0.38 * (1 - day); sun.color.copy(DAY.moon).lerp(B.sunCol, day);
-  hemi.intensity = B.hemiInt * (0.45 + 0.55 * day);
-  renderer.toneMappingExposure = DAY.exp0 * (0.66 + 0.34 * day);
+  sun.intensity = B.sunInt * day + 0.55 * (1 - day); sun.color.copy(DAY.moon).lerp(B.sunCol, day);
+  hemi.intensity = B.hemiInt * (0.62 + 0.38 * day);
+  renderer.toneMappingExposure = DAY.exp0 * (0.8 + 0.2 * day);
+  nightGlowTick(day);
   stars.position.copy(camera.position); stars.material.opacity = Math.max(0, 1 - day * 1.4) * 0.9; stars.visible = stars.material.opacity > 0.01;
   WIN_MAT().emissiveIntensity = 1.0 + 2.4 * (1 - day);
   if (world && world.nightLights) for (const nl of world.nightLights) nl.l.intensity = nl.b * (0.35 + 1.9 * (1 - day));
@@ -5264,7 +5275,23 @@ const BOONS = [
   { k: "thorns", name: "Bramble Mail", col: "#a8d84a", text: m => `Attackers take ${Math.round(30 * m)}% of the damage they deal to you.` },
   { k: "focus", name: "Focus", col: "#58a8f2", text: m => `Specials recharge ${Math.round(12 * m)}% faster and hit ${Math.round(15 * m)}% harder.` },
   { k: "storm", name: "Static Charge", col: "#9ae0ff", text: m => `${Math.round(12 * m)}% chance on hit for lightning to leap to 2 more foes.` },
-  { k: "riposte", name: "Riposte", col: "#ffe0a0", text: m => `Parrying strikes back for ${Math.round(300 * m)}% weapon damage.` }
+  { k: "riposte", name: "Riposte", col: "#ffe0a0", text: m => `Parrying strikes back for ${Math.round(300 * m)}% weapon damage.` },
+  { k: "glass", name: "Glass Cannon", col: "#ff9ad8", text: m => `+${Math.round(25 * m)}% weapon damage, but ${Math.round(10 * m)}% less max health.` },
+  { k: "titan", name: "Titan's Grip", col: "#c8a070", text: m => `+${Math.round(8 * m)}% weapon damage and +${Math.round(10 * m)}% max health.` },
+  { k: "leap", name: "Skyward", col: "#d8f0ff", text: m => `Jump ${Math.round(12 * m)}% higher.` },
+  { k: "sprint", name: "Fleetfoot", col: "#a0ffd8", text: m => `+${Math.round(15 * m)}% move speed.` },
+  { k: "soulfeed", name: "Soul Feast", col: "#c86aff", text: m => `Every foe you defeat heals ${Math.round(5 * m)}% of your max health.` },
+  { k: "greed", name: "Gold Rush", col: "#ffd040", text: m => `+${Math.round(20 * m)}% coins from foes.` },
+  { k: "wisdom", name: "Scholar's Insight", col: "#9ab8ff", text: m => `+${Math.round(20 * m)}% experience from foes.` },
+  { k: "dashblast", name: "Comet Dash", col: "#ffb070", text: m => `Dashing through foes hits them for ${Math.round(40 * m)}% weapon damage.` },
+  { k: "laststand", name: "Last Stand", col: "#ff5a5a", text: m => `Below 30% health, deal ${Math.round(25 * m)}% more damage and take ${Math.round(15 * m)}% less.` },
+  { k: "momentum", name: "Momentum", col: "#ffe08a", text: m => `Each hit within 2 s of the last adds ${Math.round(3 * m)}% damage, up to 10 stacks.` },
+  { k: "explode", name: "Chain Reaction", col: "#ff7a3a", text: m => `Defeated foes burst for ${Math.round(50 * m)}% weapon damage around them.` },
+  { k: "angel", name: "Guardian Angel", col: "#fff4c0", text: m => `${Math.max(1, Math.round(m))} time${Math.round(m) > 1 ? "s" : ""} this run, a killing blow leaves you on 30% health instead.` },
+  { k: "surge", name: "Spell Surge", col: "#7ad8ff", text: m => `+${Math.round(25 * m)}% Power.` },
+  { k: "frostguard", name: "Frost Armour", col: "#bfe8ff", text: m => `Foes that hit you are slowed for ${(2 * m).toFixed(1)} s.` },
+  { k: "treasure", name: "Treasure Sense", col: "#ffcf6a", text: m => `+${Math.round(15 * m)}% chance of a chest when you clear a level.` },
+  { k: "execute", name: "Overkill", col: "#ff4a6a", text: m => `Deal ${Math.round(50 * m)}% more damage to foes below 30% health.` }
 ];
 const BOON_TIERS = [["common", 1, 55], ["rare", 1.5, 30], ["epic", 2.2, 12], ["legendary", 3.2, 3]];
 let cardOffer = null;
@@ -5291,6 +5318,8 @@ function applyBoons(st) {
   if (v("stamina")) { st.dashes += Math.min(3, Math.max(1, Math.round(v("stamina")))); st.dashCd *= Math.max(0.5, 1 - 0.1 * v("stamina")); }
   st.move *= 1 + 0.08 * v("haste"); st.atkSpd *= 1 + 0.08 * v("haste"); st.maxHp = Math.round(st.maxHp * (1 + 0.15 * v("vitality")));
   st.dr = Math.min(0.85, 1 - (1 - st.dr) * (1 - 0.08 * v("guard"))); st.specCd /= 1 + 0.12 * v("focus"); st.power += 0.15 * v("focus");
+  st.hit *= (1 + 0.25 * v("glass")) * (1 + 0.08 * v("titan")); st.maxHp = Math.max(30, Math.round(st.maxHp * Math.max(0.4, 1 - 0.1 * v("glass")) * (1 + 0.1 * v("titan"))));
+  st.jump *= 1 + 0.12 * v("leap"); st.move *= 1 + 0.15 * v("sprint"); st.power += 0.25 * v("surge");
   st.dps = st.hit * st.atkSpd;
 }
 function boonProcs(e, dmg) {
@@ -5302,6 +5331,105 @@ function boonProcs(e, dmg) {
   if (b.storm && Math.random() < 0.12 * b.storm) for (const x of enemies.filter(x => x !== e && !x.dead && x.pos.distanceTo(e.pos) < 8).slice(0, 2)) { boltFx(e.pos.clone().add(new V3(0, 1, 0)), x.pos.clone().add(new V3(0, 1, 0)), 0x9ae0ff, 0.25); damageEnemy(x, dmg * 0.5, null, 0, { noProc: true, canCrit: false, color: "#9ae0ff" }); }
 }
 
+/* =====================================================================
+   NIGHT LIGHTS: a lantern glow around you, stone lanterns across the land, fireflies in the meadows
+   ===================================================================== */
+const heroLight = new THREE.PointLight(lin(0xffd8a0), 0, 20, 1.6); scene.add(heroLight);
+const nightGlows = [];
+const glowOwn = (c, size, op) => { const sp = glowSprite(c, size, op); sp.material = sp.material.clone(); sp.material.userData.keep = false; return sp; };
+let fireflies = null;
+function nightGlowTick(day) {
+  const dark = 1 - day;
+  for (const g of nightGlows) if (g.parent) g.material.opacity = g.userData.base * (0.15 + 0.85 * dark);
+  const kind = world && world.kind, caveLit = kind === "cave", dim = kind === "island" && world.dungeon && !world.sky;
+  heroLight.intensity = caveLit ? 0 : kind === "lobby" ? 1.5 * smooth(0.15, 0.85, dark) : dim ? 1.1 : kind === "sky" ? 0.8 * dark : 0.6 * dark;
+  if (hero) heroLight.position.set(P.pos.x, P.pos.y + 3.2, P.pos.z);
+  if (fireflies) { fireflies.visible = kind === "lobby" && dark > 0.45; if (fireflies.visible) { fireflies.material.opacity = Math.min(1, (dark - 0.45) * 2.5); const a = fireflies.geometry.attributes.position, t = performance.now() / 1000, sd = fireflies.userData.seed;
+      for (let i = 0; i < a.count; i++) { const k = sd[i]; a.setXYZ(i, P.pos.x + k.x + Math.sin(t * k.s + k.p) * 2.5, (world.hBase || world.h)(P.pos.x + k.x, P.pos.z + k.z) + 0.6 + k.y + Math.sin(t * 1.7 + k.p) * 0.4, P.pos.z + k.z + Math.cos(t * k.s * 0.8 + k.p) * 2.5); } a.needsUpdate = true; } }
+}
+function buildLanterns(group, h) {
+  nightGlows.length = 0;
+  const post = std(0x8a8678, { r: 0.9, map: "rock" }), cap = std(0x3a3a40, { m: 0.6, r: 0.4 }), lampM = std(0xffe0a0, { e: 0xffb050, ei: 2.4 }), g = new THREE.Group(); group.add(g); let n = 0;
+  for (const R of [92, 128, 166, 204, 244]) { const steps = Math.round(TAU * R / 24);
+    for (let k = 0; k < steps; k++) { const a = k / steps * TAU + R * 0.01, x = Math.cos(a) * R, z = Math.sin(a) * R, y = h(x, z);
+      if (y < SEA + 0.6 || blockedLobby(x, z) || world.circles.some(c => Math.hypot(x - c.x, z - c.z) < c.r + 2) || onPath(x, z, 0.5) || inZone(x, z, 1)) continue;
+      M(G.box(), post, x, y + 0.7, z, g, 0.45, 1.4, 0.45); M(G.box(), cap, x, y + 1.55, z, g, 0.7, 0.12, 0.7); M(G.box(), lampM, x, y + 1.3, z, g, 0.26, 0.3, 0.26);
+      const gl = nightGlows.length ? new THREE.Sprite(nightGlows[0].material) : glowOwn(0xffc070, 3.2, 0.9); gl.scale.setScalar(3.2); gl.position.set(x, y + 1.35, z); gl.userData.base = 0.9; group.add(gl); nightGlows.push(gl); n++; } }
+  // the town's windows and lamps get a warm halo after dark
+  for (const it of world.interact) { if (n > 420) break; const gl = glowOwn(0xffd8a0, 2.2, 0.35); gl.position.set(it.x, (it.y ?? h(it.x, it.z)) + 2.6, it.z); gl.userData.base = 0.35; group.add(gl); nightGlows.push(gl); n++; }
+  shadows(g, false, true); mergeStatic(g);
+  if (!fireflies) { const N = 160, pos = new Float32Array(N * 3), seed = []; for (let i = 0; i < N; i++) seed.push({ x: (Math.random() - 0.5) * 70, z: (Math.random() - 0.5) * 70, y: Math.random() * 2.2, s: 0.3 + Math.random() * 0.6, p: Math.random() * 6 });
+    const geo2 = new THREE.BufferGeometry(); geo2.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    fireflies = new THREE.Points(geo2, new THREE.PointsMaterial({ color: 0xd8ff8a, size: 0.22, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+    fireflies.userData.seed = seed; fireflies.userData.keep = true; fireflies.frustumCulled = false; scene.add(fireflies); }
+}
+
+/* =====================================================================
+   FESTIVALS: rare celebrations that come and go with the real clock
+   ===================================================================== */
+const FESTIVALS = [
+  { id: "lantern", name: "Festival of Lanterns", text: "Paper lanterns rise over the plaza. +25% coins from foes.", col: 0xffb050, bonus: { coins: 1.25 } },
+  { id: "harvest", name: "Harvest Fair", text: "Pumpkins, bunting and a fair in the plaza. +25% experience from foes.", col: 0xffa040, bonus: { xp: 1.25 } },
+  { id: "starfall", name: "Starfall Night", text: "Stars streak across the sky. Fish bite faster and rarer, and +15% coins.", col: 0xd8e0ff, bonus: { coins: 1.15, fish: 1.5 } },
+  { id: "bonfire", name: "Midsummer Bonfire", text: "A great bonfire burns in the plaza. +20% coins and +20% experience.", col: 0xff6a2a, bonus: { coins: 1.2, xp: 1.2 } },
+  { id: "tides", name: "Tidefeast", text: "Fireworks over the harbour. +30% coins from foes.", col: 0x60d8ff, bonus: { coins: 1.3 } }
+];
+const FEST_WINDOW = 30 * 60e3; // each half hour of the real clock has a small chance to be a festival
+function currentFestival(now = Date.now()) {
+  if (S && S.festForce) return FESTIVALS.find(f => f.id === S.festForce) || null;
+  const w = Math.floor(now / FEST_WINDOW), roll = hash("fest" + w) % 1000;
+  if (roll >= 70) return null; // about 7% of half hours, so a festival is a treat, not an everyday thing
+  return FESTIVALS[hash("festkind" + w) % FESTIVALS.length];
+}
+const festMult = k => { const f = currentFestival(); return f && f.bonus[k] ? f.bonus[k] : 1; };
+let festNow = null, festGroup = null, festCheckT = 0;
+function festivalTick(dt, t) {
+  festCheckT -= dt; if (festCheckT <= 0) { festCheckT = 5; const f = currentFestival();
+    if ((f && f.id) !== (festNow && festNow.id)) { festNow = f; if (f) { banner(f.name, f.text); toast(`<b>${esc(f.name)}</b> has begun! ${esc(f.text)}`, "legendary"); bumpStat("festivals"); } else if (festGroup) toast("The festival is over. Until next time!", ""); rebuildFestival(); }
+    else if (world && world.kind === "lobby" && f && (!festGroup || !festGroup.parent || festGroup.parent !== world.group)) rebuildFestival(); }
+  const chip = $("festChip"); if (chip) { chip.hidden = !festNow; if (festNow) chip.textContent = `Festival: ${festNow.name}`; }
+  if (festGroup && festGroup.userData.tick) festGroup.userData.tick(t, dt);
+}
+function rebuildFestival() {
+  if (festGroup) { if (festGroup.parent) festGroup.parent.remove(festGroup); festGroup = null; }
+  if (!festNow || !world || world.kind !== "lobby") return;
+  const F = festNow, g = new THREE.Group(); world.group.add(g); festGroup = g; const parts = [];
+  const pal = [0xff5a5a, 0xffd040, 0x5ad8ff, 0x7aff8a, 0xff8ad8, 0xffffff];
+  // strings of lanterns or bunting across the plaza
+  for (let k = 0; k < 8; k++) { const a0 = k / 8 * TAU, a1 = a0 + Math.PI * 0.85, R = 19, A = new V3(Math.cos(a0) * R, 6.5, Math.sin(a0) * R), B = new V3(Math.cos(a1) * R, 6.5, Math.sin(a1) * R);
+    M(G.cyl(0.08, 0.1, 6), std(0x5a3a22), A.x, 3.3, A.z, g, 1, 6.6, 1);
+    for (let i = 1; i < 14; i++) { const u = i / 14, P2 = A.clone().lerp(B, u); P2.y = 6.5 - Math.sin(u * Math.PI) * 1.4; const c = pal[(i + k) % pal.length];
+      if (F.id === "harvest" || F.id === "tides") { const fl = M(G.cone(3), std(c, { r: 0.7, ds: true }), P2.x, P2.y - 0.25, P2.z, g, 0.3, 0.5, 0.05); fl.rotation.x = Math.PI; }
+      else { M(G.sph(), std(c, { e: c, ei: 1.3, r: 0.6 }), P2.x, P2.y - 0.3, P2.z, g, 0.22, 0.3, 0.22); if (i % 2) { const gl = glowSprite(c, 1.2, 0.6); gl.position.set(P2.x, P2.y - 0.3, P2.z); g.add(gl); } } } }
+  // a festival stall with a herald who hands out one gift per festival
+  const hx = 14, hz = 10, y0 = world.h(hx, hz), st = new THREE.Group(); st.position.set(hx, y0, hz); st.rotation.y = Math.atan2(-hx, -hz); g.add(st);
+  M(G.box(), std(0x8a5a3a, { r: 0.8, map: "bark" }), 0, 0.6, 0, st, 3.4, 1.2, 1.2); for (const sx of [-1.5, 1.5]) M(G.cyl(0.08, 0.08, 6), std(0x5a3a22), sx, 1.7, -0.4, st, 1, 3.4, 1);
+  for (let i = 0; i < 6; i++) M(G.box(), std(i % 2 ? 0xffffff : F.col, { r: 0.8, map: "fabric", ds: true }), -1.5 + i * 0.6, 3.4, -0.2, st, 0.6, 0.12, 2);
+  const herald = buildHumanoid({ look: { skin: 0xe0b48c, hair: 0x6a3a1a, cloth: F.col, cloth2: 0xffffff, extra: "hat" }, armour: null, weapon: null, lite: true }); herald.g.position.set(0, 0, -1); st.add(herald.g);
+  const lb = textSprite(`Festival Herald · ${F.name}`, "#ffe2a0", 0.8); lb.position.set(hx, y0 + 3.2, hz); g.add(lb);
+  world.interact.push({ x: hx, z: hz, y: y0, r: 3, label: `Festival gift from the herald`, act: festivalGift });
+  // the centrepiece of each festival
+  if (F.id === "bonfire") { for (let k = 0; k < 10; k++) { const lg = M(G.cyl(0.18, 0.2, 6), MAT.bark(0x5a3a22), 0, 0.9, 0, g, 1, 2.6, 1); lg.position.set(Math.cos(k * 0.63) * 0.8 - 14, world.h(-14, 10) + 1, Math.sin(k * 0.63) * 0.8 + 10); lg.rotation.z = Math.cos(k * 0.63) * 0.5; lg.rotation.x = Math.sin(k * 0.63) * 0.5; }
+    const fire = glowSprite(0xff7a2a, 7, 0.9); fire.position.set(-14, world.h(-14, 10) + 2.4, 10); g.add(fire); const fl = new THREE.PointLight(lin(0xff8a3a), 2.5, 34, 2); fl.position.set(-14, world.h(-14, 10) + 3, 10); g.add(fl); parts.push(t => { fire.scale.setScalar(6.5 + Math.sin(t * 9) * 0.8); fl.intensity = 2.2 + Math.sin(t * 13) * 0.4; }); }
+  if (F.id === "harvest") for (let k = 0; k < 18; k++) { const a = k / 18 * TAU, x = Math.cos(a) * 24, z = Math.sin(a) * 24, y = world.h(x, z); M(G.sph(), std(0xff8a20, { r: 0.6 }), x, y + 0.35, z, g, 0.45, 0.36, 0.45); M(G.cyl(0.04, 0.05, 5), std(0x3a6a2a), x, y + 0.75, z, g, 1, 0.2, 1); if (k % 3 === 0) M(G.box(), std(0xe8c870, { r: 0.9, map: "fabric" }), x * 1.1, y + 0.5, z * 1.1, g, 1.2, 1, 0.9); }
+  // sky lanterns, shooting stars and fireworks, mostly after dark
+  const sky = [], N = F.id === "lantern" ? 40 : 0; for (let k = 0; k < N; k++) { const sp = glowOwn(0xffb050, 1.6, 0.85); sp.userData = { x: (Math.random() - 0.5) * 60, z: (Math.random() - 0.5) * 60, ph: Math.random() * 40, sp: 0.8 + Math.random() * 0.6 }; g.add(sp); sky.push(sp); }
+  const bursts = []; let fwT = 0;
+  g.userData.tick = (t, dt) => { for (const p of parts) p(t);
+    for (const sp of sky) { const u = ((t * sp.userData.sp + sp.userData.ph) % 40) / 40; sp.position.set(sp.userData.x + Math.sin(t * 0.3 + sp.userData.ph) * 3, 4 + u * 70, sp.userData.z); sp.material.opacity = 0.85 * (1 - u); }
+    const dark = 1 - DAY.day; fwT -= dt;
+    if ((F.id === "tides" || F.id === "lantern" || F.id === "bonfire" || F.id === "starfall") && dark > 0.4 && fwT <= 0 && Math.hypot(P.pos.x, P.pos.z) < 160) { fwT = F.id === "starfall" ? 0.5 : 1.2 + Math.random();
+      const c = F.id === "starfall" ? 0xffffff : pal[Math.floor(Math.random() * pal.length)], o = F.id === "tides" ? new V3(150 + rand(-20, 20), 30 + rand(0, 15), rand(-30, 30)) : new V3(rand(-40, 40), 34 + rand(0, 16), rand(-40, 40));
+      for (let k = 0; k < (F.id === "starfall" ? 1 : 18); k++) { const sp = glowOwn(c, F.id === "starfall" ? 2 : 1.4, 1); sp.position.copy(o); g.add(sp); const v = F.id === "starfall" ? new V3(rand(-30, -18), rand(-10, -6), rand(-8, 8)) : new V3(rand(-1, 1), rand(-0.6, 1), rand(-1, 1)).normalize().multiplyScalar(rand(8, 13)); bursts.push({ sp, v, life: F.id === "starfall" ? 1.4 : 1.6 }); } }
+    for (let i = bursts.length - 1; i >= 0; i--) { const b = bursts[i]; b.life -= dt; b.v.y -= (F.id === "starfall" ? 0 : 6) * dt; b.sp.position.addScaledVector(b.v, dt); b.sp.material.opacity = Math.max(0, b.life / 1.6); if (b.life <= 0) { g.remove(b.sp); b.sp.material.dispose(); bursts.splice(i, 1); } }
+  };
+}
+function festivalGift() {
+  const F = festNow; if (!F) return; S.festGifts = S.festGifts || {}; const key = F.id + Math.floor(Date.now() / FEST_WINDOW);
+  if (S.festGifts[key]) { toast("You already have your festival gift. Enjoy the celebrations!", ""); return; }
+  S.festGifts[key] = 1; const best = Math.max(0, ISLANDS.map((_, i) => islandUnlocked(i)).lastIndexOf(true)), coins = 2000 + best * 1000; S.coins += coins; grantChest(1, Math.min(best, 11)); MUSIC.sfx("chest"); pillarFx(P.pos, F.col, 10, 0.7); save();
+  toast(`<b>${esc(F.name)} gift:</b> ${fmt(coins)} coins and an Ironbound Chest.`, "epic");
+}
 /* ---- enchanting at the top of the spire ---- */
 function enchLv(id) { return (S && S.ench && S.ench[id]) || 0; }
 function enchCost(it, lv) {
@@ -5602,6 +5730,7 @@ function seasonApply(i) {
   seasonFx.material.color.set(S0.fx.col); seasonFx.material.size = S0.fx.size;
 }
 function seasonTick(dt) {
+  try { festivalTick(dt, performance.now() / 1000); } catch (err) { reportError(err); }
   const days = Math.floor((performance.now() / 1000) / DAY.cycle + DAY.offset);
   const idx = SEASON.force ?? Math.floor(days / 4) % 4; SEASON.day = (days % 4) + 1;
   if (idx !== SEASON.idx) { SEASON.idx = idx; SEASON.name = SEASONS[idx].name; seasonApply(idx); }
@@ -7005,7 +7134,7 @@ const DOOR_FX = [
   { name: "Gambler's Door", text: "A coin toss: two extra chests, or foes with 30% more health.", apply: () => { if (Math.random() < 0.5) { run.bonusChest = (run.bonusChest || 0) + 2; toast("<b>Gambler's Door:</b> you won. Two extra chests wait at the end.", "epic"); } else { run.foeHpStage = 1.3; toast("<b>Gambler's Door:</b> you lost. The next foes are tougher.", ""); } } }
 ];
 const lvKey = () => run.level * 100 + (run.sub || 1);
-function levelCleared() { run.state = "between"; run.doorNext = "sub"; banner(`Level ${run.sub} cleared`, "Take a blessing, then pick one of the two doors."); heal(ST.maxHp * 0.15); const n = (Math.random() < 0.22 ? 1 : 0) + (run.bonusChest || 0); run.bonusChest = 0; for (let k = 0; k < n; k++) grantChest(run.stage, Math.min(run.idx, 11)); if (n) toast(`<b>${n} chest${n > 1 ? "s" : ""}</b> for clearing level ${run.sub}.`, "rare"); offerCards(); openDoors(); }
+function levelCleared() { run.state = "between"; run.doorNext = "sub"; banner(`Level ${run.sub} cleared`, "Take a blessing, then pick one of the two doors."); heal(ST.maxHp * 0.15); const n = (Math.random() < 0.22 + 0.15 * ((run.boons && run.boons.treasure) || 0) ? 1 : 0) + (run.bonusChest || 0); run.bonusChest = 0; for (let k = 0; k < n; k++) grantChest(run.stage, Math.min(run.idx, 11)); if (n) toast(`<b>${n} chest${n > 1 ? "s" : ""}</b> for clearing level ${run.sub}.`, "rare"); offerCards(); openDoors(); }
 const wavesNow = () => Math.max(1, STAGES[run.stage].waves - (run.quiet === run.level ? 1 : 0));
 let fadeEl = null;
 function fadeThrough(fn) {
@@ -7271,7 +7400,7 @@ function reelBox() {
   document.body.appendChild(el); return el;
 }
 function startReel(f) {
-  const luck = f.rod.luck * f.sp.bonus; f.fish = rollFish(luck); const rk = RANK[f.fish.rarity] || 0;
+  const luck = f.rod.luck * f.sp.bonus * festMult("fish"); f.fish = rollFish(luck); const rk = RANK[f.fish.rarity] || 0;
   Object.assign(f, { stage: "reel", prog: 0.45, hook: 0.45, vel: 0, zone: 0.5, zv: 0, zw: Math.max(0.24, 0.48 - rk * 0.04) * (0.9 + f.rod.win * 0.1), rk, zT: 0, last: worldT });
   reelBox().hidden = false;
   buzz(rk >= 2 ? [60, 40, 60, 40, 120] : [60]);
@@ -8447,7 +8576,7 @@ $("achList").addEventListener("click", e => { const b = e.target.closest("button
 $("achNow").addEventListener("click", e => { if (e.target.closest("[data-hide]")) { S.title = null; save(); refreshNameTag(); renderAchievements(); } });
 $("startBtn").addEventListener("click", () => { if (S.avatar && S.name) enterLobby(); else openAvatar(true); });
 buildLobby(); rebuildHero(); refreshNameTag(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { skyQ, openSkyQuests, get SKYGATE() { return SKYGATE; }, askTravel, fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { festivalTick, currentFestival, get festNow() { return festNow; }, festivalGift, BOONS, heroLight, get nightGlows() { return nightGlows; }, DAY, skyQ, openSkyQuests, get SKYGATE() { return SKYGATE; }, askTravel, fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
