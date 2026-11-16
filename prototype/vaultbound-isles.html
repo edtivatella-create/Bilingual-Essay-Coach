@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Vaultbound Isles</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Alegreya+Sans:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -98,6 +100,29 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 640px) { #musicPanel { top: auto; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); } }
 @media (max-width: 760px) { #menuBar { left: calc(10px + env(safe-area-inset-left, 0px)); transform: none; bottom: auto; top: calc(150px + env(safe-area-inset-top, 0px)); flex-direction: column; } #menuBar button { padding: 6px 9px; font-size: 11px; } #toasts { left: auto; right: calc(10px + env(safe-area-inset-right, 0px)); top: calc(160px + env(safe-area-inset-top, 0px)); width: min(240px, 58vw); } }
 
+/* phones: one Menu button instead of nine, a compact HUD and slimmer action buttons */
+#mbToggle { display: none; }
+body.phone #mbToggle { display: inline-flex; align-items: center; gap: 6px; }
+body.phone #menuBar { left: calc(10px + env(safe-area-inset-left, 0px)); right: auto; transform: none; bottom: auto; top: var(--menuTop, 84px); flex-direction: column; align-items: flex-start; gap: 4px; }
+body.phone #menuBar > button:not(#mbToggle) { display: none; }
+body.phone #menuBar.open { display: grid; grid-template-columns: repeat(2, minmax(0, auto)); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; max-height: calc(100vh - var(--menuTop, 84px) - 12px); overflow: auto; z-index: 9; }
+body.phone #menuBar.open > button:not(#mbToggle) { display: block; }
+body.phone #menuBar.open #mbToggle { grid-column: 1 / -1; }
+body.phone #menuBar button { padding: 8px 12px; font-size: 12.5px; }
+#mbToggle.ready { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 14px -2px var(--accent); }
+body.phone #hudTL { width: min(206px, 40vw); padding: 6px 8px; gap: 3px; }
+body.phone #hFace { display: none; }
+body.phone .chip { font-size: 11px; padding: 3px 8px; }
+body.phone #hudTR { gap: 4px; }
+body.phone .hbtn { padding: 5px 9px; font-size: 12px; }
+body.phone #actions { gap: 6px; }
+body.phone .act.big { width: 72px; height: 72px; font-size: 13px; }
+body.phone .act.mid { width: 54px; height: 54px; font-size: 8.5px; }
+body.phone .act.small { width: 47px; height: 47px; font-size: 9.5px; }
+body.phone #bFish svg { width: 22px; height: 22px; }
+body.phone .keys { display: none; }
+body.phone #joyHint { width: 96px; height: 96px; font-size: 11px; }
+body.phone #joyBase { width: 112px; height: 112px; margin: -56px 0 0 -56px; }
 /* touch joystick */
 #joyBase { position: fixed; z-index: 7; width: 124px; height: 124px; margin: -62px 0 0 -62px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); pointer-events: none; }
 #joyKnob { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%; background: rgba(230,184,92,0.55); border: 2px solid rgba(255,255,255,0.45); }
@@ -384,7 +409,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 </div>
 <div id="festChip" hidden style="position:fixed;z-index:5;right:calc(12px + env(safe-area-inset-right, 0px));top:calc(156px + env(safe-area-inset-top, 0px));padding:5px 12px;border-radius:999px;background:linear-gradient(90deg,#ff8a3a,#ffd040);color:#1a1008;font-weight:800;font-size:12.5px;box-shadow:0 0 18px -4px #ffb050"></div>
 <div id="menuBar">
-  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests" style="display:none">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses" style="display:none">Classes</button><button id="mbAch">Achievements</button><button id="mbGuild">Guild</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
+  <button id="mbToggle" aria-expanded="false">&#9776; Menu</button>  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests" style="display:none">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses" style="display:none">Classes</button><button id="mbAch">Achievements</button><button id="mbGuild">Guild</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
 <div id="musicPanel" hidden role="dialog" aria-label="Music">
   <div class="mpHead"><b>Music</b><button class="hbtn" id="mpClose">Close</button></div>
@@ -505,8 +530,8 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 </div>
 <div class="modal" id="guildBoard" hidden role="dialog" aria-label="Guilds">
   <div class="achBox" id="achBoardG">
-    <div class="achHead"><h2>Guild Hall</h2><span class="muted">Join a company of adventurers or found your own</span><button class="btn" id="guildClose">Close</button></div>
-    <div class="achTabs" style="margin-top:10px"><button data-g="mine">My guild</button><button data-g="browse">Browse guilds</button><button data-g="create">Found a guild</button></div>
+    <div class="achHead"><h2>Guild Hall</h2><span class="muted">Join a company of adventurers or create your own</span><button class="btn primary" data-gtab="create" id="guildCreateTop">+ Create guild</button><button class="btn" id="guildClose">Close</button></div>
+    <div class="achTabs" style="margin-top:10px"><button data-g="mine">My guild</button><button data-g="browse">Browse guilds</button><button data-g="create">Create a guild</button></div>
     <div id="guildBody" style="flex:1;overflow:auto;padding-right:4px"></div>
   </div>
 </div>
@@ -1603,13 +1628,14 @@ const coarse = window.matchMedia("(pointer: coarse)").matches;
 let renderer;
 try { renderer = new THREE.WebGLRenderer({ antialias: !coarse, powerPreference: "high-performance" }); }
 catch (e) { $("introNote").textContent = "This device could not start 3D graphics."; $("startBtn").disabled = true; return; }
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2));
+const PERF = { max: Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2), acc: 0, n: 0, hudT: 0 }; PERF.pr = coarse ? Math.min(PERF.max, 1.25) : PERF.max;
+renderer.setPixelRatio(PERF.pr);
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 renderer.physicallyCorrectLights = false;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = coarse ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
 stage.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 900);
@@ -2928,10 +2954,10 @@ let GTAB = "mine", gForm = { name: "", tag: "", col: GUILD_COLOURS[0], perk: "dm
 const GUILD_COST = 5000;
 function openGuilds() { GTAB = S.guild ? "mine" : "browse"; $("guildBoard").hidden = false; renderGuilds(); }
 function renderGuilds() {
-  for (const b of document.querySelectorAll("#guildBoard .achTabs button")) b.classList.toggle("on", b.dataset.g === GTAB);
+  for (const b of document.querySelectorAll("#guildBoard .achTabs button")) b.classList.toggle("on", b.dataset.g === GTAB); $("guildCreateTop").hidden = !!S.guild || GTAB === "create";
   const g = guildInfo(); let h = "";
   if (GTAB === "mine") {
-    if (!g) h = `<p class="muted">You are not in a guild yet. Join one of the great companies, or found your own.</p><div class="row"><button class="btn primary" data-gtab="browse">Browse guilds</button><button class="btn" data-gtab="create">Found a guild</button></div>`;
+    if (!g) h = `<p class="muted">You are not in a guild yet. Join one of the great companies, or found your own.</p><div class="row"><button class="btn primary" data-gtab="browse">Browse guilds</button><button class="btn primary" data-gtab="create">+ Create a guild</button></div>`;
     else { const lv = g.level || 1, need = guildXpNeed(lv), P2 = GUILD_PERKS[g.perk], members = (g.members || []).slice(0, 8);
       h = `<div class="achNow" style="--c:${g.col}"><div><b style="color:${g.col};font-family:var(--f-display);font-size:22px">[${esc(g.tag)}] ${esc(g.name)}</b><br><span class="muted">${esc(g.motto || "Founded by " + (S.name || "you"))}</span></div><div style="text-align:right"><b>Guild level ${lv}${lv >= 10 ? " (max)" : ""}</b><br><span class="muted">${esc(P2.name)}: +${(guildPerk(g.perk) * 100).toFixed(1)}% ${esc(P2.text)}</span></div></div>
         <div class="achBar" style="--c:${g.col};height:10px"><i style="width:${lv >= 10 ? 100 : (100 * (g.xp || 0) / need).toFixed(1)}%"></i></div><small class="muted">${lv >= 10 ? "Your guild is at the highest level." : `${fmt(Math.floor(g.xp || 0))} / ${fmt(need)} guild exp. Earn it by defeating foes and bosses, or donate coins.`}</small>
@@ -2939,16 +2965,16 @@ function renderGuilds() {
         <b>Members</b><div id="achList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-top:6px"><div class="achCard done" style="--c:${g.col}"><b>${esc(S.name || "You")}</b><small>${g.custom ? "Guild Master" : "Member"} · ${esc(CLASS[S.cls].name)} · level ${S.level}</small></div>${members.map((m, k) => `<div class="achCard"><b>${esc(m)}</b><small>${["Guild Master", "Officer", "Veteran", "Member", "Recruit"][Math.min(4, k + (g.custom ? 1 : 0))]}</small></div>`).join("")}</div>
         <p class="muted" style="font-size:12px">Guild mates here are computer-controlled. Playing with real friends needs an online server, which this prototype does not have yet.</p>`; }
   } else if (GTAB === "browse") {
-    h = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px">${GUILDS.map(x => { const P2 = GUILD_PERKS[x.perk], mine = S.guild && S.guild.id === x.id;
+    h = `${S.guild ? "" : `<div class="row" style="margin:0 0 10px;align-items:center;gap:10px"><span class="muted">Want your own banner?</span><button class="btn primary" data-gtab="create">+ Create your own guild</button></div>`}<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px">${GUILDS.map(x => { const P2 = GUILD_PERKS[x.perk], mine = S.guild && S.guild.id === x.id;
       return `<div class="achCard ${mine ? "done" : ""}" style="--c:${x.col}"><b style="color:${x.col}">[${x.tag}] ${esc(x.name)}</b><small>"${esc(x.motto)}"</small><span class="t">${esc(P2.name)}: ${esc(P2.text)}</span><small>${x.members.length + 20 + (x.id.length * 7) % 30} members</small>${mine ? `<button class="show on" disabled>Your guild</button>` : `<button class="claim" data-join="${x.id}">${S.guild ? "Switch to this guild" : "Join"}</button>`}</div>`; }).join("")}</div>`;
   } else {
-    h = `<p class="muted" style="margin-top:0">Found your own guild for ${fmt(GUILD_COST)} coins. You become its Guild Master.</p>
+    h = `<p class="muted" style="margin-top:0">Create your own guild for ${fmt(GUILD_COST)} coins. You become its Guild Master.</p>
       <div class="avRow"><b>Guild name</b><input class="avName" id="gName" maxlength="24" placeholder="e.g. Knights of the Dawn" value="${esc(gForm.name)}" style="width:240px"></div>
       <div class="avRow"><b>Tag (2 to 4 letters)</b><input class="avName" id="gTag" maxlength="4" placeholder="DAWN" value="${esc(gForm.tag)}" style="width:110px;text-transform:uppercase"></div>
       <div class="avRow"><b>Colour</b><div class="avSw">${GUILD_COLOURS.map(c => `<button data-gcol="${c}" class="${gForm.col === c ? "on" : ""}" style="background:${c}" aria-label="Colour ${c}"></button>`).join("")}</div></div>
       <div class="avRow"><b>Guild bonus</b><div class="achTabs" style="margin:0;flex-wrap:wrap">${Object.entries(GUILD_PERKS).map(([k, v]) => `<button data-gperk="${k}" class="${gForm.perk === k ? "on" : ""}">${esc(v.name)}</button>`).join("")}</div></div>
       <p class="muted">${esc(GUILD_PERKS[gForm.perk].name)}: +${(GUILD_PERKS[gForm.perk].base * 100).toFixed(0)}% ${esc(GUILD_PERKS[gForm.perk].text)} at level 1, growing with every guild level.</p>
-      <button class="btn primary" data-found="1">Found guild (${fmt(GUILD_COST)} coins)</button>`;
+      <button class="btn primary" data-found="1">Create guild (${fmt(GUILD_COST)} coins)</button>`;
   }
   $("guildBody").innerHTML = h;
 }
@@ -3531,13 +3557,16 @@ stage.addEventListener("pointerdown", e => {
   if (SL.on && !coarse && !document.pointerLockElement && e.pointerType === "mouse") { try { stage.requestPointerLock(); } catch (er) {} }
   if (isPaused()) return;
   if (e.pointerType !== "mouse") usedTouch = true;
-  if (e.pointerType !== "mouse" && joy.id === null && e.clientX < window.innerWidth * 0.45 && e.clientY > window.innerHeight * 0.35) {
+  if (e.pointerType !== "mouse" && joy.id === null && e.clientX < window.innerWidth * 0.5 && e.clientY > window.innerHeight * 0.28) {
     joy.id = e.pointerId; joy.ox = e.clientX; joy.oy = e.clientY; const b = $("joyBase"); b.style.left = e.clientX + "px"; b.style.top = e.clientY + "px"; b.hidden = false; $("joyKnob").style.transform = "translate(0,0)"; $("joyHint").hidden = true;
   } else if (drag.id === null) Object.assign(drag, { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), moved: 0, type: e.pointerType });
   try { stage.setPointerCapture(e.pointerId); } catch (err) {}
 });
 stage.addEventListener("pointermove", e => {
-  if (e.pointerId === joy.id) { let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const d = Math.hypot(dx, dy), max = 56; if (d > max) { dx *= max / d; dy *= max / d; } touchMove.x = dx / max; touchMove.y = dy / max; $("joyKnob").style.transform = `translate(${dx}px, ${dy}px)`; }
+  if (e.pointerId === joy.id) { let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const d = Math.hypot(dx, dy), max = 52;
+    if (d > max) { const k = (d - max) / d; joy.ox += dx * k; joy.oy += dy * k; dx *= max / d; dy *= max / d; const b = $("joyBase"); b.style.left = joy.ox + "px"; b.style.top = joy.oy + "px"; }
+    const m = Math.min(1, Math.hypot(dx, dy) / max), dead = 0.12, s2 = m < dead ? 0 : (m - dead) / (1 - dead) / Math.max(m, 1e-6);
+    touchMove.x = dx / max * s2; touchMove.y = dy / max * s2; $("joyKnob").style.transform = `translate(${dx}px, ${dy}px)`; }
   else if (e.pointerId === drag.id) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy); cam.yaw -= dx * 0.0062; cam.pitch = clamp(cam.pitch + dy * 0.0038, 0.05, 1.2); }
 });
 function endPtr(e) {
@@ -3547,6 +3576,18 @@ function endPtr(e) {
 stage.addEventListener("pointerup", endPtr); stage.addEventListener("pointercancel", endPtr);
 stage.addEventListener("wheel", e => { cam.dist = clamp(cam.dist + e.deltaY * 0.01, 3, 30); e.preventDefault(); }, { passive: false });
 stage.addEventListener("contextmenu", e => e.preventDefault());
+/* ---- phones: decide the compact layout, keep the Menu button under the HUD, and open or close the menu ---- */
+(function phoneLayout() {
+  const isPhone = () => (coarse || usedTouch) && Math.min(window.innerWidth, window.innerHeight) < 600;
+  const place = () => { document.body.classList.toggle("phone", isPhone()); if (!isPhone()) { $("menuBar").classList.remove("open"); return; }
+    let y = $("hudTL").getBoundingClientRect().bottom; const tc = $("hudTC").getBoundingClientRect(); if (window.innerWidth <= 640 && tc.left < 220) y = Math.max(y, tc.bottom);
+    document.body.style.setProperty("--menuTop", Math.round(y + 8) + "px");
+    $("mbToggle").classList.toggle("ready", [...$("menuBar").querySelectorAll("button")].some(b => b.id !== "mbToggle" && b.classList.contains("ready"))); };
+  window.addEventListener("resize", place); window.addEventListener("orientationchange", () => setTimeout(place, 300)); setInterval(place, 1000); place();
+  $("mbToggle").addEventListener("click", e => { e.stopPropagation(); const open = !$("menuBar").classList.contains("open"); $("menuBar").classList.toggle("open", open); $("mbToggle").setAttribute("aria-expanded", open); $("mbToggle").innerHTML = open ? "&#10005; Close" : "&#9776; Menu"; });
+  $("menuBar").addEventListener("click", e => { const b = e.target.closest("button"); if (b && b.id !== "mbToggle" && document.body.classList.contains("phone")) { $("menuBar").classList.remove("open"); $("mbToggle").innerHTML = "&#9776; Menu"; } });
+  stage.addEventListener("pointerdown", () => { if ($("menuBar").classList.contains("open")) { $("menuBar").classList.remove("open"); $("mbToggle").innerHTML = "&#9776; Menu"; } });
+})();
 function holdBtn(id, on, off) {
   const b = $(id);
   b.addEventListener("pointerdown", e => { e.preventDefault(); e.stopPropagation(); b.classList.add("on"); on(); try { b.setPointerCapture(e.pointerId); } catch (err) {} });
@@ -8139,9 +8180,40 @@ function caveFoe(def, pos, f, elite) {
   const e = { R, name: (elite ? "" : "") + name, role, boss: false, base, pos, kb: new V3(), hp, maxHp: hp, dmg, spd: base.spd * 1.05, atkT: rand(0.5, 1.5), dead: false, flash: 0, accent: acc, col, scale: sc, radius: 0.5 * sc, t: rand(0, 10), atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, bossT: 9, summoned: true, enrage: 1, caveFoe: true, hgt: ({ treant: 2.9, serpent: 2.6, bat: 2.3, mantis: 2.1, slime: 1.25, spider: 1.45, giant: 3, beetle: 1.2, dragon: 3, hydra: 3.3 })[body] || 1.9 };
   e.label = textSprite(name, elite ? "#ffd166" : "#" + new THREE.Color(acc).getHexString(), elite ? 1.2 : 0.9); scene.add(e.label);
   const bar = new THREE.Group(); M(G.box(), new THREE.MeshBasicMaterial({ color: 0x1a0a10 }), 0, 0, 0, bar, 1.1, 0.09, 0.01); e.fg = M(G.box(), new THREE.MeshBasicMaterial({ color: 0xe0505f }), 0, 0, 0.01, bar, 1.1, 0.09, 0.01); scene.add(bar); e.bar = bar;
-  e.onDeath = () => { const C = world.cave; if (!C) return; const table = C.ores[Math.min(3, Math.floor(f * 4))]; if (Math.random() < (elite ? 1 : 0.35)) { const it = ITEM[pickWeighted(Object.fromEntries(table))]; gain(it, e.pos, elite ? 3 : 1); } S.coins += Math.round(40 + f * 400) * (elite ? 10 : 1); if (elite) { banner(`${name} falls`, "The deepest treasure is yours."); grantChest(2, 11); } };
+  e.onDeath = () => { const C = world.cave; if (!C) return; const table = C.ores[Math.min(3, Math.floor(f * 4))]; if (Math.random() < (elite ? 1 : 0.35)) { const it = ITEM[pickWeighted(Object.fromEntries(table))]; gain(it, e.pos, elite ? 3 : 1); } S.coins += Math.round(40 + f * 400) * (elite ? 10 : 1); if (elite) { banner(`${name} falls`, "A treasure vault opens behind it."); grantChest(2, 11); try { caveBossVault(e.pos.clone()); } catch (err) { reportError(err); } } };
   if (ROLE_AI[role]) roleProps(e);
   enemies.push(e); return e;
+}
+/* ---- the hoard behind every cave boss: rare ore veins, heaps of treasure and three chests ---- */
+function caveBossVault(at) {
+  const C = world.cave, F = world.F, h = world.h, g = new THREE.Group(); world.group.add(g); const top = C.ores[3], rr = seeded(hash(C.id) + 77);
+  const ring = (k, n, rad) => { const a = k / n * TAU + 0.3, x = at.x + Math.cos(a) * rad, z = at.z + Math.sin(a) * rad * 0.7; return [x, z]; };
+  // rare ore veins, weighted towards the rarest ore in the cave
+  for (let k = 0; k < 6; k++) { const [x, z] = ring(k, 6, 6.5); const w = {}; for (const [id, wt] of top) w[id] = wt * Math.pow(3, RANK[ITEM[id].rarity] || 0); const ore = ITEM[pickWeighted(w)];
+    const y = h(x, z), ng = new THREE.Group(); ng.position.set(x, y, z); g.add(ng); M(rockGeo(k % 5), MAT.rock(C.rock), 0, 0.55, 0, ng, 1.1, 0.9, 1);
+    for (let j = 0; j < 6; j++) { const a = j / 6 * TAU; M(G.oct(), std(ore.col, { e: ore.col, ei: 1.1, flat: true, r: 0.3, m: 0.4 }), Math.cos(a) * 0.65, 0.7 + (j % 2) * 0.35, Math.sin(a) * 0.6, ng, 0.14, 0.3, 0.14).rotation.z = a; }
+    const gs = glowSprite(ore.col, 3, 0.6); gs.position.y = 0.9; ng.add(gs);
+    const node = { x, z, y, ore, g: ng, s: F.L, done: false }; world.nodes.push(node); addCircle(x, z, 1.0, 2);
+    const it = { x, z, y, r: 2.8, label: `Mine rare ${ore.name}`, act: () => startCaveMining(node) }; node.it = it; world.interact.push(it); }
+  // heaps of treasure
+  const gold = std(0xffd040, { m: 0.9, r: 0.25, e: 0x8a5a10, ei: 0.5 });
+  for (let k = 0; k < 2; k++) { const x = at.x + (k ? 3 : -3), z = at.z - 2.5, y = h(x, z), tg = new THREE.Group(); tg.position.set(x, y, z); g.add(tg);
+    M(G.cone(10), gold, 0, 0.45, 0, tg, 1.4, 0.9, 1.4); for (let j = 0; j < 14; j++) M(G.cyl(0.14, 0.14, 10), gold, (rr() - 0.5) * 2.6, 0.06 + rr() * 0.3, (rr() - 0.5) * 2.6, tg, 1, 0.12, 1);
+    for (let j = 0; j < 5; j++) M(G.oct(), std([0xff4a6a, 0x4ad8ff, 0x7aff6a, 0xd88aff, 0xffffff][j], { e: [0xff4a6a, 0x4ad8ff, 0x7aff6a, 0xd88aff, 0xffffff][j], ei: 0.8, r: 0.2 }), (rr() - 0.5) * 1.6, 0.7 + rr() * 0.4, (rr() - 0.5) * 1.6, tg, 0.16);
+    const gl = glowSprite(0xffd040, 4, 0.5); gl.position.y = 1; tg.add(gl);
+    const it = { x, z, y, r: 2.6, label: "Gather the treasure", act: () => { const coins = Math.round(4000 + rr() * 6000 + S.level * 150); S.coins += coins; const gem = ITEM[pick(top)[0]]; gain(gem, tg.position.clone(), 2, true);
+      g.remove(tg); world.interact = world.interact.filter(i => i !== it); MUSIC.sfx("chest"); burstFx(new V3(x, y + 1, z), 2, 0xffd040, 0.6); bumpStat("treasures"); save(); toast(`<b>Treasure!</b> ${fmt(coins)} coins and 2 × ${esc(gem.name)}.`, "legendary"); } };
+    world.interact.push(it); }
+  // three chests behind the hoard
+  [1, 2, 2].forEach((t, k) => { const x = at.x + (k - 1) * 2.6, z = at.z - 6, y = h(x, z), T = CHEST_TIERS[t], cg = new THREE.Group(); cg.position.set(x, y, z); cg.rotation.y = Math.PI; g.add(cg);
+    const body = std(new THREE.Color(T.col).getHex(), { r: 0.7, map: "bark" }), band = std(new THREE.Color(T.band).getHex(), { m: 0.9, r: 0.3 });
+    M(G.box(), body, 0, 0.4, 0, cg, 1.3, 0.8, 0.85); const lid = M(G.cyl(0.43, 0.43, 14, true), body, 0, 0.8, 0, cg, 1, 1.5, 1); lid.rotation.z = Math.PI / 2;
+    for (const sx of [-0.45, 0.45]) M(G.box(), band, sx, 0.6, 0, cg, 0.1, 1.25, 0.9); M(G.box(), band, 0, 0.62, 0.44, cg, 0.2, 0.26, 0.05);
+    const gl = glowSprite(new THREE.Color(T.band).getHex(), 2.6, 0.55); gl.position.y = 1; cg.add(gl);
+    const it = { x, z, y, r: 2.4, label: `Open the ${T.name}`, act: () => { grantChest(t, 11); g.remove(cg); world.interact = world.interact.filter(i => i !== it); MUSIC.sfx("chest"); burstFx(new V3(x, y + 1, z), 1.6, new THREE.Color(T.band).getHex(), 0.5); save(); toast(`<b>${esc(T.name)}</b> added to your chests. Open it from the Armoury.`, T.rarity); } };
+    world.interact.push(it); addCircle(x, z, 0.7, 1.2); });
+  const lb = textSprite("The Boss's Hoard", "#ffd166", 1.2); lb.position.set(at.x, h(at.x, at.z) + 4.5, at.z - 3); g.add(lb); world.labels && world.labels.push(lb);
+  const pl = new THREE.PointLight(lin(0xffd080), 1.6, 26, 2); pl.position.set(at.x, h(at.x, at.z) + 5, at.z - 3); g.add(pl);
 }
 function caveTick(dt) {
   const C = world.cave, F = world.F, s = clamp(-P.pos.z, 0, F.L), f = s / F.L;
@@ -8161,6 +8233,8 @@ function caveTick(dt) {
 (function caveHudUi() { const el = document.createElement("div"); el.id = "caveHud"; el.hidden = true; el.style.cssText = "position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:5;min-width:260px;padding:8px 12px;border-radius:12px;background:rgba(10,12,20,.72);border:1px solid rgba(255,255,255,.12);font:600 13px/1.3 system-ui,sans-serif;color:#f4ead2;text-align:center;pointer-events:none";
   el.innerHTML = `<div style="display:flex;justify-content:space-between;gap:10px"><span>Depth</span><b id="caveName"></b><span id="caveDepth"></span></div><div style="height:8px;border-radius:4px;background:#1a1612;margin:5px 0;overflow:hidden"><i id="caveBar" style="display:block;height:100%;background:linear-gradient(90deg,#e6b85c,#ff6a2a,#9a3aff)"></i></div><small id="cavePick" style="opacity:.8"></small>`; document.body.appendChild(el); })();
 /* cave mouths in the hills, and the pickaxe shop with its locked display stands */
+function moundH(M0, wx, wz) { const dx = wx - M0.x, dz = wz - M0.z, lx = dx * M0.cs - dz * M0.sn, lz = dx * M0.sn + dz * M0.cs;
+  const ox = Math.max(M0.x0 - lx, 0, lx - M0.x1), oz = Math.max(M0.z0 - lz, 0, lz - M0.z1); return M0.y0 - 0.02 - Math.hypot(ox, oz) * 0.6; }
 function buildCaveMouths(group, h) {
   for (const C of CAVES) {
     // slide the hill outward until no building, wall or tree sits inside it
@@ -8201,7 +8275,7 @@ function buildCaveMouths(group, h) {
     L(G.box(), black, 0, y0 + 2.9, -14.2, 6.3, 5.9, 0.2);
     for (let k = 0; k < 10; k++) { const lz = 8 - k * 2.2, [fx, fz] = toW(0, lz), fy = Math.max(y0, h(fx, fz)) + 0.06; L(G.box(), iron, -0.6, fy, lz, 0.08, 0.08, 2.3); L(G.box(), iron, 0.6, fy, lz, 0.08, 0.08, 2.3); for (let j = 0; j < 3; j++) L(G.box(), beam, 0, fy - 0.03, lz - 0.8 + j * 0.8, 1.7, 0.07, 0.22); }
     // the yard: a cart full of ore, crates, barrels, an ore heap, lantern posts and a headframe on the cliff
-    const yh = (lx, lz) => h(...toW(lx, lz));
+    const yh = (lx, lz) => Math.max(y0, h(...toW(lx, lz)));
     { const cz = 6.2, cy = yh(0, cz); L(G.box(), std(0x5a4a3a, { r: 0.8, map: "bark" }), 0, cy + 0.85, cz, 1.4, 0.8, 2); for (const [wx, wz] of [[-0.75, cz - 0.6], [0.75, cz - 0.6], [-0.75, cz + 0.6], [0.75, cz + 0.6]]) L(G.cyl(0.28, 0.28, 10), iron, wx, cy + 0.32, wz, 1, 0.12, 1).rotation.z = Math.PI / 2;
       for (let k = 0; k < 5; k++) L(G.dode(), std(C.crystal, { e: C.crystal, ei: 0.8, r: 0.3 }), (k - 2) * 0.25, cy + 1.35, cz + (k % 2) * 0.3 - 0.15, 0.24); }
     for (const [lx, lz, s2] of [[-4.6, 3.5, 1], [-5.4, 4.6, 0.8], [4.4, 4, 1], [5.2, 2.6, 0.75]]) L(G.box(), plank, lx, yh(lx, lz) + s2 / 2, lz, s2, s2, s2).rotation.y = lx * 0.3;
@@ -8224,6 +8298,12 @@ function buildCaveMouths(group, h) {
     let inside = false;
     world.animated.push(() => { const d = Math.hypot(P.pos.x - qx, P.pos.z - qz); if (d < 1.8 && !inside && !run && !P.dead) { inside = true; askTravel("Mineshaft portal", `Descend into ${C.name}?`, "The portal at the end of the shaft drops you into the cave. A village waits near the entrance, and the deeper you go, the richer and deadlier it gets.", () => enterCave(C.id)); } if (d > 3) inside = false; });
     C.mouth = toW(2.2, 10.5);
+    // a mound of earth that carries the yard and tunnel level, sloping gently down to the hillside
+    { const M0 = { x, z, y0, cs, sn, x0: -9, x1: 9, z0: -15, z1: 12 }; (world.mounds = world.mounds || []).push(M0);
+      const N = 46, span = 46, gp = new THREE.PlaneGeometry(span, span + 4, N, N); gp.rotateX(-Math.PI / 2); const pa = gp.attributes.position;
+      for (let i = 0; i < pa.count; i++) { const lx = pa.getX(i), lz = pa.getZ(i) - 1.5, [wx, wz] = toW(lx, lz), b = h(wx, wz), m = moundH(M0, wx, wz); pa.setX(i, lx); pa.setZ(i, lz); pa.setY(i, m > b + 0.04 ? m : b - 0.6); }
+      gp.computeVertexNormals(); const mm = new THREE.Mesh(gp, std(0x58803a, { r: 0.97, map: "fabric", rep: 8 })); mm.receiveShadow = true; g.add(mm); }
+    { const base = world.h; if (!base.mounded) { const wrapped = (x2, z2) => { let v = base(x2, z2); for (const M0 of world.mounds || []) { const m = moundH(M0, x2, z2); if (m > v) v = m; } return v; }; wrapped.mounded = true; world.h = wrapped; } }
     { const [cx2, cz2] = toW(0, -14); world.circles.push({ x: cx2, z: cz2, r: 18, h: 0, ghost: true }); world.circles.push({ x, z, r: 11, h: 0, ghost: true }); const [yx, yz] = toW(0, 7); world.circles.push({ x: yx, z: yz, r: 11, h: 0, ghost: true }); }
   }
   // the pickaxe shop
@@ -8744,12 +8824,16 @@ $("prompt").style.pointerEvents = "auto";
 $("prompt").addEventListener("click", () => { const it = nearestInteract(); if (it) it.act(); });
 function frame(now) {
   requestAnimationFrame(frame);
-  const dt = Math.min(0.05, (now - last) / 1000) * timeScale; last = now;
+  const raw = Math.max(0, (now - last) / 1000); last = now;
+  const dt = Math.min(0.1, raw) * timeScale, steps = dt > 0.034 ? 2 : 1;
+  if (coarse && raw < 0.5) { PERF.acc += raw; PERF.n++; if (PERF.acc > 2.5) { const avg = PERF.acc / PERF.n; let np = PERF.pr;
+      if (avg > 1 / 38) np = Math.max(0.65, PERF.pr - 0.15); else if (avg < 1 / 56) np = Math.min(PERF.max, PERF.pr + 0.1);
+      if (Math.abs(np - PERF.pr) > 0.01) { PERF.pr = np; renderer.setPixelRatio(np); resize(); } PERF.acc = 0; PERF.n = 0; } }
   const paused = isPaused();
   if (SL.on && paused && document.pointerLockElement) document.exitPointerLock();
-  try { if (!paused) update(dt); } catch (err) { reportError(err); }
+  try { if (!paused) for (let k = 0; k < steps; k++) update(dt / steps); } catch (err) { reportError(err); }
   try { animate(dt, paused); } catch (err) { reportError(err); }
-  try { updateHud(); } catch (err) { reportError(err); }
+  PERF.hudT += raw; if (!coarse || PERF.hudT > 0.05) { PERF.hudT = 0; try { updateHud(); } catch (err) { reportError(err); } }
   try { MUSIC.update(Math.min(0.05, dt / (timeScale || 1)), run ? enemies.reduce((n, e) => n + (e.dead ? 0 : 1), 0) : 0, Math.max(0, P.hp / ST.maxHp), !$("menu").hidden);
   } catch (err) { reportError(err); }
   try { renderer.render(scene, camera); } catch (err) { reportError(err); }
@@ -8793,7 +8877,7 @@ $("achList").addEventListener("click", e => { const b = e.target.closest("button
 $("achNow").addEventListener("click", e => { if (e.target.closest("[data-hide]")) { S.title = null; save(); refreshNameTag(); renderAchievements(); } });
 $("startBtn").addEventListener("click", () => { if (S.avatar && S.name) enterLobby(); else openAvatar(true); });
 buildLobby(); rebuildHero(); refreshNameTag(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { openSkyRealmBoard, SKY_REALM_START, SKY_NPC_QUESTS, npcQ, openNpcQuests, ACH, festivalTick, currentFestival, get festNow() { return festNow; }, festivalGift, BOONS, heroLight, get nightGlows() { return nightGlows; }, DAY, skyQ, openSkyQuests, get SKYGATE() { return SKYGATE; }, askTravel, fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { PERF, caveBossVault, moundH, openSkyRealmBoard, SKY_REALM_START, SKY_NPC_QUESTS, npcQ, openNpcQuests, ACH, festivalTick, currentFestival, get festNow() { return festNow; }, festivalGift, BOONS, heroLight, get nightGlows() { return nightGlows; }, DAY, skyQ, openSkyQuests, get SKYGATE() { return SKYGATE; }, askTravel, fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
