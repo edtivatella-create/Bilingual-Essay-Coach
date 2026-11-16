@@ -1161,8 +1161,6 @@ const CLASS_LIST = [
     perks: [["Swift Palm", "+15% attack speed."], ["Inner Calm", "+8% move speed."]], look: { skin: 0xd9a77f, hair: 0x1a1a1a, cloth: 0xd8802a, cloth2: 0x8a4a1a, extra: "beads" } },
   { id: "knight", name: "Knight", rarity: "common", role: "Tank", odds: 15, desc: "Sworn to the shield and the realm.",
     perks: [["Shield Discipline", "Blocking stops 85% of damage instead of 70%."], ["Plate Drill", "+25% defence."]], look: { skin: 0xe0b48c, hair: 0x6a4a2a, cloth: 0x3a4a7a, cloth2: 0x2a2a3a, extra: "plume" } },
-  { id: "pirate", name: "Pirate", rarity: "rare", role: "DPS", odds: 9, desc: "Plunders every isle, and every pocket on it.",
-    perks: [["Plunder", "+25% coins from defeated foes."], ["Dirty Fighting", "+10% critical hit chance."]], look: { skin: 0xc08a5a, hair: 0x2a1a10, cloth: 0x8a1a1a, cloth2: 0x2a2018, extra: "tricorn" } },
   { id: "druid", name: "Druid", rarity: "rare", role: "Healer", odds: 9, desc: "Speaks for the forest, and the forest heals them.",
     perks: [["Verdant Pulse", "Heal 0.7% of your max health every second."], ["Barkskin", "+15% defence."]], look: { skin: 0xc99a74, hair: 0x3a5a2a, cloth: 0x4a6a2a, cloth2: 0x5a3a22, extra: "antlers" } },
   { id: "shadowblade", name: "Shadowblade", rarity: "rare", role: "DPS", odds: 8, desc: "Strikes from the dark between two heartbeats.",
@@ -1171,8 +1169,6 @@ const CLASS_LIST = [
     perks: [["Battle Hymn", "Allies deal 20% more damage."], ["Soothing Chord", "Heal 0.5% of your max health every second."], ["Encore", "Special attacks recharge 20% faster."]], look: { skin: 0xf0d0b0, hair: 0xc89a5a, cloth: 0x7a3a8a, cloth2: 0xe8c060, extra: "lute" } },
   { id: "necromancer", name: "Necromancer", rarity: "epic", role: "Support", odds: 4, desc: "Borrows strength from the fallen, and never returns it.",
     perks: [["Soul Siphon", "Every foe you defeat heals 4% of your max health."], ["Grave Power", "+20% Power."]], look: { skin: 0xb8b8c0, hair: 0x1a1a1a, cloth: 0x2a1a3a, cloth2: 0x101018, extra: "skulls" } },
-  { id: "valkyrie", name: "Valkyrie", rarity: "epic", role: "Tank", odds: 4, desc: "Rides the storm to carry heroes home.",
-    perks: [["Shieldmaiden", "+15% max health."], ["Skyborne", "One extra dash and a higher jump."]], look: { skin: 0xf0d8c0, hair: 0xe8d070, cloth: 0xc8d0e0, cloth2: 0x5a6a8a, extra: "wingedhelm" } },
   { id: "dragonknight", name: "Dragon Knight", rarity: "legendary", role: "Tank", odds: 0.5, desc: "Bonded to a dragon's heart, and burns like one.",
     perks: [["Dragonheart", "+25% max health and +20% defence."], ["Dragonfire", "Every 10 s, a burst of flame hits foes within 6 m for 2.5x weapon damage."], ["Scaled Hide", "Take 40% less knockback."]], look: { skin: 0xd8a07a, hair: 0x8a2a1a, cloth: 0x6a1a14, cloth2: 0x2a1410, extra: "dragonhorns" } },
   { id: "starseer", name: "Starseer", rarity: "legendary", role: "Support", odds: 0.5, desc: "Reads the stars, then throws them.",
@@ -1195,7 +1191,7 @@ const CLASS_LIST = [
     perks: [["Crown of Nothing", "+50% max health and +40% damage."], ["Event Horizon", "Special attacks recharge 50% faster and +50% Power."], ["Starless Wings", "Double jump and glide, two extra dashes, +20% move speed."], ["Absolute", "+20% critical hit chance."]], look: { skin: 0xd8d0e8, hair: 0x0a0814, cloth: 0x0e0a1a, cloth2: 0x2a0a3a, extra: "voidcrown" } }
 ];
 const CLASS = Object.fromEntries(CLASS_LIST.map(c => [c.id, c]));
-{ const tot = CLASS_LIST.filter(c => c.odds && c.rarity !== "vaulted").reduce((a, c) => a + c.odds, 0); for (const c of CLASS_LIST) if (c.rarity === "vaulted") c.odds = tot / 1e6; }
+{ const tot = CLASS_LIST.filter(c => c.odds && c.rarity !== "vaulted").reduce((a, c) => a + c.odds, 0); for (const c of CLASS_LIST) if (c.rarity === "vaulted") c.odds = tot * 0.0025; }
 const classPct = c => { const tot = CLASS_LIST.reduce((a, x) => a + (x.odds || 0), 0), p = 100 * c.odds / tot; return (p >= 0.1 ? p.toFixed(1) : p >= 0.01 ? p.toFixed(2) : p.toFixed(5)) + "%"; };
 const ROLL_COINS = 10000;
 
@@ -1601,7 +1597,7 @@ try {
     for (const id of Object.keys(S.inv)) if (!ITEM[id] || S.inv[id] <= 0) delete S.inv[id];
     if (!S.inv[S.equip.weapon] || ITEM[S.equip.weapon]?.cat !== "weapon") { S.equip.weapon = "ironwood"; S.inv.ironwood = S.inv.ironwood || 1; }
     if (!S.inv[S.equip.armour] || ITEM[S.equip.armour]?.cat !== "armour") { S.equip.armour = "padded"; S.inv.padded = S.inv.padded || 1; }
-    if (!CLASS[S.cls]) S.cls = "wanderer";
+    if (!CLASS[S.cls]) S.cls = ({ pirate: "windwalker", valkyrie: "skyknight" })[S.cls] || "wanderer";
     S.allies = (S.allies || []).filter(a => ALLY_POOL.some(p => p.id === a)).slice(0, 3);
   }
 } catch (e) { S = fresh(); }
@@ -1637,7 +1633,7 @@ function guildXp(n) {
   if (up) { computeStats(); toast(`<b>${esc(guildInfo().name)}</b> reached guild level ${g.level}. Your guild bonus grew.`, "epic"); save(); }
 }
 function statsFor(weaponId, armourId, clsId) {
-  const w = ITEM[weaponId], a = ITEM[armourId], c = CLASS[clsId || S.cls], role = ROLES[c.role] || {}, p = S.pts, id = c.id;
+  const w = ITEM[weaponId], a = ITEM[armourId], c = CLASS[clsId || S.cls] || CLASS.wanderer, role = ROLES[c.role] || {}, p = S.pts, id = c.id;
   const st = {};
   const eA = 1 + 0.07 * enchLv(armourId), eW = 1 + 0.07 * enchLv(weaponId);
   const gp = guildPerk;
@@ -2817,8 +2813,8 @@ function buildLobby() {
   for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + TAU / 16, x = Math.cos(a) * 25, z = Math.sin(a) * 25; M(G.cyl(0.06, 0.08), std(0x2a2a30, { m: 0.8, r: 0.4 }), x, 1.6, z, group, 1, 3.2, 1).castShadow = true; M(G.sph(), std(0xffe0a0, { e: 0xffc060, ei: 2.5 }), x, 3.3, z, group, 0.16); const lg = glowSprite(0xffb050, 2.2, 0.75); lg.position.set(x, 3.3, z); group.add(lg); addCircle(x, z, 0.3, 3); }
   const lampL = new THREE.PointLight(0xffc070, 0.8, 14, 2); lampL.position.set(0, 4, 0); group.add(lampL); world.nightLights = [{ l: lampL, b: 0.8 }];
   frontier(group, h); townInfill(group);
-  grassField(group, coarse ? 2600 : 7000, 0x6f9e3c, () => { let x = 0, z = 0; for (let k = 0; k < 10; k++) { const a = rand(0, TAU), d = rand(95, 262); x = Math.cos(a) * d; z = Math.sin(a) * d; if (!onPath(x, z, 0.4) && !blockedLobby(x, z) && h(x, z) > SEA + 0.8) return [x, h(x, z), z]; } return [x, -50, z]; });
-  grassField(group, coarse ? 7000 : 20000, 0x6a9a3a, () => { let x = 0, z = 0; for (let k = 0; k < 8; k++) { const a = rand(0, TAU), d = rand(27.6, 95); x = Math.cos(a) * d; z = Math.sin(a) * d; if (!onPath(x, z, 0.4)) break; } return [x, h(x, z), z]; });
+  grassField(group, coarse ? 4500 : 13000, 0x6f9e3c, () => { let x = 0, z = 0; for (let k = 0; k < 10; k++) { const a = rand(0, TAU), d = rand(95, 262); x = Math.cos(a) * d; z = Math.sin(a) * d; if (!onPath(x, z, 0.4) && !blockedLobby(x, z) && h(x, z) > SEA + 0.8) return [x, h(x, z), z]; } return [x, -50, z]; });
+  grassField(group, coarse ? 9500 : 28000, 0x6a9a3a, () => { let x = 0, z = 0; for (let k = 0; k < 8; k++) { const a = rand(0, TAU), d = rand(27.6, 95); x = Math.cos(a) * d; z = Math.sin(a) * d; if (!onPath(x, z, 0.4)) break; } return [x, h(x, z), z]; });
   for (let k = 0; k < 30; k++) { const a = r3() * TAU, d = 30 + r3() * 40, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z) || onPath(x, z, 1)) continue; makeRock(group, x, h(x, z), z, 0.4 + r3() * 1.4, 0x8a8680, r3); }
   world.clouds = addClouds(group, 0xffffff);
   // distant mountains
@@ -2862,7 +2858,7 @@ function buildIsland(idx) {
     if (d < 42 && s > 0.9) addCircle(x, z, s * 0.8, 2);
   }
   world.clouds = addClouds(group, I.clouds || [0, 1, 3, 5, 6].includes(idx) ? 0xffffff : I.fog);
-  if (I.grass) grassField(group, coarse ? 4500 : 13000, I.grass, () => { const a = rand(0, TAU), d = rand(0, 50); const x = Math.cos(a) * d, z = Math.sin(a) * d, y = h(x, z); return y > -0.5 ? [x, y, z] : null; });
+  if (I.grass) grassField(group, coarse ? 6500 : 19000, I.grass, () => { const a = rand(0, TAU), d = rand(0, 50); const x = Math.cos(a) * d, z = Math.sin(a) * d, y = h(x, z); return y > -0.5 ? [x, y, z] : null; });
   // floating motes for atmosphere
   const pg = new THREE.BufferGeometry(), arr = new Float32Array(300 * 3);
   for (let k = 0; k < 300; k++) { arr[k * 3] = rand(-50, 50); arr[k * 3 + 1] = rand(0.5, 12); arr[k * 3 + 2] = rand(-50, 50); }
@@ -3191,6 +3187,7 @@ function damageEnemy(e, amount, dir, kb, o = {}) {
   if (run && run.drumsKey === lvKey()) dmg *= 1.2;
   if (e.role === "shield" && dir) { const fy = e.R.g.rotation.y, d2 = dir.clone().setY(0); if (d2.lengthSq() > 1e-6 && Math.sin(fy) * d2.x + Math.cos(fy) * d2.z < -0.3 * d2.length()) { dmg *= 0.35; if (!o.silent) floatText(e.pos, "Shielded", "#a1abc4"); } }
   if (e.vulnUntil > worldT) { dmg *= 1.6; o = Object.assign({}, o, { color: o.color || "#ffd166" }); }
+  if (e.traits) dmg = traitDamage(e, dmg, dir);
   e.hp -= dmg; e.flash = 0.12;
   if (run && run.boons && o.canCrit !== false && !o.noProc && !e.dead) boonProcs(e, dmg);
   if (!o.silent) floatText(e.pos, Math.round(dmg) + (crit ? "!" : ""), o.color || (crit ? "#ffd166" : "#fff2c8"), crit);
@@ -3203,7 +3200,7 @@ function damageEnemy(e, amount, dir, kb, o = {}) {
   if (e.hp <= 0) { if (e.duelist) duelEnd(true); else if (e.seaBeast) seaBeastDie(e); else killEnemy(e); }
 }
 function killEnemy(e) {
-  e.dead = true; e.hp = 0;
+  e.dead = true; e.hp = 0; try { traitDeath(e); } catch (er) {}
   scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar); freeEnemy(e); if (e.onDeath) { try { e.onDeath(e); } catch (er) { reportError(er); } }
   burstFx(e.pos.clone().add(new V3(0, 1, 0)), 2 * e.scale, e.accent, 0.4);
   // helpers called in by a boss or summoner fall with their master; dismissing them pays nothing
@@ -3236,6 +3233,7 @@ function hurtHero(target, amount, from, src) {
   if (target.isHero) {
     if (P.dead || P.invuln > 0 || P.buffs.veil > worldT) return;
     if (P.blocking) { if (worldT - P.blockStart <= PARRY_WINDOW) { parryHit(src); return; } amount *= S.cls === "knight" ? 0.15 : 0.3; P.kb.multiplyScalar(0.3); }
+    else if (src && src.traits) traitOnHit(src);
     let dr = ST.dr;
     if (P.buffs.shield > worldT) dr = 1 - (1 - dr) * (1 - P.buffs.shieldAmt);
     if (run && run.boons && run.boons.laststand && P.hp < ST.maxHp * 0.3) amount *= Math.max(0.4, 1 - 0.15 * run.boons.laststand);
@@ -3412,6 +3410,87 @@ function dash(dirV) {
 /* =====================================================================
    RUNS: islands, stages, levels, waves, bosses
    ===================================================================== */
+/* ---- every foe gets its own look and an ability, picked from its name so the same foe always looks the same ---- */
+const FOE_TRAITS = {
+  Venomous: { col: 0x7aff4a, text: "hits poison you" }, Frostbite: { col: 0x9ae8ff, text: "hits slow you" }, Armoured: { col: 0xc8ccd4, text: "takes 30% less damage" },
+  Thorned: { col: 0xa8d860, text: "returns some melee damage" }, Regenerating: { col: 0x6aff9a, text: "heals over time" }, Frenzied: { col: 0xff4a3a, text: "faster when wounded" },
+  Blinking: { col: 0xc070ff, text: "teleports around you" }, Warded: { col: 0x8ac8ff, text: "a shield soaks the first hits" }, Volatile: { col: 0xff8a2a, text: "explodes when it falls" },
+  Leaping: { col: 0xffd060, text: "leaps and slams down" }, Swift: { col: 0xffffff, text: "moves much faster" }
+};
+const TRAIT_KEYS = Object.keys(FOE_TRAITS);
+const FOE_METALS = [0x8a8e96, 0xb87a3a, 0xd8b040, 0x2a2430, 0xe8dcc0, 0x5a7a8a];
+function dressFoe(R, name, boss, col, acc) {
+  const r = seeded(hash(name) + 7), pickR = a => a[Math.floor(r() * a.length)], g = R.inner || R.g;
+  // body proportions: lean, stocky, tall or long
+  const sx = 0.82 + r() * 0.36, sy = 0.84 + r() * 0.38, sz = 0.85 + r() * 0.35; g.scale.set(g.scale.x * sx, g.scale.y * sy, g.scale.z * sz);
+  R.g.updateMatrixWorld(true); const bb = new THREE.Box3(), tmpB = new THREE.Box3(), size = new V3(), ctr = new V3(); g.traverse(o => { if (o.isMesh && o.geometry) { if (!o.geometry.boundingBox) o.geometry.computeBoundingBox(); tmpB.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); bb.union(tmpB); } }); if (bb.isEmpty()) bb.set(new V3(-0.5, 0, -0.5), new V3(0.5, 1.5, 0.5)); bb.getSize(size); bb.getCenter(ctr);
+  const toL = v => g.worldToLocal(v.clone()), W = Math.min(size.x, Math.max(size.z, size.y) * 0.8, size.z * 1.1), H = size.y, D = size.z, top = bb.max.y, front = bb.max.z, back = bb.min.z;
+  const metalCol = pickR(FOE_METALS), metal = std(metalCol, { m: metalCol === 0xe8dcc0 ? 0 : 0.8, r: 0.35, map: metalCol === 0xe8dcc0 ? "rock" : undefined }), accM = std(acc, { e: acc, ei: 0.6, r: 0.3 }), hornM = std(pickR([0xe8dcc0, 0x2a2420, 0x8a5a3a, acc]), { r: 0.45 });
+  const ws = g.getWorldScale(new V3()), add = (geo, mat, wx, wy, wz, sx2 = 1, sy2 = 1, sz2 = 1) => { const m = M(geo, mat, 0, 0, 0, g, sx2 / ws.x, sy2 / ws.y, sz2 / ws.z); m.position.copy(toL(new V3(wx, wy, wz))); return m; };
+  const feat = new Set(), n = boss ? 5 : 2 + Math.floor(r() * 2), pool = ["horns", "spikes", "armour", "weapon", "shield", "tail", "wings", "crest", "markings", "tusks"];
+  const longBody = ["dragon", "hydra", "serpent", "bat"].includes(R.body); if (longBody) pool.splice(0, pool.length, "horns", "spikes", "tail", "crest", "tusks", "spikes");
+  while (feat.size < Math.min(n, new Set(pool).size)) feat.add(pickR(pool)); if (boss) { if (!longBody) { feat.add("armour"); feat.add("weapon"); } feat.add("crown"); feat.add("spikes"); }
+  const headY = top - H * 0.12, headZ = front - D * 0.18;
+  if (feat.has("horns")) { const kind = Math.floor(r() * 3); for (const s2 of kind === 1 ? [0] : [-1, 1]) { const hn = add(G.cone(6), hornM, ctr.x + s2 * W * 0.18, top + H * 0.06, headZ, W * 0.07, H * (kind === 1 ? 0.32 : 0.22), W * 0.07); hn.rotation.z = -s2 * (kind === 2 ? 0.9 : 0.35); hn.rotation.x = kind === 2 ? -0.5 : -0.2; } }
+  if (feat.has("tusks")) for (const s2 of [-1, 1]) { const tk = add(G.cone(6), std(0xf0e8d0, { r: 0.4 }), ctr.x + s2 * W * 0.12, headY - H * 0.12, front + D * 0.02, W * 0.05, H * 0.16, W * 0.05); tk.rotation.x = 2.4; }
+  if (feat.has("spikes")) { const k2 = 4 + Math.floor(r() * 4); for (let k = 0; k < k2; k++) { const z = back + D * (0.15 + 0.7 * k / (k2 - 1)); add(G.cone(5), hornM, ctr.x, top - H * 0.04, z, W * 0.06, H * (0.12 + r() * 0.1), W * 0.06); } }
+  if (feat.has("crest")) for (let k = 0; k < 6; k++) add(G.box(), accM, ctr.x, top + H * 0.03, headZ - D * 0.05 * k, W * 0.03, H * (0.16 - k * 0.02), D * 0.04);
+  if (feat.has("armour")) { add(G.tor(1, 0.1), metal, ctr.x, ctr.y, ctr.z, W * 0.5, D * 0.5, Math.max(W, D) * 0.5).rotation.x = Math.PI / 2; for (const s2 of [-1, 1]) add(G.sph(), metal, ctr.x + s2 * W * 0.46, ctr.y + H * 0.22, ctr.z + D * 0.1, W * 0.18, H * 0.12, D * 0.16);
+    add(G.sph(), metal, ctr.x, headY + H * 0.05, headZ, W * 0.24, H * 0.1, D * 0.18); }
+  if (feat.has("markings")) { const mk = std(pickR([0x1a1418, 0xf0e8d8, acc]), { r: 0.6, e: r() < 0.4 ? acc : 0, ei: 0.5 }); for (let k = 0; k < 3; k++) add(G.tor(1, 0.05), mk, ctr.x, ctr.y + H * 0.05, back + D * (0.3 + k * 0.18), W * 0.5, H * 0.42, 1).rotation.y = 0; }
+  if (feat.has("tail")) { const tl = add(G.cone(6), std(col, { r: 0.6 }), ctr.x, ctr.y, back - D * 0.18, W * 0.1, D * 0.45, W * 0.1); tl.rotation.x = -Math.PI / 2 - 0.3; if (r() < 0.5) add(G.oct(), accM, ctr.x, ctr.y - H * 0.08, back - D * 0.42, W * 0.08, W * 0.08, W * 0.08); }
+  if (feat.has("wings") && R.body !== "dragon" && R.body !== "bat") for (const s2 of [-1, 1]) { const wg = add(G.cone(3), std(acc, { r: 0.7, op: 0.85, ds: true }), ctr.x + s2 * W * 0.55, top - H * 0.1, ctr.z - D * 0.1, W * 0.35, H * 0.5, 0.02); wg.rotation.z = s2 * 1.9; (R.dressWings = R.dressWings || []).push(wg); }
+  if (feat.has("weapon")) { const wk = pickR(["sword", "axe", "spear", "club", "staff", "trident", "scythe"]), wpn = new THREE.Group(); wpn.position.copy(toL(new V3(ctr.x + W * 0.58, ctr.y + H * 0.05, ctr.z + D * 0.22))); g.add(wpn);
+    const L = H * (boss ? 1.0 : 0.85) / ws.y, sh = std(0x5a3a22, { r: 0.8 }), bl = std(pickR([0xd8dce4, 0x2a2a30, acc, 0xd8b040]), { m: 0.85, r: 0.25, e: r() < 0.35 ? acc : 0, ei: 0.6 });
+    M(G.cyl(0.04, 0.04, 6), sh, 0, 0, 0, wpn, L * 0.25, L * 0.6, L * 0.25);
+    if (wk === "sword") M(G.box(), bl, 0, L * 0.55, 0, wpn, L * 0.08, L * 0.7, L * 0.02); if (wk === "axe") M(G.box(), bl, L * 0.08, L * 0.3, 0, wpn, L * 0.2, L * 0.16, L * 0.03);
+    if (wk === "spear" || wk === "trident") { M(G.cyl(0.03, 0.03, 6), sh, 0, L * 0.45, 0, wpn, L * 0.2, L * 0.9, L * 0.2); for (const tx of wk === "trident" ? [-1, 0, 1] : [0]) M(G.cone(5), bl, tx * L * 0.06, L * 0.95, 0, wpn, L * 0.03, L * 0.14, L * 0.03); }
+    if (wk === "club") M(G.sph(), bl, 0, L * 0.32, 0, wpn, L * 0.1, L * 0.18, L * 0.1); if (wk === "staff") { M(G.cyl(0.03, 0.03, 6), sh, 0, L * 0.4, 0, wpn, L * 0.2, L * 0.8, L * 0.2); M(G.oct(), accM, 0, L * 0.85, 0, wpn, L * 0.08); const gl = glowSprite(acc, L * 0.5, 0.6); gl.position.y = L * 0.85; wpn.add(gl); }
+    if (wk === "scythe") { M(G.cyl(0.03, 0.03, 6), sh, 0, L * 0.4, 0, wpn, L * 0.2, L * 0.8, L * 0.2); const bd = M(G.box(), bl, L * 0.15, L * 0.8, 0, wpn, L * 0.36, L * 0.05, L * 0.02); bd.rotation.z = -0.4; }
+    wpn.rotation.x = 0.3; R.dressWpn = wpn; R.dressWpnKind = wk; }
+  if (feat.has("shield")) { const sd = add(G.cyl(1, 1, 16), metal, ctr.x - W * 0.6, ctr.y, ctr.z + D * 0.18, H * 0.3, 0.05, H * 0.3); sd.rotation.z = Math.PI / 2; add(G.sph(), accM, ctr.x - W * 0.63, ctr.y, ctr.z + D * 0.18, H * 0.06, H * 0.06, H * 0.06); }
+  if (feat.has("crown")) { const cr = add(G.tor(1, 0.15), std(0xffd040, { m: 0.9, r: 0.2, e: 0xa86a10, ei: 0.4 }), ctr.x, top + H * 0.04, headZ, W * 0.2, W * 0.2, W * 0.2); cr.rotation.x = Math.PI / 2; for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; add(G.cone(4), std(0xffd040, { m: 0.9, r: 0.2 }), ctr.x + Math.cos(a) * W * 0.2, top + H * 0.1, headZ + Math.sin(a) * W * 0.2, W * 0.04, H * 0.1, W * 0.04); }
+    const cape = add(G.box(), std(acc, { r: 0.8, map: "fabric", ds: true }), ctr.x, ctr.y + H * 0.05, back + D * 0.05, W * 0.7, H * 0.6, 0.03); cape.rotation.x = 0.15; }
+  // abilities
+  const traits = []; const tn = boss ? 2 : (r() < 0.75 ? 1 : 0); while (traits.length < tn) { const t = pickR(TRAIT_KEYS); if (!traits.includes(t)) traits.push(t); }
+  for (const t of traits) { const c = FOE_TRAITS[t].col;
+    if (t === "Warded") { const bub = add(G.sph(), new THREE.MeshBasicMaterial({ color: lin(c), transparent: true, opacity: 0.18, depthWrite: false }), ctr.x, ctr.y, ctr.z, W * 0.75, H * 0.7, D * 0.7); R.ward = bub; }
+    else if (t === "Volatile" || t === "Venomous" || t === "Regenerating" || t === "Frostbite" || t === "Blinking") { const gs = glowSprite(c, Math.max(W, H) * 1.1, 0.35); gs.position.copy(toL(ctr)); g.add(gs); }
+    if (t === "Frostbite") for (let k = 0; k < 4; k++) add(G.cone(5), std(0xd8f4ff, { r: 0.1, e: 0x6ac8ff, ei: 0.4 }), ctr.x + (r() - 0.5) * W * 0.6, top - H * 0.05, ctr.z + (r() - 0.5) * D * 0.6, W * 0.05, H * 0.2, W * 0.05);
+    if (t === "Thorned") for (let k = 0; k < 8; k++) { const a = k / 8 * TAU, th = add(G.cone(4), std(0x5a7a2a, { r: 0.6 }), ctr.x + Math.cos(a) * W * 0.5, ctr.y + (r() - 0.5) * H * 0.4, ctr.z + Math.sin(a) * D * 0.5, W * 0.04, H * 0.14, W * 0.04); th.rotation.z = Math.cos(a) * -1.2; th.rotation.x = Math.sin(a) * 1.2; } }
+  return traits;
+}
+function applyTraits(e, traits) {
+  e.traits = traits; if (!traits.length) return;
+  if (traits.includes("Swift")) e.spd *= 1.35; if (traits.includes("Warded")) e.ward = e.maxHp * 0.25; e.blinkT = rand(4, 7); e.leapT = rand(5, 8);
+}
+function traitTick(e, dt) {
+  const T = e.traits; if (e.R.dressWpn) e.R.dressWpn.rotation.x = 0.3 - (e.atkAnim || 0) * 1.6; if (e.R.dressWings) for (const w of e.R.dressWings) w.rotation.y = Math.sin(e.t * 6) * 0.25;
+  if (!T || !T.length || e.frozen > worldT || e.stunUntil > worldT) return;
+  if (T.includes("Regenerating") && e.hp < e.maxHp) e.hp = Math.min(e.maxHp, e.hp + e.maxHp * 0.02 * dt);
+  if (T.includes("Frenzied") && !e.frenzy && e.hp < e.maxHp * 0.4) { e.frenzy = 1; e.spd *= 1.4; e.base = Object.assign({}, e.base, { cd: e.base.cd * 0.6 }); floatText(e.pos, "Frenzied!", "#ff6a5a"); }
+  const d = e.pos.distanceTo(P.pos);
+  if (T.includes("Blinking") && d < 18) { e.blinkT -= dt; if (e.blinkT <= 0) { e.blinkT = rand(5, 8); const a = rand(0, TAU), np = P.pos.clone().add(new V3(Math.cos(a) * 3.5, 0, Math.sin(a) * 3.5)); if (!world.inside || world.inside(np.x, np.z, 1)) { ringFx(e.pos, 1.4, 0xc070ff, 0.4); e.pos.x = np.x; e.pos.z = np.z; e.pos.y = world.h(np.x, np.z); ringFx(e.pos, 1.4, 0xc070ff, 0.4); } } }
+  if (T.includes("Leaping") && d < 14 && d > 4 && !e.leaping) { e.leapT -= dt; if (e.leapT <= 0) { e.leapT = rand(6, 9); const at = P.pos.clone(), from = e.pos.clone(); e.leaping = true; ringFx(at, 2.6, 0xffd060, 0.7);
+      for (let k = 1; k <= 6; k++) later(k * 0.1, () => { if (e.dead) return; const f = k / 6; e.pos.lerpVectors(from, at, f); e.pos.y = world.h(e.pos.x, e.pos.z) + Math.sin(f * Math.PI) * 3; });
+      later(0.65, () => { e.leaping = false; if (e.dead) return; burstFx(at.clone().add(new V3(0, 0.3, 0)), 2.6, 0xffd060, 0.35); for (const h of heroTargets()) if (h.pos.distanceTo(at) < 2.6) hurtHero(h, e.dmg * 1.3, at, e); }); } }
+}
+function traitDamage(e, dmg, dir) {
+  const T = e.traits; if (!T || !T.length) return dmg;
+  if (T.includes("Armoured")) dmg *= 0.7;
+  if (e.ward > 0) { const soak = Math.min(e.ward, dmg); e.ward -= soak; dmg -= soak; if (e.ward <= 0 && e.R.ward) { e.R.ward.visible = false; floatText(e.pos, "Ward broken", "#8ac8ff"); } }
+  if (T.includes("Thorned") && dir && e.pos.distanceTo(P.pos) < 4 && !P.dead) { P.hp -= dmg * 0.06; if (P.hp <= 0) { P.hp = 0; heroDown(); } }
+  return dmg;
+}
+function traitOnHit(e) {
+  const T = e.traits; if (!T || !T.length || P.dead) return;
+  if (T.includes("Frostbite")) { P.slowUntil = worldT + 1.6; floatText(P.pos, "Chilled", "#9ae8ff"); }
+  if (T.includes("Venomous")) { const dps = e.dmg * 0.1; floatText(P.pos, "Poisoned", "#7aff4a"); for (let k = 1; k <= 4; k++) later(k * 0.6, () => { if (P.dead) return; P.hp -= dps; floatText(P.pos, Math.round(dps) + "", "#7aff4a"); if (P.hp <= 0) { P.hp = 0; heroDown(); } }); }
+}
+function traitDeath(e) {
+  if (!e.traits || !e.traits.includes("Volatile")) return; const at = e.pos.clone(), dmg = e.dmg * 1.2; ringFx(at, 3, 0xff8a2a, 0.6);
+  later(0.6, () => { burstFx(at.clone().add(new V3(0, 0.6, 0)), 3, 0xff8a2a, 0.4); if (!P.dead && P.pos.distanceTo(at) < 3) hurtHero(heroTargets()[0], dmg, at, null); });
+}
 const ENEMY_DMG = 0.55; // enemies hit 45% softer than before
 function spawnEnemy(def, role, boss, scaleBoost = 1) {
   const I = ISLANDS[run.idx], st = STAGES[run.stage];
@@ -3427,10 +3506,11 @@ function spawnEnemy(def, role, boss, scaleBoost = 1) {
   let p;
   for (let k = 0; k < 20; k++) { const a = rand(0, TAU), d = boss ? 16 : rand(14, 26); p = new V3(P.pos.x + Math.cos(a) * d, 0, P.pos.z + Math.sin(a) * d); if ((world.inside ? world.inside(p.x, p.z, 1) : Math.hypot(p.x, p.z) < world.radius - 2) && !blocked(p.x, p.z, 1)) break; p.multiplyScalar(0.6); }
   p.y = world.h(p.x, p.z);
-  const name = boss ? def[0] : def[0];
+  const name = boss ? def[0] : def[0], traits = dressFoe(R, def[0], boss, col, acc);
   const e = { R, name, role: boss ? "boss" : role, boss, base, pos: p, kb: new V3(), hp: base.hp * hpMult, maxHp: base.hp * hpMult, dmg: base.dmg * dmgMult, spd: base.spd * (boss ? 1 : 1),
     atkT: rand(0.5, 1.5), dead: false, flash: 0, accent: acc, col, hgt: ({ treant: 2.9, serpent: 2.6, void: 2.4, bat: 2.3, mantis: 2.1, slime: 1.25, spider: 1.45, giant: 3.0, beetle: 1.2, dragon: 3.0, hydra: 3.3 })[body] || 1.9, scale, radius: 0.5 * scale, t: rand(0, 10), atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, bossT: 3, summoned: false, enrage: 1 };
-  if (!boss) { e.label = textSprite(name, "#" + new THREE.Color(acc).getHexString(), 0.9); scene.add(e.label); }
+  applyTraits(e, traits); if (!boss) { e.label = textSprite(name + (traits.length ? ` · ${traits.join(" · ")}` : ""), "#" + new THREE.Color(acc).getHexString(), 0.9); scene.add(e.label); }
+  else if (traits.length) later(1.2, () => { if (!e.dead) toast(`<b>${esc(name)}</b> is ${traits.map(t => `${t} (${FOE_TRAITS[t].text})`).join(" and ")}.`, "epic"); });
   const bar = new THREE.Group(); M(G.box(), new THREE.MeshBasicMaterial({ color: 0x1a0a10 }), 0, 0, 0, bar, 1.1, 0.09, 0.01); e.fg = M(G.box(), new THREE.MeshBasicMaterial({ color: 0xe0505f }), 0, 0, 0.01, bar, 1.1, 0.09, 0.01); if (!boss) { scene.add(bar); e.bar = bar; }
   if (ROLE_AI[e.role]) roleProps(e);
   enemies.push(e);
@@ -4168,6 +4248,7 @@ function update(dt) {
     if (e.burn > worldT) damageEnemy(e, e.burnDps * dt, null, 0, { silent: true, canCrit: false });
     if (e.poison > worldT && !e.dead) damageEnemy(e, e.poisonDps * dt, null, 0, { silent: true, canCrit: false, noProc: true });
     if (e.dead) continue;
+    traitTick(e, dt);
     e.pos.addScaledVector(e.kb, dt); e.kb.multiplyScalar(Math.exp(-6 * dt));
     let tgt = null, td = 1e9; for (const h of heroes) { const d = h.pos.distanceTo(e.pos); if (d < td) { td = d; tgt = h; } }
     if (e.leash && tgt && Math.hypot(tgt.pos.x - e.leash.x, tgt.pos.z - e.leash.z) > e.leash.r) tgt = null;
@@ -7334,7 +7415,7 @@ function buildSkylands() {
     world.interact.push({ x: dockX, z: dockZ + 6, y: SP.y, r: 3.2, label: "Set sail into the Open Sky", act: () => { if (!Object.keys(S.airships || {}).length) { toast("You need an airship first. Airwright Corra can build one for you.", ""); openAirwright(); return; } enterSkyVoyage(); } }); }
   try { placeNpcQuestItems(group, ISL, h); } catch (err) { reportError(err); }
   try { const area = ISL.reduce((a, I) => a + I.r * I.r, 0);
-    grassField(group, coarse ? 2200 : 6000, 0x6ab84a, () => { let w = rand(0, area); const I = ISL.find(I => (w -= I.r * I.r) < 0) || ISL[0]; const a = rand(0, TAU), d = Math.sqrt(Math.random()) * (I.r - 1.5), x = I.x + Math.cos(a) * d, z = I.z + Math.sin(a) * d, y = h(x, z);
+    grassField(group, coarse ? 4000 : 11000, 0x6ab84a, () => { let w = rand(0, area); const I = ISL.find(I => (w -= I.r * I.r) < 0) || ISL[0]; const a = rand(0, TAU), d = Math.sqrt(Math.random()) * (I.r - 1.5), x = I.x + Math.cos(a) * d, z = I.z + Math.sin(a) * d, y = h(x, z);
       return (Math.abs(y - I.y) < 1.2 && !world.circles.some(c => !c.ghost && Math.hypot(x - c.x, z - c.z) < c.r)) ? [x, y, z] : [x, -500, z]; });
     const post = std(0xe8e4dc, { r: 0.6 }), cap = std(0xe8c060, { m: 0.9, r: 0.3 }), lampM = std(0xfff0c0, { e: 0xffd080, ei: 2.4 }), lg = new THREE.Group(); group.add(lg); nightGlows.length = 0;
     for (const I of ISL) { const n = Math.max(5, Math.round(TAU * I.r / 11)); for (let k = 0; k < n; k++) { const a = k / n * TAU + I.r, x = I.x + Math.cos(a) * (I.r - 1.6), z = I.z + Math.sin(a) * (I.r - 1.6), y = h(x, z);
@@ -7576,7 +7657,7 @@ function voyFire() {
 function voySpawn(band, boss) {
   const defs = VOY_FOES[band], v = VOY; let name, body, c1, c2, sc, D = null;
   if (boss !== undefined) { D = DEMIGODS[boss]; name = `${D.name}, ${D.title}`; body = D.body; c1 = D.c1; c2 = D.c2; sc = D.sc; } else [name, body, c1, c2, sc] = pick(defs);
-  const R = buildCreature(body, c1, c2, sc, !!D); world.group.add(R.g);
+  const R = buildCreature(body, c1, c2, sc, !!D); try { dressFoe(R, name, !!D, c1, c2); } catch (err) {} world.group.add(R.g);
   if (body === "humanoid") for (const sx of [-1, 1]) { const w = M(featherGeo(), std(0xffffff, { e: c2, ei: 0.4, r: 0.6 }), sx * 0.6, 1.6, -0.3, R.g, 2.8); w.scale.x = sx * 2.8; w.rotation.z = -sx * 0.7; }
   const a = rand(0, TAU), pos = new V3(v.pos.x + Math.cos(a) * 70, v.alt + rand(-6, 12), v.pos.z + Math.sin(a) * 70);
   const hp = ST.hit * (D ? 160 * (boss + 1) : (6 + band * 6) * (1 + band * 0.5)), dmg = D ? 40 + boss * 30 : 10 + band * 14;
@@ -8490,11 +8571,11 @@ function caveVillage(C, F, group) {
 }
 function caveFoe(def, pos, f, elite) {
   const [name, body, role, col, acc] = def, sc = (elite ? 2.1 : 1) * ({ slime: 0.95, bat: 0.95, giant: 1, beetle: 1 }[body] || 1);
-  const R = buildCreature(body, col, acc, sc, elite); scene.add(R.g); pos.y = world.h(pos.x, pos.z);
+  const R = buildCreature(body, col, acc, sc, elite), ctraits = dressFoe(R, name, elite, col, acc); scene.add(R.g); pos.y = world.h(pos.x, pos.z);
   const base = Object.assign({}, ROLE_BASE[ROLE_AI[role] ? role : role === "bomber" ? "bomber" : role] || ROLE_BASE.melee, { xp: 20 + f * 120, coins: 30 + f * 300 });
   const hp = Math.max(ST.maxHp * 0.8, ST.dps * (3 + f * 22)) * (elite ? 7 : 1), dmg = ST.maxHp * (0.035 + f * 0.06) * (elite ? 1.6 : 1) / Math.max(0.15, 1 - ST.dr);
   const e = { R, name: (elite ? "" : "") + name, role, boss: false, base, pos, kb: new V3(), hp, maxHp: hp, dmg, spd: base.spd * 1.05, atkT: rand(0.5, 1.5), dead: false, flash: 0, accent: acc, col, scale: sc, radius: 0.5 * sc, t: rand(0, 10), atkAnim: 0, slow: 0, frozen: 0, burn: 0, burnDps: 0, bossT: 9, summoned: true, enrage: 1, caveFoe: true, hgt: ({ treant: 2.9, serpent: 2.6, bat: 2.3, mantis: 2.1, slime: 1.25, spider: 1.45, giant: 3, beetle: 1.2, dragon: 3, hydra: 3.3 })[body] || 1.9 };
-  e.label = textSprite(name, elite ? "#ffd166" : "#" + new THREE.Color(acc).getHexString(), elite ? 1.2 : 0.9); scene.add(e.label);
+  applyTraits(e, ctraits); e.label = textSprite(name + (ctraits.length ? ` · ${ctraits.join(" · ")}` : ""), elite ? "#ffd166" : "#" + new THREE.Color(acc).getHexString(), elite ? 1.2 : 0.9); scene.add(e.label);
   const bar = new THREE.Group(); M(G.box(), new THREE.MeshBasicMaterial({ color: 0x1a0a10 }), 0, 0, 0, bar, 1.1, 0.09, 0.01); e.fg = M(G.box(), new THREE.MeshBasicMaterial({ color: 0xe0505f }), 0, 0, 0.01, bar, 1.1, 0.09, 0.01); scene.add(bar); e.bar = bar;
   e.onDeath = () => { const C = world.cave; if (!C) return; const table = C.ores[Math.min(3, Math.floor(f * 4))]; if (Math.random() < (elite ? 1 : 0.35)) { const it = ITEM[pickWeighted(Object.fromEntries(table))]; gain(it, e.pos, elite ? 3 : 1); } S.coins += Math.round(40 + f * 400) * (elite ? 10 : 1); if (elite) { banner(`${name} falls`, "A treasure vault opens behind it."); grantChest(2, 11); try { caveBossVault(e.pos.clone()); } catch (err) { reportError(err); } } };
   if (ROLE_AI[role]) roleProps(e);
@@ -9195,7 +9276,7 @@ $("achList").addEventListener("click", e => { const b = e.target.closest("button
 $("achNow").addEventListener("click", e => { if (e.target.closest("[data-hide]")) { S.title = null; save(); refreshNameTag(); renderAchievements(); } });
 $("startBtn").addEventListener("click", () => { if (S.avatar && S.name) enterLobby(); else openAvatar(true); });
 buildLobby(); rebuildHero(); refreshNameTag(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { VOY, AIRSHIPS, enterSkyVoyage, leaveSkyVoyage, voyBoard, voySpawn, voyKill, openAirwright, openVoyBoard, buildAirship, VOY_START, DEMIGODS, PERF, caveBossVault, moundH, openSkyRealmBoard, SKY_REALM_START, SKY_NPC_QUESTS, npcQ, openNpcQuests, ACH, festivalTick, currentFestival, get festNow() { return festNow; }, festivalGift, BOONS, heroLight, get nightGlows() { return nightGlows; }, DAY, skyQ, openSkyQuests, get SKYGATE() { return SKYGATE; }, askTravel, fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { buildCreature, classPct, CLASS_LIST, dressFoe, FOE_TRAITS, VOY, AIRSHIPS, enterSkyVoyage, leaveSkyVoyage, voyBoard, voySpawn, voyKill, openAirwright, openVoyBoard, buildAirship, VOY_START, DEMIGODS, PERF, caveBossVault, moundH, openSkyRealmBoard, SKY_REALM_START, SKY_NPC_QUESTS, npcQ, openNpcQuests, ACH, festivalTick, currentFestival, get festNow() { return festNow; }, festivalGift, BOONS, heroLight, get nightGlows() { return nightGlows; }, DAY, skyQ, openSkyQuests, get SKYGATE() { return SKYGATE; }, askTravel, fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
