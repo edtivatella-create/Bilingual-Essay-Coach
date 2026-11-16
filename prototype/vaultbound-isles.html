@@ -415,7 +415,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <button class="act mid" id="bDash" aria-label="Dash"><span>Dash</span><div class="pips" id="dashPips"></div></button>
   <button class="act big" id="bAttack" aria-label="Attack"><span>Attack</span></button>
 </div>
-<div class="keys">WASD move · drag to look · Space jump · Shift dash · J or click attack · K special · R armour special · F or right-click block (just before a hit to parry) · Q potion · E use · G fish</div>
+<div class="keys">WASD move · drag to look · Space jump · Shift dash · L or Ctrl shift lock · J or click attack · K special · R armour special · F or right-click block (just before a hit to parry) · Q potion · E use · G fish</div>
 <div id="floaters"></div>
 
 <div class="modal" id="menu" hidden>
@@ -3514,7 +3514,7 @@ window.addEventListener("keydown", e => {
   if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "tab"].includes(k)) e.preventDefault();
   keys.add(k); if (e.repeat) return;
   if (k === " ") { edge.jump = true; }
-  if (k === "shift" || k === "l") edge.dash = true;
+  if (k === "shift") edge.dash = true;
   if (k === "k") edge.special = true;
   if (k === "r") edge.arm = true;
   if (k === "q" || k === "h") edge.potion = true;
