@@ -2453,6 +2453,12 @@ function buildCreature(body, col, acc, scale, boss) {
   shadows(g);
   return R;
 }
+function flyDragon(R, t) {
+  poseCreature(R, t, 0, 0); const f = Math.sin(t * 2.6);
+  R.parts.wingL.rotation.z = -0.15 + f * 0.6; R.parts.wingR.rotation.z = 0.15 - f * 0.6;
+  if (R.legs) R.legs.forEach((l, i) => { l.rotation.x = 1.25 + (i < 2 ? -0.15 : 0.1); });
+  R.inner.position.y = -f * 0.12; R.inner.rotation.x = 0.06;
+}
 function poseCreature(R, t, move, atk) {
   const s = Math.sin(t * 8) * move;
   if (R.legs) R.legs.forEach((l, i) => l.rotation.x = (i % 2 ? s : -s) * 0.6);
@@ -2736,6 +2742,7 @@ function buildLobby() {
   for (let k = 0; k < 8; k++) { const a = k / 8 * TAU + TAU / 16, x = Math.cos(a) * 25, z = Math.sin(a) * 25; M(G.cyl(0.06, 0.08), std(0x2a2a30, { m: 0.8, r: 0.4 }), x, 1.6, z, group, 1, 3.2, 1).castShadow = true; M(G.sph(), std(0xffe0a0, { e: 0xffc060, ei: 2.5 }), x, 3.3, z, group, 0.16); const lg = glowSprite(0xffb050, 2.2, 0.75); lg.position.set(x, 3.3, z); group.add(lg); addCircle(x, z, 0.3, 3); }
   const lampL = new THREE.PointLight(0xffc070, 0.8, 14, 2); lampL.position.set(0, 4, 0); group.add(lampL); world.nightLights = [{ l: lampL, b: 0.8 }];
   frontier(group, h); townInfill(group);
+  grassField(group, coarse ? 2600 : 7000, 0x6f9e3c, () => { let x = 0, z = 0; for (let k = 0; k < 10; k++) { const a = rand(0, TAU), d = rand(95, 262); x = Math.cos(a) * d; z = Math.sin(a) * d; if (!onPath(x, z, 0.4) && !blockedLobby(x, z) && h(x, z) > SEA + 0.8) return [x, h(x, z), z]; } return [x, -50, z]; });
   grassField(group, coarse ? 7000 : 20000, 0x6a9a3a, () => { let x = 0, z = 0; for (let k = 0; k < 8; k++) { const a = rand(0, TAU), d = rand(27.6, 95); x = Math.cos(a) * d; z = Math.sin(a) * d; if (!onPath(x, z, 0.4)) break; } return [x, h(x, z), z]; });
   for (let k = 0; k < 30; k++) { const a = r3() * TAU, d = 30 + r3() * 40, x = Math.cos(a) * d, z = Math.sin(a) * d; if (blockedLobby(x, z) || onPath(x, z, 1)) continue; makeRock(group, x, h(x, z), z, 0.4 + r3() * 1.4, 0x8a8680, r3); }
   world.clouds = addClouds(group, 0xffffff);
@@ -5408,7 +5415,7 @@ function nightGlowTick(day) {
 function buildLanterns(group, h) {
   nightGlows.length = 0;
   const post = std(0x8a8678, { r: 0.9, map: "rock" }), cap = std(0x3a3a40, { m: 0.6, r: 0.4 }), lampM = std(0xffe0a0, { e: 0xffb050, ei: 2.4 }), g = new THREE.Group(); group.add(g); let n = 0;
-  for (const R of [92, 128, 166, 204, 244]) { const steps = Math.round(TAU * R / 24);
+  for (const R of [62, 92, 110, 128, 147, 166, 186, 204, 224, 244]) { const steps = Math.round(TAU * R / 24);
     for (let k = 0; k < steps; k++) { const a = k / steps * TAU + R * 0.01, x = Math.cos(a) * R, z = Math.sin(a) * R, y = h(x, z);
       if (y < SEA + 0.6 || blockedLobby(x, z) || world.circles.some(c => Math.hypot(x - c.x, z - c.z) < c.r + 2) || onPath(x, z, 0.5) || inZone(x, z, 1)) continue;
       M(G.box(), post, x, y + 0.7, z, g, 0.45, 1.4, 0.45); M(G.box(), cap, x, y + 1.55, z, g, 0.7, 0.12, 0.7); M(G.box(), lampM, x, y + 1.3, z, g, 0.26, 0.3, 0.26);
@@ -7098,8 +7105,8 @@ function buildSkylands() {
   for (let k = 0; k < 3; k++) M(G.sph(), std([0xe8d8c0, 0xc8e8ff, 0xffc8a0][k], { r: 0.4 }), D.x - 1 + k, D.y + 0.6, D.z + (k - 1) * 0.6, group, 0.5, 0.7, 0.5);
   const rest = buildCreature("dragon", 0x8a2a1a, 0xffb040, 1.6, true); rest.g.position.set(D.x + 4, D.y, D.z - 4); rest.g.rotation.y = -2.2; group.add(rest.g); solidCyl(D.x + 4, D.z - 4, 3, 999);
   world.animated.push(t => poseCreature(rest, t, 0, 0));
-  const flyers = [[0x2a6a8a, 0x9ae8ff, 70, 22, 0.16], [0x5a2a8a, 0xd8a0ff, 95, 34, -0.11]].map(([c1, c2, rad, hy, sp]) => { const R = buildCreature("dragon", c1, c2, 2, true); group.add(R.g); return { R, rad, hy, sp }; });
-  world.animated.push(t => { for (const f of flyers) { const a = t * f.sp; f.R.g.position.set(Math.cos(a) * f.rad, f.hy + Math.sin(t * 0.7) * 4, Math.sin(a) * f.rad); f.R.g.rotation.y = -a + (f.sp > 0 ? Math.PI : 0); poseCreature(f.R, t * 1.5, 1, 0); } });
+  const flyers = [[0x2a6a8a, 0x9ae8ff, 70, 22, 0.16], [0x5a2a8a, 0xd8a0ff, 95, 34, -0.11]].map(([c1, c2, rad, hy, sp]) => { const R = buildCreature("dragon", c1, c2, 2, true); group.add(R.g); (world.flyers = world.flyers || []).push(R); return { R, rad, hy, sp }; });
+  world.animated.push(t => { for (const f of flyers) { const a = t * f.sp; f.R.g.position.set(Math.cos(a) * f.rad, f.hy + Math.sin(t * 0.7) * 4, Math.sin(a) * f.rad); f.R.g.rotation.y = -a + (f.sp > 0 ? 0 : Math.PI); f.R.g.rotation.z = (f.sp > 0 ? 1 : -1) * 0.18; flyDragon(f.R, t * 1.5); } });
   // the observatory with its daily sky chest
   const O = ISL[3];
   M(G.cyl(4.2, 4.6, 24), white, O.x, O.y + 2, O.z, group, 1, 4, 1); const dome = M(G.sph(), std(0xd8dce8, { m: 0.8, r: 0.3 }), O.x, O.y + 4, O.z, group, 4.2, 3.2, 4.2); solidCyl(O.x, O.z, 4.7, 999);
@@ -7173,7 +7180,7 @@ function buildSkylands() {
   const perch = buildCreature("dragon", 0x2a3a6a, 0x9ad8ff, 1.3, true); perch.g.position.set(CH.x + 9, CH.y + 12, CH.z - 9); perch.g.rotation.y = 2.4; group.add(perch.g); world.animated.push(t => poseCreature(perch, t, 0, 0));
   // ---------- more dragons in the open sky
   const flyers2 = [[0x6a1a1a, 0xffb040, 130, 46, 0.09], [0x1a4a2a, 0x9aff8a, 160, 18, -0.07], [0xd8d0e8, 0xfff0c0, 110, 60, 0.12]].map(([c1, c2, rad, hy, sp]) => { const R = buildCreature("dragon", c1, c2, 2.2, true); group.add(R.g); return { R, rad, hy, sp }; });
-  world.animated.push(t => { for (const f of flyers2) { const a = t * f.sp + f.rad; f.R.g.position.set(Math.cos(a) * f.rad, f.hy + Math.sin(t * 0.5 + f.rad) * 6, Math.sin(a) * f.rad); f.R.g.rotation.y = -a + (f.sp > 0 ? Math.PI : 0); poseCreature(f.R, t * 1.4, 1, 0); } });
+  world.animated.push(t => { for (const f of flyers2) { const a = t * f.sp + f.rad; f.R.g.position.set(Math.cos(a) * f.rad, f.hy + Math.sin(t * 0.5 + f.rad) * 6, Math.sin(a) * f.rad); f.R.g.rotation.y = -a + (f.sp > 0 ? 0 : Math.PI); f.R.g.rotation.z = (f.sp > 0 ? 1 : -1) * 0.18; flyDragon(f.R, t * 1.4); } });
   // ---------- small floating rocks and lone towers drifting between the isles
   { const rr = seeded(919); for (let k = 0; k < 14; k++) { const a = rr() * TAU, d = 70 + rr() * 90, x = Math.cos(a) * d, z = Math.sin(a) * d, y = -10 + rr() * 50; if (ISL.some(I => Math.hypot(I.x - x, I.z - z) < I.r + 8)) continue;
       const fr = new THREE.Group(); fr.position.set(x, y, z); group.add(fr); M(G.cone(7), std(0x9a8a78, { r: 0.9, map: "rock" }), 0, -3, 0, fr, 3, 5, 3).rotation.x = Math.PI; M(G.cyl(3, 3, 14), std(0x6ab84a, { r: 0.9, map: "fabric" }), 0, 0.2, 0, fr, 1, 0.4, 1);
@@ -7190,6 +7197,15 @@ function buildSkylands() {
     const lb = textSprite(`Realm Portal ${["I", "II", "III", "IV"][k]}`, "#" + new THREE.Color(c).getHexString(), 0.8); lb.position.set(x, RG.y + 6, z); group.add(lb); world.labels.push(lb);
     let inside = false; world.animated.push(() => { const d = Math.hypot(P.pos.x - x, P.pos.z - z); if (d < 1.6 && !inside && !P.dead) { inside = true; openSkyRealmBoard(k); } if (d > 3) inside = false; }); });
   try { placeNpcQuestItems(group, ISL, h); } catch (err) { reportError(err); }
+  try { const area = ISL.reduce((a, I) => a + I.r * I.r, 0);
+    grassField(group, coarse ? 2200 : 6000, 0x6ab84a, () => { let w = rand(0, area); const I = ISL.find(I => (w -= I.r * I.r) < 0) || ISL[0]; const a = rand(0, TAU), d = Math.sqrt(Math.random()) * (I.r - 1.5), x = I.x + Math.cos(a) * d, z = I.z + Math.sin(a) * d, y = h(x, z);
+      return (Math.abs(y - I.y) < 1.2 && !world.circles.some(c => !c.ghost && Math.hypot(x - c.x, z - c.z) < c.r)) ? [x, y, z] : [x, -500, z]; });
+    const post = std(0xe8e4dc, { r: 0.6 }), cap = std(0xe8c060, { m: 0.9, r: 0.3 }), lampM = std(0xfff0c0, { e: 0xffd080, ei: 2.4 }), lg = new THREE.Group(); group.add(lg); nightGlows.length = 0;
+    for (const I of ISL) { const n = Math.max(5, Math.round(TAU * I.r / 11)); for (let k = 0; k < n; k++) { const a = k / n * TAU + I.r, x = I.x + Math.cos(a) * (I.r - 1.6), z = I.z + Math.sin(a) * (I.r - 1.6), y = h(x, z);
+      if (Math.abs(y - I.y) > 1 || world.circles.some(c => Math.hypot(x - c.x, z - c.z) < c.r + 1.2)) continue;
+      M(G.cyl(0.08, 0.11, 6), post, x, y + 1.1, z, lg, 1, 2.2, 1); M(G.cone(6), cap, x, y + 2.55, z, lg, 0.32, 0.25, 0.32); M(G.sph(), lampM, x, y + 2.3, z, lg, 0.2);
+      const gl = glowOwn(0xffe0a0, 2.6, 0.75); gl.position.set(x, y + 2.3, z); gl.userData.base = 0.75; group.add(gl); nightGlows.push(gl); solidCyl(x, z, 0.2, 2.2); } }
+    shadows(lg, false, true); mergeStatic(lg); } catch (err) { reportError(err); }
   // a safe catch for anyone who falls
   world.animated.push(() => { if (!P.dead && P.pos.y < -60) { P.pos.set(0, 0, 14); P.vy = 0; P.kb.set(0, 0, 0); toast("The wind catches you and sets you down gently.", ""); } });
   shadows(group, false, true);
