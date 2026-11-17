@@ -442,7 +442,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 </div>
 <div id="festChip" hidden style="position:fixed;z-index:5;right:calc(12px + env(safe-area-inset-right, 0px));top:calc(156px + env(safe-area-inset-top, 0px));padding:5px 12px;border-radius:999px;background:linear-gradient(90deg,#ff8a3a,#ffd040);color:#1a1008;font-weight:800;font-size:12.5px;box-shadow:0 0 18px -4px #ffb050"></div>
 <div id="menuBar">
-  <button id="mbToggle" aria-expanded="false">&#9776; Menu</button>  <button id="mbSettings">Settings</button><button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests" style="display:none">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses" style="display:none">Classes</button><button id="mbAch">Achievements</button><button id="mbGuild">Guild</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
+  <button id="mbToggle" aria-expanded="false">&#9776; Menu</button>  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests" style="display:none">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses" style="display:none">Classes</button><button id="mbAch">Achievements</button><button id="mbGuild">Guild</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
 <div id="musicPanel" hidden role="dialog" aria-label="Music">
   <div class="mpHead"><b>Music</b><button class="hbtn" id="mpClose">Close</button></div>
@@ -3798,8 +3798,9 @@ const OPT_DEF = {
 };
 let atkLatch = false, camExtra = 0, lootT = 0, lastTap = { t: 0, x: 0, y: 0 }, gfxGroup = null;
 function platGuess() { return coarse ? "mobile" : "pc"; }
-function opt() { if (!S.opt || typeof S.opt !== "object") S.opt = Object.assign({}, OPT_DEF[platGuess()]); for (const k in OPT_DEF.pc) if (S.opt[k] === undefined) S.opt[k] = OPT_DEF[platGuess()][k]; return S.opt; }
-function gfxGrass() { const g = (S.opt && S.opt.gfx) || (coarse ? "medium" : "high"); return g === "low" ? 0.35 : g === "medium" ? 0.7 : 1; }
+const OPT_ORIG = Object.freeze(Object.assign({}, OPT_DEF.pc, { bossZoom: false }));
+function opt() { return OPT_ORIG; }
+function gfxGrass() { return 1; }
 function joySide(x) { return opt().leftHand ? x > window.innerWidth * 0.5 : x < window.innerWidth * 0.5; }
 function buzz(p) { try { if (S.opt && S.opt.vibrate && navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
 function ctxVerb(label) {
@@ -3812,7 +3813,7 @@ function applyOpts() {
   const o = opt(), b = document.body, pl = platGuess();
   b.classList.remove("plat-mobile", "plat-pc"); b.classList.toggle("lefty", !!o.leftHand);
   b.style.setProperty("--bs", o.btnScale); b.style.setProperty("--ts", o.textScale); b.style.setProperty("--padX", (o.padX || 0) + "px"); b.style.setProperty("--padY", (o.padY || 0) + "px");
-  $("bView").hidden = !(coarse || usedTouch);
+  $("bView").hidden = true;
   // graphics
   const g = o.gfx; sun.castShadow = g !== "low";
   const dpr = window.devicePixelRatio || 1; PERF.max = g === "low" ? Math.min(dpr, 0.8) : g === "medium" ? Math.min(dpr, 1.25) : Math.min(dpr, coarse ? 1.5 : 2);
@@ -3861,7 +3862,6 @@ function renderSettings() {
     <h3>Text size</h3>${seg("textScale", [[0.9, "Small"], [1, "Normal"], [1.15, "Large"], [1.3, "Huge"]])}`;
 }
 function openSettings() { renderSettings(); $("setPanel").hidden = false; }
-$("mbSettings").addEventListener("click", openSettings);
 $("setPanel").addEventListener("click", e => {
   if (e.target === $("setPanel") || e.target.id === "setClose") { $("setPanel").hidden = true; return; }
   const p = e.target.closest("[data-plat]"); if (p) { choosePlatform(p.dataset.plat); renderSettings(); return; }
@@ -3880,7 +3880,7 @@ $("setPanel").addEventListener("input", e => { const k = e.target.dataset.rng; i
   $("padDone").addEventListener("click", () => { document.body.classList.remove("editPad"); $("padDone").hidden = true; save(); toast("Button layout saved.", ""); });
 })();
 document.addEventListener("visibilitychange", () => { if (document.hidden) { keys.clear(); attackHeld = jumpHeld = false; touchMove.x = touchMove.y = 0; } else last = performance.now(); });
-if (S.platform) { delete S.platform; S.opt = Object.assign({}, OPT_DEF[platGuess()]); }
+delete S.platform; delete S.opt;
 opt(); applyOpts();
 const padPrev = {};
 function readPad() {
