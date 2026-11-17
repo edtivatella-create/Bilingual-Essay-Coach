@@ -1193,8 +1193,8 @@ const CLASS_LIST = [
     perks: [["Crown of Nothing", "+50% max health and +40% damage."], ["Event Horizon", "Special attacks recharge 50% faster and +50% Power."], ["Starless Wings", "Double jump and glide, two extra dashes, +20% move speed."], ["Absolute", "+20% critical hit chance."]], look: { skin: 0xd8d0e8, hair: 0x0a0814, cloth: 0x0e0a1a, cloth2: 0x2a0a3a, extra: "voidcrown" } }
 ];
 const CLASS = Object.fromEntries(CLASS_LIST.map(c => [c.id, c]));
-{ const tot = CLASS_LIST.filter(c => c.odds && c.rarity !== "vaulted").reduce((a, c) => a + c.odds, 0); for (const c of CLASS_LIST) if (c.rarity === "vaulted") c.odds = tot * 0.0025; }
-const classPct = c => { const tot = CLASS_LIST.reduce((a, x) => a + (x.odds || 0), 0), p = 100 * c.odds / tot; return (p >= 0.1 ? p.toFixed(1) : p >= 0.01 ? p.toFixed(2) : p.toFixed(5)) + "%"; };
+{ const tot = CLASS_LIST.filter(c => c.odds && c.rarity !== "vaulted").reduce((a, c) => a + c.odds, 0); const nV = CLASS_LIST.filter(c => c.rarity === "vaulted").length; for (const c of CLASS_LIST) if (c.rarity === "vaulted") c.odds = tot * 0.0001 / (1 - 0.0001 * nV); }
+const classPct = c => { const tot = CLASS_LIST.reduce((a, x) => a + (x.odds || 0), 0), p = 100 * c.odds / tot; return (p >= 0.1 ? p.toFixed(1) : p >= 0.00995 ? p.toFixed(2) : p.toFixed(5)) + "%"; };
 const ROLL_COINS = 10000;
 
 /* ---------- islands ---------- */
