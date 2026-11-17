@@ -122,7 +122,7 @@ body.phone .act.small { width: 47px; height: 47px; font-size: 9.5px; }
 body.phone #bFish svg { width: 22px; height: 22px; }
 body.phone .keys { display: none; }
 body.phone #joyHint { width: 96px; height: 96px; font-size: 11px; }
-body.phone #joyBase { width: 90px; height: 90px; margin: -45px 0 0 -45px; }
+body.phone #joyBase { width: 106px; height: 106px; margin: -53px 0 0 -53px; }
 /* platform chooser, settings, context button, layout */
 .plat { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .plat button { display: grid; gap: 4px; justify-items: center; padding: 14px 10px; border-radius: 12px; border: 2px solid var(--line); background: rgba(255,255,255,0.04); color: inherit; font: inherit; cursor: pointer; }
@@ -158,7 +158,7 @@ body.lefty.phone #helm { left: auto !important; right: calc(10px + env(safe-area
 #voyHud .vbar small { position: relative; font-size: 10.5px; font-weight: 800; }
 body.phone #voyHud { top: auto; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); left: 50%; min-width: 0; width: min(300px, 46vw); font-size: 10.5px; padding: 5px 8px; }
 /* touch joystick */
-#joyBase { position: fixed; z-index: 7; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); pointer-events: none; }
+#joyBase { position: fixed; z-index: 7; width: 116px; height: 116px; margin: -58px 0 0 -58px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); pointer-events: none; }
 #joyKnob { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: rgba(230,184,92,0.55); border: 2px solid rgba(255,255,255,0.45); }
 #joyHint { position: fixed; z-index: 4; left: calc(26px + env(safe-area-inset-left, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); width: 112px; height: 112px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.2); display: grid; place-items: center; color: rgba(255,255,255,0.5); font-size: 12px; text-align: center; pointer-events: none; }
 
@@ -3717,7 +3717,7 @@ function bossAttack(e) {
 const keys = new Set();
 const edge = { jump: false, dash: false, special: false, arm: false, potion: false, use: false };
 let attackHeld = false, jumpHeld = false, attackTap = false;
-const touchMove = { x: 0, y: 0 };
+const touchMove = { x: 0, y: 0 }, touchSm = { x: 0, y: 0 };
 const cam = { yaw: 0, pitch: 0.36, dist: 8.5 };
 window.addEventListener("keydown", e => {
   const k = e.key.toLowerCase();
@@ -3752,9 +3752,9 @@ stage.addEventListener("pointerdown", e => {
   try { stage.setPointerCapture(e.pointerId); } catch (err) {}
 });
 stage.addEventListener("pointermove", e => {
-  if (e.pointerId === joy.id) { let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const d = Math.hypot(dx, dy), max = 34;
+  if (e.pointerId === joy.id) { let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const d = Math.hypot(dx, dy), max = 44;
     if (d > max) { const k = (d - max) / d; joy.ox += dx * k; joy.oy += dy * k; dx *= max / d; dy *= max / d; const b = $("joyBase"); b.style.left = joy.ox + "px"; b.style.top = joy.oy + "px"; }
-    const m = Math.min(1, Math.hypot(dx, dy) / max), dead = 0.1, s2 = m < dead ? 0 : Math.min(1, (m - dead) / (0.75 - dead)) / Math.max(m, 1e-6);
+    const m = Math.min(1, Math.hypot(dx, dy) / max), dead = 0.2, s2 = m < dead ? 0 : Math.min(1, (m - dead) / (0.85 - dead)) / Math.max(m, 1e-6);
     touchMove.x = dx / max * s2; touchMove.y = dy / max * s2; $("joyKnob").style.transform = `translate(${dx}px, ${dy}px)`; }
   else if (e.pointerId === drag.id) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy); cam.yaw -= dx * 0.0062; cam.pitch = clamp(cam.pitch + dy * 0.0038, 0.05, 1.2); }
 });
@@ -3795,7 +3795,7 @@ holdBtn("bBlock", () => blockHeld = true, () => blockHeld = false);
 
 /* ---- platform choice and the ease-of-play settings ---- */
 const OPT_DEF = {
-  mobile: { autoAim: true, holdAtk: true, autoAtk: false, ctxBtn: true, autoLoot: true, camFollow: true, bossZoom: true, rightLook: true, btnScale: 1, leftHand: false, gfx: "medium", fps30: false, swipeDash: true, dblJump: true, vibrate: true, textScale: 1, padX: 0, padY: 0 },
+  mobile: { autoAim: true, holdAtk: true, autoAtk: false, ctxBtn: true, autoLoot: true, camFollow: false, bossZoom: true, rightLook: true, btnScale: 1, leftHand: false, gfx: "medium", fps30: false, swipeDash: true, dblJump: true, vibrate: true, textScale: 1, padX: 0, padY: 0 },
   pc: { autoAim: false, holdAtk: true, autoAtk: false, ctxBtn: false, autoLoot: false, camFollow: false, bossZoom: true, rightLook: false, btnScale: 1, leftHand: false, gfx: "high", fps30: false, swipeDash: false, dblJump: false, vibrate: false, textScale: 1, padX: 0, padY: 0 }
 };
 let atkLatch = false, camExtra = 0, lootT = 0, lastTap = { t: 0, x: 0, y: 0 }, gfxGroup = null;
@@ -3886,6 +3886,7 @@ $("setPanel").addEventListener("input", e => { const k = e.target.dataset.rng; i
   $("padDone").addEventListener("click", () => { document.body.classList.remove("editPad"); $("padDone").hidden = true; save(); toast("Button layout saved.", ""); });
 })();
 document.addEventListener("visibilitychange", () => { if (document.hidden) { keys.clear(); attackHeld = jumpHeld = false; touchMove.x = touchMove.y = 0; } else last = performance.now(); });
+if (!S.optV2) { if (S.opt) S.opt.camFollow = false; S.optV2 = true; }
 opt(); applyOpts();
 const padPrev = {};
 function readPad() {
@@ -4303,7 +4304,8 @@ function update(dt) {
   let ix = 0, iy = 0;
   if (keys.has("w") || keys.has("arrowup")) iy -= 1; if (keys.has("s") || keys.has("arrowdown")) iy += 1;
   if (keys.has("a") || keys.has("arrowleft")) ix -= 1; if (keys.has("d") || keys.has("arrowright")) ix += 1;
-  ix += touchMove.x; iy += touchMove.y;
+  const ks = 1 - Math.exp(-12 * dt); touchSm.x = lerp(touchSm.x, touchMove.x, ks); touchSm.y = lerp(touchSm.y, touchMove.y, ks); if (!touchMove.x && !touchMove.y && Math.hypot(touchSm.x, touchSm.y) < 0.05) touchSm.x = touchSm.y = 0;
+  ix += touchSm.x; iy += touchSm.y;
   if (gp) { ix += gp.mx; iy += gp.my; cam.yaw -= gp.cx * 2.6 * dt; cam.pitch = clamp(cam.pitch + gp.cy * 1.5 * dt, 0.05, 1.2); }
   const mag = Math.min(1, Math.hypot(ix, iy));
   const cf = new V3(-Math.sin(cam.yaw), 0, -Math.cos(cam.yaw)), cr = new V3(Math.cos(cam.yaw), 0, -Math.sin(cam.yaw));
