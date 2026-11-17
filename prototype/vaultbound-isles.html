@@ -122,7 +122,7 @@ body.phone .act.small { width: 47px; height: 47px; font-size: 9.5px; }
 body.phone #bFish svg { width: 22px; height: 22px; }
 body.phone .keys { display: none; }
 body.phone #joyHint { width: 96px; height: 96px; font-size: 11px; }
-body.phone #joyBase { width: 112px; height: 112px; margin: -56px 0 0 -56px; }
+body.phone #joyBase { width: 90px; height: 90px; margin: -45px 0 0 -45px; }
 /* platform chooser, settings, context button, layout */
 .plat { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .plat button { display: grid; gap: 4px; justify-items: center; padding: 14px 10px; border-radius: 12px; border: 2px solid var(--line); background: rgba(255,255,255,0.04); color: inherit; font: inherit; cursor: pointer; }
@@ -158,8 +158,8 @@ body.lefty.phone #helm { left: auto !important; right: calc(10px + env(safe-area
 #voyHud .vbar small { position: relative; font-size: 10.5px; font-weight: 800; }
 body.phone #voyHud { top: auto; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); left: 50%; min-width: 0; width: min(300px, 46vw); font-size: 10.5px; padding: 5px 8px; }
 /* touch joystick */
-#joyBase { position: fixed; z-index: 7; width: 124px; height: 124px; margin: -62px 0 0 -62px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); pointer-events: none; }
-#joyKnob { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%; background: rgba(230,184,92,0.55); border: 2px solid rgba(255,255,255,0.45); }
+#joyBase { position: fixed; z-index: 7; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); pointer-events: none; }
+#joyKnob { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: rgba(230,184,92,0.55); border: 2px solid rgba(255,255,255,0.45); }
 #joyHint { position: fixed; z-index: 4; left: calc(26px + env(safe-area-inset-left, 0px)); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); width: 112px; height: 112px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.2); display: grid; place-items: center; color: rgba(255,255,255,0.5); font-size: 12px; text-align: center; pointer-events: none; }
 
 /* action buttons */
@@ -3752,9 +3752,9 @@ stage.addEventListener("pointerdown", e => {
   try { stage.setPointerCapture(e.pointerId); } catch (err) {}
 });
 stage.addEventListener("pointermove", e => {
-  if (e.pointerId === joy.id) { let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const d = Math.hypot(dx, dy), max = 52;
+  if (e.pointerId === joy.id) { let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const d = Math.hypot(dx, dy), max = 34;
     if (d > max) { const k = (d - max) / d; joy.ox += dx * k; joy.oy += dy * k; dx *= max / d; dy *= max / d; const b = $("joyBase"); b.style.left = joy.ox + "px"; b.style.top = joy.oy + "px"; }
-    const m = Math.min(1, Math.hypot(dx, dy) / max), dead = 0.12, s2 = m < dead ? 0 : (m - dead) / (1 - dead) / Math.max(m, 1e-6);
+    const m = Math.min(1, Math.hypot(dx, dy) / max), dead = 0.1, s2 = m < dead ? 0 : Math.min(1, (m - dead) / (0.75 - dead)) / Math.max(m, 1e-6);
     touchMove.x = dx / max * s2; touchMove.y = dy / max * s2; $("joyKnob").style.transform = `translate(${dx}px, ${dy}px)`; }
   else if (e.pointerId === drag.id) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy); cam.yaw -= dx * 0.0062; cam.pitch = clamp(cam.pitch + dy * 0.0038, 0.05, 1.2); }
 });
