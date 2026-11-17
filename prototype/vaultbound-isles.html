@@ -139,6 +139,7 @@ body.phone #joyBase { width: 112px; height: 112px; margin: -56px 0 0 -56px; }
 body.lefty #actions { right: auto; left: calc(12px + env(safe-area-inset-left, 0px)); transform-origin: bottom left; }
 body.lefty #bCtx { right: auto; left: 0; } body.lefty #bView { right: auto; left: 130px; }
 body.lefty #joyHint { left: auto; right: calc(26px + env(safe-area-inset-right, 0px)); }
+body.plat-pc #actions > .act { display: none; } body.plat-mobile .keys { display: none; }
 body.editPad #actions { outline: 2px dashed var(--accent); outline-offset: 6px; cursor: move; }
 #padDone { position: fixed; z-index: 30; left: 50%; top: 14px; transform: translateX(-50%); }
 #hudTL, #hudTR, #hudTC, #prompt, #voyHud, #toasts, #menuBar { zoom: var(--ts, 1); }
@@ -442,7 +443,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 </div>
 <div id="festChip" hidden style="position:fixed;z-index:5;right:calc(12px + env(safe-area-inset-right, 0px));top:calc(156px + env(safe-area-inset-top, 0px));padding:5px 12px;border-radius:999px;background:linear-gradient(90deg,#ff8a3a,#ffd040);color:#1a1008;font-weight:800;font-size:12.5px;box-shadow:0 0 18px -4px #ffb050"></div>
 <div id="menuBar">
-  <button id="mbToggle" aria-expanded="false">&#9776; Menu</button>  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests" style="display:none">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses" style="display:none">Classes</button><button id="mbAch">Achievements</button><button id="mbGuild">Guild</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
+  <button id="mbToggle" aria-expanded="false">&#9776; Menu</button>  <button id="mbSettings">Settings</button><button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests" style="display:none">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses" style="display:none">Classes</button><button id="mbAch">Achievements</button><button id="mbGuild">Guild</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
 <div id="musicPanel" hidden role="dialog" aria-label="Music">
   <div class="mpHead"><b>Music</b><button class="hbtn" id="mpClose">Close</button></div>
@@ -555,6 +556,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
       <li><b>Level up</b> from fights and spend stat points on Speed, Damage, Defence or Power.</li>
       <li><b>Open the Armoury</b> to turn your weapons and armour around in 3D and compare their stats.</li>
     </ul>
+    <div><b style="font-size:13px">How are you playing?</b><div class="plat" id="platPick" style="margin-top:6px"><button data-plat="mobile"><i>&#128241;</i><b>Mobile</b><small>Touch controls, big buttons, auto-aim</small></button><button data-plat="pc"><i>&#128421;</i><b>PC (Computer)</b><small>Keyboard and mouse</small></button></div></div>
     <div class="row"><button class="btn primary" id="startBtn">Enter the lobby</button><button class="btn" id="avEditBtn">Edit avatar</button><span class="muted" id="introNote"></span></div>
   </div>
 </div>
@@ -3797,10 +3799,9 @@ const OPT_DEF = {
   pc: { autoAim: false, holdAtk: true, autoAtk: false, ctxBtn: false, autoLoot: false, camFollow: false, bossZoom: true, rightLook: false, btnScale: 1, leftHand: false, gfx: "high", fps30: false, swipeDash: false, dblJump: false, vibrate: false, textScale: 1, padX: 0, padY: 0 }
 };
 let atkLatch = false, camExtra = 0, lootT = 0, lastTap = { t: 0, x: 0, y: 0 }, gfxGroup = null;
-function platGuess() { return coarse ? "mobile" : "pc"; }
-const OPT_ORIG = Object.freeze(Object.assign({}, OPT_DEF.pc, { bossZoom: false }));
-function opt() { return OPT_ORIG; }
-function gfxGrass() { return 1; }
+function platGuess() { return S.platform || (coarse ? "mobile" : "pc"); }
+function opt() { if (!S.opt || typeof S.opt !== "object") S.opt = Object.assign({}, OPT_DEF[platGuess()]); for (const k in OPT_DEF.pc) if (S.opt[k] === undefined) S.opt[k] = OPT_DEF[platGuess()][k]; return S.opt; }
+function gfxGrass() { const g = (S.opt && S.opt.gfx) || (coarse ? "medium" : "high"); return g === "low" ? 0.35 : g === "medium" ? 0.7 : 1; }
 function joySide(x) { return opt().leftHand ? x > window.innerWidth * 0.5 : x < window.innerWidth * 0.5; }
 function buzz(p) { try { if (S.opt && S.opt.vibrate && navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
 function ctxVerb(label) {
@@ -3811,9 +3812,9 @@ function ctxVerb(label) {
 }
 function applyOpts() {
   const o = opt(), b = document.body, pl = platGuess();
-  b.classList.remove("plat-mobile", "plat-pc"); b.classList.toggle("lefty", !!o.leftHand);
+  b.classList.toggle("plat-mobile", pl === "mobile"); b.classList.toggle("plat-pc", pl === "pc"); b.classList.toggle("lefty", !!o.leftHand);
   b.style.setProperty("--bs", o.btnScale); b.style.setProperty("--ts", o.textScale); b.style.setProperty("--padX", (o.padX || 0) + "px"); b.style.setProperty("--padY", (o.padY || 0) + "px");
-  $("bView").hidden = true;
+  $("bView").hidden = pl === "pc";
   // graphics
   const g = o.gfx; sun.castShadow = g !== "low";
   const dpr = window.devicePixelRatio || 1; PERF.max = g === "low" ? Math.min(dpr, 0.8) : g === "medium" ? Math.min(dpr, 1.25) : Math.min(dpr, coarse ? 1.5 : 2);
@@ -3841,6 +3842,9 @@ function choosePlatform(p) {
   const fromNone = !S.platform; S.platform = p; if (fromNone || !S.opt) S.opt = Object.assign({}, OPT_DEF[p]); else S.opt = Object.assign({}, OPT_DEF[p], { textScale: opt().textScale });
   document.querySelectorAll("#platPick button, #setBody [data-plat]").forEach(b => b.classList.toggle("on", b.dataset.plat === p)); applyOpts(); save();
 }
+$("platPick").addEventListener("click", e => { const b = e.target.closest("[data-plat]"); if (b) choosePlatform(b.dataset.plat); });
+document.querySelectorAll("#platPick button").forEach(b => b.classList.toggle("on", b.dataset.plat === platGuess()));
+$("startBtn").addEventListener("click", () => { if (!S.platform) choosePlatform(platGuess()); }, true);
 $("bCtx").addEventListener("click", e => { e.stopPropagation(); const it = nearestInteract(); if (it) it.act(); });
 $("bCtx").addEventListener("pointerdown", e => e.stopPropagation());
 $("bView").addEventListener("click", e => { e.stopPropagation(); cam.yaw = P.face + Math.PI; cam.pitch = 0.36; if (!VOY.flying && !sailing) cam.dist = 8.5; });
@@ -3855,6 +3859,7 @@ const SET_ROWS = [
 function renderSettings() {
   const o = opt(), pl = platGuess(); const seg = (key, vals) => `<div class="seg">${vals.map(([v, t]) => `<button class="btn ${o[key] === v ? "on" : ""}" data-seg="${key}" data-val="${v}">${t}</button>`).join("")}</div>`;
   $("setBody").innerHTML = `<div class="row" style="justify-content:space-between"><b style="font-family:var(--f-display);font-size:18px">Settings</b><button class="btn" id="setClose">Close</button></div>
+    <div class="plat"><button data-plat="mobile" class="${pl === "mobile" ? "on" : ""}"><i>&#128241;</i><b>Mobile</b><small>Touch helpers on</small></button><button data-plat="pc" class="${pl === "pc" ? "on" : ""}"><i>&#128421;</i><b>PC (Computer)</b><small>Keyboard and mouse</small></button></div>
     ${SET_ROWS.map(([h, rows]) => `<h3>${h}</h3>${rows.map(([k, t, d]) => `<label class="sw"><span>${t}${d ? `<small>${d}</small>` : ""}</span><input type="checkbox" data-opt="${k}" ${o[k] ? "checked" : ""}></label>`).join("")}`).join("")}
     <label class="sw"><span>Button size</span><input type="range" min="0.7" max="1.4" step="0.05" value="${o.btnScale}" data-rng="btnScale"></label>
     <div class="row"><button class="btn" id="setMovePad">Move the buttons</button><button class="btn" id="setResetPad">Reset button position</button></div>
@@ -3862,6 +3867,7 @@ function renderSettings() {
     <h3>Text size</h3>${seg("textScale", [[0.9, "Small"], [1, "Normal"], [1.15, "Large"], [1.3, "Huge"]])}`;
 }
 function openSettings() { renderSettings(); $("setPanel").hidden = false; }
+$("mbSettings").addEventListener("click", openSettings);
 $("setPanel").addEventListener("click", e => {
   if (e.target === $("setPanel") || e.target.id === "setClose") { $("setPanel").hidden = true; return; }
   const p = e.target.closest("[data-plat]"); if (p) { choosePlatform(p.dataset.plat); renderSettings(); return; }
@@ -3880,7 +3886,6 @@ $("setPanel").addEventListener("input", e => { const k = e.target.dataset.rng; i
   $("padDone").addEventListener("click", () => { document.body.classList.remove("editPad"); $("padDone").hidden = true; save(); toast("Button layout saved.", ""); });
 })();
 document.addEventListener("visibilitychange", () => { if (document.hidden) { keys.clear(); attackHeld = jumpHeld = false; touchMove.x = touchMove.y = 0; } else last = performance.now(); });
-delete S.platform; delete S.opt;
 opt(); applyOpts();
 const padPrev = {};
 function readPad() {
@@ -4524,7 +4529,7 @@ function updateHud() {
   const pips = $("dashPips").children, avail = ST.dashes - P.dashQ.length; for (let k = 0; k < pips.length; k++) pips[k].className = k < avail ? "full" : "";
   const it = isPaused() ? null : nearestInteract(), pr = $("prompt");
   if (it) { pr.hidden = false; pr.innerHTML = `<kbd>E</kbd>${esc(it.label)}`; } else pr.hidden = true;
-  const cb = $("bCtx"), showCb = !!it && opt().ctxBtn && (coarse || usedTouch); if (cb.hidden !== !showCb) cb.hidden = !showCb; if (showCb) { const v = ctxVerb(it.label); if (cb.dataset.v !== v) { cb.dataset.v = v; $("tCtx").textContent = v; } }
+  const cb = $("bCtx"), showCb = !!it && opt().ctxBtn && S.platform !== "pc"; if (cb.hidden !== !showCb) cb.hidden = !showCb; if (showCb) { const v = ctxVerb(it.label); if (cb.dataset.v !== v) { cb.dataset.v = v; $("tCtx").textContent = v; } }
 }
 /* =====================================================================
    CHESTS, FORGE, QUESTS AND LOBBY TOWNSFOLK
