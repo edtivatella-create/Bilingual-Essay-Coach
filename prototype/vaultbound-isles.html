@@ -7737,19 +7737,19 @@ function buildSkyVoyage(theme) {
   const VD = theme === "void"; clearWorld(); const group = new THREE.Group(); scene.add(group); S.voy = S.voy || {}; S.voy.slain = S.voy.slain || {}; S.voy.search = S.voy.search || {};
   const isles = []; VOY_BANDS.forEach((B, b) => { if (!!B.void !== VD) return; const r0 = 260 + b * 230; for (let k = 0; k < 10; k++) { const rr = seeded(b * 100 + k * 7 + 3), a = VD ? k * 2.05 + 0.4 : k / 10 * TAU + b * 0.31 + (rr() - 0.5) * 0.35, d = VD ? 230 + k * 64 + (rr() - 0.5) * 30 : r0 + (rr() - 0.5) * 90;
     isles.push({ idx: VOY_START + b * 10 + k, b, k, x: Math.cos(a) * d, z: Math.sin(a) * d, y: -6 + rr() * 34, r: k === 9 ? 30 : 15 + rr() * 10 }); } });
-  const h = (x, z) => { if (Math.hypot(x, z) < 26) return 0; if (Math.abs(x) < 2 && z < -24 && z > -40) return 0; return -999; };
-  world = { kind: "skyvoy", theme: VD ? "void" : "sky", group, h, hBase: h, radius: 1e5, circles: [], portals: [], interact: [], animated: [], labels: [], isles };
-  if (VD) setSky(0x05020e, 0x5a2a8a, 0x1a0a2a, 0x2a1440, 140, 850, 0xd8a0ff, 1.6, 0.55); else setSky(0x5a9ae8, 0xffe0c0, 0xd8e8ff, 0xe8f0ff, 160, 900, 0xfff0d8, 2.4, 0.65); world.clouds = addClouds(group, VD ? 0x4a2a6a : 0xffffff);
+  const HR = VD ? 46 : 26, h = (x, z) => { if (Math.hypot(x, z) < HR) return 0; if (Math.abs(x) < 2 && z < -(HR - 2) && z > -(HR + 14)) return 0; return -999; };
+  world = { kind: "skyvoy", theme: VD ? "void" : "sky", hr: HR, group, h, hBase: h, radius: 1e5, circles: [], portals: [], interact: [], animated: [], labels: [], isles };
+  if (VD) setSky(0x0a0420, 0x8a2a9a, 0x1a0a2a, 0x2a1440, 160, 900, 0xd8a0ff, 1.7, 0.6); else setSky(0x5a9ae8, 0xffe0c0, 0xd8e8ff, 0xe8f0ff, 160, 900, 0xfff0d8, 2.4, 0.65); world.clouds = addClouds(group, VD ? 0x4a2a6a : 0xffffff);
   // a sea of cloud far below
   { const c = document.createElement("canvas"); c.width = c.height = 512; const x = c.getContext("2d"); x.fillStyle = VD ? "#140822" : "#c8d8ef"; x.fillRect(0, 0, 512, 512); for (let k = 0; k < 400; k++) { const g2 = x.createRadialGradient(0, 0, 0, 0, 0, 40); const px = Math.random() * 512, py = Math.random() * 512, rr = 20 + Math.random() * 50; x.fillStyle = VD ? `rgba(${120 + Math.random() * 60 | 0},60,${200 + Math.random() * 55 | 0},${0.1 + Math.random() * 0.25})` : `rgba(255,255,255,${0.15 + Math.random() * 0.25})`; x.beginPath(); x.arc(px, py, rr, 0, TAU); x.fill(); }
     const tex = new THREE.CanvasTexture(c); tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(30, 30); const pl = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000), new THREE.MeshBasicMaterial({ map: tex, fog: false })); pl.rotation.x = -Math.PI / 2; pl.position.y = -90; group.add(pl); world.animated.push(t => { tex.offset.set(t * 0.002, t * 0.001); }); }
   // the harbour
   const rock = std(VD ? 0x2a2030 : 0x9a8a78, { r: 0.9, map: "rock", rep: 3 }), grass = std(VD ? 0x3a2a5a : 0x6ab84a, { r: 0.9, map: "fabric", rep: 6 }), white = std(VD ? 0x3a3048 : 0xf4f0e8, { r: 0.7, map: "plaster", rep: 2 }), wood = std(VD ? 0x3a2a3a : 0x8a6a4a, { r: 0.85, map: "bark" });
-  M(G.cyl(26, 26, 40), grass, 0, -0.5, 0, group, 1, 1, 1); M(G.cone(40), rock, 0, -16, 0, group, 26, 30, 26).rotation.x = Math.PI; M(G.box(), wood, 0, -0.1, -32, group, 3.4, 0.3, 16);
-  for (let k = 0; k < 4; k++) { const a = k / 4 * TAU + 0.6, hx = Math.cos(a) * 15, hz = Math.sin(a) * 15, hg = new THREE.Group(); hg.position.set(hx, 0, hz); hg.rotation.y = -a + Math.PI / 2; group.add(hg); M(G.box(), white, 0, 2, 0, hg, 4, 4, 3.6); const rf = M(G.cone(4), std([0xc84a4a, 0x3a6ac8, 0x4aa86a, 0xe8a040][k], { r: 0.6, flat: true }), 0, 5, 0, hg, 3.4, 2, 3); rf.rotation.y = Math.PI / 4; solidBox(hx, hz, 4.2, 3.8, -a + Math.PI / 2, 999); }
-  for (let k = 0; k < 10; k++) { const a = k / 10 * TAU, x = Math.cos(a) * 24, z = Math.sin(a) * 24; M(G.cyl(0.08, 0.1, 6), std(0xe8e4dc), x, 1.1, z, group, 1, 2.2, 1); const gl = glowSprite(0xffe0a0, 2.2, 0.7); gl.position.set(x, 2.3, z); group.add(gl); }
-  { const lb = textSprite(VD ? "Obsidian Harbour · board your airship at the end of the pier" : "Skyport Harbour · board your airship at the end of the pier", VD ? "#d8a0ff" : "#9ad8ff", 1.2); lb.position.set(0, 8, -28); group.add(lb); world.labels.push(lb); }
-  world.interact.push({ x: 0, z: -36, y: 0, r: 3.5, label: "Board your airship", act: () => voyBoard() });
+  M(G.cyl(HR, HR, 48), grass, 0, -0.5, 0, group, 1, 1, 1); M(G.cone(48), rock, 0, -16, 0, group, HR, VD ? 44 : 30, HR).rotation.x = Math.PI; M(G.box(), wood, 0, -0.1, -(HR + 6), group, 3.4, 0.3, 16);
+  if (!VD) for (let k = 0; k < 4; k++) { const a = k / 4 * TAU + 0.6, hx = Math.cos(a) * 15, hz = Math.sin(a) * 15, hg = new THREE.Group(); hg.position.set(hx, 0, hz); hg.rotation.y = -a + Math.PI / 2; group.add(hg); M(G.box(), white, 0, 2, 0, hg, 4, 4, 3.6); const rf = M(G.cone(4), std([0xc84a4a, 0x3a6ac8, 0x4aa86a, 0xe8a040][k], { r: 0.6, flat: true }), 0, 5, 0, hg, 3.4, 2, 3); rf.rotation.y = Math.PI / 4; solidBox(hx, hz, 4.2, 3.8, -a + Math.PI / 2, 999); }
+  for (let k = 0; k < (VD ? 16 : 10); k++) { const a = k / (VD ? 16 : 10) * TAU, x = Math.cos(a) * (HR - 2), z = Math.sin(a) * (HR - 2); M(G.cyl(0.08, 0.1, 6), std(0xe8e4dc), x, 1.1, z, group, 1, 2.2, 1); const gl = glowSprite(0xffe0a0, 2.2, 0.7); gl.position.set(x, 2.3, z); group.add(gl); }
+  { const lb = textSprite(VD ? "Obsidian Harbour · board your airship at the end of the pier" : "Skyport Harbour · board your airship at the end of the pier", VD ? "#d8a0ff" : "#9ad8ff", 1.2); lb.position.set(0, 8, -(HR + 2)); group.add(lb); world.labels.push(lb); }
+  world.interact.push({ x: 0, z: -(HR + 10), y: 0, r: 3.5, label: "Board your airship", act: () => voyBoard() });
   { const pg = new THREE.Group(); pg.position.set(0, 0, 15); pg.rotation.y = Math.PI; group.add(pg); const stoneM = std(0xf4f0e8, { r: 0.6, map: "plaster" }), goldM = std(0xe8c060, { m: 0.9, r: 0.25, e: 0x8a6a20, ei: 0.4 });
     M(G.cyl(3.2, 3.4, 28), stoneM, 0, 0.12, 0, pg, 1, 0.24, 1); for (const sx of [-1.7, 1.7]) M(G.cyl(0.3, 0.36, 10), stoneM, sx, 2.1, 0, pg, 1, 4.2, 1); M(new THREE.TorusGeometry(1.7, 0.2, 8, 24, Math.PI), goldM, 0, 4.2, 0, pg);
     const disc = VD ? portalDisc(0x8a3aff, 0x0a0418) : portalDisc(0x9ad8ff, 0xffffff); disc.scale.set(1.5, 2.05, 1); disc.position.set(0, 2.15, 0); pg.add(disc); const gl = glowSprite(0x9ad8ff, 5, 0.5); gl.position.set(0, 2.15, 0); pg.add(gl);
@@ -7758,7 +7758,7 @@ function buildSkyVoyage(theme) {
     const back = () => VD ? enterSkyVoyage("sky") : leaveSkyVoyage();
     world.interact.push({ x: 0, z: 13.6, y: 0, r: 3, label: VD ? "Step through to the Open Sky" : "Step through to the Skylands", act: back });
     let inside = false; world.animated.push(() => { if (VOY.flying || P.dead || run) return; const d = Math.hypot(P.pos.x, P.pos.z - 15); if (d < 1.3 && !inside) { inside = true; if (VD) askTravel("Wormhole", "Return to the Open Sky?", "The wormhole folds you back to Skyport Harbour in the Open Sky.", back); else askTravel("Skylands portal", "Return to the Skylands?", "The portal carries you back to the Skyport. Your airship stays moored here.", back); } if (d > 3) inside = false; }); }
-  if (VD) { // drifting void shards round the harbour
+  if (VD) { buildVoidTown(group, HR); // drifting void shards round the harbour
     for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 60 + (k % 4) * 30, sh = M(G.oct(), std(0x1a0a2a, { e: 0x8a3aff, ei: 0.6, r: 0.2, m: 0.4 }), Math.cos(a) * d, 10 + (k % 5) * 8, Math.sin(a) * d, group, 3 + (k % 3) * 2, 6 + (k % 4) * 2, 3 + (k % 3) * 2); const gl = glowSprite(0xa060ff, 14, 0.35); sh.add(gl);
       world.animated.push(t => { sh.rotation.y = t * 0.2 + k; sh.position.y = 10 + (k % 5) * 8 + Math.sin(t * 0.5 + k) * 2; }); } }
   else { // the wormhole at the far edge of the Open Sky
@@ -7788,6 +7788,94 @@ function buildSkyVoyage(theme) {
   { const sun = new THREE.DirectionalLight(0xffffff, 0); group.add(sun); }
   shadows(group, false, true); return world;
 }
+
+/* ---- Lanternfall, the town at the Obsidian Harbour of the Void Realm ---- */
+function buildVoidTown(group, HR) {
+  const rr = seeded(777), far = m => { m.material = m.material.clone(); m.material.fog = false; m.material.depthWrite = false; return m; };
+  const obs = std(0x1e1628, { r: 0.35, m: 0.3, map: "rock", rep: 2 }), plum = std(0x4a2a6a, { r: 0.75, map: "plaster", rep: 2 }), teal = std(0x24505e, { r: 0.7, map: "plaster", rep: 2 });
+  const roofs = [0x7a3ab8, 0x2ab8a8, 0xd84a9a, 0x4a6ad8], trim = std(0xe8c060, { m: 0.85, r: 0.3 }), lit = c => std(c, { e: c, ei: 1.4, r: 0.2 });
+  // ---- the sky: stars, twin moons, nebulae, aurora ----
+  { const n = 1800, pos = new Float32Array(n * 3), col = new Float32Array(n * 3), c = new THREE.Color();
+    for (let k = 0; k < n; k++) { const u = rr() * TAU, v = Math.acos(rr() * 1.1 - 0.1), R = 820; pos[k * 3] = Math.sin(v) * Math.cos(u) * R; pos[k * 3 + 1] = Math.cos(v) * R; pos[k * 3 + 2] = Math.sin(v) * Math.sin(u) * R; c.setHSL(0.6 + rr() * 0.35, 0.6, 0.75 + rr() * 0.25); col.set([c.r, c.g, c.b], k * 3); }
+    const gm = new THREE.BufferGeometry(); gm.setAttribute("position", new THREE.BufferAttribute(pos, 3)); gm.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    const stars = new THREE.Points(gm, new THREE.PointsMaterial({ size: 2.4, sizeAttenuation: false, vertexColors: true, fog: false, transparent: true, opacity: 0.95, depthWrite: false })); group.add(stars);
+    world.animated.push(t => { stars.rotation.y = t * 0.004; stars.material.opacity = 0.8 + Math.sin(t * 1.7) * 0.15; }); }
+  for (const [x, y, z, r, cc, gc] of [[-420, 300, -520, 46, 0xe0d0ff, 0xb08aff], [520, 200, -260, 24, 0x9afff0, 0x4ad8c8]]) {
+    const moon = far(M(G.sph(), new THREE.MeshBasicMaterial({ color: cc }), x, y, z, group, r)); const gl = far(glowSprite(gc, r * 6, 0.45)); gl.position.set(x, y, z); group.add(gl);
+    if (r < 30) { const ring = far(M(new THREE.TorusGeometry(r * 1.8, 1.4, 6, 64), new THREE.MeshBasicMaterial({ color: 0xd8a0ff, transparent: true, opacity: 0.6 }), x, y, z, group)); ring.rotation.set(1.2, 0.3, 0.2); }
+    for (let k = 0; k < 4; k++) M(G.sph(), new THREE.MeshBasicMaterial({ color: new THREE.Color(cc).multiplyScalar(0.8), fog: false }), x + (rr() - 0.5) * r * 1.1, y + (rr() - 0.5) * r * 1.1, z + r * 0.75, group, r * (0.08 + rr() * 0.1), r * (0.08 + rr() * 0.1), 1); }
+  for (let k = 0; k < 9; k++) { const a = rr() * TAU, gl = far(glowSprite([0xd84ad8, 0x4ad8d8, 0x7a4aff, 0xff7ab8, 0x5a8aff][k % 5], 380 + rr() * 300, 0.18 + rr() * 0.12)); gl.position.set(Math.cos(a) * 700, 160 + rr() * 300, Math.sin(a) * 700); group.add(gl); }
+  { const cv = document.createElement("canvas"); cv.width = 256; cv.height = 64; const x = cv.getContext("2d"), gr = x.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, "rgba(120,255,220,0)"); gr.addColorStop(0.5, "rgba(140,255,210,0.55)"); gr.addColorStop(1, "rgba(200,90,255,0)"); x.fillStyle = gr; x.fillRect(0, 0, 256, 64);
+    const tex = new THREE.CanvasTexture(cv);
+    for (let k = 0; k < 4; k++) { const a = -2.2 + k * 0.55, geo = new THREE.PlaneGeometry(520, 90, 24, 1), p = geo.attributes.position; for (let i = 0; i < p.count; i++) p.setZ(i, Math.sin(p.getX(i) * 0.02 + k) * 40);
+      const au = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false, fog: false })); au.position.set(Math.cos(a) * 600, 260 + k * 30, Math.sin(a) * 600); au.lookAt(0, 260, 0); group.add(au);
+      world.animated.push(t => { au.material.opacity = 0.32 + Math.sin(t * 0.6 + k * 1.3) * 0.18; }); } }
+  // floating lanterns, sky jellies and upside-down islets
+  const lanterns = []; for (let k = 0; k < 46; k++) { const lg = new THREE.Group(), c = [0xffb050, 0xff7ab8, 0x9ad8ff, 0xd8a0ff][k % 4]; M(G.box(), lit(c), 0, 0, 0, lg, 0.5, 0.7, 0.5); M(G.cone(4), std(0x2a1a2a), 0, 0.45, 0, lg, 0.4, 0.2, 0.4); const gl = glowSprite(c, 3.2, 0.7); lg.add(gl);
+    const a = rr() * TAU, d = 8 + rr() * 80; lg.position.set(Math.cos(a) * d, 6 + rr() * 34, Math.sin(a) * d); group.add(lg); lanterns.push({ lg, y0: lg.position.y, sp: 0.4 + rr() * 0.8, ph: rr() * 9 }); }
+  const jellies = []; for (let k = 0; k < 9; k++) { const jg = new THREE.Group(), c = [0xc070ff, 0x6af0e0, 0xff8ad8][k % 3]; M(G.sph(), std(c, { e: c, ei: 0.6, op: 0.55, r: 0.2 }), 0, 0, 0, jg, 1.8, 1.1, 1.8);
+    for (let j = 0; j < 6; j++) { const a = j / 6 * TAU; M(G.cyl(0.05, 0.02, 5), lit(c), Math.cos(a) * 0.9, -1.8, Math.sin(a) * 0.9, jg, 1, 2.6 + (j % 2), 1); } jg.add(glowSprite(c, 7, 0.5)); group.add(jg); jellies.push({ jg, a: rr() * TAU, d: 30 + rr() * 50, y: 16 + rr() * 22, sp: 0.05 + rr() * 0.06 }); }
+  for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + 0.3, d = 90 + rr() * 50, ig = new THREE.Group(); ig.position.set(Math.cos(a) * d, 34 + rr() * 30, Math.sin(a) * d); group.add(ig);
+    M(G.cone(10), obs, 0, 0, 0, ig, 6, 9, 6); M(G.cyl(6, 6, 16), plum, 0, -4.4, 0, ig, 1, 0.3, 1); const tw = M(G.cone(6), std(roofs[k % 4], { r: 0.5, flat: true }), 0, -8, 0, ig, 2, 4, 2); tw.rotation.x = Math.PI; M(G.box(), plum, 0, -6, 0, ig, 2.4, 3, 2.4);
+    for (let j = 0; j < 5; j++) M(G.oct(), lit(0xc070ff), (rr() - 0.5) * 6, 4 + rr() * 2, (rr() - 0.5) * 6, ig, 0.5, 1.6, 0.5); ig.add(glowSprite(0xc070ff, 18, 0.35));
+    world.animated.push(t => { ig.rotation.y = t * 0.05 + k; ig.position.y += Math.sin(t * 0.4 + k) * 0.01; }); }
+  world.animated.push(t => { for (const L of lanterns) { L.lg.position.y = L.y0 + Math.sin(t * L.sp + L.ph) * 1.6; L.lg.rotation.y = t * 0.3 + L.ph; }
+    for (const J of jellies) { J.a += J.sp * 0.016; J.jg.position.set(Math.cos(J.a) * J.d, J.y + Math.sin(t * 0.8 + J.d) * 2.5, Math.sin(J.a) * J.d); J.jg.scale.y = 1 + Math.sin(t * 2 + J.d) * 0.12; } });
+  // ---- the plaza and the Starwell ----
+  M(G.cyl(13, 13, 48), std(0x2a2038, { r: 0.5, map: "rock", rep: 5 }), 0, 0.02, 0, group, 1, 0.05, 1);
+  M(new THREE.TorusGeometry(13, 0.14, 6, 72), glowMat(0xc070ff, 0.85), 0, 0.08, 0, group).rotation.x = Math.PI / 2;
+  M(new THREE.TorusGeometry(8, 0.08, 6, 64), glowMat(0x6af0e0, 0.7), 0, 0.08, 0, group).rotation.x = Math.PI / 2;
+  M(G.cyl(2.8, 3.1, 24), obs, 0, 0.4, 0, group, 1, 0.8, 1); M(G.cyl(2.4, 2.4, 24), std(0x6a3aff, { e: 0x4a1aaf, ei: 0.8, r: 0.1, op: 0.85 }), 0, 0.82, 0, group, 1, 0.06, 1);
+  const wellGem = M(G.oct(), lit(0xd8a0ff), 0, 3.2, 0, group, 0.9, 1.6, 0.9); const wg = glowSprite(0xd8a0ff, 8, 0.6); wg.position.set(0, 3.2, 0); group.add(wg); solidCyl(0, 0, 3, 1.2);
+  world.animated.push(t => { wellGem.rotation.y = t * 0.8; wellGem.position.y = 3.2 + Math.sin(t * 1.4) * 0.3; });
+  { const lb = textSprite("Lanternfall · the town at the end of the stars", "#d8a0ff", 1.1); lb.position.set(0, 6.5, 0); group.add(lb); world.labels.push(lb); }
+  // ---- buildings round the plaza ----
+  const types = ["spire", "mushroom", "shop", "dome", "spire", "mushroom", "dome", "shop", "spire", "mushroom"]; let ti = 0;
+  for (let k = 0; k < 12; k++) { if (k === 8 || k === 9) continue; const a = k * TAU / 12 + 0.26, d = 35 + (k % 3) * 2, x = Math.cos(a) * d, z = Math.sin(a) * d, rot = Math.atan2(-x, -z), t = types[ti++ % types.length];
+    const b = new THREE.Group(); b.position.set(x, 0, z); b.rotation.y = rot; group.add(b); const rc = roofs[k % 4];
+    if (t === "spire") { let y = 0; for (let j = 0; j < 3; j++) { const w = 5 - j * 1.1, hh = 4 - j * 0.5, bx = M(G.box(), j % 2 ? teal : plum, 0, y + hh / 2, 0, b, w, hh, w); bx.rotation.y = j * 0.22; y += hh; for (const sx of [-1, 1]) M(G.box(), lit(0xffc070), sx * w * 0.25, y - hh / 2, w / 2 + 0.02, b, 0.6, 0.9, 0.05); }
+      const hat = M(G.cone(8), std(rc, { r: 0.5, flat: true }), 0.3, y + 2.6, 0, b, 2.2, 5.2, 2.2); hat.rotation.z = 0.22; const orb = M(G.sph(), lit(0x6af0e0), 1.3, y + 5, 0, b, 0.35); orb.add(glowSprite(0x6af0e0, 3, 0.7)); solidBox(x, z, 5.4, 5.4, rot, 999); }
+    else if (t === "mushroom") { M(G.cyl(1.6, 2, 14), std(0xe8dcc8, { r: 0.8, map: "plaster" }), 0, 2.5, 0, b, 1, 5, 1); M(G.sph(), std(rc, { r: 0.55 }), 0, 5.6, 0, b, 5, 2.4, 5);
+      for (let j = 0; j < 9; j++) { const a2 = j * 0.9, r2 = 2 + (j % 3) * 1.1; M(G.sph(), lit(0xfff0ff), Math.cos(a2) * r2, 6.3 + (j % 2) * 0.4 - r2 * 0.25, Math.sin(a2) * r2, b, 0.35); }
+      M(G.box(), std(0x3a2418, { r: 0.8, map: "bark" }), 0, 1.1, 1.85, b, 1.1, 2.1, 0.12); M(G.cyl(0.5, 0.5, 14), lit(0xffc070), 0, 3.5, 1.82, b, 1, 0.05, 1).rotation.x = Math.PI / 2; solidCyl(x, z, 2.2, 999); }
+    else if (t === "shop") { M(G.box(), teal, 0, 1.9, -0.6, b, 6, 3.8, 3.4); M(G.box(), std(rc, { r: 0.6, map: "fabric", ds: true }), 0, 3.6, 1.6, b, 6.4, 0.08, 2.4).rotation.x = -0.3; M(G.box(), std(0x3a2418, { map: "bark" }), 0, 0.6, 1.3, b, 5, 1.2, 0.8);
+      for (let j = 0; j < 5; j++) M(G.sph(), lit([0xffb050, 0x6af0e0, 0xff7ab8, 0xd8a0ff, 0x9ad8ff][j]), -2 + j, 1.35, 1.3, b, 0.22); for (const sx of [-2.8, 2.8]) { M(G.cyl(0.08, 0.08, 6), trim, sx, 1.8, 2.6, b, 1, 3.6, 1); const lg = glowSprite(0xffb050, 2.4, 0.8); lg.position.set(sx, 3.5, 2.7); b.add(lg); }
+      M(G.cone(4), std(0x2a1a3a, { flat: true }), 0, 4.9, -0.6, b, 4.6, 2.2, 2.6).rotation.y = Math.PI / 4; solidBox(x, z, 6.4, 5.2, rot, 999); }
+    else { M(G.cyl(3, 3.2, 20), obs, 0, 1.6, 0, b, 1, 3.2, 1); M(G.sph(), std(0x5a3aaf, { e: 0x3a1a8a, ei: 0.7, r: 0.1, op: 0.8 }), 0, 3.2, 0, b, 3, 2.6, 3); const sc = M(G.cyl(0.35, 0.5, 10), trim, 0.8, 5.2, 0.6, b, 1, 3.4, 1); sc.rotation.set(0.5, 0, -0.5); M(G.box(), lit(0xffc070), 0, 1.3, 3.05, b, 1.2, 2, 0.06); solidCyl(x, z, 3.3, 999); } }
+  // ---- portals ----
+  const portal = (x, z, c1, c2, name, label, eyebrow, title, text, go) => { const rot = Math.atan2(-x, -z), pg = new THREE.Group(); pg.position.set(x, 0, z); pg.rotation.y = rot; group.add(pg); const goldM = std(0xe8c060, { m: 0.9, r: 0.25, e: 0x6a3aa0, ei: 0.4 });
+    M(G.cyl(3.2, 3.4, 28), obs, 0, 0.12, 0, pg, 1, 0.24, 1); for (const sx of [-1.7, 1.7]) { M(G.cyl(0.3, 0.36, 10), obs, sx, 2.1, 0, pg, 1, 4.2, 1); const o = M(G.oct(), lit(c1), sx, 4.6, 0, pg, 0.35); o.add(glowSprite(c1, 2, 0.7)); } M(new THREE.TorusGeometry(1.7, 0.2, 8, 24, Math.PI), goldM, 0, 4.2, 0, pg);
+    const disc = portalDisc(c1, c2); disc.scale.set(1.5, 2.05, 1); disc.position.set(0, 2.15, 0); pg.add(disc); const gl = glowSprite(c1, 5, 0.5); gl.position.set(0, 2.15, 0); pg.add(gl); world.animated.push(t => { if (disc.material.uniforms) disc.material.uniforms.t.value = t; });
+    const lb = textSprite(name, "#" + new THREE.Color(c1).getHexString(), 0.95); lb.position.set(x, 6, z); group.add(lb); world.labels.push(lb);
+    const c = Math.cos(rot), s2 = Math.sin(rot); solidCyl(x + c * -1.7, z - s2 * -1.7, 0.4, 99); solidCyl(x + c * 1.7, z - s2 * 1.7, 0.4, 99);
+    world.interact.push({ x: x + Math.sin(rot) * 1.4, z: z + Math.cos(rot) * 1.4, y: 0, r: 3, label, act: go });
+    let inside = false; world.animated.push(() => { if (VOY.flying || P.dead || run) return; const d = Math.hypot(P.pos.x - x, P.pos.z - z); if (d < 1.3 && !inside) { inside = true; askTravel(eyebrow, title, text, go); } if (d > 3) inside = false; }); };
+  portal(-18, 12, 0xffd070, 0xffffff, "Portal to the Lobby", "Step through to the lobby", "Lobby portal", "Return to the lobby?", "Golden light folds you home to the lobby. Your airship stays moored here.", () => { voyCleanup(); $("voyHud").hidden = true; goLobby(); });
+  portal(18, 12, 0x9ad8ff, 0xffffff, "Portal to the Skylands", "Step through to the Skylands", "Skylands portal", "Return to the Skylands?", "The portal carries you to the Skyport.", () => leaveSkyVoyage());
+  portal(24, -11, 0xff3aa0, 0x0a0418, "Rift of Nihilus · rare", "Enter the Rift", "Rift of Nihilus", "Dive into the Rift?", "The Rift drops you onto a random Void island on Hard. Win and it spits you back out here.", () => {
+    const i = VOY_START + 50 + Math.floor(Math.random() * 9); voyDropShip(); for (const f of VOY.flyers) voyFlyerGone(f); VOY.flyers = []; VOY.boss = null; $("voyHud").hidden = true; VOY.returnAfterRun = true; bumpStat("rifts"); startRun(i, 1, S.allies.slice()); });
+  // ---- people ----
+  const named = [
+    ["Umbra the Lamplighter", { skin: 0x8a7ab8, hair: 0xe0d0ff, cloth: 0x3a2a5a, cloth2: 0x1a1028 }, -7, -11, ["Every lantern here holds a wish someone forgot. I just keep them lit.", "The jellies drift up when the Hollow King stirs. Watch the sky."]],
+    ["Old Moth, Keeper of Doors", { skin: 0x6a5a7a, hair: 0x9a8aaa, cloth: 0x1a1024, cloth2: 0x2a1a3a, extra: "reaperhood" }, -12, 6, ["Four doors I keep. Gold to the lobby, blue to the Skylands, the wormhole to the Open Sky.", "The pink one is the Rift. It goes wherever Nihilus is not looking."]],
+    ["Vesper the Star-seller", { skin: 0xc8b8e8, hair: 0x6af0e0, cloth: 0x24505e, cloth2: 0x1a2a3a, extra: "ears" }, 10, -9, ["Starlight, a coin a jar! No? Then mind the beasts past the third island.", "Nihilus keeps the last island. Bring your sturdiest airship."]],
+    ["Kip the Ferryhand", { skin: 0xa88a6a, hair: 0x2a1a1a, cloth: 0x4a2a6a, cloth2: 0x2a1a1a }, 3, -(HR - 3), ["Your airship waits at the end of the pier.", "The islands drift further apart the deeper you fly."]]
+  ];
+  const folk = [];
+  for (const [name, look, x, z, lines] of named) { const R = buildHumanoid({ look, armour: null, weapon: null }); R.g.position.set(x, 0, z); group.add(R.g); const lb = textSprite(name, "#d8a0ff", 0.6); group.add(lb); world.labels.push(lb); let li = 0;
+    folk.push({ R, lb, x, z, home: true, face: Math.atan2(-x, -z), walk: 0 }); solidCyl(x, z, 0.5, 2);
+    world.interact.push({ x, z, y: 0, r: 2.6, label: `Talk to ${name}`, act: () => { toast(`<b>${esc(name)}</b>: ${esc(lines[li++ % lines.length])}`, "epic"); } }); }
+  const pal = [[0x9a8ac8, 0xd8c8ff, 0x3a2a5a, 0x1a1028, null], [0x7ab8b8, 0x1a3a3a, 0x24505e, 0x1a2a3a, "ears"], [0x5a4a6a, 0x8a7aa8, 0x1a1024, 0x2a1a3a, "reaperhood"], [0xd8b8a8, 0xff8ad8, 0x6a2a5a, 0x2a1a2a, null], [0xb8a8e8, 0x4ad8c8, 0x2a2a5a, 0x1a1a3a, null]];
+  for (let k = 0; k < 9; k++) { const p = pal[k % pal.length], child = k >= 7, R = buildHumanoid({ look: { skin: p[0], hair: p[1], cloth: p[2], cloth2: p[3], extra: p[4] || undefined }, armour: null, weapon: null });
+    if (child) R.g.scale.setScalar(0.65); const a = rr() * TAU, d = 6 + rr() * 10; R.g.position.set(Math.cos(a) * d, 0, Math.sin(a) * d); group.add(R.g);
+    folk.push({ R, x: R.g.position.x, z: R.g.position.z, tx: 0, tz: 0, wait: rr() * 3, spd: child ? 3.4 : 1.3 + rr() * 0.5, face: 0, walk: 0 }); }
+  let last = 0; world.animated.push(t => { const dt = Math.min(0.1, Math.max(0, t - last)); last = t;
+    folk.forEach((f, i) => {
+      if (f.home) { const dp = Math.hypot(P.pos.x - f.x, P.pos.z - f.z); if (dp < 6) { let d = Math.atan2(P.pos.x - f.x, P.pos.z - f.z) - f.face; d = Math.atan2(Math.sin(d), Math.cos(d)); f.face += d * Math.min(1, dt * 4); } f.R.g.rotation.y = f.face; f.lb.position.set(f.x, 2.5, f.z); f.lb.visible = dp < 22; poseHumanoid(f.R, t + i, 0, 0, "normal", false); return; }
+      if (f.wait > 0) { f.wait -= dt; f.walk = lerp(f.walk, 0, Math.min(1, dt * 6)); if (f.wait <= 0) { const a = rr() * TAU, d = 5 + rr() * 13; f.tx = Math.cos(a) * d; f.tz = Math.sin(a) * d; } }
+      else { const dx = f.tx - f.x, dz = f.tz - f.z, d = Math.hypot(dx, dz); if (d < 0.4) f.wait = 1 + rr() * 4; else { const st = Math.min(d, f.spd * dt); f.x += dx / d * st; f.z += dz / d * st; const r0 = Math.hypot(f.x, f.z); if (r0 < 3.6) { f.x *= 3.6 / r0; f.z *= 3.6 / r0; } let df = Math.atan2(dx, dz) - f.face; df = Math.atan2(Math.sin(df), Math.cos(df)); f.face += df * Math.min(1, dt * 6); } f.walk = lerp(f.walk, 1, Math.min(1, dt * 6)); }
+      f.R.g.position.set(f.x, 0, f.z); f.R.g.rotation.y = f.face; poseHumanoid(f.R, t * (f.spd > 3 ? 1.8 : 1) + i, f.walk, 0, "normal", false); }); });
+}
 function voyCleanup() {
   closeAllModals(); duel = null; enemies.forEach(e => { scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar); }); enemies = [];
   projectiles.forEach(q => scene.remove(q.m)); projectiles = []; telegraphs.forEach(t => scene.remove(t.mesh)); telegraphs = []; timers = []; allies.forEach(a => { scene.remove(a.R.g); scene.remove(a.lbl); }); allies = [];
@@ -7804,13 +7892,13 @@ function leaveSkyVoyage() { voyCleanup(); $("voyHud").hidden = true; enterSkylan
 function voyBoard() {
   const def = AIRSHIP[S.airship] || AIRSHIP[Object.keys(S.airships || {})[0]]; if (!def) { toast("You have no airship. Airwright Corra builds them at the Skyport.", ""); return; }
   voyDropShip(); const ship = buildAirship(def); world.group.add(ship);
-  Object.assign(VOY, { flying: true, ship, def, yaw: Math.PI, alt: 6, speed: 0, hull: voyMaxHull(def), sink: 0, cd: 0 }); VOY.pos.set(0, 0, -44);
+  Object.assign(VOY, { flying: true, ship, def, yaw: Math.PI, alt: 6, speed: 0, hull: voyMaxHull(def), sink: 0, cd: 0 }); VOY.pos.set(0, 0, -(world.hr || 26) - 18);
   P.dashT = 0; cam.dist = Math.max(cam.dist, 22); voyHud();
   toast("You take the wheel. Move or turn the wheel to steer, hold Jump to climb and Block to dive. Attack fires the cannons. Fly near an island and press use to land.", "epic");
 }
 function voyMaxHull(def) { return Math.round(def.hull * (S.cls === "skyknight" ? 1.25 : 1) * (S.cls === "demigod" ? 1.3 : 1)); }
 function voyDropShip() { if (VOY.ship && VOY.ship.parent) VOY.ship.parent.remove(VOY.ship); VOY.ship = null; VOY.flying = false; }
-function voyMoor() { voyDropShip(); P.pos.set(0, 0, -30); P.vy = 0; P.onGround = true; toast("You moor at the harbour.", ""); voyHud(); }
+function voyMoor() { voyDropShip(); P.pos.set(0, 0, -(world.hr || 26) - 4); P.vy = 0; P.onGround = true; toast("You moor at the harbour.", ""); voyHud(); }
 function flyUpdate(dt, ix, iy, up, down) {
   const v = VOY, def = v.def; if (!v.ship) { v.flying = false; return; }
   if (v.sink > 0) { v.sink += dt; v.alt -= dt * 14; v.ship.rotation.z += dt * 0.6; v.ship.position.set(v.pos.x, v.alt, v.pos.z); P.pos.set(v.pos.x, v.alt + v.ship.userData.deck, v.pos.z);
@@ -7819,7 +7907,7 @@ function flyUpdate(dt, ix, iy, up, down) {
   v.alt = clamp(v.alt + ((up ? 1 : 0) - (down ? 1 : 0)) * 9 * dt, -30, 90);
   const f = new V3(Math.sin(v.yaw), 0, Math.cos(v.yaw)), next = v.pos.clone().addScaledVector(f, v.speed * dt);
   for (const I of world.isles) { const d = Math.hypot(next.x - I.x, next.z - I.z); if (d < I.r + 2 && v.alt < I.y + 4 && v.alt > I.y - I.r * 1.3) { const ux = (next.x - I.x) / d, uz = (next.z - I.z) / d; next.x = I.x + ux * (I.r + 2); next.z = I.z + uz * (I.r + 2); v.speed *= 0.5; } }
-  if (Math.hypot(next.x, next.z) < 27 && v.alt < 3) { const d = Math.hypot(next.x, next.z) || 1; next.x *= 27 / d; next.z *= 27 / d; }
+  const HRo = (world.hr || 26) + 1; if (Math.hypot(next.x, next.z) < HRo && v.alt < 3) { const d = Math.hypot(next.x, next.z) || 1; next.x *= HRo / d; next.z *= HRo / d; }
   if (Math.hypot(next.x, next.z) > 1500) next.multiplyScalar(1500 / Math.hypot(next.x, next.z));
   v.pos.copy(next); const bob = Math.sin(worldT * 1.3) * 0.35; v.ship.position.set(v.pos.x, v.alt + bob, v.pos.z); v.ship.rotation.set(-(up ? 0.08 : 0) + (down ? 0.1 : 0), v.yaw, -turn * 0.18 * Math.min(1, Math.abs(v.speed) / 8)); airshipAnim(v.ship, worldT);
   const hw = v.ship.userData.helm; if (hw) hw.rotation.z = lerp(hw.rotation.z, -turn * 2.6, Math.min(1, dt * 6)); const off = (v.ship.userData.helmZ || 0) - 0.85;
@@ -7827,7 +7915,7 @@ function flyUpdate(dt, ix, iy, up, down) {
   let d = v.yaw + Math.PI - cam.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); cam.yaw += d * Math.min(1, dt * 1.1);
   // cannons
   v.cd -= dt; if ((attackHeld || attackTap || keys.has("j")) && v.cd <= 0) voyFire();
-  const near = Math.hypot(v.pos.x, v.pos.z) < 40; if (near) v.hull = Math.min(voyMaxHull(def), v.hull + voyMaxHull(def) * 0.08 * dt);
+  const near = Math.hypot(v.pos.x, v.pos.z) < (world.hr || 26) + 14; if (near) v.hull = Math.min(voyMaxHull(def), v.hull + voyMaxHull(def) * 0.08 * dt);
   for (const I of world.isles) I.it.r = Math.hypot(v.pos.x - I.x, v.pos.z - I.z) < I.r + 26 ? I.r + 26 : 0;
   S.stats.flown = (S.stats.flown || 0) + Math.abs(v.speed) * dt;
 }
@@ -7887,7 +7975,7 @@ function voyTick(dt) {
 }
 function voyHud() {
   const el = $("voyHud"); if (!el || !world || world.kind !== "skyvoy") return; const v = VOY, band = v.flying ? voyBand(v.pos.x, v.pos.z) : -1;
-  if (!v.flying) { el.innerHTML = `<b>Skyport Harbour</b><span>Walk to the end of the pier and board your airship.</span>`; return; }
+  if (!v.flying) { el.innerHTML = world.theme === "void" ? `<b>Lanternfall · Obsidian Harbour</b><span>Walk to the end of the pier and board your airship.</span>` : `<b>Skyport Harbour</b><span>Walk to the end of the pier and board your airship.</span>`; return; }
   const max = voyMaxHull(v.def), pct = Math.max(0, v.hull / max * 100);
   el.innerHTML = `<b>${esc(v.def.name)}</b><span>${band < 0 ? (world.theme === "void" ? "The calm round the Obsidian Harbour" : "Safe skies near the harbour") : `${VOY_BANDS[band].name} · danger ${VOY_BANDS[band].danger}`}${v.boss ? ` · <em style="color:#ffd166">${esc(v.boss.D.name)} attacks!</em>` : ""}</span>
     <div class="vbar"><i style="width:${pct.toFixed(1)}%;background:${pct > 50 ? "#7fd858" : pct > 25 ? "#ffd166" : "#ff6a5a"}"></i><small>Hull ${Math.ceil(v.hull)} / ${max}</small></div><span class="num">Altitude ${Math.round(v.alt)} · speed ${Math.abs(v.speed).toFixed(0)} · ${Math.round(Math.hypot(v.pos.x, v.pos.z))} from the harbour${world.wormhole && Math.hypot(v.pos.x, v.pos.z) > 900 ? ` · wormhole ${Math.round(Math.hypot(v.pos.x - world.wormhole.x, v.pos.z - world.wormhole.z))} away` : ""}</span>`;
