@@ -123,6 +123,33 @@ body.phone #bFish svg { width: 22px; height: 22px; }
 body.phone .keys { display: none; }
 body.phone #joyHint { width: 96px; height: 96px; font-size: 11px; }
 body.phone #joyBase { width: 112px; height: 112px; margin: -56px 0 0 -56px; }
+/* platform chooser, settings, context button, layout */
+.plat { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.plat button { display: grid; gap: 4px; justify-items: center; padding: 14px 10px; border-radius: 12px; border: 2px solid var(--line); background: rgba(255,255,255,0.04); color: inherit; font: inherit; cursor: pointer; }
+.plat button b { font-family: var(--f-display); font-size: 18px; } .plat button small { font-size: 11.5px; opacity: 0.75; } .plat button i { font-style: normal; font-size: 28px; line-height: 1; }
+.plat button.on { border-color: var(--accent); background: rgba(230,184,92,0.16); box-shadow: 0 0 16px -4px var(--accent); }
+#setPanel .panel { width: min(560px, 100%); max-height: 100%; overflow-y: auto; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 10px; }
+#setPanel h3 { margin: 6px 0 0; font-family: var(--f-display); font-size: 15px; color: var(--accent); }
+#setPanel label.sw { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+#setPanel label.sw small { display: block; opacity: 0.65; font-size: 11px; }
+#setPanel .seg { display: flex; gap: 6px; flex-wrap: wrap; } #setPanel .seg button.on { border-color: var(--accent); color: var(--accent); }
+#bCtx { position: absolute; right: 0; bottom: calc(100% + 10px); width: 120px; height: 52px; border-radius: 26px; font-size: 12.5px; border-color: #7fd858; background: rgba(40,70,30,0.78); }
+#bView { position: absolute; right: 130px; bottom: calc(100% + 14px); width: 44px; height: 44px; font-size: 18px; }
+#actions { transform-origin: bottom right; transform: translate(var(--padX, 0px), var(--padY, 0px)) scale(var(--bs, 1)); }
+body.lefty #actions { right: auto; left: calc(12px + env(safe-area-inset-left, 0px)); transform-origin: bottom left; }
+body.lefty #bCtx { right: auto; left: 0; } body.lefty #bView { right: auto; left: 130px; }
+body.lefty #joyHint { left: auto; right: calc(26px + env(safe-area-inset-right, 0px)); }
+body.plat-pc #actions > .act { display: none; } body.plat-mobile .keys { display: none; }
+body.editPad #actions { outline: 2px dashed var(--accent); outline-offset: 6px; cursor: move; }
+#padDone { position: fixed; z-index: 30; left: 50%; top: 14px; transform: translateX(-50%); }
+#hudTL, #hudTR, #hudTC, #prompt, #voyHud, #toasts, #menuBar { zoom: var(--ts, 1); }
+body.phone #helm { left: calc(10px + env(safe-area-inset-left, 0px)) !important; transform: none !important; bottom: calc(136px + env(safe-area-inset-bottom, 0px)) !important; flex-direction: column-reverse; align-items: flex-start !important; gap: 6px !important; }
+body.phone #helm > div { min-width: 0 !important; width: 150px; padding: 5px 7px !important; font-size: 11px; }
+body.phone #helmWheel { width: 92px; height: 92px; }
+body.phone.flying #helmFire { display: none; }
+body.phone.flying #actions > .act:not(#bAttack):not(#bJump):not(#bBlock) { display: none; }
+body.phone.flying #voyHud { top: calc(var(--menuTop, 170px) + 44px); bottom: auto; width: min(300px, 72vw); }
+body.lefty.phone #helm { left: auto !important; right: calc(10px + env(safe-area-inset-right, 0px)) !important; align-items: flex-end !important; }
 /* airship voyage HUD */
 #voyHud { position: fixed; z-index: 5; left: 50%; transform: translateX(-50%); top: calc(84px + env(safe-area-inset-top, 0px)); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 7px 12px; display: grid; gap: 3px; min-width: min(360px, 70vw); font-size: 12.5px; pointer-events: none; text-align: center; }
 #voyHud b { font-family: var(--f-display); font-size: 14px; }
@@ -416,7 +443,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
 </div>
 <div id="festChip" hidden style="position:fixed;z-index:5;right:calc(12px + env(safe-area-inset-right, 0px));top:calc(156px + env(safe-area-inset-top, 0px));padding:5px 12px;border-radius:999px;background:linear-gradient(90deg,#ff8a3a,#ffd040);color:#1a1008;font-weight:800;font-size:12.5px;box-shadow:0 0 18px -4px #ffb050"></div>
 <div id="menuBar">
-  <button id="mbToggle" aria-expanded="false">&#9776; Menu</button>  <button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests" style="display:none">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses" style="display:none">Classes</button><button id="mbAch">Achievements</button><button id="mbGuild">Guild</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
+  <button id="mbToggle" aria-expanded="false">&#9776; Menu</button>  <button id="mbSettings">Settings</button><button id="mbDaily">Daily</button><button id="mbMap">Map</button><button id="mbArmoury">Armoury</button><button id="mbChests" style="display:none">Chests</button><button id="mbQuests">Quests</button><button id="mbClasses" style="display:none">Classes</button><button id="mbAch">Achievements</button><button id="mbGuild">Guild</button><button id="mbStats">Stats</button><button id="mbShop">Shop</button><button id="mbMusic">Music</button>
 </div>
 <div id="musicPanel" hidden role="dialog" aria-label="Music">
   <div class="mpHead"><b>Music</b><button class="hbtn" id="mpClose">Close</button></div>
@@ -447,7 +474,10 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
   <button class="act mid" id="bJump" aria-label="Jump"><span>Jump</span></button>
   <button class="act mid" id="bDash" aria-label="Dash"><span>Dash</span><div class="pips" id="dashPips"></div></button>
   <button class="act big" id="bAttack" aria-label="Attack"><span>Attack</span></button>
+  <button class="act" id="bCtx" hidden aria-label="Context action"><span id="tCtx">Use</span></button>
+  <button class="act" id="bView" aria-label="Reset camera view" hidden>&#10227;</button>
 </div>
+<button class="btn primary" id="padDone" hidden>Done moving buttons</button>
 <div class="keys">WASD move · drag to look · Space jump · Shift dash · L or Ctrl shift lock · J or click attack · K special · R armour special · F or right-click block (just before a hit to parry) · Q potion · E use · G fish</div>
 <div id="floaters"></div>
 
@@ -512,6 +542,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
     <div class="row" style="justify-content:center"><button class="btn" id="clStay">Keep fighting</button><button class="btn danger" id="clLeave">Leave</button></div>
   </div>
 </div>
+<div class="modal" id="setPanel" hidden><div class="panel" id="setBody"></div></div>
 <div class="modal" id="intro">
   <div class="intro">
     <h1>Vaultbound Isles</h1>
@@ -525,6 +556,7 @@ h3.sec { margin: 6px 0 6px; font-family: var(--f-display); font-size: 16px; lett
       <li><b>Level up</b> from fights and spend stat points on Speed, Damage, Defence or Power.</li>
       <li><b>Open the Armoury</b> to turn your weapons and armour around in 3D and compare their stats.</li>
     </ul>
+    <div><b style="font-size:13px">How are you playing?</b><div class="plat" id="platPick" style="margin-top:6px"><button data-plat="mobile"><i>&#128241;</i><b>Mobile</b><small>Touch controls, big buttons, auto-aim</small></button><button data-plat="pc"><i>&#128421;</i><b>PC (Computer)</b><small>Keyboard and mouse</small></button></div></div>
     <div class="row"><button class="btn primary" id="startBtn">Enter the lobby</button><button class="btn" id="avEditBtn">Edit avatar</button><span class="muted" id="introNote"></span></div>
   </div>
 </div>
@@ -1423,7 +1455,8 @@ const VOY_BANDS = [
   { name: "The Gale Expanse", pre: ["Windswept", "Whistling", "Howling", "Gusting", "Drifting", "Tumbling", "Breezy", "Sighing", "Restless"], sky: [0x6ab8c8, 0xe0f8ff], grd: 0x6a9a8a, c2: 0x9affe8, tree: "pine", danger: 2 },
   { name: "The Thunder Wastes", pre: ["Thunderous", "Charred", "Shattered", "Crackling", "Stormlit", "Blackened", "Riven", "Booming", "Scorched"], sky: [0x2a3048, 0x8a98b8], grd: 0x4a4a5a, c2: 0x9ae8ff, tree: "dead", danger: 3 },
   { name: "The Seraph Heights", pre: ["Hallowed", "Radiant", "Pearl", "Silver", "Hymnal", "Feathered", "Shining", "Holy", "Pale"], sky: [0xa8c8ff, 0xffffff], grd: 0xe8e4d8, c2: 0xfff0a0, tree: "crystal", danger: 4 },
-  { name: "The Godsreach", pre: ["Eternal", "Starforged", "Titan", "Celestial", "Abyssal", "Sovereign", "Ancient", "Endless", "Divine"], sky: [0x1a0a3a, 0x8a5ac8], grd: 0x3a2a5a, c2: 0xd8a0ff, tree: "crystal", danger: 5 }
+  { name: "The Godsreach", pre: ["Eternal", "Starforged", "Titan", "Celestial", "Abyssal", "Sovereign", "Ancient", "Endless", "Divine"], sky: [0x1a0a3a, 0x8a5ac8], grd: 0x3a2a5a, c2: 0xd8a0ff, tree: "crystal", danger: 5 },
+  { name: "The Void Realm", pre: ["Hollow", "Starless", "Umbral", "Silent", "Shadowed", "Nether", "Gloom", "Eclipsed", "Unlit"], sky: [0x05020e, 0x5a2a8a], grd: 0x2a1a3a, c2: 0xc070ff, tree: "crystal", danger: 6, void: true }
 ];
 const VOY_NOUNS = ["Perch", "Rise", "Bluff", "Haven", "Knoll", "Crest", "Isle", "Shelf", "Spire"];
 const DEMIGODS = [
@@ -1431,7 +1464,8 @@ const DEMIGODS = [
   { name: "Zephyra", title: "Demigod of the Four Winds", body: "humanoid", c1: 0x5ad8c8, c2: 0xe0fff8, sc: 3.2, sig: "lightning", isle: "Eyrie of Zephyra" },
   { name: "Thoros", title: "Demigod of Thunder", body: "golem", c1: 0x3a4a6a, c2: 0x9ae8ff, sc: 2.8, sig: "lightning", isle: "Anvil of Thoros" },
   { name: "Seraphiel", title: "Demigod of Wings", body: "humanoid", c1: 0xfaf6ee, c2: 0xffe080, sc: 3.3, sig: "shards", isle: "Choir of Seraphiel" },
-  { name: "Ouranax", title: "the Sky-Father, Eldest of Demigods", body: "dragon", c1: 0x2a1a4a, c2: 0xffd040, sc: 3.4, sig: "meteor", isle: "Crown of Ouranax" }
+  { name: "Ouranax", title: "the Sky-Father, Eldest of Demigods", body: "dragon", c1: 0x2a1a4a, c2: 0xffd040, sc: 3.4, sig: "meteor", isle: "Crown of Ouranax" },
+  { name: "Nihilus", title: "the Hollow King of the Void", body: "void", c1: 0x0a0618, c2: 0xc070ff, sc: 3.8, sig: "voidPull", isle: "Throne of Nihilus" }
 ];
 const VOY_START = ISLANDS.length;
 VOY_BANDS.forEach((B, b) => { for (let k = 0; k < 10; k++) {
@@ -2584,6 +2618,7 @@ function texRep2(name, rep) { return texRep(name, Math.round(rep)); }
 /* swaying grass blades */
 const WIND = { value: 0 };
 function grassField(group, count, col, place) {
+  count = Math.max(1, Math.round(count * gfxGrass()));
   const bg = new THREE.PlaneGeometry(0.07, 0.55, 1, 4); bg.translate(0, 0.275, 0);
   const bp = bg.attributes.position, bc = new Float32Array(bp.count * 3), bn = bg.attributes.normal;
   for (let i = 0; i < bp.count; i++) { const y = bp.getY(i), t = y / 0.55; bp.setX(i, bp.getX(i) * (1 - t * 0.92)); bp.setZ(i, t * t * 0.12); const d = 0.35 + 0.65 * t; bc[i * 3] = bc[i * 3 + 1] = bc[i * 3 + 2] = d; bn.setXYZ(i, 0, 0.9, 0.42); }
@@ -2607,7 +2642,7 @@ function grassField(group, count, col, place) {
     im.setMatrixAt(n, m4); c.set(col).offsetHSL(rand(-0.035, 0.035), rand(-0.12, 0.08), rand(-0.12, 0.1)).convertSRGBToLinear(); im.setColorAt(n, c); n++;
   }
   im.count = n; im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true;
-  im.receiveShadow = true; im.userData.grass = true;
+  im.receiveShadow = true; im.userData.grass = true; im.userData.full = n; im.userData.builtF = gfxGrass();
   group.add(im);
 }
 /* merged foliage cards: one draw call per crown, with leafy shadows */
@@ -3247,14 +3282,14 @@ function addXp(x) {
 function hurtHero(target, amount, from, src) {
   if (target.isHero) {
     if (P.dead || P.invuln > 0 || P.buffs.veil > worldT) return;
-    if (P.blocking) { if (worldT - P.blockStart <= PARRY_WINDOW) { parryHit(src); return; } amount *= S.cls === "knight" ? 0.15 : 0.3; P.kb.multiplyScalar(0.3); }
+    if (P.blocking) { if (worldT - P.blockStart <= PARRY_WINDOW) { buzz([20, 30, 20]); parryHit(src); return; } amount *= S.cls === "knight" ? 0.15 : 0.3; P.kb.multiplyScalar(0.3); }
     else if (src && src.traits) traitOnHit(src);
     let dr = ST.dr;
     if (P.buffs.shield > worldT) dr = 1 - (1 - dr) * (1 - P.buffs.shieldAmt);
     if (run && run.boons && run.boons.laststand && P.hp < ST.maxHp * 0.3) amount *= Math.max(0.4, 1 - 0.15 * run.boons.laststand);
     if (src && !src.dead && run && run.boons && run.boons.frostguard) src.slow = worldT + 2 * run.boons.frostguard;
     const dmg = P.swimming ? amount * 2 : amount * (1 - dr);
-    P.hp -= dmg; floatText(P.pos, `-${Math.round(dmg)}`, "#ff7a85");
+    P.hp -= dmg; floatText(P.pos, `-${Math.round(dmg)}`, "#ff7a85"); buzz(dmg > ST.maxHp * 0.15 ? 70 : 25);
     if (src && !src.dead && !src.dummy && run && run.boons && run.boons.thorns) damageEnemy(src, dmg * 0.3 * run.boons.thorns, null, 0, { noProc: true, canCrit: false, color: "#d8ff6a" });
     if (from && !(P.buffs.noKb > worldT) && !(S.cls === "berserker" && P.atkT > 0)) { const d = P.pos.clone().sub(from).setY(0); if (d.lengthSq() > 0) P.kb.copy(d.normalize().multiplyScalar(5 * ST.kbTaken)); }
     if (S.cls === "warrior" && !P.flags.secondWind && P.hp > 0 && P.hp < ST.maxHp * 0.3) { P.flags.secondWind = true; heal(ST.maxHp * 0.2); toast("<b>Second Wind</b> healed you.", "common"); }
@@ -3293,7 +3328,7 @@ function attack() {
   if (P.atkT > 0 || P.dead || P.dashT > 0) return;
   const w = ITEM[S.equip.weapon];
   P.atkT = 1 / ST.atkSpd; P.swing = 1; P.swingStyle = swingStyleFor(w); P.swingDur = Math.min(0.55, 0.9 / ST.atkSpd); swingFx(w); if (SWORD_STYLE[w.id]) { const ss = SWORD_STYLE[w.id]; later(P.swingDur * 0.45, () => swordFx(ss, w)); } MUSIC.sfx("swing", { w });
-  const t = nearestEnemy(P.pos, ST.reach + 2.5);
+  const t = nearestEnemy(P.pos, ST.reach + (opt().autoAim ? 7 : 2.5));
   if (t) P.face = Math.atan2(t.pos.x - P.pos.x, t.pos.z - P.pos.z);
   const f = fwd();
   const strike = () => {
@@ -3328,6 +3363,7 @@ function shoot(from, to, color, dmg, kb, side, o = {}) {
 function castSpecial() {
   if (P.specT > 0 || P.dead) return;
   const w = ITEM[S.equip.weapon], sp = SPECIALS[w.special];
+  if (opt().autoAim) { const tg = nearestEnemy(P.pos, 14); if (tg) P.face = Math.atan2(tg.pos.x - P.pos.x, tg.pos.z - P.pos.z); }
   P.specT = sp.cd * ST.specCd; bumpStat("specials"); MUSIC.sfx("special");
   const mult = w.specMult * (1 + ST.power), base = ST.hit, f = fwd(), pos = P.pos.clone(), col = w.accent;
   const D = mult * base;
@@ -3610,7 +3646,7 @@ function showResult(eyebrow, title, text, col) {
   $("rsEyebrow").textContent = eyebrow; $("rsTitle").textContent = title; $("rsText").textContent = text; $("resultCard").style.setProperty("--c", col);
   $("result").hidden = false;
 }
-$("rsBtn").addEventListener("click", () => { $("result").hidden = true; if (VOY.returnAfterRun) { VOY.returnAfterRun = false; enterSkyVoyage(); } else goLobby(); });
+$("rsBtn").addEventListener("click", () => { $("result").hidden = true; if (VOY.returnAfterRun) { VOY.returnAfterRun = false; enterSkyVoyage(VOY.theme); } else goLobby(); });
 function goLobby() {
   closeAllModals(); duel = null;
   enemies.forEach(e => { scene.remove(e.R.g); if (e.label) scene.remove(e.label); if (e.bar) scene.remove(e.bar); });
@@ -3630,6 +3666,7 @@ function spawnAlly(def, k) {
 
 /* telegraphs (boss attacks the party must dash out of) */
 function ringTelegraph(at, r, col, dur, friendly) {
+  if (!friendly && at.distanceTo(P.pos) < r + 6) buzz([12, 50, 12]);
   const g = new THREE.Group(); g.position.set(at.x, at.y + 0.06, at.z);
   const fill = new THREE.Mesh(geo("circ", () => new THREE.CircleGeometry(1, 40)), new THREE.MeshBasicMaterial({ color: lin(friendly ? col : 0xff2a3a), transparent: true, opacity: 0.25, depthWrite: false, side: THREE.DoubleSide }));
   const edge = new THREE.Mesh(geo("ringfx2", () => new THREE.RingGeometry(0.94, 1, 48)), new THREE.MeshBasicMaterial({ color: lin(friendly ? col : 0xff4a5a), transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide }));
@@ -3709,9 +3746,9 @@ stage.addEventListener("pointerdown", e => {
   if (SL.on && !coarse && !document.pointerLockElement && e.pointerType === "mouse") { try { stage.requestPointerLock(); } catch (er) {} }
   if (isPaused()) return;
   if (e.pointerType !== "mouse") usedTouch = true;
-  if (e.pointerType !== "mouse" && joy.id === null && e.clientX < window.innerWidth * 0.5 && e.clientY > window.innerHeight * 0.28) {
+  if (e.pointerType !== "mouse" && joy.id === null && joySide(e.clientX) && e.clientY > window.innerHeight * 0.28) {
     joy.id = e.pointerId; joy.ox = e.clientX; joy.oy = e.clientY; const b = $("joyBase"); b.style.left = e.clientX + "px"; b.style.top = e.clientY + "px"; b.hidden = false; $("joyKnob").style.transform = "translate(0,0)"; $("joyHint").hidden = true;
-  } else if (drag.id === null) Object.assign(drag, { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), moved: 0, type: e.pointerType });
+  } else if (drag.id === null && !(e.pointerType !== "mouse" && opt().rightLook && joySide(e.clientX))) Object.assign(drag, { id: e.pointerId, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, yaw0: cam.yaw, pitch0: cam.pitch, t: performance.now(), moved: 0, type: e.pointerType });
   try { stage.setPointerCapture(e.pointerId); } catch (err) {}
 });
 stage.addEventListener("pointermove", e => {
@@ -3723,7 +3760,7 @@ stage.addEventListener("pointermove", e => {
 });
 function endPtr(e) {
   if (e.pointerId === joy.id) { joy.id = null; touchMove.x = touchMove.y = 0; $("joyBase").hidden = true; }
-  if (e.pointerId === drag.id) { if (drag.type === "mouse" && drag.moved < 6 && performance.now() - drag.t < 300) attackTap = true; drag.id = null; }
+  if (e.pointerId === drag.id) { if (drag.type === "mouse" && drag.moved < 6 && performance.now() - drag.t < 300) attackTap = true; else if (drag.type !== "mouse") touchGesture(e); drag.id = null; }
 }
 stage.addEventListener("pointerup", endPtr); stage.addEventListener("pointercancel", endPtr);
 stage.addEventListener("wheel", e => { cam.dist = clamp(cam.dist + e.deltaY * 0.01, 3, 30); e.preventDefault(); }, { passive: false });
@@ -3755,6 +3792,101 @@ holdBtn("bSpecial", () => edge.special = true);
 holdBtn("bArmSpec", () => edge.arm = true);
 holdBtn("bPotion", () => edge.potion = true);
 holdBtn("bBlock", () => blockHeld = true, () => blockHeld = false);
+
+/* ---- platform choice and the ease-of-play settings ---- */
+const OPT_DEF = {
+  mobile: { autoAim: true, holdAtk: true, autoAtk: false, ctxBtn: true, autoLoot: true, camFollow: true, bossZoom: true, rightLook: true, btnScale: 1, leftHand: false, gfx: "medium", fps30: false, swipeDash: true, dblJump: true, vibrate: true, textScale: 1, padX: 0, padY: 0 },
+  pc: { autoAim: false, holdAtk: true, autoAtk: false, ctxBtn: false, autoLoot: false, camFollow: false, bossZoom: true, rightLook: false, btnScale: 1, leftHand: false, gfx: "high", fps30: false, swipeDash: false, dblJump: false, vibrate: false, textScale: 1, padX: 0, padY: 0 }
+};
+let atkLatch = false, camExtra = 0, lootT = 0, lastTap = { t: 0, x: 0, y: 0 }, gfxGroup = null;
+function platGuess() { return S.platform || (coarse ? "mobile" : "pc"); }
+function opt() { if (!S.opt || typeof S.opt !== "object") S.opt = Object.assign({}, OPT_DEF[platGuess()]); for (const k in OPT_DEF.pc) if (S.opt[k] === undefined) S.opt[k] = OPT_DEF[platGuess()][k]; return S.opt; }
+function gfxGrass() { const g = (S.opt && S.opt.gfx) || (coarse ? "medium" : "high"); return g === "low" ? 0.35 : g === "medium" ? 0.7 : 1; }
+function joySide(x) { return opt().leftHand ? x > window.innerWidth * 0.5 : x < window.innerWidth * 0.5; }
+function buzz(p) { try { if (S.opt && S.opt.vibrate && navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+function ctxVerb(label) {
+  const L = label.toLowerCase();
+  const map = [["board", "Board"], ["mine", "Mine"], ["fish", "Fish"], ["cast", "Fish"], ["open", "Open"], ["gather", "Loot"], ["loot", "Loot"], ["talk", "Talk"], ["speak", "Talk"], ["step through", "Enter"], ["enter", "Enter"], ["portal", "Enter"], ["land", "Land"], ["shop", "Shop"], ["buy", "Shop"], ["forge", "Forge"], ["sail", "Sail"], ["read", "Read"], ["climb", "Climb"], ["search", "Search"], ["rest", "Rest"]];
+  for (const [k, v] of map) if (L.includes(k)) return v;
+  return label.length > 14 ? label.split(" ").slice(0, 2).join(" ") : label;
+}
+function applyOpts() {
+  const o = opt(), b = document.body, pl = platGuess();
+  b.classList.toggle("plat-mobile", pl === "mobile"); b.classList.toggle("plat-pc", pl === "pc"); b.classList.toggle("lefty", !!o.leftHand);
+  b.style.setProperty("--bs", o.btnScale); b.style.setProperty("--ts", o.textScale); b.style.setProperty("--padX", (o.padX || 0) + "px"); b.style.setProperty("--padY", (o.padY || 0) + "px");
+  $("bView").hidden = pl === "pc";
+  // graphics
+  const g = o.gfx; sun.castShadow = g !== "low";
+  const dpr = window.devicePixelRatio || 1; PERF.max = g === "low" ? Math.min(dpr, 0.8) : g === "medium" ? Math.min(dpr, 1.25) : Math.min(dpr, coarse ? 1.5 : 2);
+  PERF.pr = coarse ? Math.min(PERF.pr, PERF.max) : PERF.max; if (g === "low") PERF.pr = PERF.max; renderer.setPixelRatio(PERF.pr); resize(); gfxGroup = null;
+}
+function gfxWorldTick() {
+  if (!world || !world.group || gfxGroup === world.group) return; gfxGroup = world.group; const f = gfxGrass();
+  world.group.traverse(o => { if (o.isInstancedMesh && o.userData.grass && o.userData.full) o.count = Math.max(1, Math.min(o.userData.full, Math.round(o.userData.full * f / (o.userData.builtF || f)))); });
+}
+function easeTick(dt, mag, iy) {
+  const o = opt();
+  // camera follows behind while you move forward or sideways
+  if (o.camFollow && mag > 0.2 && iy < 0.35 && drag.id === null && !SL.on && !VOY.flying && !(sailing && !sailing.anchored) && !P.dead) {
+    let d = P.face + Math.PI - cam.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); cam.yaw += d * Math.min(1, dt * 1.1 * mag); }
+  // pick up treasure heaps and chests you walk over
+  lootT -= dt; if (o.autoLoot && lootT <= 0 && !P.dead && !isPaused()) { lootT = 0.25; const it = nearestInteract(); if (it && it.loot && Math.hypot(it.x - P.pos.x, it.z - P.pos.z) < 2.3) it.act(); }
+}
+function touchGesture(e) {
+  const o = opt(), now = performance.now(), dur = now - drag.t, dx = e.clientX - drag.sx, dy = e.clientY - drag.sy, dist = Math.hypot(dx, dy);
+  if (o.swipeDash && dur < 260 && dist > 70) { cam.yaw = drag.yaw0; cam.pitch = drag.pitch0;
+    const cf = new V3(-Math.sin(cam.yaw), 0, -Math.cos(cam.yaw)), cr = new V3(Math.cos(cam.yaw), 0, -Math.sin(cam.yaw)); const v = new V3().addScaledVector(cr, dx).addScaledVector(cf, -dy).normalize(); edge.dash = false; dash(v); return; }
+  if (o.dblJump && dur < 260 && drag.moved < 12) { if (now - lastTap.t < 320 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 60) { edge.jump = true; lastTap.t = 0; } else lastTap = { t: now, x: e.clientX, y: e.clientY }; }
+}
+function choosePlatform(p) {
+  const fromNone = !S.platform; S.platform = p; if (fromNone || !S.opt) S.opt = Object.assign({}, OPT_DEF[p]); else S.opt = Object.assign({}, OPT_DEF[p], { textScale: opt().textScale });
+  document.querySelectorAll("#platPick button, #setBody [data-plat]").forEach(b => b.classList.toggle("on", b.dataset.plat === p)); applyOpts(); save();
+}
+$("platPick").addEventListener("click", e => { const b = e.target.closest("[data-plat]"); if (b) choosePlatform(b.dataset.plat); });
+document.querySelectorAll("#platPick button").forEach(b => b.classList.toggle("on", b.dataset.plat === platGuess()));
+$("startBtn").addEventListener("click", () => { if (!S.platform) choosePlatform(platGuess()); }, true);
+$("bCtx").addEventListener("click", e => { e.stopPropagation(); const it = nearestInteract(); if (it) it.act(); });
+$("bCtx").addEventListener("pointerdown", e => e.stopPropagation());
+$("bView").addEventListener("click", e => { e.stopPropagation(); cam.yaw = P.face + Math.PI; cam.pitch = 0.36; if (!VOY.flying && !sailing) cam.dist = 8.5; });
+const SET_ROWS = [
+  ["Combat", [["autoAim", "Auto-aim", "Attacks and specials turn to the nearest foe"], ["holdAtk", "Hold Attack to keep swinging", ""], ["autoAtk", "Auto-attack", "Swing on your own when a foe is in reach"]]],
+  ["Actions", [["ctxBtn", "Big action button", "Shows Mine, Fish, Open, Talk, Board or Enter above Attack"], ["autoLoot", "Auto-pickup", "Grab treasure heaps and chests you walk over"]]],
+  ["Camera", [["camFollow", "Camera follows behind you", ""], ["bossZoom", "Zoom out in boss fights", ""], ["rightLook", "Drag to look only on the other half", "Stops the camera spinning when you steer"]]],
+  ["Touch gestures", [["swipeDash", "Swipe to dash", "A quick flick on the look side"], ["dblJump", "Double-tap to jump", ""], ["vibrate", "Vibration cues", "Hits taken, parries and boss wind-ups"]]],
+  ["Layout", [["leftHand", "Left-handed layout", "Buttons on the left, joystick on the right"]]],
+  ["Performance", [["fps30", "Battery saver (30 fps)", ""]]]
+];
+function renderSettings() {
+  const o = opt(), pl = platGuess(); const seg = (key, vals) => `<div class="seg">${vals.map(([v, t]) => `<button class="btn ${o[key] === v ? "on" : ""}" data-seg="${key}" data-val="${v}">${t}</button>`).join("")}</div>`;
+  $("setBody").innerHTML = `<div class="row" style="justify-content:space-between"><b style="font-family:var(--f-display);font-size:18px">Settings</b><button class="btn" id="setClose">Close</button></div>
+    <div class="plat"><button data-plat="mobile" class="${pl === "mobile" ? "on" : ""}"><i>&#128241;</i><b>Mobile</b><small>Touch helpers on</small></button><button data-plat="pc" class="${pl === "pc" ? "on" : ""}"><i>&#128421;</i><b>PC (Computer)</b><small>Keyboard and mouse</small></button></div>
+    ${SET_ROWS.map(([h, rows]) => `<h3>${h}</h3>${rows.map(([k, t, d]) => `<label class="sw"><span>${t}${d ? `<small>${d}</small>` : ""}</span><input type="checkbox" data-opt="${k}" ${o[k] ? "checked" : ""}></label>`).join("")}`).join("")}
+    <label class="sw"><span>Button size</span><input type="range" min="0.7" max="1.4" step="0.05" value="${o.btnScale}" data-rng="btnScale"></label>
+    <div class="row"><button class="btn" id="setMovePad">Move the buttons</button><button class="btn" id="setResetPad">Reset button position</button></div>
+    <h3>Graphics</h3>${seg("gfx", [["low", "Low"], ["medium", "Medium"], ["high", "High"]])}<small class="muted">Low turns off shadows and thins the grass. Grass density fully updates in the next area you enter.</small>
+    <h3>Text size</h3>${seg("textScale", [[0.9, "Small"], [1, "Normal"], [1.15, "Large"], [1.3, "Huge"]])}`;
+}
+function openSettings() { renderSettings(); $("setPanel").hidden = false; }
+$("mbSettings").addEventListener("click", openSettings);
+$("setPanel").addEventListener("click", e => {
+  if (e.target === $("setPanel") || e.target.id === "setClose") { $("setPanel").hidden = true; return; }
+  const p = e.target.closest("[data-plat]"); if (p) { choosePlatform(p.dataset.plat); renderSettings(); return; }
+  const sg = e.target.closest("[data-seg]"); if (sg) { const k = sg.dataset.seg, v = sg.dataset.val; opt()[k] = isNaN(+v) ? v : +v; applyOpts(); save(); renderSettings(); return; }
+  if (e.target.id === "setMovePad") { $("setPanel").hidden = true; document.body.classList.add("editPad"); $("padDone").hidden = false; return; }
+  if (e.target.id === "setResetPad") { opt().padX = 0; opt().padY = 0; applyOpts(); save(); toast("Buttons moved back to the corner.", ""); }
+});
+$("setPanel").addEventListener("change", e => { const k = e.target.dataset.opt; if (k) { opt()[k] = e.target.checked; applyOpts(); save(); } });
+$("setPanel").addEventListener("input", e => { const k = e.target.dataset.rng; if (k) { opt()[k] = +e.target.value; applyOpts(); save(); } });
+(function padEditor() {
+  const A = $("actions"); let st = null;
+  A.addEventListener("pointerdown", e => { if (!document.body.classList.contains("editPad")) return; e.stopPropagation(); e.preventDefault(); st = { id: e.pointerId, x: e.clientX, y: e.clientY, px: opt().padX || 0, py: opt().padY || 0 }; try { A.setPointerCapture(e.pointerId); } catch (er) {} }, true);
+  A.addEventListener("pointermove", e => { if (!st || e.pointerId !== st.id) return; const o = opt(); o.padX = Math.round(clamp(st.px + e.clientX - st.x, -window.innerWidth * 0.6, window.innerWidth * 0.6)); o.padY = Math.round(clamp(st.py + e.clientY - st.y, -window.innerHeight * 0.6, 0)); applyOpts(); }, true);
+  const end = () => { st = null; }; A.addEventListener("pointerup", end, true); A.addEventListener("pointercancel", end, true);
+  A.addEventListener("click", e => { if (document.body.classList.contains("editPad")) { e.stopPropagation(); e.preventDefault(); } }, true);
+  $("padDone").addEventListener("click", () => { document.body.classList.remove("editPad"); $("padDone").hidden = true; save(); toast("Button layout saved.", ""); });
+})();
+document.addEventListener("visibilitychange", () => { if (document.hidden) { keys.clear(); attackHeld = jumpHeld = false; touchMove.x = touchMove.y = 0; } else last = performance.now(); });
+opt(); applyOpts();
 const padPrev = {};
 function readPad() {
   const gp = navigator.getGamepads ? Array.from(navigator.getGamepads()).find(p => p && p.connected) : null; if (!gp) return null;
@@ -4116,7 +4248,7 @@ $("mapSide").addEventListener("click", e => {
 });
 $("bLeave").addEventListener("click", () => { $("confirmLeave").hidden = false; });
 $("clStay").addEventListener("click", () => { $("confirmLeave").hidden = true; });
-$("clLeave").addEventListener("click", () => { $("confirmLeave").hidden = true; if (run && VOY.returnAfterRun) { VOY.returnAfterRun = false; enterSkyVoyage(); } else if (world && world.kind === "cave") leaveCave(); else if (world && world.kind === "sky") leaveSkylands(); else if (world && world.kind === "skyvoy") leaveSkyVoyage(); else goLobby(); });
+$("clLeave").addEventListener("click", () => { $("confirmLeave").hidden = true; if (run && VOY.returnAfterRun) { VOY.returnAfterRun = false; enterSkyVoyage(VOY.theme); } else if (world && world.kind === "cave") leaveCave(); else if (world && world.kind === "sky") leaveSkylands(); else if (world && world.kind === "skyvoy") leaveSkyVoyage(); else goLobby(); });
 
 function updateModeUi() {
   const inLobby = world && world.kind === "lobby";
@@ -4124,7 +4256,7 @@ function updateModeUi() {
   $("bLeave").textContent = world && world.kind === "skyvoy" ? "Return to the Skylands" : world && world.kind === "sky" ? "Leave the Skylands" : world && world.kind === "raid" ? "Leave the hall" : world && world.kind === "cave" ? "Leave the cave" : "Leave island";
   if (world && world.kind === "cave") { $("hWhere").textContent = world.cave.name; $("hSub").textContent = "Mine ore. The deeper you go, the richer and the deadlier."; $("bossBar").hidden = true; }
   if (world && world.kind === "sky") { $("hWhere").textContent = "The Skylands"; $("hSub").textContent = "Towers above the clouds. Mind the edges."; $("bossBar").hidden = true; }
-  if (world && world.kind === "skyvoy") { $("hWhere").textContent = "The Open Sky"; $("hSub").textContent = "Fly far, fight hard. Demigods wait at the edge."; $("bossBar").hidden = true; }
+  if (world && world.kind === "skyvoy") { $("hWhere").textContent = world.theme === "void" ? "The Void Realm" : "The Open Sky"; $("hSub").textContent = world.theme === "void" ? "Starless islands. The Hollow King waits." : "Fly far, fight hard. Demigods wait at the edge."; $("bossBar").hidden = true; }
   $("voyHud").hidden = !(world && world.kind === "skyvoy") || !!run;
   if (world && world.kind === "raid") { $("hWhere").textContent = "The Raid Hall"; $("hSub").textContent = "Step through a gate to start a raid"; $("bossBar").hidden = true; }
   if (inLobby) { $("hWhere").textContent = "The Lobby"; $("hSub").textContent = "Step onto a portal to choose an island"; $("bossBar").hidden = true; }
@@ -4182,7 +4314,9 @@ function update(dt) {
   if (fishing) fishControl(mag, !!(attackHeld || attackTap || fishHeld || keys.has("j") || keys.has("e") || edge.use || (gp && (gp.attack || gp.use))));
   else if (rodOut && (attackHeld || attackTap || keys.has("j"))) putRodAway();
   if (!P.dead && !fishing) {
-    if (!P.blocking && (attackHeld || keys.has("j") || attackTap || (gp && gp.attack))) attack();
+    const heldOk = attackHeld && (opt().holdAtk || !atkLatch); if (attackHeld && !opt().holdAtk) atkLatch = true; if (!attackHeld) atkLatch = false;
+    if (!P.blocking && (heldOk || keys.has("j") || attackTap || (gp && gp.attack))) attack();
+    else if (opt().autoAtk && !P.blocking && !sailing && !VOY.flying && enemies.length && nearestEnemy(P.pos, ST.reach + 1)) attack();
     if (edge.dash || (gp && gp.dash)) dash(move);
     if (edge.special || (gp && gp.special)) castSpecial();
     if (edge.arm || (gp && gp.arm)) castArmourSpecial();
@@ -4190,6 +4324,7 @@ function update(dt) {
     if (edge.use || (gp && gp.use)) { const it = nearestInteract(); if (it) it.act(); }
   }
   attackTap = false; for (const k in edge) edge[k] = false;
+  easeTick(dt, mag, iy);
   P.atkT = Math.max(0, P.atkT - dt); P.specT = Math.max(0, P.specT - dt); P.armT = Math.max(0, P.armT - dt); P.potT = Math.max(0, P.potT - dt); P.invuln = Math.max(0, P.invuln - dt);
   P.dashQ = P.dashQ.filter(t => t > worldT);
   if (run && run.boons && run.boons.recovery && !P.dead) heal(ST.maxHp * 0.01 * run.boons.recovery * dt, true);
@@ -4199,7 +4334,7 @@ function update(dt) {
     if (S.cls === "druid") heal(ST.maxHp * 0.007 * dt, true); if (S.cls === "bard") heal(ST.maxHp * 0.005 * dt, true); if (S.cls === "chronomancer") heal(ST.maxHp * 0.006 * dt, true); if (S.cls === "seraph") heal(ST.maxHp * 0.01 * dt, true); if (S.cls === "demigod") heal(ST.maxHp * 0.008 * dt, true);
     if (S.cls === "dragonknight") { P.dfT = (P.dfT || 0) - dt; if (P.dfT <= 0 && enemies.some(e => !e.dead && e.pos.distanceTo(P.pos) < 6)) { P.dfT = 10; for (const e of enemiesNear(P.pos, 6)) damageEnemy(e, ST.hit * 2.5, e.pos.clone().sub(P.pos), 2, { color: "#ff9a3a" }); ringFx(P.pos, 6, 0xff6a2a, 0.6); burstFx(P.pos.clone().add(new V3(0, 1, 0)), 5, 0xff7a2a, 0.5); } }
     if (S.cls === "paladin") { heal(ST.maxHp * 0.01 * dt, true); P.consecrateT -= dt; if (P.consecrateT <= 0 && enemies.some(e => !e.dead && e.pos.distanceTo(P.pos) < 5)) { P.consecrateT = 8; for (const e of enemiesNear(P.pos, 5)) damageEnemy(e, ST.hit * 1.5, e.pos.clone().sub(P.pos), 1.5, { color: "#fff0a0" }); ringFx(P.pos, 5, 0xffe8a0, 0.6); } }
-    helmTick(dt, ix); if (VOY.flying && world.kind === "skyvoy") flyUpdate(dt, ix, iy, jumpDown, blockDown); else if (sailing && !sailing.anchored) sailUpdate(dt, wheelTurn !== null ? wheelTurn : ix, iy); else {
+    helmTick(dt, ix); if (VOY.flying && world.kind === "skyvoy") flyUpdate(dt, wheelTurn !== null ? wheelTurn : ix, iy, jumpDown, blockDown); else if (sailing && !sailing.anchored) sailUpdate(dt, wheelTurn !== null ? wheelTurn : ix, iy); else {
     // horizontal
     if (P.dashT > 0) {
       P.dashT -= dt; P.pos.addScaledVector(P.dashDir, 30 * dt);
@@ -4341,7 +4476,8 @@ function animate(dt, paused) {
   // camera
   camTarget.lerp(new V3(P.pos.x + (SL.on ? Math.cos(cam.yaw) * 0.85 : 0), P.pos.y + 1.55, P.pos.z - (SL.on ? Math.sin(cam.yaw) * 0.85 : 0)), 1 - Math.exp(-12 * dt));
   const cp = Math.cos(cam.pitch);
-  camera.position.set(camTarget.x + Math.sin(cam.yaw) * cp * cam.dist, camTarget.y + Math.sin(cam.pitch) * cam.dist, camTarget.z + Math.cos(cam.yaw) * cp * cam.dist);
+  camExtra = lerp(camExtra, opt().bossZoom && (enemies.some(e => e.boss && !e.dead) || VOY.boss) ? 5 : 0, 1 - Math.exp(-2 * dt)); const cd2 = cam.dist + camExtra;
+  camera.position.set(camTarget.x + Math.sin(cam.yaw) * cp * cd2, camTarget.y + Math.sin(cam.pitch) * cd2, camTarget.z + Math.cos(cam.yaw) * cp * cd2);
   const gy = (world.hBase || world.h)(camera.position.x, camera.position.z) + 0.6; if (camera.position.y < gy) camera.position.y = gy;
   if (camShake > 0) { camShake = Math.max(0, camShake - dt); const k = camShake * 0.12; camera.position.x += (Math.random() - 0.5) * k; camera.position.y += (Math.random() - 0.5) * k; }
   camera.lookAt(camTarget);
@@ -4393,6 +4529,7 @@ function updateHud() {
   const pips = $("dashPips").children, avail = ST.dashes - P.dashQ.length; for (let k = 0; k < pips.length; k++) pips[k].className = k < avail ? "full" : "";
   const it = isPaused() ? null : nearestInteract(), pr = $("prompt");
   if (it) { pr.hidden = false; pr.innerHTML = `<kbd>E</kbd>${esc(it.label)}`; } else pr.hidden = true;
+  const cb = $("bCtx"), showCb = !!it && opt().ctxBtn && S.platform !== "pc"; if (cb.hidden !== !showCb) cb.hidden = !showCb; if (showCb) { const v = ctxVerb(it.label); if (cb.dataset.v !== v) { cb.dataset.v = v; $("tCtx").textContent = v; } }
 }
 /* =====================================================================
    CHESTS, FORGE, QUESTS AND LOBBY TOWNSFOLK
@@ -7557,6 +7694,12 @@ function buildAirship(def) {
     if (id === "barge") { const sun = M(G.cyl(1.6, 1.6, 24), glowMat(0xffd040, 0.95), 0, 5.2, 0, g, 1, 0.08, 1); sun.rotation.x = Math.PI / 2; const gl = glowSprite(0xffd060, 9, 0.6); gl.position.set(0, 5.2, 0); g.add(gl); }
     for (const sx of [-1, 1]) { const lt = glowSprite(0xffc070, 1.4, 0.8); lt.position.set(sx * L.beam * 0.5, 1.6, L.len * 0.3); g.add(lt); }
     g.userData.deck = hull.userData.deck || 0.8; g.userData.len = L.len; }
+  { const hz = id === "kiteraft" || id === "blimp" ? -1.0 : -g.userData.len * 0.3, dk = g.userData.deck, wd = std(0x6a4a2a, { r: 0.8, map: "bark" }), brass = std(0xd8b860, { m: 0.85, r: 0.3 });
+    M(G.cyl(0.08, 0.1, 8), wd, 0, dk + 0.5, hz, g, 1, 1.0, 1); const wh = new THREE.Group(); wh.position.set(0, dk + 1.05, hz); g.add(wh);
+    M(new THREE.TorusGeometry(0.5, 0.05, 6, 22), wd, 0, 0, 0, wh); M(new THREE.TorusGeometry(0.18, 0.04, 6, 14), brass, 0, 0, 0.02, wh);
+    for (let k = 0; k < 4; k++) M(G.box(), wd, 0, 0, 0, wh, 0.06, 1.34, 0.06).rotation.z = k * Math.PI / 4;
+    for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; M(G.sph(), brass, Math.cos(a) * 0.68, Math.sin(a) * 0.68, 0, wh, 0.07); }
+    M(G.cyl(0.08, 0.08, 10), brass, 0, 0, 0, wh, 1, 0.2, 1).rotation.x = Math.PI / 2; g.userData.helm = wh; g.userData.helmZ = hz; }
   shadows(g, true, false); return g;
 }
 function airshipAnim(g, t) { for (const { w, sx } of g.userData.wings || []) w.rotation.z = sx * (Math.sin(t * 2.2) * 0.12); }
@@ -7585,36 +7728,53 @@ const VOY_FOES = [
   [["Storm Griffin", "bat", 0x6a5a3a, 0xffe0a0, 2.2], ["Thunder Wyvern", "dragon", 0x3a4a6a, 0x9ae8ff, 1.1], ["Tempest Wisp", "floater", 0x5a6a8a, 0x9ae8ff, 1.5]],
   [["Sky Serpent", "serpent", 0x2a6a8a, 0x9affe8, 1.6], ["Ash Drake", "dragon", 0x3a2a2a, 0xff6a2a, 1.4], ["Storm Eye", "void", 0x2a2a4a, 0x9ad8ff, 1.6]],
   [["Archangel Sentinel", "humanoid", 0xf0ece0, 0xfff0a0, 1.8], ["Seraph Hound", "beast", 0xf8f4e8, 0xffe080, 1.8], ["Elder Dragon", "dragon", 0x5a1a1a, 0xffb040, 1.8]],
-  [["Godspawn Titan", "giant", 0x4a3a6a, 0xffd0ff, 1.6], ["Void Seraph", "void", 0x1a0a2a, 0xc070ff, 2.0], ["Celestial Hydra", "hydra", 0x2a2a5a, 0xfff0a0, 1.4]]
+  [["Godspawn Titan", "giant", 0x4a3a6a, 0xffd0ff, 1.6], ["Void Seraph", "void", 0x1a0a2a, 0xc070ff, 2.0], ["Celestial Hydra", "hydra", 0x2a2a5a, 0xfff0a0, 1.4]],
+  [["Void Wraith", "void", 0x0a0618, 0xc070ff, 2.1], ["Abyss Leviathan", "serpent", 0x120a22, 0x9a5aff, 2.0], ["Hollow Drake", "dragon", 0x1a1028, 0xd080ff, 2.0]]
 ];
-const VOY_DROPS = [["skysilk", "cloudoak"], ["windstone", "skysilk", "cloudoak"], ["stormfeather", "windstone", "dragonbone"], ["seraphdown", "stormfeather", "dragonbone"], ["dragonbone", "seraphdown", "windstone"]];
-const voyBand = (x, z) => { const d = Math.hypot(x, z); return d < 150 ? -1 : Math.min(4, Math.floor((d - 150) / 230)); };
-function buildSkyVoyage() {
-  clearWorld(); const group = new THREE.Group(); scene.add(group); S.voy = S.voy || {}; S.voy.slain = S.voy.slain || {}; S.voy.search = S.voy.search || {};
-  const isles = []; VOY_BANDS.forEach((B, b) => { const r0 = 260 + b * 230; for (let k = 0; k < 10; k++) { const rr = seeded(b * 100 + k * 7 + 3), a = k / 10 * TAU + b * 0.31 + (rr() - 0.5) * 0.35, d = r0 + (rr() - 0.5) * 90;
+const VOY_DROPS = [["skysilk", "cloudoak"], ["windstone", "skysilk", "cloudoak"], ["stormfeather", "windstone", "dragonbone"], ["seraphdown", "stormfeather", "dragonbone"], ["dragonbone", "seraphdown", "windstone"], ["dragonbone", "seraphdown", "stormfeather", "windstone"]];
+const voyBand = (x, z) => { const d = Math.hypot(x, z); if (d < 150) return -1; if (world && world.theme === "void") return 5; return Math.min(4, Math.floor((d - 150) / 230)); };
+function buildSkyVoyage(theme) {
+  const VD = theme === "void"; clearWorld(); const group = new THREE.Group(); scene.add(group); S.voy = S.voy || {}; S.voy.slain = S.voy.slain || {}; S.voy.search = S.voy.search || {};
+  const isles = []; VOY_BANDS.forEach((B, b) => { if (!!B.void !== VD) return; const r0 = 260 + b * 230; for (let k = 0; k < 10; k++) { const rr = seeded(b * 100 + k * 7 + 3), a = VD ? k * 2.05 + 0.4 : k / 10 * TAU + b * 0.31 + (rr() - 0.5) * 0.35, d = VD ? 230 + k * 64 + (rr() - 0.5) * 30 : r0 + (rr() - 0.5) * 90;
     isles.push({ idx: VOY_START + b * 10 + k, b, k, x: Math.cos(a) * d, z: Math.sin(a) * d, y: -6 + rr() * 34, r: k === 9 ? 30 : 15 + rr() * 10 }); } });
   const h = (x, z) => { if (Math.hypot(x, z) < 26) return 0; if (Math.abs(x) < 2 && z < -24 && z > -40) return 0; return -999; };
-  world = { kind: "skyvoy", group, h, hBase: h, radius: 1e5, circles: [], portals: [], interact: [], animated: [], labels: [], isles };
-  setSky(0x5a9ae8, 0xffe0c0, 0xd8e8ff, 0xe8f0ff, 160, 900, 0xfff0d8, 2.4, 0.65); world.clouds = addClouds(group, 0xffffff);
+  world = { kind: "skyvoy", theme: VD ? "void" : "sky", group, h, hBase: h, radius: 1e5, circles: [], portals: [], interact: [], animated: [], labels: [], isles };
+  if (VD) setSky(0x05020e, 0x5a2a8a, 0x1a0a2a, 0x2a1440, 140, 850, 0xd8a0ff, 1.6, 0.55); else setSky(0x5a9ae8, 0xffe0c0, 0xd8e8ff, 0xe8f0ff, 160, 900, 0xfff0d8, 2.4, 0.65); world.clouds = addClouds(group, VD ? 0x4a2a6a : 0xffffff);
   // a sea of cloud far below
-  { const c = document.createElement("canvas"); c.width = c.height = 512; const x = c.getContext("2d"); x.fillStyle = "#c8d8ef"; x.fillRect(0, 0, 512, 512); for (let k = 0; k < 400; k++) { const g2 = x.createRadialGradient(0, 0, 0, 0, 0, 40); const px = Math.random() * 512, py = Math.random() * 512, rr = 20 + Math.random() * 50; x.fillStyle = `rgba(255,255,255,${0.15 + Math.random() * 0.25})`; x.beginPath(); x.arc(px, py, rr, 0, TAU); x.fill(); }
+  { const c = document.createElement("canvas"); c.width = c.height = 512; const x = c.getContext("2d"); x.fillStyle = VD ? "#140822" : "#c8d8ef"; x.fillRect(0, 0, 512, 512); for (let k = 0; k < 400; k++) { const g2 = x.createRadialGradient(0, 0, 0, 0, 0, 40); const px = Math.random() * 512, py = Math.random() * 512, rr = 20 + Math.random() * 50; x.fillStyle = VD ? `rgba(${120 + Math.random() * 60 | 0},60,${200 + Math.random() * 55 | 0},${0.1 + Math.random() * 0.25})` : `rgba(255,255,255,${0.15 + Math.random() * 0.25})`; x.beginPath(); x.arc(px, py, rr, 0, TAU); x.fill(); }
     const tex = new THREE.CanvasTexture(c); tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(30, 30); const pl = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000), new THREE.MeshBasicMaterial({ map: tex, fog: false })); pl.rotation.x = -Math.PI / 2; pl.position.y = -90; group.add(pl); world.animated.push(t => { tex.offset.set(t * 0.002, t * 0.001); }); }
   // the harbour
-  const rock = std(0x9a8a78, { r: 0.9, map: "rock", rep: 3 }), grass = std(0x6ab84a, { r: 0.9, map: "fabric", rep: 6 }), white = std(0xf4f0e8, { r: 0.7, map: "plaster", rep: 2 }), wood = std(0x8a6a4a, { r: 0.85, map: "bark" });
+  const rock = std(VD ? 0x2a2030 : 0x9a8a78, { r: 0.9, map: "rock", rep: 3 }), grass = std(VD ? 0x3a2a5a : 0x6ab84a, { r: 0.9, map: "fabric", rep: 6 }), white = std(VD ? 0x3a3048 : 0xf4f0e8, { r: 0.7, map: "plaster", rep: 2 }), wood = std(VD ? 0x3a2a3a : 0x8a6a4a, { r: 0.85, map: "bark" });
   M(G.cyl(26, 26, 40), grass, 0, -0.5, 0, group, 1, 1, 1); M(G.cone(40), rock, 0, -16, 0, group, 26, 30, 26).rotation.x = Math.PI; M(G.box(), wood, 0, -0.1, -32, group, 3.4, 0.3, 16);
   for (let k = 0; k < 4; k++) { const a = k / 4 * TAU + 0.6, hx = Math.cos(a) * 15, hz = Math.sin(a) * 15, hg = new THREE.Group(); hg.position.set(hx, 0, hz); hg.rotation.y = -a + Math.PI / 2; group.add(hg); M(G.box(), white, 0, 2, 0, hg, 4, 4, 3.6); const rf = M(G.cone(4), std([0xc84a4a, 0x3a6ac8, 0x4aa86a, 0xe8a040][k], { r: 0.6, flat: true }), 0, 5, 0, hg, 3.4, 2, 3); rf.rotation.y = Math.PI / 4; solidBox(hx, hz, 4.2, 3.8, -a + Math.PI / 2, 999); }
   for (let k = 0; k < 10; k++) { const a = k / 10 * TAU, x = Math.cos(a) * 24, z = Math.sin(a) * 24; M(G.cyl(0.08, 0.1, 6), std(0xe8e4dc), x, 1.1, z, group, 1, 2.2, 1); const gl = glowSprite(0xffe0a0, 2.2, 0.7); gl.position.set(x, 2.3, z); group.add(gl); }
-  { const lb = textSprite("Skyport Harbour · board your airship at the end of the pier", "#9ad8ff", 1.2); lb.position.set(0, 8, -28); group.add(lb); world.labels.push(lb); }
+  { const lb = textSprite(VD ? "Obsidian Harbour · board your airship at the end of the pier" : "Skyport Harbour · board your airship at the end of the pier", VD ? "#d8a0ff" : "#9ad8ff", 1.2); lb.position.set(0, 8, -28); group.add(lb); world.labels.push(lb); }
   world.interact.push({ x: 0, z: -36, y: 0, r: 3.5, label: "Board your airship", act: () => voyBoard() });
   { const pg = new THREE.Group(); pg.position.set(0, 0, 15); pg.rotation.y = Math.PI; group.add(pg); const stoneM = std(0xf4f0e8, { r: 0.6, map: "plaster" }), goldM = std(0xe8c060, { m: 0.9, r: 0.25, e: 0x8a6a20, ei: 0.4 });
     M(G.cyl(3.2, 3.4, 28), stoneM, 0, 0.12, 0, pg, 1, 0.24, 1); for (const sx of [-1.7, 1.7]) M(G.cyl(0.3, 0.36, 10), stoneM, sx, 2.1, 0, pg, 1, 4.2, 1); M(new THREE.TorusGeometry(1.7, 0.2, 8, 24, Math.PI), goldM, 0, 4.2, 0, pg);
-    const disc = portalDisc(0x9ad8ff, 0xffffff); disc.scale.set(1.5, 2.05, 1); disc.position.set(0, 2.15, 0); pg.add(disc); const gl = glowSprite(0x9ad8ff, 5, 0.5); gl.position.set(0, 2.15, 0); pg.add(gl);
+    const disc = VD ? portalDisc(0x8a3aff, 0x0a0418) : portalDisc(0x9ad8ff, 0xffffff); disc.scale.set(1.5, 2.05, 1); disc.position.set(0, 2.15, 0); pg.add(disc); const gl = glowSprite(0x9ad8ff, 5, 0.5); gl.position.set(0, 2.15, 0); pg.add(gl);
     world.animated.push(t => { if (disc.material.uniforms) disc.material.uniforms.t.value = t; });
-    const lb = textSprite("Portal to the Skylands", "#9ad8ff", 0.95); lb.position.set(0, 6, 15); group.add(lb); world.labels.push(lb); solidCyl(-1.7, 15, 0.4, 99); solidCyl(1.7, 15, 0.4, 99);
-    world.interact.push({ x: 0, z: 13.6, y: 0, r: 3, label: "Step through to the Skylands", act: () => leaveSkyVoyage() });
-    let inside = false; world.animated.push(() => { if (VOY.flying || P.dead || run) return; const d = Math.hypot(P.pos.x, P.pos.z - 15); if (d < 1.3 && !inside) { inside = true; askTravel("Skylands portal", "Return to the Skylands?", "The portal carries you back to the Skyport. Your airship stays moored here.", () => leaveSkyVoyage()); } if (d > 3) inside = false; }); }
+    const lb = textSprite(VD ? "Wormhole back to the Open Sky" : "Portal to the Skylands", VD ? "#d8a0ff" : "#9ad8ff", 0.95); lb.position.set(0, 6, 15); group.add(lb); world.labels.push(lb); solidCyl(-1.7, 15, 0.4, 99); solidCyl(1.7, 15, 0.4, 99);
+    const back = () => VD ? enterSkyVoyage("sky") : leaveSkyVoyage();
+    world.interact.push({ x: 0, z: 13.6, y: 0, r: 3, label: VD ? "Step through to the Open Sky" : "Step through to the Skylands", act: back });
+    let inside = false; world.animated.push(() => { if (VOY.flying || P.dead || run) return; const d = Math.hypot(P.pos.x, P.pos.z - 15); if (d < 1.3 && !inside) { inside = true; if (VD) askTravel("Wormhole", "Return to the Open Sky?", "The wormhole folds you back to Skyport Harbour in the Open Sky.", back); else askTravel("Skylands portal", "Return to the Skylands?", "The portal carries you back to the Skyport. Your airship stays moored here.", back); } if (d > 3) inside = false; }); }
+  if (VD) { // drifting void shards round the harbour
+    for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, d = 60 + (k % 4) * 30, sh = M(G.oct(), std(0x1a0a2a, { e: 0x8a3aff, ei: 0.6, r: 0.2, m: 0.4 }), Math.cos(a) * d, 10 + (k % 5) * 8, Math.sin(a) * d, group, 3 + (k % 3) * 2, 6 + (k % 4) * 2, 3 + (k % 3) * 2); const gl = glowSprite(0xa060ff, 14, 0.35); sh.add(gl);
+      world.animated.push(t => { sh.rotation.y = t * 0.2 + k; sh.position.y = 10 + (k % 5) * 8 + Math.sin(t * 0.5 + k) * 2; }); } }
+  else { // the wormhole at the far edge of the Open Sky
+    const aW = 0.9, W = new V3(Math.cos(aW) * 1400, 30, Math.sin(aW) * 1400), wg = new THREE.Group(); wg.position.copy(W); group.add(wg); wg.lookAt(0, 30, 0);
+    const disc = portalDisc(0x8a3aff, 0x05020e); disc.scale.set(19, 19, 1); wg.add(disc);
+    const r1 = M(new THREE.TorusGeometry(20, 1.3, 8, 64), glowMat(0xc070ff, 0.95), 0, 0, 0, wg), r2 = M(new THREE.TorusGeometry(25, 0.6, 6, 64), glowMat(0x6a2aff, 0.8), 0, 0, -2, wg), r3 = M(new THREE.TorusGeometry(30, 0.35, 6, 64), glowMat(0xe0b0ff, 0.6), 0, 0, -4, wg);
+    for (let k = 0; k < 10; k++) { const a = k / 10 * TAU, sh = M(G.oct(), std(0x1a0a2a, { e: 0xa060ff, ei: 0.8 }), Math.cos(a) * 34, Math.sin(a) * 34, -3, wg, 1.6, 3.2, 1.6); r3.add(sh); sh.position.set(Math.cos(a) * 30, Math.sin(a) * 30, 0); }
+    const gl = glowSprite(0xa060ff, 110, 0.55); wg.add(gl); const gl2 = glowSprite(0xffffff, 26, 0.5); wg.add(gl2);
+    const lb = textSprite("Wormhole to the Void Realm · danger 6", "#d8a0ff", 4); lb.position.set(W.x, W.y + 38, W.z); lb.userData.far = 2000; group.add(lb); world.labels.push(lb);
+    world.wormhole = W; let asked = false;
+    world.animated.push(t => { if (disc.material.uniforms) disc.material.uniforms.t.value = t * 1.6; r1.rotation.z = t * 0.6; r2.rotation.z = -t * 0.9; r3.rotation.z = t * 0.25; gl.material.opacity = 0.45 + Math.sin(t * 2) * 0.12;
+      if (!VOY.flying || VOY.sink || P.dead || run) return; const d = Math.hypot(VOY.pos.x - W.x, VOY.alt - W.y, VOY.pos.z - W.z);
+      if (d < 26 && !asked) { asked = true; VOY.speed = 0; askTravel("Wormhole", "Enter the Void Realm?", "A tear in the sky leads to the Void Realm: ten starless islands, the fiercest beasts yet, and Nihilus, the Hollow King. Your airship goes with you.", () => enterSkyVoyage("void")); }
+      if (d > 70) asked = false; }); }
   // the fifty islands
-  const bandCol = [[0xd8b878, 0x8ac04a], [0x6a9a8a, 0x5aa88a], [0x4a4a5a, 0x3a4a3a], [0xe8e4d8, 0xd8e8c8], [0x3a2a5a, 0x6a4a9a]];
+  const bandCol = [[0xd8b878, 0x8ac04a], [0x6a9a8a, 0x5aa88a], [0x4a4a5a, 0x3a4a3a], [0xe8e4d8, 0xd8e8c8], [0x3a2a5a, 0x6a4a9a], [0x1a1024, 0x3a2050]];
   for (const I of isles) { const B = VOY_BANDS[I.b], [rc0, gc] = bandCol[I.b], ig = new THREE.Group(); ig.position.set(I.x, I.y, I.z); group.add(ig); const rr = seeded(I.idx * 13);
     M(G.cyl(I.r, I.r * 0.92, 20), std(gc, { r: 0.9, map: "fabric", rep: 4 }), 0, -0.4, 0, ig, 1, 0.8, 1); M(G.cone(20), std(rc0, { r: 0.9, map: "rock", rep: 3 }), 0, -I.r * 0.75, 0, ig, I.r * 0.95, I.r * 1.4, I.r * 0.95).rotation.x = Math.PI;
     for (let k = 0; k < 4 + Math.floor(I.r / 4); k++) { const a = rr() * TAU, d = rr() * I.r * 0.75, t = makeTree(B.tree, rr); t.position.set(Math.cos(a) * d, 0, Math.sin(a) * d); t.scale.setScalar(0.9 + rr() * 0.6); ig.add(t); }
@@ -7634,10 +7794,11 @@ function voyCleanup() {
   if (run) { run = null; computeStats(); renderBoonBar(); $("cards").hidden = true; } if (sailing) removeBoat(); stopFishing(); if (mining) endMining(false);
   voyDropShip(); for (const f of VOY.flyers) voyFlyerGone(f); VOY.flyers = []; VOY.balls = []; VOY.boss = null;
 }
-function enterSkyVoyage() {
-  voyCleanup(); buildSkyVoyage(); P.pos.set(0, 0, 6); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.dead = false; P.hp = ST.maxHp; P.onPortal = -1; P.dashT = 0;
-  updateModeUi(); MUSIC.setMode("portal", 0, "The Open Sky"); bumpStat("voyages"); $("voyHud").hidden = false; voyHud();
-  banner("The Open Sky", "Fifty islands, five demigods. The further you fly, the fiercer it gets."); save();
+function enterSkyVoyage(theme) {
+  VOY.theme = theme === "void" ? "void" : "sky"; const VD = VOY.theme === "void"; voyCleanup(); buildSkyVoyage(VOY.theme); P.pos.set(0, 0, 6); P.face = Math.PI; cam.yaw = 0; P.vy = 0; P.dead = false; P.hp = ST.maxHp; P.onPortal = -1; P.dashT = 0;
+  updateModeUi(); MUSIC.setMode("portal", 0, VD ? "The Void Realm" : "The Open Sky"); bumpStat("voyages"); $("voyHud").hidden = false; voyHud();
+  if (VD) { bumpStat("voidTrips"); banner("The Void Realm", "Ten starless islands. Nihilus, the Hollow King, waits at the last."); if (Object.keys(S.airships || {}).length) voyBoard(); }
+  else banner("The Open Sky", "Fifty islands, five demigods. Fly far enough and a wormhole waits at the edge."); save();
 }
 function leaveSkyVoyage() { voyCleanup(); $("voyHud").hidden = true; enterSkylands(); const SPx = 38, SPz = 124; P.pos.set(SPx + 3, 2, SPz + 8); P.vy = 0; }
 function voyBoard() {
@@ -7645,7 +7806,7 @@ function voyBoard() {
   voyDropShip(); const ship = buildAirship(def); world.group.add(ship);
   Object.assign(VOY, { flying: true, ship, def, yaw: Math.PI, alt: 6, speed: 0, hull: voyMaxHull(def), sink: 0, cd: 0 }); VOY.pos.set(0, 0, -44);
   P.dashT = 0; cam.dist = Math.max(cam.dist, 22); voyHud();
-  toast("You take the wheel. Move to steer, hold Jump to climb and Block to dive. Attack fires the cannons. Fly near an island and press use to land.", "epic");
+  toast("You take the wheel. Move or turn the wheel to steer, hold Jump to climb and Block to dive. Attack fires the cannons. Fly near an island and press use to land.", "epic");
 }
 function voyMaxHull(def) { return Math.round(def.hull * (S.cls === "skyknight" ? 1.25 : 1) * (S.cls === "demigod" ? 1.3 : 1)); }
 function voyDropShip() { if (VOY.ship && VOY.ship.parent) VOY.ship.parent.remove(VOY.ship); VOY.ship = null; VOY.flying = false; }
@@ -7661,7 +7822,8 @@ function flyUpdate(dt, ix, iy, up, down) {
   if (Math.hypot(next.x, next.z) < 27 && v.alt < 3) { const d = Math.hypot(next.x, next.z) || 1; next.x *= 27 / d; next.z *= 27 / d; }
   if (Math.hypot(next.x, next.z) > 1500) next.multiplyScalar(1500 / Math.hypot(next.x, next.z));
   v.pos.copy(next); const bob = Math.sin(worldT * 1.3) * 0.35; v.ship.position.set(v.pos.x, v.alt + bob, v.pos.z); v.ship.rotation.set(-(up ? 0.08 : 0) + (down ? 0.1 : 0), v.yaw, -turn * 0.18 * Math.min(1, Math.abs(v.speed) / 8)); airshipAnim(v.ship, worldT);
-  P.pos.set(v.pos.x, v.ship.position.y + v.ship.userData.deck, v.pos.z); P.vy = 0; P.onGround = true; P.kb.set(0, 0, 0); if (P.swing <= 0) P.face = v.yaw;
+  const hw = v.ship.userData.helm; if (hw) hw.rotation.z = lerp(hw.rotation.z, -turn * 2.6, Math.min(1, dt * 6)); const off = (v.ship.userData.helmZ || 0) - 0.85;
+  P.pos.set(v.pos.x + f.x * off, v.ship.position.y + v.ship.userData.deck, v.pos.z + f.z * off); P.vy = 0; P.onGround = true; P.kb.set(0, 0, 0); if (P.swing <= 0) P.face = v.yaw;
   let d = v.yaw + Math.PI - cam.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); cam.yaw += d * Math.min(1, dt * 1.1);
   // cannons
   v.cd -= dt; if ((attackHeld || attackTap || keys.has("j")) && v.cd <= 0) voyFire();
@@ -7727,8 +7889,8 @@ function voyHud() {
   const el = $("voyHud"); if (!el || !world || world.kind !== "skyvoy") return; const v = VOY, band = v.flying ? voyBand(v.pos.x, v.pos.z) : -1;
   if (!v.flying) { el.innerHTML = `<b>Skyport Harbour</b><span>Walk to the end of the pier and board your airship.</span>`; return; }
   const max = voyMaxHull(v.def), pct = Math.max(0, v.hull / max * 100);
-  el.innerHTML = `<b>${esc(v.def.name)}</b><span>${band < 0 ? "Safe skies near the harbour" : `${VOY_BANDS[band].name} · danger ${VOY_BANDS[band].danger}`}${v.boss ? ` · <em style="color:#ffd166">${esc(v.boss.D.name)} attacks!</em>` : ""}</span>
-    <div class="vbar"><i style="width:${pct.toFixed(1)}%;background:${pct > 50 ? "#7fd858" : pct > 25 ? "#ffd166" : "#ff6a5a"}"></i><small>Hull ${Math.ceil(v.hull)} / ${max}</small></div><span class="num">Altitude ${Math.round(v.alt)} · speed ${Math.abs(v.speed).toFixed(0)} · ${Math.round(Math.hypot(v.pos.x, v.pos.z))} from the harbour</span>`;
+  el.innerHTML = `<b>${esc(v.def.name)}</b><span>${band < 0 ? (world.theme === "void" ? "The calm round the Obsidian Harbour" : "Safe skies near the harbour") : `${VOY_BANDS[band].name} · danger ${VOY_BANDS[band].danger}`}${v.boss ? ` · <em style="color:#ffd166">${esc(v.boss.D.name)} attacks!</em>` : ""}</span>
+    <div class="vbar"><i style="width:${pct.toFixed(1)}%;background:${pct > 50 ? "#7fd858" : pct > 25 ? "#ffd166" : "#ff6a5a"}"></i><small>Hull ${Math.ceil(v.hull)} / ${max}</small></div><span class="num">Altitude ${Math.round(v.alt)} · speed ${Math.abs(v.speed).toFixed(0)} · ${Math.round(Math.hypot(v.pos.x, v.pos.z))} from the harbour${world.wormhole && Math.hypot(v.pos.x, v.pos.z) > 900 ? ` · wormhole ${Math.round(Math.hypot(v.pos.x - world.wormhole.x, v.pos.z - world.wormhole.z))} away` : ""}</span>`;
 }
 function openVoyBoard(I) {
   if (run) return; const i = I.idx, IS = ISLANDS[i], B = VOY_BANDS[I.b]; dlgNpc = null; keys.clear(); attackHeld = false;
@@ -7744,7 +7906,7 @@ function openVoyBoard(I) {
 $("dialog").addEventListener("click", e => { const b = e.target.closest("[data-voy],[data-voysearch]"); if (!b) return;
   if (b.dataset.voysearch) { const i = +b.dataset.voysearch, I = openVoyBoard.last, band = I.b; S.voy.search[i] = Date.now(); const got = [];
     for (const id of VOY_DROPS[band]) { const n = 1 + Math.floor(Math.random() * (2 + (band === 0 ? 1 : 0))); gain(ITEM[id], null, n, true); got.push(`${n} × ${ITEM[id].name}`); }
-    if (band === 4 && Math.random() < 0.12) { gain(ITEM.godember, null, 1, true); got.push("a Godforge Ember"); } const c = 400 * (band + 1); S.coins += c;
+    if (band >= 4 && Math.random() < (band === 5 ? 0.25 : 0.12)) { gain(ITEM.godember, null, 1, true); got.push("a Godforge Ember"); } const c = 400 * (band + 1); S.coins += c;
     MUSIC.sfx("chest"); toast(`<b>Searched ${esc(ISLANDS[i].name)}</b>: ${got.map(esc).join(", ")} and ${fmt(c)} coins.`, "epic"); save(); openVoyBoard(I); return; }
   const [i, k] = b.dataset.voy.split(":").map(Number); $("dialog").hidden = true; voyDropShip(); for (const f of VOY.flyers) voyFlyerGone(f); VOY.flyers = []; VOY.boss = null; $("voyHud").hidden = true; VOY.returnAfterRun = true; startRun(i, k, S.allies.slice()); });
 /* ---- Marla the Fishmonger, by Mirror Pond ---- */
@@ -8122,12 +8284,16 @@ let wheelTurn = null, cannonT = 0;
   wh.addEventListener("pointerdown", e => { x0 = e.clientX; wh.setPointerCapture(e.pointerId); wheelTurn = 0; });
   wh.addEventListener("pointermove", e => { if (x0 === null) return; wheelTurn = clamp((e.clientX - x0) / 70, -1, 1); });
   const up = () => { x0 = null; wheelTurn = null; }; wh.addEventListener("pointerup", up); wh.addEventListener("pointercancel", up);
-  $("helmFire").addEventListener("click", () => fireCannons());
+  $("helmFire").addEventListener("click", () => { if (VOY.flying && VOY.ship) { if (VOY.cd <= 0 && !VOY.sink) voyFire(); } else fireCannons(); });
 })();
 let helmAngle = 0;
 function helmTick(dt, ix) {
-  const sh = sailing && !sailing.anchored && !sailing.sink, el = $("helm"); el.hidden = !sh; if (!sh) return;
+  const fl = VOY.flying && VOY.ship && world && world.kind === "skyvoy" && !VOY.sink, sh = !fl && sailing && !sailing.anchored && !sailing.sink, el = $("helm"); el.hidden = !(sh || fl); if (document.body.classList.contains("flying") !== !!fl) document.body.classList.toggle("flying", !!fl); if (!(sh || fl)) return;
   const t = wheelTurn !== null ? wheelTurn : clamp(ix || 0, -1, 1); helmAngle = lerp(helmAngle, t * 150, Math.min(1, dt * 8)); $("helmSpin").setAttribute("transform", `rotate(${helmAngle.toFixed(1)})`);
+  if (fl) { const max = voyMaxHull(VOY.def), k = Math.max(0, VOY.hull / max); $("helmBoat").textContent = `${VOY.def.name} · hull ${Math.ceil(VOY.hull)} / ${max}`; $("helmHullT").textContent = Math.round(k * 100) + "%";
+    $("helmHull").style.width = (k * 100) + "%"; $("helmHull").style.background = k > 0.6 ? "#7fd69a" : k > 0.35 ? "#e6b85c" : "#ff5a6a"; $("helmWarn").style.display = k < 0.35 ? "block" : "none"; $("helmWarn").textContent = "Hull critical. Fly back to the harbour!";
+    const full = 0.55 / (1 + VOY.def.tier * 0.08); $("cdCannon").style.height = (VOY.cd > 0 ? 100 * Math.min(1, VOY.cd / full) : 0) + "%"; return; }
+  $("helmWarn").textContent = "Hull critical. Retreat to shore!";
   const k = sailing.hull / sailing.def.hull; $("helmBoat").textContent = `${sailing.def.name} · hull ${Math.ceil(sailing.hull)} / ${sailing.def.hull}`; $("helmHullT").textContent = Math.round(k * 100) + "%";
   $("helmHull").style.width = (k * 100) + "%"; $("helmHull").style.background = k > 0.6 ? "#7fd69a" : k > 0.35 ? "#e6b85c" : "#ff5a6a"; $("helmWarn").style.display = k < 0.35 ? "block" : "none";
   cannonT = Math.max(0, cannonT - dt); $("cdCannon").style.height = (cannonT > 0 ? 100 * cannonT / 1.6 : 0) + "%";
@@ -8658,7 +8824,7 @@ function caveBossVault(at) {
     M(G.cone(10), gold, 0, 0.45, 0, tg, 1.4, 0.9, 1.4); for (let j = 0; j < 14; j++) M(G.cyl(0.14, 0.14, 10), gold, (rr() - 0.5) * 2.6, 0.06 + rr() * 0.3, (rr() - 0.5) * 2.6, tg, 1, 0.12, 1);
     for (let j = 0; j < 5; j++) M(G.oct(), std([0xff4a6a, 0x4ad8ff, 0x7aff6a, 0xd88aff, 0xffffff][j], { e: [0xff4a6a, 0x4ad8ff, 0x7aff6a, 0xd88aff, 0xffffff][j], ei: 0.8, r: 0.2 }), (rr() - 0.5) * 1.6, 0.7 + rr() * 0.4, (rr() - 0.5) * 1.6, tg, 0.16);
     const gl = glowSprite(0xffd040, 4, 0.5); gl.position.y = 1; tg.add(gl);
-    const it = { x, z, y, r: 2.6, label: "Gather the treasure", act: () => { const coins = Math.round(4000 + rr() * 6000 + S.level * 150); S.coins += coins; const gem = ITEM[pick(top)[0]]; gain(gem, tg.position.clone(), 2, true);
+    const it = { x, z, y, r: 2.6, loot: true, label: "Gather the treasure", act: () => { const coins = Math.round(4000 + rr() * 6000 + S.level * 150); S.coins += coins; const gem = ITEM[pick(top)[0]]; gain(gem, tg.position.clone(), 2, true);
       g.remove(tg); world.interact = world.interact.filter(i => i !== it); MUSIC.sfx("chest"); burstFx(new V3(x, y + 1, z), 2, 0xffd040, 0.6); bumpStat("treasures"); save(); toast(`<b>Treasure!</b> ${fmt(coins)} coins and 2 × ${esc(gem.name)}.`, "legendary"); } };
     world.interact.push(it); }
   // three chests behind the hoard
@@ -8667,7 +8833,7 @@ function caveBossVault(at) {
     M(G.box(), body, 0, 0.4, 0, cg, 1.3, 0.8, 0.85); const lid = M(G.cyl(0.43, 0.43, 14, true), body, 0, 0.8, 0, cg, 1, 1.5, 1); lid.rotation.z = Math.PI / 2;
     for (const sx of [-0.45, 0.45]) M(G.box(), band, sx, 0.6, 0, cg, 0.1, 1.25, 0.9); M(G.box(), band, 0, 0.62, 0.44, cg, 0.2, 0.26, 0.05);
     const gl = glowSprite(new THREE.Color(T.band).getHex(), 2.6, 0.55); gl.position.y = 1; cg.add(gl);
-    const it = { x, z, y, r: 2.4, label: `Open the ${T.name}`, act: () => { grantChest(t, 11); g.remove(cg); world.interact = world.interact.filter(i => i !== it); MUSIC.sfx("chest"); burstFx(new V3(x, y + 1, z), 1.6, new THREE.Color(T.band).getHex(), 0.5); save(); toast(`<b>${esc(T.name)}</b> added to your chests. Open it from the Armoury.`, T.rarity); } };
+    const it = { x, z, y, r: 2.4, loot: true, label: `Open the ${T.name}`, act: () => { grantChest(t, 11); g.remove(cg); world.interact = world.interact.filter(i => i !== it); MUSIC.sfx("chest"); burstFx(new V3(x, y + 1, z), 1.6, new THREE.Color(T.band).getHex(), 0.5); save(); toast(`<b>${esc(T.name)}</b> added to your chests. Open it from the Armoury.`, T.rarity); } };
     world.interact.push(it); addCircle(x, z, 0.7, 1.2); });
   const lb = textSprite("The Boss's Hoard", "#ffd166", 1.2); lb.position.set(at.x, h(at.x, at.z) + 4.5, at.z - 3); g.add(lb); world.labels && world.labels.push(lb);
   const pl = new THREE.PointLight(lin(0xffd080), 1.6, 26, 2); pl.position.set(at.x, h(at.x, at.z) + 5, at.z - 3); g.add(pl);
@@ -8678,7 +8844,7 @@ function caveHeap(group, x, z, C, big) {
   M(G.cone(10), gold, 0, 0.45 * sc, 0, tg, 1.4 * sc, 0.9 * sc, 1.4 * sc); for (let j = 0; j < 14; j++) M(G.cyl(0.14, 0.14, 10), gold, (rr() - 0.5) * 2.6 * sc, 0.06 + rr() * 0.3, (rr() - 0.5) * 2.6 * sc, tg, 1, 0.12, 1);
   for (let j = 0; j < 5; j++) { const c = [0xff4a6a, 0x4ad8ff, 0x7aff6a, 0xd88aff, 0xffffff][j]; M(G.oct(), std(c, { e: c, ei: 0.8, r: 0.2 }), (rr() - 0.5) * 1.6 * sc, 0.7 * sc + rr() * 0.4, (rr() - 0.5) * 1.6 * sc, tg, 0.16); }
   const gl = glowSprite(0xffd040, 4 * sc, 0.5); gl.position.y = 1; tg.add(gl); const top = C.ores[3];
-  const it = { x, z, y, r: 2.6, label: "Gather the treasure", act: () => { const coins = Math.round((big ? 9000 : 5000) + rr() * 6000 + S.level * 180); S.coins += coins; const gem = ITEM[pick(top)[0]]; gain(gem, tg.position.clone(), big ? 3 : 2, true);
+  const it = { x, z, y, r: 2.6, loot: true, label: "Gather the treasure", act: () => { const coins = Math.round((big ? 9000 : 5000) + rr() * 6000 + S.level * 180); S.coins += coins; const gem = ITEM[pick(top)[0]]; gain(gem, tg.position.clone(), big ? 3 : 2, true);
     group.remove(tg); world.interact = world.interact.filter(i => i !== it); MUSIC.sfx("chest"); burstFx(new V3(x, y + 1, z), 2, 0xffd040, 0.6); bumpStat("treasures"); save(); toast(`<b>Treasure!</b> ${fmt(coins)} coins and ${big ? 3 : 2} × ${esc(gem.name)}.`, "legendary"); } };
   world.interact.push(it);
 }
@@ -8687,7 +8853,7 @@ function caveChestAt(group, x, z, t) {
   const body = std(new THREE.Color(T.col).getHex(), { r: 0.7, map: "bark" }), band = std(new THREE.Color(T.band).getHex(), { m: 0.9, r: 0.3 });
   M(G.box(), body, 0, 0.4, 0, cg, 1.3, 0.8, 0.85); const lid = M(G.cyl(0.43, 0.43, 14), body, 0, 0.8, 0, cg, 1, 1.5, 1); lid.rotation.z = Math.PI / 2; for (const sx of [-0.45, 0.45]) M(G.box(), band, sx, 0.6, 0, cg, 0.1, 1.25, 0.9);
   const gl = glowSprite(new THREE.Color(T.band).getHex(), 2.6, 0.55); gl.position.y = 1; cg.add(gl);
-  const it = { x, z, y, r: 2.4, label: `Open the ${T.name}`, act: () => { grantChest(t, 11); group.remove(cg); world.interact = world.interact.filter(i => i !== it); MUSIC.sfx("chest"); burstFx(new V3(x, y + 1, z), 1.6, new THREE.Color(T.band).getHex(), 0.5); save(); toast(`<b>${esc(T.name)}</b> added to your chests.`, T.rarity); } };
+  const it = { x, z, y, r: 2.4, loot: true, label: `Open the ${T.name}`, act: () => { grantChest(t, 11); group.remove(cg); world.interact = world.interact.filter(i => i !== it); MUSIC.sfx("chest"); burstFx(new V3(x, y + 1, z), 1.6, new THREE.Color(T.band).getHex(), 0.5); save(); toast(`<b>${esc(T.name)}</b> added to your chests.`, T.rarity); } };
   world.interact.push(it); addCircle(x, z, 0.7, 1.2);
 }
 function buildCaveDeep(C, F, group) {
@@ -9347,6 +9513,8 @@ $("prompt").style.pointerEvents = "auto";
 $("prompt").addEventListener("click", () => { const it = nearestInteract(); if (it) it.act(); });
 function frame(now) {
   requestAnimationFrame(frame);
+  if (S.opt && S.opt.fps30 && now - last < 31) return;
+  gfxWorldTick();
   const raw = Math.max(0, (now - last) / 1000); last = now;
   const dt = Math.min(0.1, raw) * timeScale, steps = dt > 0.034 ? 2 : 1;
   if (coarse && raw < 0.5) { PERF.acc += raw; PERF.n++; if (PERF.acc > 2.5) { const avg = PERF.acc / PERF.n; let np = PERF.pr;
@@ -9401,7 +9569,7 @@ $("achList").addEventListener("click", e => { const b = e.target.closest("button
 $("achNow").addEventListener("click", e => { if (e.target.closest("[data-hide]")) { S.title = null; save(); refreshNameTag(); renderAchievements(); } });
 $("startBtn").addEventListener("click", () => { if (S.avatar && S.name) enterLobby(); else openAvatar(true); });
 buildLobby(); rebuildHero(); refreshNameTag(); P.hp = ST.maxHp; updateModeUi(); MUSIC.setMode("lobby", 0, "Harbour of Portals"); updateChestBadge();
-window.__game = { buildHumanoid, openFishmonger, buildCaveDeep, carveLobbyTerrain, buildCreature, classPct, CLASS_LIST, dressFoe, FOE_TRAITS, VOY, AIRSHIPS, enterSkyVoyage, leaveSkyVoyage, voyBoard, voySpawn, voyKill, openAirwright, openVoyBoard, buildAirship, VOY_START, DEMIGODS, PERF, caveBossVault, moundH, openSkyRealmBoard, SKY_REALM_START, SKY_NPC_QUESTS, npcQ, openNpcQuests, ACH, festivalTick, currentFestival, get festNow() { return festNow; }, festivalGift, BOONS, heroLight, get nightGlows() { return nightGlows; }, DAY, skyQ, openSkyQuests, get SKYGATE() { return SKYGATE; }, askTravel, fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
+window.__game = { opt, applyOpts, choosePlatform, openSettings, ctxVerb, gfxGrass, nearestInteract, buildHumanoid, openFishmonger, buildCaveDeep, carveLobbyTerrain, buildCreature, classPct, CLASS_LIST, dressFoe, FOE_TRAITS, VOY, AIRSHIPS, enterSkyVoyage, leaveSkyVoyage, voyBoard, voySpawn, voyKill, openAirwright, openVoyBoard, buildAirship, VOY_START, DEMIGODS, PERF, caveBossVault, moundH, openSkyRealmBoard, SKY_REALM_START, SKY_NPC_QUESTS, npcQ, openNpcQuests, ACH, festivalTick, currentFestival, get festNow() { return festNow; }, festivalGift, BOONS, heroLight, get nightGlows() { return nightGlows; }, DAY, skyQ, openSkyQuests, get SKYGATE() { return SKYGATE; }, askTravel, fishButton, findCastSpot, get fishing() { return fishing; }, get rodOut() { return rodOut; }, openGuilds, joinGuild, guildInfo, guildXp, statsFor, CLASS, enterSkylands, leaveSkylands, touchFeather, skyOpen, openMap, buildWeapon, claimAch, openAchievements, get nameTag() { return nameTag; }, damageEnemy, killEnemy, ITEM, collide, solidGround, get world() { return world; }, enterCave, CAVES, PICKS, openPickShop, toggleLock, get SL() { return SL; }, offerResume, saveCheckpoint, openChest, openCastleAuction, auctionHouse, VILLAGERS, spawnEnemy, startForgeGame, forgeStrike, startMining, get VEINS() { return VEINS; }, fireCannons, dailyGear, seqOf, levelCleared, CASTLES, ROOMS, buildDungeon, openDoors, enterDoor, placeStranger, SECRET_NPCS, SECRET_DEALERS, openSecretNpc, openSecretDealer, get secretNow() { return secretNow; }, set secretNow(v) { secretNow = v; }, get dealerNow() { return dealerNow; }, set dealerNow(v) { dealerNow = v; }, nextWave, checkRunProgress, ISLANDS, onPath, inZone, SWORD_STYLE, SWORD_FORMS, waveWindow, RARE_PORTALS, BEASTS, openRarePortal, buildQuarters, buildCreatureX: buildCreature, RAID_START, spawnBoss, bossAttack, sigAttack, rosterFor, openWorldMap, setWaypoint, mapPlaces, TRAIL, SEASON, ISLES, BOATS, launchBoat, getSailing: () => sailing, openRiftBoard, getStorm: () => stormLevel, spawnBeast, openDaily, claimDaily, dailyInfo, offerCards, BOONS, startFishing, getFishing: () => fishing, renderBoonBar, auctionState, SPIRE, MOUNT, RODS, startDuel, duelEnd, RIVALS, DAY, COMPASS, getDuel: () => duel, cam, MUSIC, grantChest, openMany, craft, RECIPES, QUEST_NPCS, openDialog, npcStatus, scene, renderer, sun, hemi, THREE, get wt() { return worldT; }, set timeScale(v) { timeScale = v; }, get info() { return renderer.info.render; }, S, P, get run() { return run; }, get enemies() { return enemies; }, startRun, goLobby, openMenu, openMap, ITEMS, ITEM, dropTable, killEnemy, addXp, rebuildHero, get world() { return world; } };
 requestAnimationFrame(frame);
 })();
 </script>
