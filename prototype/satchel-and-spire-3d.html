@@ -1,0 +1,1790 @@
+<title>Satchel and Spire 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: full-screen 3D world; a light HUD hugs the corners, panels slide over the world when opened. */
+:root {
+  color-scheme: dark;
+  --bg: #12161f;
+  --panel: rgba(20, 25, 38, 0.86);
+  --panel-solid: #171d2b;
+  --panel-2: #222a3d;
+  --line: #36415e;
+  --fg: #eef1f8;
+  --muted: #a3acc3;
+  --accent: #e3b45a;
+  --hp: #e2566a;
+  --hp-bg: #3a2030;
+  --good: #7fd69a;
+
+  --r-common: #b4bac8;
+  --r-rare: #5aa7f0;
+  --r-epic: #b07cf2;
+  --r-legendary: #f0b545;
+  --r-vaulted: #ff5f8f;
+  --r-vaulted-2: #4fe3d0;
+
+  --f-display: "Alegreya SC", "Palatino Linotype", Georgia, serif;
+  --f-body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  --f-data: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+
+#stage { position: fixed; inset: 0; touch-action: none; }
+#stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+/* HUD */
+.hud-tl, .hud-tc, .hud-tr { position: fixed; z-index: 5; }
+.hud-tl { top: calc(10px + env(safe-area-inset-top, 0px)); left: calc(10px + env(safe-area-inset-left, 0px)); width: min(250px, 44vw); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; display: grid; gap: 5px; }
+.cls { font-family: var(--f-display); font-weight: 700; font-size: 17px; line-height: 1.1; display: flex; justify-content: space-between; gap: 6px; }
+.cls small { font-family: var(--f-body); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c, var(--muted)); align-self: center; }
+.hpbar { position: relative; height: 16px; border-radius: 4px; background: var(--hp-bg); overflow: hidden; }
+.hpbar i { position: absolute; inset: 0 auto 0 0; background: var(--hp); transition: width 0.15s; }
+.hpbar span { position: relative; display: block; text-align: center; font-family: var(--f-data); font-size: 11px; line-height: 16px; }
+.coins { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; }
+.coins b { color: var(--accent); font-family: var(--f-data); }
+.hud-tc { top: calc(10px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: 4px; pointer-events: none; max-width: 40vw; }
+.zone { font-family: var(--f-display); font-size: 20px; font-weight: 700; text-shadow: 0 2px 6px rgba(0,0,0,0.7); white-space: nowrap; }
+.pill { font-size: 12px; padding: 2px 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.pill.live { border-color: var(--r-vaulted); color: var(--fg); background: linear-gradient(90deg, rgba(255,95,143,0.35), rgba(79,227,208,0.25)); }
+.hud-tr { top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(10px + env(safe-area-inset-right, 0px)); display: grid; gap: 6px; justify-items: end; }
+#minimap { width: 128px; height: 128px; border-radius: 50%; border: 2px solid var(--line); background: #1d2a1c; }
+.hbtn { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; font-weight: 700; }
+.hbtn:hover { border-color: var(--accent); }
+@media (max-width: 560px) { #minimap { width: 92px; height: 92px; } .zone { font-size: 16px; } .hud-tc { top: calc(100px + env(safe-area-inset-top, 0px)); left: calc(10px + env(safe-area-inset-left, 0px)); transform: none; justify-items: start; max-width: 60vw; } #prompt { bottom: calc(196px + env(safe-area-inset-bottom, 0px)); } .hud-tl { width: min(210px, 52vw); } }
+
+#toasts { position: fixed; z-index: 6; left: calc(10px + env(safe-area-inset-left, 0px)); top: calc(118px + env(safe-area-inset-top, 0px)); display: grid; gap: 4px; width: min(300px, 70vw); pointer-events: none; }
+@media (max-width: 560px) { #toasts { top: calc(178px + env(safe-area-inset-top, 0px)); } }
+.toast { background: var(--panel); border-left: 3px solid var(--c, var(--line)); border-radius: 6px; padding: 4px 9px; font-size: 13px; animation: tin 0.25s ease-out; }
+.toast b { color: var(--c, var(--fg)); }
+@keyframes tin { from { transform: translateX(-12px); opacity: 0; } }
+
+#prompt { position: fixed; z-index: 6; left: 50%; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--panel); border: 1px solid var(--accent); border-radius: 999px; padding: 6px 16px; font-weight: 700; white-space: nowrap; pointer-events: none; }
+@media (max-width: 560px) { #prompt { bottom: calc(200px + env(safe-area-inset-bottom, 0px)); } }
+#prompt kbd { font-family: var(--f-data); font-size: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-right: 6px; color: var(--accent); }
+
+/* touch joystick */
+#joyBase { position: fixed; z-index: 7; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); pointer-events: none; }
+#joyKnob { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%; background: rgba(227,180,90,0.55); border: 2px solid rgba(255,255,255,0.4); }
+.joyhint { position: fixed; z-index: 4; left: calc(28px + env(safe-area-inset-left, 0px)); bottom: calc(28px + env(safe-area-inset-bottom, 0px)); width: 110px; height: 110px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.18); display: grid; place-items: center; color: rgba(255,255,255,0.45); font-size: 12px; text-align: center; pointer-events: none; }
+
+/* action buttons */
+.actions { position: fixed; z-index: 6; right: calc(14px + env(safe-area-inset-right, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: repeat(3, auto); grid-template-areas: "heal use special" ". jump attack"; gap: 8px; align-items: end; justify-items: center; touch-action: none; }
+.act { position: relative; border-radius: 50%; border: 2px solid rgba(255,255,255,0.28); background: rgba(20,25,38,0.72); font-weight: 800; font-size: 13px; display: grid; place-items: center; overflow: hidden; touch-action: none; }
+.act:active, .act.on { background: rgba(227,180,90,0.45); }
+.act.big { width: 84px; height: 84px; font-size: 15px; grid-area: attack; border-color: var(--accent); }
+.act.mid { width: 64px; height: 64px; }
+.act.small { width: 52px; height: 52px; font-size: 12px; }
+#bJump { grid-area: jump; } #bSpecial { grid-area: special; } #bUse { grid-area: use; } #bHeal { grid-area: heal; }
+#bSpecial .cd { position: absolute; inset: auto 0 0 0; background: rgba(0,0,0,0.55); height: 0; }
+#bSpecial span { position: relative; z-index: 1; font-size: 11px; line-height: 1.1; padding: 0 4px; text-align: center; }
+.keys { position: fixed; z-index: 4; left: 50%; transform: translateX(-50%); bottom: calc(8px + env(safe-area-inset-bottom, 0px)); font-size: 12px; color: rgba(255,255,255,0.6); text-shadow: 0 1px 3px #000; white-space: nowrap; pointer-events: none; }
+@media (max-width: 900px) { .keys { display: none; } }
+
+/* floating numbers */
+#floaters { position: fixed; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
+.fl { position: absolute; font-family: var(--f-data); font-weight: 600; font-size: 14px; text-shadow: 0 1px 3px #000, 0 0 2px #000; transform: translate(-50%, -50%); white-space: nowrap; }
+
+/* modals */
+.modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(6,8,14,0.6); padding: calc(12px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+.sheet { width: min(860px, 100%); max-height: 100%; display: grid; grid-template-rows: auto 1fr; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.sheet > header { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.sheet h2 { margin: 0; font-family: var(--f-display); font-size: 24px; }
+.sheet .body { overflow-y: auto; padding: 12px 16px 18px; display: grid; gap: 12px; align-content: start; -webkit-user-select: text; user-select: text; }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 4px 10px; font-family: var(--f-display); font-size: 17px; color: var(--muted); }
+.tab.on { color: var(--fg); border-bottom-color: var(--accent); }
+.btn { background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 6px 12px; font-weight: 700; font-size: 14px; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #1b1408; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.muted { color: var(--muted); }
+h3.sec { margin: 4px 0 0; font-family: var(--f-display); font-size: 19px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.card { background: var(--panel-2); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 9px; padding: 10px 12px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.card.vaulted { background: linear-gradient(135deg, rgba(255,95,143,0.16), rgba(79,227,208,0.12)), var(--panel-2); }
+.card .t { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.card .t b { font-size: 16px; color: var(--c); line-height: 1.15; }
+.card .t .q { font-family: var(--f-data); font-size: 12px; color: var(--muted); white-space: nowrap; }
+.tag { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.eq { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--good); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+.stats div { background: rgba(0,0,0,0.22); border-radius: 5px; padding: 3px 6px; min-width: 0; }
+.stats small { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; overflow-wrap: anywhere; }
+.note { font-size: 12px; color: var(--muted); }
+.stats b { font-family: var(--f-data); font-size: 13px; font-variant-numeric: tabular-nums; }
+.spec { font-size: 13px; color: var(--muted); }
+.spec b { color: var(--fg); }
+.desc { margin: 0; font-size: 13px; color: var(--muted); font-style: italic; }
+.mini { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.mi { background: var(--panel-2); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 7px; padding: 6px 9px; display: grid; gap: 2px; min-width: 0; }
+.mi b { font-size: 14px; line-height: 1.2; }
+.mi .tag { color: var(--c); }
+.mi.unknown { color: var(--muted); border-style: dashed; border-left-style: solid; }
+.mi.vaulted { background: linear-gradient(135deg, rgba(255,95,143,0.16), rgba(79,227,208,0.12)), var(--panel-2); }
+.list { display: grid; gap: 4px; }
+.li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; background: var(--panel-2); border-left: 3px solid var(--c); border-radius: 6px; padding: 5px 8px; }
+.li b { color: var(--c); }
+.cls-card { background: var(--panel-2); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 9px; padding: 8px 10px; display: grid; gap: 3px; min-width: 0; }
+.cls-card.cur { outline: 2px solid var(--good); }
+.cls-card b { font-family: var(--f-display); font-size: 18px; color: var(--c); }
+.cls-card .perk { font-size: 13px; }
+.cls-card .odds { font-family: var(--f-data); font-size: 12px; color: var(--muted); }
+.banner { border-radius: 10px; padding: 12px 14px; border: 2px solid var(--c); background: var(--panel-2); display: grid; gap: 4px; }
+.banner b { font-family: var(--f-display); font-size: 22px; color: var(--c); }
+
+/* reveal + intro */
+.reveal-card { width: min(420px, 100%); text-align: center; border-radius: 14px; padding: 26px 22px; display: grid; gap: 10px; background: var(--panel-solid); border: 2px solid var(--c); box-shadow: 0 0 60px -8px var(--c); }
+.reveal-card.vaulted { animation: glow 2.4s ease-in-out infinite alternate; }
+@keyframes glow { from { box-shadow: 0 0 40px -8px var(--r-vaulted); } to { box-shadow: 0 0 70px -4px var(--r-vaulted-2); } }
+.reveal-card .eyebrow { text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; color: var(--c); font-weight: 800; }
+.reveal-card h3 { margin: 0; font-family: var(--f-display); font-size: 30px; line-height: 1.1; }
+.reveal-card p { margin: 0; color: var(--muted); }
+.intro { width: min(560px, 100%); background: var(--panel-solid); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 12px; max-height: 100%; overflow-y: auto; }
+.intro h1 { margin: 0; font-family: var(--f-display); font-size: clamp(30px, 6vw, 42px); line-height: 1; }
+.intro h1 span { color: var(--accent); }
+.intro p { margin: 0; color: var(--muted); }
+.intro ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.ladder { display: flex; flex-wrap: wrap; gap: 6px; }
+.ladder span { font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); border: 1px solid var(--c); border-radius: 999px; padding: 2px 9px; }
+@media (prefers-reduced-motion: reduce) { .reveal-card.vaulted, .toast { animation: none; } }
+</style>
+
+<div id="stage"></div>
+
+<div class="hud-tl" id="hudTL">
+  <div class="cls"><span id="hCls">Wanderer</span><small id="hClsR">No class</small></div>
+  <div class="hpbar"><i id="hHp" style="width:100%"></i><span id="hHpTxt">100 / 100</span></div>
+  <div class="coins"><span>Coins <b id="hCoins">0</b></span><span id="hDie"></span></div>
+</div>
+<div class="hud-tc">
+  <div class="zone" id="hZone">Wayfarer's Camp</div>
+  <div class="pill" id="hEvent">Comet Night soon</div>
+  <div class="pill" id="hSpire" hidden></div>
+</div>
+<div class="hud-tr">
+  <canvas id="minimap" width="256" height="256" aria-label="Map"></canvas>
+  <button class="hbtn" id="bSatchel">Satchel</button>
+</div>
+<div id="toasts" aria-live="polite"></div>
+<div id="prompt" hidden></div>
+<div class="joyhint" id="joyHint" hidden>Drag here<br>to move</div>
+<div id="joyBase" hidden><div id="joyKnob"></div></div>
+<div class="actions" id="actions">
+  <button class="act small" id="bHeal" aria-label="Heal">Heal</button>
+  <button class="act small" id="bUse" aria-label="Use">Use</button>
+  <button class="act mid" id="bSpecial" aria-label="Special"><span id="bSpecialTxt">Special</span><i class="cd" id="bSpecialCd"></i></button>
+  <button class="act mid" id="bJump" aria-label="Jump">Jump</button>
+  <button class="act big" id="bAttack" aria-label="Attack">Attack</button>
+</div>
+<div class="keys">WASD move · drag to look · Space jump · J or click attack · K special · E use · H heal · I satchel</div>
+<div id="floaters"></div>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <header><h2 id="mTitle">Satchel</h2><button class="btn" id="mClose">Close</button></header>
+    <div class="body" id="mBody"></div>
+  </div>
+</div>
+
+<div class="modal" id="reveal" hidden>
+  <div class="reveal-card" id="revealCard">
+    <div class="eyebrow" id="rvEyebrow"></div>
+    <h3 id="rvName"></h3>
+    <p id="rvDesc"></p>
+    <div><button class="btn primary" id="rvClose">Into the satchel</button></div>
+  </div>
+</div>
+
+<div class="modal" id="dead" hidden>
+  <div class="reveal-card" style="--c: var(--hp)">
+    <div class="eyebrow">Knocked out</div>
+    <h3>You wake up at camp</h3>
+    <p>Nothing was lost. Rest, heal, and try again with better gear.</p>
+    <div><button class="btn primary" id="deadBtn">Get up</button></div>
+  </div>
+</div>
+
+<div class="modal" id="intro">
+  <div class="intro">
+    <h1>Satchel <span>&amp;</span> Spire</h1>
+    <p>Explore the valley, fight what lives there, and fill your satchel. Every item, weapon, armour piece and class sits on one rarity ladder.</p>
+    <div class="ladder"><span style="--c:var(--r-common)">Common</span><span style="--c:var(--r-rare)">Rare</span><span style="--c:var(--r-epic)">Epic</span><span style="--c:var(--r-legendary)">Legendary</span><span style="--c:var(--r-vaulted)">Vaulted</span></div>
+    <ul>
+      <li><b>Move</b> with the joystick (touch), WASD, or a game controller. Drag the screen to look around.</li>
+      <li><b>Search</b> crates, ore rocks, shelves and weapon racks with Use. Higher rarity drops shoot up a coloured beam.</li>
+      <li><b>Roll a class</b> at the Class Altar in camp with a Fortune Die or 10,000 coins.</li>
+      <li><b>The Vault Spire</b> in the north east is a long climb. Its summit always holds a Vaulted item.</li>
+      <li><b>Comet Night</b> comes every few minutes. While the sky is purple, Vaulted items can drop anywhere.</li>
+    </ul>
+    <div class="row"><button class="btn primary" id="startBtn">Start exploring</button><span class="muted" id="introNote"></span></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+"use strict";
+const $ = id => document.getElementById(id);
+if (!window.THREE) {
+  $("introNote").textContent = "The 3D engine could not load. Check your connection and reload.";
+  $("startBtn").disabled = true;
+  return;
+}
+const V3 = THREE.Vector3;
+const TAU = Math.PI * 2;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function seeded(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function pickWeighted(w) {
+  const e = Object.entries(w).filter(([, v]) => v > 0);
+  let r = Math.random() * e.reduce((s, [, v]) => s + v, 0);
+  for (const [k, v] of e) if ((r -= v) < 0) return k;
+  return e[e.length - 1][0];
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* =====================================================================
+   DATA: rarity, items, classes
+   ===================================================================== */
+const RAR = ["common", "rare", "epic", "legendary", "vaulted"];
+const RANK = { common: 0, rare: 1, epic: 2, legendary: 3, vaulted: 4 };
+const RNAME = { common: "Common", rare: "Rare", epic: "Epic", legendary: "Legendary", vaulted: "Vaulted" };
+const RCOL = { common: 0xb4bac8, rare: 0x5aa7f0, epic: 0xb07cf2, legendary: 0xf0b545, vaulted: 0xff5f8f };
+const rc = r => `var(--r-${r})`;
+const BASE_VALUE = { common: 14, rare: 110, epic: 480, legendary: 2100, vaulted: 11500 };
+
+const SPECIALS = {
+  cleave:   { name: "Whirlwind",       cd: 5,  text: "Spin and strike every foe within reach for double damage." },
+  dash:     { name: "Lunge",           cd: 5,  text: "Dash forward along the ground, striking everything in your path." },
+  ignite:   { name: "Ignite",          cd: 7,  text: "A wave of fire hits foes ahead and leaves them burning for 4 seconds." },
+  frost:    { name: "Frostbloom",      cd: 8,  text: "A freezing burst that slows nearby foes by 60% for 4 seconds." },
+  chain:    { name: "Chain Lightning", cd: 6,  text: "Lightning leaps between up to 5 foes." },
+  drain:    { name: "Soul Drain",      cd: 12, text: "For 6 seconds, heal for 40% of all damage you deal." },
+  timestop: { name: "Stop the Clock",  cd: 20, text: "Freezes every foe nearby in time." },
+  vortex:   { name: "Maelstrom",       cd: 10, text: "Drags nearby foes into a crushing whirlpool." },
+  meteor:   { name: "Skyfall",         cd: 9,  text: "Calls a burning star down just ahead of you." }
+};
+const ARM_SPECIALS = {
+  none:        { name: "None",        text: () => "No special ability." },
+  regen:       { name: "Mending",     text: v => `Heal ${v} health every second.` },
+  thorns:      { name: "Thornguard",  text: () => "Doubles the damage attackers take when they hit you." },
+  swift:       { name: "Windstep",    text: v => `Move ${v}% faster.` },
+  aura:        { name: "Cinder Aura", text: v => `Burns foes within 3.5 m for ${v} damage per second.` },
+  dodge:       { name: "Shadowstep",  text: v => `${v}% chance to dodge a hit completely.` },
+  featherfall: { name: "Featherfall", text: () => "Fall slowly and jump higher. Made for the Spire." },
+  bulwark:     { name: "Bulwark",     text: () => "You cannot be knocked back, and you block 15% more damage." }
+};
+const SHAPE_NAME = { sword: "Sword", katana: "Katana", hammer: "Hammer", axe: "Axe", spear: "Spear", trident: "Trident", scythe: "Scythe", staff: "Staff", bow: "Bow", chakram: "Chakram" };
+const RANGED = { bow: 9, staff: 8, chakram: 7 };
+const REACH = { spear: 3.2, trident: 3.2, scythe: 3.0, hammer: 2.7, axe: 2.6, sword: 2.6, katana: 2.8 };
+
+// [id, name, rarity, shape, attack%, defence, damage, knockback(m), speed(hits/s), special, description]
+const WEAPONS = [
+  ["gladius", "Rustbitten Gladius", "common", "sword", 3, 1, 8, 1.0, 1.4, "dash", "A legionary's blade, more rust than steel. Still pointy."],
+  ["oakroot", "Oakroot Cudgel", "common", "hammer", 2, 2, 10, 2.2, 1.0, "cleave", "A knotted root that has settled a few arguments."],
+  ["pitchfork", "Hayfield Pitchfork", "common", "spear", 2, 0, 9, 1.6, 1.1, "dash", "Borrowed from a farmer. Probably."],
+  ["driftstaff", "Driftwood Staff", "common", "staff", 4, 1, 7, 1.0, 1.2, "frost", "Washed up on a cold shore and never warmed up."],
+  ["hatchet", "Flintcleave Hatchet", "common", "axe", 3, 0, 11, 1.4, 0.95, "cleave", "Knapped flint lashed to ash wood."],
+  ["willow", "Willowstring Bow", "common", "bow", 3, 0, 7, 0.6, 1.3, "chain", "Bends like a reed and sings like one too."],
+  ["cutlass", "Brinewatch Cutlass", "rare", "sword", 9, 4, 17, 1.4, 1.3, "dash", "Carried by the harbour wardens of the salt cliffs."],
+  ["copperfang", "Copperfang Spear", "rare", "spear", 10, 2, 19, 2.0, 1.0, "dash", "Its tip was cast in a single pour."],
+  ["ashgrove", "Ashgrove Longbow", "rare", "bow", 11, 0, 15, 0.8, 1.2, "chain", "Strung with hair from a storm horse's tail."],
+  ["moonsabre", "Moonlit Sabre", "rare", "sword", 10, 3, 16, 1.2, 1.5, "frost", "Frost forms along the blade on clear nights."],
+  ["quarrymaul", "Quarrybreaker Maul", "rare", "hammer", 8, 6, 26, 3.4, 0.7, "cleave", "Built to split boulders. Works on most things."],
+  ["emberwick", "Emberwick Wand", "rare", "staff", 12, 0, 14, 1.0, 1.3, "ignite", "The tip smoulders like a candle that refuses to go out."],
+  ["thalassine", "Thalassine Trident", "epic", "trident", 20, 8, 32, 2.4, 1.1, "vortex", "Pulled from a reef where a city used to stand."],
+  ["frostvein", "Frostvein Katana", "epic", "katana", 22, 4, 30, 1.5, 1.6, "frost", "Folded a thousand times in glacier water."],
+  ["gloomreap", "Gloomreap Scythe", "epic", "scythe", 24, 2, 38, 2.0, 0.9, "drain", "It whispers the names of everything it has cut."],
+  ["sunforged", "Sunforged Warhammer", "epic", "hammer", 18, 12, 44, 4.0, 0.7, "meteor", "Forged at noon on the longest day of the year."],
+  ["tempest", "Tempest Chakram", "epic", "chakram", 20, 3, 28, 1.2, 1.4, "chain", "A ring of blades that always comes home."],
+  ["wyrmtooth", "Wyrmtooth Glaive", "epic", "spear", 21, 6, 36, 2.6, 1.0, "ignite", "The blade is a single fang. Nobody asks where the rest went."],
+  ["aeonbrand", "Aeonbrand", "legendary", "sword", 34, 10, 58, 2.2, 1.3, "timestop", "Its hilt holds a little clock that runs backwards."],
+  ["leviathan", "Wake of the Leviathan", "legendary", "trident", 32, 14, 62, 3.0, 1.0, "vortex", "The sea follows wherever it points."],
+  ["solarch", "Solarch Lance", "legendary", "spear", 36, 8, 66, 3.4, 0.9, "meteor", "A lance of the old sun kings, still warm to hold."],
+  ["nightfall", "Nightfall Requiem", "legendary", "scythe", 38, 4, 64, 2.2, 1.1, "drain", "It plays one quiet note each time it swings."],
+  ["seraphedge", "Seraph's Halo Edge", "legendary", "sword", 33, 12, 56, 1.8, 1.4, "chain", "Lightning remembers who carried it."],
+  ["thousandfold", "Thousandfold Katana", "legendary", "katana", 35, 6, 54, 1.6, 1.8, "dash", "Faster than the eye. Faster than the echo."],
+  ["oathbreaker", "Oathbreaker", "vaulted", "sword", 55, 20, 96, 3.0, 1.3, "cleave", "The blade that ended the Long War. It has never needed sharpening."],
+  ["eternum", "Eternum, the Last Second", "vaulted", "katana", 58, 15, 90, 2.0, 1.7, "timestop", "Forged in the moment between one heartbeat and the next."],
+  ["merrowdeep", "Sovereign of Merrowdeep", "vaulted", "trident", 52, 25, 104, 3.6, 1.1, "vortex", "Crown weapon of the drowned kingdom of Merrowdeep."],
+  ["starfall", "Starfall Verdict", "vaulted", "hammer", 60, 18, 118, 4.6, 0.8, "meteor", "Each swing asks the sky for a favour. The sky agrees."]
+];
+// [id, name, rarity, attack%, defence, damage when struck, knockback when struck, special, special value, description]
+const ARMOURS = [
+  ["tunic", "Padded Tunic", "common", 0, 6, 0, 0, "none", 0, "Quilted cloth. Better than nothing, just."],
+  ["jerkin", "Patchwork Jerkin", "common", 1, 8, 0, 0, "none", 0, "Seven old coats stitched into one new one."],
+  ["boarhide", "Boarhide Vest", "common", 2, 9, 3, 0.6, "none", 0, "Still bristly. Still smells of boar."],
+  ["reedmail", "Reedwoven Mail", "common", 0, 11, 0, 0, "swift", 5, "Light as a basket, almost as strong."],
+  ["bronzeplate", "Bronze Breastplate", "rare", 2, 20, 5, 1.0, "none", 0, "Dented in exactly one place."],
+  ["saltscale", "Saltscale Hauberk", "rare", 3, 18, 4, 0.8, "regen", 1, "Scales from a sea serpent's moult."],
+  ["wardwood", "Wardwood Brigandine", "rare", 4, 22, 8, 1.5, "thorns", 0, "Bark plates that bite back."],
+  ["windrunner", "Windrunner Leathers", "rare", 5, 16, 2, 0.5, "swift", 15, "Worn by the valley's fastest messengers."],
+  ["drownedchoir", "Chainmail of the Drowned Choir", "epic", 6, 38, 10, 1.4, "regen", 2, "The rings chime softly underwater."],
+  ["glacierheart", "Glacierheart Plate", "epic", 4, 45, 12, 0, "bulwark", 0, "Carved from ice that never melts."],
+  ["duskweave", "Duskweave Cloak", "epic", 10, 32, 6, 1.0, "dodge", 20, "Half of it is always in shadow."],
+  ["cinderscale", "Cinderscale Plate", "epic", 8, 40, 14, 1.6, "aura", 6, "Embers crawl along the seams."],
+  ["gildedaegis", "Gilded Aegis Plate", "legendary", 10, 68, 25, 3.0, "thorns", 0, "Arrows turn aside like water round a stone."],
+  ["vesperwing", "Vesperwing Mantle", "legendary", 14, 60, 16, 1.6, "featherfall", 0, "Feathers of a bird that only flies at dusk."],
+  ["titanbone", "Titanbone Carapace", "legendary", 8, 75, 20, 0, "bulwark", 0, "The ribcage of something very large and very old."],
+  ["tidecrown", "Tidecrown Regalia", "legendary", 12, 64, 18, 2.0, "regen", 5, "Royal armour of a sunken court, still dripping."],
+  ["lastwatch", "Mantle of the Last Watch", "vaulted", 20, 105, 30, 2.5, "regen", 8, "Worn by the final sentry of the Spire. It is never cold inside."],
+  ["celestine", "Celestine Ward", "vaulted", 25, 98, 28, 2.5, "featherfall", 0, "Light enough to float, hard enough to stop a falling star."],
+  ["abyssplate", "Abyssal Pearlplate", "vaulted", 22, 102, 32, 3.0, "aura", 22, "Plated with pearls from the deepest trench."]
+];
+// [id, name, category, rarity, description, heal (necessities only)]
+const GOODS = [
+  ["copper", "Copper Ore", "ore", "common", "Streaked green and orange."],
+  ["tin", "Tin Ore", "ore", "common", "Dull and grey. Half of every bronze."],
+  ["iron", "Iron Ore", "ore", "common", "Heavy, rusty, everywhere."],
+  ["coal", "Coal Lump", "ore", "common", "Leaves black fingerprints on everything."],
+  ["bronze", "Bronze Ingot", "ore", "rare", "Copper and tin, already smelted. Someone did you a favour."],
+  ["silver", "Silver Ore", "ore", "rare", "Bright seams in black rock."],
+  ["thundercopper", "Thundercopper", "ore", "rare", "Crackles quietly whenever it rains."],
+  ["brineglass", "Brineglass Crystal", "ore", "rare", "Sea salt that grew into a gem."],
+  ["gold", "Gold Ore", "ore", "epic", "Small nuggets, very heavy for their size."],
+  ["moonsilver", "Moonsilver", "ore", "epic", "Only shines when nobody is looking straight at it."],
+  ["coralite", "Coralite", "ore", "epic", "Stone grown by a reef, harder than granite."],
+  ["obsidian", "Obsidian Shard", "ore", "epic", "Volcano glass with an edge sharper than steel."],
+  ["starsteel", "Starsteel Ore", "ore", "legendary", "Fell from the sky. Rings like a bell when struck."],
+  ["chronium", "Chronium Ore", "ore", "legendary", "It ticks faintly. Clocks near it run slow."],
+  ["sunstone", "Sunstone", "ore", "legendary", "Warm as a hearth, even at midnight."],
+  ["heartstone", "Heartstone", "ore", "vaulted", "A red stone with a slow pulse, found only at the heart of the Spire."],
+  ["marisvel", "Pearl of Marisvel", "ore", "vaulted", "The last pearl of the city beneath the waves."],
+  ["aethercore", "Aethercore", "ore", "vaulted", "A seed of pure sky. It weighs nothing at all."],
+  ["plank", "Wood Plank", "building", "common", "Pine. Slightly warped."],
+  ["plastic", "Plastic Sheet", "building", "common", "Light, waterproof, ugly."],
+  ["wire", "Copper Wire", "building", "common", "A tangled coil of it."],
+  ["brick", "Clay Brick", "building", "common", "Fired red. Stacks nicely."],
+  ["thatch", "Thatch Bundle", "building", "common", "Good for roofs, bad near candles."],
+  ["beam", "Steel Beam", "building", "rare", "Holds up a roof, a bridge, or a grudge."],
+  ["glass", "Glass Pane", "building", "rare", "Clear and unbroken, which is the rare part."],
+  ["slate", "Slate Tile", "building", "rare", "Split thin as paper and twice as useful."],
+  ["tidemarble", "Tidemarble Block", "building", "rare", "Marble veined with blue, quarried below the tideline."],
+  ["ironwood", "Ironwood Log", "building", "epic", "Sinks in water. Blunts axes."],
+  ["voidglass", "Voidglass Pane", "building", "epic", "You can see the stars through it at noon."],
+  ["wyrmbone", "Wyrmbone Rafter", "building", "epic", "A rib long enough to roof a hall."],
+  ["livingstone", "Living Stone", "building", "legendary", "Masonry that slowly mends its own cracks."],
+  ["skygirder", "Skyforged Girder", "building", "legendary", "Forged in the clouds and lowered down on chains."],
+  ["worldroot", "Worldroot Timber", "building", "vaulted", "Cut from a root older than the valley. Nothing built from it has ever fallen."],
+  ["book", "Worn Book", "everyday", "common", "Half the pages are stuck together. The other half are about turnips."],
+  ["quill", "Quill Pen", "everyday", "common", "Needs ink. Always needs ink."],
+  ["notebook", "Leather Notebook", "everyday", "common", "Bound with a cord. A few pages of someone's shopping lists."],
+  ["candle", "Tallow Candle", "everyday", "common", "Burns for an evening, smokes for a week."],
+  ["pouch", "Cloth Pouch", "everyday", "common", "Drawstring bag. Empty, sadly."],
+  ["compass", "Brass Compass", "everyday", "rare", "Points north. Mostly."],
+  ["watch", "Pocket Watch", "everyday", "epic", "Still ticking after a century at the bottom of a lake."],
+  ["atlas", "Cartographer's Atlas", "everyday", "legendary", "Maps of places that have not been found yet."],
+  ["die", "Fortune Die", "everyday", "legendary", "Twenty faces, each a different crest. Roll it at the Class Altar to be called to a new class."],
+  ["ledger", "The First Ledger", "everyday", "vaulted", "The first record of every trade ever made in the valley. Your name is on the last page."],
+  ["bread", "Bread Loaf", "necessity", "common", "Restores 25 health.", 25],
+  ["water", "Water Flask", "necessity", "common", "Restores 15 health.", 15],
+  ["bandage", "Bandage", "necessity", "common", "Restores 35 health.", 35],
+  ["tonic", "Honeyed Tonic", "necessity", "rare", "Restores 50 health.", 50],
+  ["draught", "Healing Draught", "necessity", "epic", "Restores 90 health.", 90],
+  ["elixir", "Embervine Elixir", "necessity", "legendary", "Restores all of your health.", 9999],
+  ["canteen", "Bottomless Canteen", "necessity", "vaulted", "Restores 30 health and is never used up.", 30]
+];
+const CATS = [
+  { id: "weapon", name: "Weapons" }, { id: "armour", name: "Armour" }, { id: "ore", name: "Ores and gems" },
+  { id: "building", name: "Building materials" }, { id: "everyday", name: "Everyday items" }, { id: "necessity", name: "Necessities" }
+];
+const CAT_NAME = Object.fromEntries(CATS.map(c => [c.id, c.name]));
+const CAT_ONE = { armour: "armour", ore: "ore", building: "building material", everyday: "treasure", necessity: "supply" };
+const article = w => /^[aeiou]/i.test(w) ? "an" : "a";
+
+const ITEMS = [];
+for (const [id, name, rarity, shape, atk, def, dmg, kb, spd, special, desc] of WEAPONS) ITEMS.push({ id, name, rarity, cat: "weapon", shape, atk, def, dmg, kb, spd, special, desc });
+for (const [id, name, rarity, atk, def, dmg, kb, special, sv, desc] of ARMOURS) ITEMS.push({ id, name, rarity, cat: "armour", atk, def, dmg, kb, special, sv, desc });
+for (const [id, name, cat, rarity, desc, heal] of GOODS) ITEMS.push({ id, name, rarity, cat, desc, heal });
+const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+for (const it of ITEMS) {
+  const g = (it.cat === "weapon" || it.cat === "armour") ? 1.35 : 1;
+  it.value = Math.round(BASE_VALUE[it.rarity] * g * (0.8 + (hash(it.id) % 41) / 100));
+}
+const dpsOf = it => it.cat === "weapon" ? it.dmg * (1 + it.atk / 100) * it.spd : (it.special === "aura" ? it.sv : 0);
+
+const CLASS_LIST = [
+  { id: "wanderer", name: "Wanderer", rarity: null, perk: "No perk yet. Roll at the Class Altar in camp to be called to a class.", look: { skin: 0xd9b48f, limb: 0x5a4a3a } },
+  { id: "warrior", name: "Warrior", rarity: "common", perk: "Iron Will: +30% maximum health.", look: { skin: 0xd9a77f, limb: 0x6b4a32 } },
+  { id: "skeleton", name: "Skeleton", rarity: "common", perk: "Bone Rattle: once a minute, a knockout blow leaves you on 1 health instead.", look: { skin: 0xeae4d0, limb: 0xd8d1bb } },
+  { id: "elf", name: "Elf", rarity: "rare", perk: "Fleetfoot: +25% move speed and higher jumps.", look: { skin: 0xf0d2b0, limb: 0x3f6b3a } },
+  { id: "alchemist", name: "Alchemist", rarity: "rare", perk: "Transmutation: 30% chance of an extra find from every search, and items sell for 25% more.", look: { skin: 0xc99a74, limb: 0x5b3f6b } },
+  { id: "samurai", name: "Swordsman / Samurai", rarity: "epic", perk: "Iaido: +35% attack speed and +10% damage.", look: { skin: 0xe2b98f, limb: 0x2b2b38 } },
+  { id: "mage", name: "Mage", rarity: "epic", perk: "Arcane Flow: special abilities recharge 45% faster.", look: { skin: 0xe6c3a0, limb: 0x2e3a7a } },
+  { id: "paladin", name: "Paladin", rarity: "legendary", perk: "Holy Bulwark: +40% defence and heal 3 health every second.", look: { skin: 0xe0b48c, limb: 0xc9ccd6 } },
+  { id: "reaper", name: "Reaper", rarity: "legendary", perk: "Soul Harvest: +25% damage, and every foe you defeat heals 20% of your health.", look: { skin: 0x1c1a22, limb: 0x15131b } },
+  { id: "archangel", name: "Arch-angel", rarity: "legendary", perk: "Wings of Dawn: double jump, and hold Jump to glide. The Spire's best friend.", look: { skin: 0xf2dcc2, limb: 0xe9e6f5 } }
+];
+const CLASS = Object.fromEntries(CLASS_LIST.map(c => [c.id, c]));
+const CLASS_ODDS_BY_RARITY = { common: 45, rare: 30, epic: 17, legendary: 8 };
+const classOdds = c => c.rarity ? CLASS_ODDS_BY_RARITY[c.rarity] / CLASS_LIST.filter(x => x.rarity === c.rarity).length : 0;
+const ROLL_COINS = 10000;
+
+/* =====================================================================
+   WORLD LAYOUT
+   ===================================================================== */
+const ZONES = [
+  { id: "camp", name: "Wayfarer's Camp", x: 0, z: 0, r: 16, col: 0x9b8a62 },
+  { id: "market", name: "Market Road", x: 58, z: 6, r: 24, col: 0xb39d72, enemy: "slime", count: 6, node: "crate", nodes: 9,
+    odds: { common: 78, rare: 18, epic: 4, legendary: 0 }, cats: { everyday: 4, necessity: 4, building: 3, ore: 1, weapon: 1, armour: 1 } },
+  { id: "quarry", name: "Old Quarry", x: -4, z: -64, r: 26, col: 0x8d8a83, enemy: "golem", count: 6, node: "ore", nodes: 10,
+    odds: { common: 58, rare: 28, epic: 11, legendary: 3 }, cats: { ore: 6, building: 4, weapon: 1, armour: 1 } },
+  { id: "library", name: "Drowned Library", x: -64, z: 4, r: 24, col: 0x5f7a80, enemy: "wisp", count: 6, node: "shelf", nodes: 9,
+    odds: { common: 45, rare: 32, epic: 17, legendary: 6 }, cats: { everyday: 5, necessity: 3, weapon: 1, armour: 1 } },
+  { id: "barracks", name: "Ruined Barracks", x: 2, z: 64, r: 26, col: 0x8a7656, enemy: "skeleton", count: 7, node: "rack", nodes: 9,
+    odds: { common: 40, rare: 33, epic: 19, legendary: 8 }, cats: { weapon: 5, armour: 5, ore: 1 } },
+  { id: "spire", name: "The Vault Spire", x: 64, z: -64, r: 15, col: 0x4c4766 }
+];
+const ZONE = Object.fromEntries(ZONES.map(z => [z.id, z]));
+const SPIRE_ODDS = { common: 14, rare: 40, epic: 34, legendary: 12 };
+const ENEMIES = {
+  slime:    { name: "Bog Slime", hp: 40, dmg: 6, spd: 2.6, cd: 1.3, coins: [6, 14], col: 0x78c860 },
+  golem:    { name: "Pebble Golem", hp: 95, dmg: 11, spd: 2.2, cd: 1.5, coins: [18, 34], col: 0x8a8f99 },
+  wisp:     { name: "Drowned Wisp", hp: 70, dmg: 9, spd: 3.6, cd: 1.1, coins: [16, 30], col: 0x67c7e0 },
+  skeleton: { name: "Barracks Bones", hp: 160, dmg: 16, spd: 3.1, cd: 1.3, coins: [40, 70], col: 0xe8e2cf }
+};
+const COMET_CYCLE = 240, COMET_LEN = 60;
+const COMET_VAULT = { market: 0.5, quarry: 1, library: 1.5, barracks: 1.5, spire: 2 };
+const SHOP = [{ id: "bread", price: 40 }, { id: "bandage", price: 90 }, { id: "tonic", price: 320 }];
+
+/* =====================================================================
+   SAVE STATE
+   ===================================================================== */
+const KEY = "satchel-and-spire-3d-v1";
+function fresh() {
+  return {
+    coins: 60, cls: "wanderer",
+    inv: { gladius: 1, tunic: 1, bread: 3, water: 2 },
+    seen: { gladius: 1, tunic: 1, bread: 1, water: 1 },
+    equip: { weapon: "gladius", armour: "tunic" },
+    spire: { best: 0, cp: 0, opened: {}, summits: 0, dieGiven: false },
+    rolls: 0
+  };
+}
+let S = fresh();
+try {
+  const raw = localStorage.getItem(KEY);
+  if (raw) {
+    const d = JSON.parse(raw);
+    S = Object.assign(fresh(), d);
+    S.spire = Object.assign(fresh().spire, d.spire || {});
+    if (!ITEM[S.equip.weapon] || !S.inv[S.equip.weapon]) S.equip.weapon = Object.keys(S.inv).find(id => ITEM[id] && ITEM[id].cat === "weapon") || "gladius";
+    if (!ITEM[S.equip.armour] || !S.inv[S.equip.armour]) S.equip.armour = Object.keys(S.inv).find(id => ITEM[id] && ITEM[id].cat === "armour") || "tunic";
+    if (!S.inv[S.equip.weapon]) S.inv[S.equip.weapon] = 1;
+    if (!S.inv[S.equip.armour]) S.inv[S.equip.armour] = 1;
+    if (!CLASS[S.cls]) S.cls = "wanderer";
+    for (const id of Object.keys(S.inv)) if (!ITEM[id]) delete S.inv[id];
+  }
+} catch (e) { S = fresh(); }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+/* derived stats from class + gear */
+let ST = {};
+function computeStats() {
+  const w = ITEM[S.equip.weapon], a = ITEM[S.equip.armour], c = S.cls;
+  const atk = w.atk + a.atk;
+  const st = {
+    maxHp: Math.round(100 * (c === "warrior" ? 1.3 : 1)),
+    atk,
+    def: (w.def + a.def) * (c === "paladin" ? 1.4 : 1),
+    block: a.special === "bulwark" ? 0.15 : 0,
+    dmgMult: (1 + atk / 100) * (c === "reaper" ? 1.25 : 1) * (c === "samurai" ? 1.1 : 1),
+    atkSpeed: w.spd * (c === "samurai" ? 1.35 : 1),
+    cdMult: c === "mage" ? 0.55 : 1,
+    move: 6.2 * (c === "elf" ? 1.25 : 1) * (1 + (a.special === "swift" ? a.sv : 0) / 100),
+    jump: 8.6 * (c === "elf" ? 1.1 : 1) * (a.special === "featherfall" ? 1.09 : 1),
+    regen: (c === "paladin" ? 3 : 0) + (a.special === "regen" ? a.sv : 0),
+    dodge: a.special === "dodge" ? a.sv / 100 : 0,
+    aura: a.special === "aura" ? a.sv : 0,
+    thorns: a.dmg * (a.special === "thorns" ? 2 : 1),
+    thornsKb: a.kb,
+    noKb: a.special === "bulwark",
+    feather: a.special === "featherfall",
+    wings: c === "archangel",
+    range: RANGED[w.shape] || REACH[w.shape] || 2.6,
+    ranged: !!RANGED[w.shape]
+  };
+  st.hit = w.dmg * st.dmgMult;
+  st.dps = st.hit * st.atkSpeed;
+  ST = st;
+}
+computeStats();
+
+/* =====================================================================
+   THREE SETUP
+   ===================================================================== */
+const stage = $("stage");
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+} catch (e) {
+  $("introNote").textContent = "This device could not start 3D graphics.";
+  $("startBtn").disabled = true;
+  return;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+stage.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const DAY_SKY = new THREE.Color(0x9cc6e2), NIGHT_SKY = new THREE.Color(0x2a1d48);
+scene.background = DAY_SKY.clone();
+scene.fog = new THREE.Fog(0x9cc6e2, 70, 230);
+const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 500);
+const hemi = new THREE.HemisphereLight(0xe8f2ff, 0x4b5a3a, 0.9); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff0d0, 0.75); sun.position.set(50, 90, 30); scene.add(sun);
+function resize() {
+  const w = stage.clientWidth || window.innerWidth, h = stage.clientHeight || window.innerHeight;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+window.addEventListener("resize", resize); resize();
+
+const MC = {};
+function M(color, o = {}) {
+  const k = color + "|" + JSON.stringify(o);
+  if (MC[k]) return MC[k];
+  let m;
+  if (o.basic) m = new THREE.MeshBasicMaterial({ color, transparent: o.op !== undefined, opacity: o.op ?? 1, depthWrite: o.op === undefined, side: o.ds ? THREE.DoubleSide : THREE.FrontSide, blending: o.add ? THREE.AdditiveBlending : THREE.NormalBlending });
+  else m = new THREE.MeshPhongMaterial({ color, emissive: o.em ?? 0, shininess: o.sh ?? 10, flatShading: !!o.flat, transparent: o.op !== undefined, opacity: o.op ?? 1 });
+  return (MC[k] = m);
+}
+function mesh(geo, mat, x = 0, y = 0, z = 0, parent = scene) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); if (parent) parent.add(m); return m; }
+const G = {
+  box: new THREE.BoxGeometry(1, 1, 1),
+  cyl: new THREE.CylinderGeometry(1, 1, 1, 14),
+  cone: new THREE.ConeGeometry(1, 1, 10),
+  sph: new THREE.SphereGeometry(1, 14, 10),
+  dode: new THREE.DodecahedronGeometry(1, 0),
+  ico: new THREE.IcosahedronGeometry(1, 0),
+  oct: new THREE.OctahedronGeometry(1, 0)
+};
+function sized(geoKey, mat, sx, sy, sz, x, y, z, parent = scene) { const m = mesh(G[geoKey], mat, x, y, z, parent); m.scale.set(sx, sy, sz); return m; }
+
+/* colliders */
+const circles = []; // {x,z,r,h}
+const boxes = [];   // {x0,x1,z0,z1,h}
+
+/* ground */
+const ground = mesh(new THREE.PlaneGeometry(320, 320), M(0x6f9a52));
+ground.rotation.x = -Math.PI / 2;
+for (const z of ZONES) {
+  const c = mesh(new THREE.CircleGeometry(z.r, 40), M(z.col), z.x, 0.02, z.z);
+  c.rotation.x = -Math.PI / 2;
+}
+function path(x1, z1, x2, z2, w) {
+  const dx = x2 - x1, dz = z2 - z1, len = Math.hypot(dx, dz);
+  const p = mesh(new THREE.PlaneGeometry(w, len), M(0xa58f66), (x1 + x2) / 2, 0.015, (z1 + z2) / 2);
+  p.rotation.x = -Math.PI / 2; p.rotation.z = Math.atan2(dx, dz);
+}
+for (const z of ZONES) if (z.id !== "camp") path(0, 0, z.x, z.z, 4);
+const WORLD_HALF = 125;
+
+/* trees and boulders */
+const rng = seeded(7);
+function nearZone(x, z, pad) { return ZONES.some(zz => Math.hypot(x - zz.x, z - zz.z) < zz.r + pad); }
+function nearPath(x, z) {
+  for (const zz of ZONES) {
+    if (zz.id === "camp") continue;
+    const len = Math.hypot(zz.x, zz.z), t = clamp((x * zz.x + z * zz.z) / (len * len), 0, 1);
+    if (Math.hypot(x - zz.x * t, z - zz.z * t) < 5) return true;
+  }
+  return false;
+}
+for (let i = 0; i < 150; i++) {
+  const x = (rng() * 2 - 1) * (WORLD_HALF - 6), z = (rng() * 2 - 1) * (WORLD_HALF - 6);
+  if (nearZone(x, z, 5) || nearPath(x, z)) continue;
+  const s = 0.8 + rng() * 0.7;
+  if (rng() < 0.82) {
+    sized("cyl", M(0x6b4a2f), 0.22 * s, 1.6 * s, 0.22 * s, x, 0.8 * s, z);
+    sized("cone", M([0x3f7a3a, 0x4a8a3f, 0x356b37][Math.floor(rng() * 3)], { flat: true }), 1.5 * s, 3.4 * s, 1.5 * s, x, 3.1 * s, z);
+    circles.push({ x, z, r: 0.5 * s, h: 5 });
+  } else {
+    const b = sized("dode", M(0x8f939a, { flat: true }), 1.2 * s, 0.9 * s, 1.1 * s, x, 0.5 * s, z);
+    b.rotation.y = rng() * TAU;
+    circles.push({ x, z, r: 1.1 * s, h: 2 });
+  }
+}
+/* world edge: a ring of tall rocks */
+for (let a = 0; a < TAU; a += 0.09) {
+  const r = WORLD_HALF + 4, x = Math.cos(a) * r, z = Math.sin(a) * r;
+  const b = sized("dode", M(0x777b84, { flat: true }), 6, 7 + (hash("e" + a) % 5), 6, x, 2, z);
+  b.rotation.y = a * 3;
+}
+
+/* camp */
+const campfireLight = new THREE.PointLight(0xff9a40, 1.2, 18); campfireLight.position.set(0, 1.5, 0); scene.add(campfireLight);
+sized("cyl", M(0x5b5048), 1.1, 0.25, 1.1, 0, 0.12, 0);
+const fire1 = sized("cone", M(0xff8a2a, { basic: true }), 0.55, 1.2, 0.55, 0, 0.8, 0);
+const fire2 = sized("cone", M(0xffd25a, { basic: true }), 0.3, 0.8, 0.3, 0, 0.7, 0);
+circles.push({ x: 0, z: 0, r: 1.2, h: 1 });
+for (const [x, z, col] of [[-9, -6, 0xb0563f], [-10, 5, 0x4f7ab0], [8, 9, 0x7a5fa8]]) {
+  sized("cone", M(col, { flat: true }), 2.4, 3, 2.4, x, 1.5, z).rotation.y = 0.4;
+  circles.push({ x, z, r: 2.2, h: 3 });
+}
+// quartermaster stall
+const QM = { x: 8, z: -6 };
+sized("box", M(0x7a5536), 3.2, 1.1, 1.2, QM.x, 0.55, QM.z);
+sized("box", M(0xd9534f), 3.6, 0.12, 2, QM.x, 2.4, QM.z - 0.2).rotation.x = 0.25;
+sized("cyl", M(0x5a4030), 0.08, 2.4, 0.08, QM.x - 1.6, 1.2, QM.z + 0.5);
+sized("cyl", M(0x5a4030), 0.08, 2.4, 0.08, QM.x + 1.6, 1.2, QM.z + 0.5);
+sized("box", M(0xe3b45a), 0.4, 0.4, 0.4, QM.x - 0.8, 1.3, QM.z);
+sized("cyl", M(0x6aa0d8), 0.18, 0.4, 0.18, QM.x + 0.6, 1.3, QM.z);
+boxes.push({ x0: QM.x - 1.7, x1: QM.x + 1.7, z0: QM.z - 0.7, z1: QM.z + 0.7, h: 1.2 });
+// class altar with a floating die
+const ALTAR = { x: -7, z: 7 };
+sized("cyl", M(0x9aa0ad, { flat: true }), 1.3, 0.5, 1.3, ALTAR.x, 0.25, ALTAR.z);
+sized("cyl", M(0xb7bcc7, { flat: true }), 0.7, 1.1, 0.7, ALTAR.x, 1.0, ALTAR.z);
+const altarDie = sized("ico", M(0xf0b545, { em: 0x6a4a10, flat: true }), 0.45, 0.45, 0.45, ALTAR.x, 2.2, ALTAR.z);
+circles.push({ x: ALTAR.x, z: ALTAR.z, r: 1.3, h: 2 });
+
+/* market stalls */
+for (let i = 0; i < 5; i++) {
+  const x = 44 + i * 7, z = (i % 2 ? 9 : -6), col = [0xd9534f, 0x4f8fd9, 0xe3b45a, 0x6fbf73, 0xb07cf2][i];
+  sized("box", M(0x7a5536), 2.6, 1, 1.1, x, 0.5, z);
+  sized("box", M(col), 3, 0.1, 1.8, x, 2.2, z).rotation.x = (i % 2 ? -0.2 : 0.2);
+  sized("cyl", M(0x5a4030), 0.07, 2.2, 0.07, x - 1.3, 1.1, z);
+  sized("cyl", M(0x5a4030), 0.07, 2.2, 0.07, x + 1.3, 1.1, z);
+  boxes.push({ x0: x - 1.4, x1: x + 1.4, z0: z - 0.6, z1: z + 0.6, h: 1.2 });
+}
+/* quarry cliffs, open towards camp (south) */
+{
+  const q = ZONE.quarry;
+  for (let a = 0; a < TAU; a += 0.24) {
+    const deg = ((a / TAU) * 360 + 360) % 360;
+    if (deg > 55 && deg < 125) continue; // gap facing +z (camp side)
+    const x = q.x + Math.cos(a) * (q.r + 1), z = q.z + Math.sin(a) * (q.r + 1);
+    const s = 3 + (hash("q" + a) % 3);
+    sized("dode", M(0x7d7a74, { flat: true }), s, s * 1.3, s, x, s * 0.5, z).rotation.y = a;
+    circles.push({ x, z, r: s * 0.9, h: 6 });
+  }
+}
+/* library: pool and broken pillars */
+{
+  const l = ZONE.library;
+  const pool = mesh(new THREE.CircleGeometry(9, 32), M(0x2f7fb0, { op: 0.75 }), l.x - 4, 0.05, l.z - 2);
+  pool.rotation.x = -Math.PI / 2;
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * TAU, x = l.x + Math.cos(a) * 17, z = l.z + Math.sin(a) * 17;
+    const h = i % 3 === 0 ? 1.6 : 5.5;
+    sized("cyl", M(0xc9c4b5), 0.6, h, 0.6, x, h / 2, z);
+    circles.push({ x, z, r: 0.7, h });
+  }
+}
+/* barracks: square walls with a gate facing camp (north) */
+{
+  const b = ZONE.barracks, hw = 20, t = 1.2, h = 3.4, col = M(0x8c8378, { flat: true });
+  const wall = (x0, x1, z0, z1) => { sized("box", col, x1 - x0, h, z1 - z0, (x0 + x1) / 2, h / 2, (z0 + z1) / 2); boxes.push({ x0, x1, z0, z1, h }); };
+  wall(b.x - hw, b.x - 4, b.z - hw - t / 2, b.z - hw + t / 2);
+  wall(b.x + 4, b.x + hw, b.z - hw - t / 2, b.z - hw + t / 2);
+  wall(b.x - hw, b.x + hw, b.z + hw - t / 2, b.z + hw + t / 2);
+  wall(b.x - hw - t / 2, b.x - hw + t / 2, b.z - hw, b.z + hw);
+  wall(b.x + hw - t / 2, b.x + hw + t / 2, b.z - hw, b.z + hw);
+  sized("box", col, 4, 7, 4, b.x, 3.5, b.z + 8); boxes.push({ x0: b.x - 2, x1: b.x + 2, z0: b.z + 6, z1: b.z + 10, h: 7 });
+  sized("cone", M(0x7a3b30, { flat: true }), 3.4, 2.4, 3.4, b.x, 8.2, b.z + 8).rotation.y = Math.PI / 4;
+}
+
+/* =====================================================================
+   THE VAULT SPIRE
+   ===================================================================== */
+const SP = ZONE.spire;
+const SPIRE_R = 7.6, STEPS = 45, CHECKPOINTS = [15, 30];
+const platforms = [];
+{
+  let a = Math.atan2(0 - SP.z, 0 - SP.x); // start on the side facing camp
+  let top = 0, prevR = 2.2;
+  platforms.push({ i: 0, a, top: 0, r: 2.2, move: null });
+  for (let i = 1; i <= STEPS; i++) {
+    const floor = Math.ceil(i / 3), f = (floor - 1) / 14;
+    const cp = CHECKPOINTS.includes(i), summit = i === STEPS;
+    const r = summit ? 3.2 : cp ? 2.3 : 1.7 - 0.75 * f;
+    const gap = 1.0 + 1.4 * f, rise = 0.9 + 0.45 * f;
+    a += (prevR + r + gap) / SPIRE_R;
+    top += rise;
+    const move = (!cp && !summit && floor >= 11) ? { amp: 0.9, period: 3.4 - (floor - 11) * 0.3, phase: i * 1.7 } : null;
+    platforms.push({ i, a, top, r, move, floor, cp, summit });
+    prevR = r;
+  }
+}
+const SUMMIT_TOP = platforms[STEPS].top;
+const spirePillar = sized("cyl", M(0x3d3858, { op: 1 }), 3, SUMMIT_TOP + 8, 3, SP.x, (SUMMIT_TOP + 8) / 2, SP.z);
+for (let y = 6; y < SUMMIT_TOP + 8; y += 9) sized("cyl", M(0x4fe3d0, { basic: true }), 3.05, 0.25, 3.05, SP.x, y, SP.z);
+sized("oct", M(0xff5f8f, { em: 0x802040 }), 1.4, 2.2, 1.4, SP.x, SUMMIT_TOP + 10, SP.z);
+circles.push({ x: SP.x, z: SP.z, r: 3.1, h: SUMMIT_TOP + 9, pillar: true });
+const stoneByFloor = f => new THREE.Color(0x8d8aa0).lerp(new THREE.Color(0x5a4f7e), f / 15).getHex();
+for (const p of platforms) {
+  p.grp = new THREE.Group(); scene.add(p.grp);
+  const col = p.summit ? 0xf0b545 : p.cp ? 0x4fe3d0 : p.i === 0 ? 0x9a97ab : stoneByFloor(p.floor);
+  sized("cyl", M(col, { flat: true }), p.r, 0.5, p.r, 0, -0.25, 0, p.grp);
+  if (p.cp || p.summit) {
+    const ring = mesh(new THREE.TorusGeometry(p.r * 0.8, 0.08, 6, 30), M(p.summit ? 0xffd27a : 0x4fe3d0, { basic: true }), 0, 0.05, 0, p.grp);
+    ring.rotation.x = Math.PI / 2;
+  }
+  if (p.i > 0 && p.i % 3 === 2 && !p.cp) {
+    p.chest = makeChest(0.7, 0xa0703f, RCOL.rare);
+    p.chest.position.set(0, 0, 0); p.grp.add(p.chest);
+  }
+  if (p.summit) { p.chest = makeChest(1.3, 0x5b2140, RCOL.vaulted); p.grp.add(p.chest); }
+  placePlatform(p, 0);
+  if (p.chest && S.spire.opened[p.i]) p.chest.visible = false;
+}
+function placePlatform(p, t) {
+  const off = p.move ? Math.sin(t * TAU / p.move.period + p.move.phase) * p.move.amp : 0;
+  const R = SPIRE_R + off;
+  p.x = SP.x + Math.cos(p.a) * R; p.z = SP.z + Math.sin(p.a) * R;
+  p.grp.position.set(p.x, p.top, p.z);
+}
+function makeChest(s, wood, trim) {
+  const g = new THREE.Group();
+  sized("box", M(wood), 1 * s, 0.6 * s, 0.7 * s, 0, 0.3 * s, 0, g);
+  sized("box", M(trim, { em: trim, sh: 40 }), 1.04 * s, 0.1 * s, 0.74 * s, 0, 0.62 * s, 0, g);
+  sized("box", M(wood), 1 * s, 0.25 * s, 0.7 * s, 0, 0.78 * s, 0, g);
+  return g;
+}
+// waystone at the base
+const WAY = { x: SP.x + Math.cos(platforms[0].a) * (SPIRE_R + 5), z: SP.z + Math.sin(platforms[0].a) * (SPIRE_R + 5) };
+sized("box", M(0x4a4560, { flat: true }), 0.9, 2.6, 0.5, WAY.x, 1.3, WAY.z);
+const wayGlow = sized("box", M(0x4fe3d0, { basic: true }), 0.5, 0.5, 0.52, WAY.x, 1.9, WAY.z);
+circles.push({ x: WAY.x, z: WAY.z, r: 0.7, h: 3 });
+
+/* =====================================================================
+   CHARACTER MODELS
+   ===================================================================== */
+function makeWeapon(it) {
+  const g = new THREE.Group();
+  const metal = M(RCOL[it.rarity], { em: new THREE.Color(RCOL[it.rarity]).multiplyScalar(it.rarity === "common" ? 0.05 : 0.3).getHex(), sh: 60 });
+  const wood = M(0x6b4a2f);
+  const s = it.shape;
+  if (s === "sword" || s === "katana") {
+    const L = s === "katana" ? 1.15 : 0.95;
+    sized("box", wood, 0.06, 0.28, 0.06, 0, 0.0, 0, g);
+    if (s === "sword") sized("box", metal, 0.32, 0.05, 0.08, 0, 0.15, 0, g);
+    sized("box", metal, s === "katana" ? 0.05 : 0.09, L, 0.03, 0, 0.17 + L / 2, 0, g);
+  } else if (s === "hammer" || s === "axe") {
+    sized("cyl", wood, 0.035, 1.1, 0.035, 0, 0.4, 0, g);
+    if (s === "hammer") sized("box", metal, 0.42, 0.26, 0.26, 0, 0.92, 0, g);
+    else sized("box", metal, 0.05, 0.3, 0.34, 0, 0.85, 0.12, g);
+  } else if (s === "spear" || s === "trident") {
+    sized("cyl", wood, 0.03, 1.9, 0.03, 0, 0.55, 0, g);
+    if (s === "spear") sized("cone", metal, 0.08, 0.36, 0.08, 0, 1.68, 0, g);
+    else for (const dx of [-0.12, 0, 0.12]) sized("box", metal, 0.03, dx ? 0.3 : 0.4, 0.03, dx, 1.62, 0, g), sized("box", metal, 0.3, 0.04, 0.04, 0, 1.48, 0, g);
+  } else if (s === "scythe") {
+    sized("cyl", wood, 0.03, 1.8, 0.03, 0, 0.5, 0, g);
+    const b = sized("box", metal, 0.05, 0.12, 0.8, 0, 1.36, 0.36, g); b.rotation.x = 0.25;
+  } else if (s === "staff") {
+    sized("cyl", wood, 0.035, 1.6, 0.035, 0, 0.45, 0, g);
+    sized("ico", M(RCOL[it.rarity], { basic: true }), 0.14, 0.14, 0.14, 0, 1.32, 0, g);
+  } else if (s === "bow") {
+    const bow = mesh(new THREE.TorusGeometry(0.55, 0.03, 5, 18, Math.PI), metal, 0, 0.35, 0, g); bow.rotation.z = Math.PI / 2;
+    sized("box", M(0xeeeeee, { basic: true }), 0.01, 1.1, 0.01, -0.0, 0.35, 0, g);
+  } else if (s === "chakram") {
+    const ring = mesh(new THREE.TorusGeometry(0.28, 0.05, 6, 20), metal, 0, 0.3, 0, g); ring.rotation.y = Math.PI / 2;
+  }
+  return g;
+}
+function makeCharacter(clsId) {
+  const L = CLASS[clsId].look, arm = ITEM[S.equip.armour];
+  const g = new THREE.Group();
+  const skin = M(L.skin), limb = M(L.limb), body = M(new THREE.Color(RCOL[arm.rarity]).lerp(new THREE.Color(0x30303a), 0.35).getHex(), { sh: 30 });
+  const parts = { g };
+  for (const sx of [-1, 1]) {
+    const pivot = new THREE.Group(); pivot.position.set(0.14 * sx, 0.72, 0); g.add(pivot);
+    sized("box", limb, 0.22, 0.72, 0.24, 0, -0.36, 0, pivot);
+    parts[sx < 0 ? "legL" : "legR"] = pivot;
+  }
+  sized("box", body, 0.62, 0.72, 0.36, 0, 1.08, 0, g);
+  const head = new THREE.Group(); head.position.set(0, 1.66, 0); g.add(head);
+  sized("box", skin, 0.44, 0.44, 0.42, 0, 0, 0, head);
+  const eye = M(clsId === "reaper" ? 0xff4060 : clsId === "skeleton" ? 0x111111 : 0x222233, { basic: clsId === "reaper" });
+  sized("box", eye, 0.07, 0.07, 0.02, -0.1, 0.03, 0.215, head);
+  sized("box", eye, 0.07, 0.07, 0.02, 0.1, 0.03, 0.215, head);
+  for (const sx of [-1, 1]) {
+    const pivot = new THREE.Group(); pivot.position.set(0.42 * sx, 1.38, 0); g.add(pivot);
+    sized("box", sx < 0 ? limb : limb, 0.18, 0.64, 0.2, 0, -0.32, 0, pivot);
+    sized("box", skin, 0.16, 0.14, 0.18, 0, -0.68, 0, pivot);
+    parts[sx < 0 ? "armL" : "armR"] = pivot;
+  }
+  const holder = new THREE.Group(); holder.position.set(0, -0.68, 0.05); holder.rotation.x = Math.PI / 2; parts.armR.add(holder);
+  holder.add(makeWeapon(ITEM[S.equip.weapon]));
+  // class extras
+  const ex = (key, col, sx, sy, sz, x, y, z, parent = g, o = {}) => sized(key, M(col, o), sx, sy, sz, x, y, z, parent);
+  if (clsId === "warrior") { ex("cone", 0xe8e0c8, 0.07, 0.25, 0.07, -0.26, 0.2, 0, head).rotation.z = 0.6; ex("cone", 0xe8e0c8, 0.07, 0.25, 0.07, 0.26, 0.2, 0, head).rotation.z = -0.6; ex("box", 0x8a8f99, 0.48, 0.12, 0.46, 0, 0.18, 0, head); }
+  if (clsId === "elf") { ex("cone", L.skin, 0.05, 0.22, 0.05, -0.25, 0.08, 0, head).rotation.z = 1.0; ex("cone", L.skin, 0.05, 0.22, 0.05, 0.25, 0.08, 0, head).rotation.z = -1.0; ex("box", 0xe8d27a, 0.46, 0.5, 0.12, 0, -0.05, -0.2, head); }
+  if (clsId === "alchemist") { ex("box", 0x7a5536, 0.4, 0.46, 0.2, 0, 1.12, -0.28); ex("cyl", 0x7fd69a, 0.08, 0.26, 0.08, 0.12, 1.45, -0.28, g, { em: 0x2a8040 }); ex("cyl", 0xb07cf2, 0.07, 0.2, 0.07, -0.12, 1.42, -0.28, g, { em: 0x50308a }); }
+  if (clsId === "samurai") { ex("box", 0x1c1c22, 0.1, 0.14, 0.18, 0, 0.28, -0.08, head); ex("box", 0xc23b3b, 0.64, 0.1, 0.38, 0, 0.86, 0); }
+  if (clsId === "mage") { ex("cone", 0x2e3a7a, 0.34, 0.7, 0.34, 0, 0.55, 0, head); ex("box", 0x2e3a7a, 0.7, 0.04, 0.7, 0, 0.22, 0, head); }
+  if (clsId === "paladin") { const halo = mesh(new THREE.TorusGeometry(0.26, 0.035, 6, 24), M(0xffd75a, { basic: true }), 0, 0.42, 0, head); halo.rotation.x = Math.PI / 2; ex("box", 0xc9ccd6, 0.5, 0.2, 0.46, 0, 0.16, 0, head, { sh: 60 }); }
+  if (clsId === "reaper") { ex("cone", 0x15131b, 0.36, 0.7, 0.36, 0, 0.2, -0.04, head); ex("box", 0x15131b, 0.7, 1.2, 0.06, 0, 0.95, -0.22); }
+  if (clsId === "skeleton") { for (let i = 0; i < 3; i++) ex("box", 0x2a2a2a, 0.5, 0.04, 0.02, 0, 1.0 + i * 0.13, 0.19); }
+  if (clsId === "archangel") {
+    const halo = mesh(new THREE.TorusGeometry(0.24, 0.03, 6, 24), M(0xfff1b0, { basic: true }), 0, 0.42, 0, head); halo.rotation.x = Math.PI / 2;
+    for (const sx of [-1, 1]) {
+      const wp = new THREE.Group(); wp.position.set(0.12 * sx, 1.3, -0.2); g.add(wp);
+      const w = ex("box", 0xffffff, 1.1, 0.5, 0.05, 0.55 * sx, 0.1, 0, wp, { em: 0x606070 }); w.rotation.z = 0.25 * sx;
+      parts[sx < 0 ? "wingL" : "wingR"] = wp;
+    }
+  }
+  return parts;
+}
+
+/* =====================================================================
+   PLAYER
+   ===================================================================== */
+const P = {
+  pos: new V3(0, 0, 6), vy: 0, face: Math.PI, onGround: true, plat: null, coyote: 0, jumps: 0,
+  hp: ST.maxHp, atkT: 0, specT: 0, swing: 0, drainUntil: 0, rattleAt: -999, kb: new V3(), dashT: 0, dashHit: new Set(),
+  healT: 0, walk: 0, dead: false
+};
+let model = null;
+const shadow = mesh(new THREE.CircleGeometry(0.5, 16), M(0x000000, { basic: true, op: 0.3 }), 0, 0.03, 0);
+shadow.rotation.x = -Math.PI / 2;
+function rebuildPlayer() {
+  if (model) scene.remove(model.g);
+  model = makeCharacter(S.cls);
+  scene.add(model.g);
+  computeStats();
+  P.hp = Math.min(P.hp, ST.maxHp);
+}
+rebuildPlayer();
+
+/* =====================================================================
+   ENEMIES
+   ===================================================================== */
+const enemies = [];
+const hpBgMat = M(0x220c12, { basic: true }), hpFgMat = M(0xe2566a, { basic: true });
+function makeEnemyMesh(type) {
+  const d = ENEMIES[type], g = new THREE.Group();
+  if (type === "slime") {
+    sized("sph", M(d.col, { op: 0.88, sh: 80 }), 0.7, 0.55, 0.7, 0, 0.5, 0, g);
+    sized("box", M(0x112211), 0.08, 0.12, 0.04, -0.2, 0.62, 0.62, g); sized("box", M(0x112211), 0.08, 0.12, 0.04, 0.2, 0.62, 0.62, g);
+  } else if (type === "golem") {
+    sized("dode", M(d.col, { flat: true }), 0.75, 0.75, 0.75, 0, 0.75, 0, g);
+    sized("dode", M(0x9da2ab, { flat: true }), 0.45, 0.45, 0.45, 0, 1.65, 0, g);
+    sized("box", M(0xffb347, { basic: true }), 0.1, 0.06, 0.04, -0.14, 1.7, 0.42, g); sized("box", M(0xffb347, { basic: true }), 0.1, 0.06, 0.04, 0.14, 1.7, 0.42, g);
+  } else if (type === "wisp") {
+    sized("sph", M(d.col, { basic: true, op: 0.85 }), 0.45, 0.45, 0.45, 0, 1.4, 0, g);
+    sized("cone", M(d.col, { basic: true, op: 0.4 }), 0.35, 1.0, 0.35, 0, 0.8, 0, g).rotation.x = Math.PI;
+  } else {
+    const c = M(d.col);
+    sized("box", c, 0.5, 0.65, 0.3, 0, 1.05, 0, g);
+    sized("box", c, 0.4, 0.4, 0.38, 0, 1.6, 0, g);
+    sized("box", M(0xff3030, { basic: true }), 0.07, 0.07, 0.02, -0.09, 1.62, 0.2, g); sized("box", M(0xff3030, { basic: true }), 0.07, 0.07, 0.02, 0.09, 1.62, 0.2, g);
+    sized("box", c, 0.14, 0.75, 0.14, -0.12, 0.38, 0, g); sized("box", c, 0.14, 0.75, 0.14, 0.12, 0.38, 0, g);
+    sized("box", c, 0.12, 0.6, 0.12, -0.36, 1.05, 0, g);
+    const arm = sized("box", c, 0.12, 0.6, 0.12, 0.36, 1.05, 0.1, g);
+    sized("box", M(0x777777, { sh: 60 }), 0.05, 0.9, 0.04, 0.36, 1.2, 0.5, g).rotation.x = 1.2;
+    arm.rotation.x = -0.5;
+  }
+  const hp = new THREE.Group(); hp.position.y = type === "slime" ? 1.3 : 2.25; g.add(hp);
+  sized("box", hpBgMat, 1.0, 0.1, 0.01, 0, 0, 0, hp);
+  const fg = sized("box", hpFgMat, 1.0, 0.1, 0.02, 0, 0, 0.01, hp);
+  hp.visible = false;
+  return { g, hpBar: hp, fg };
+}
+function spawnPoint(zone) {
+  for (let k = 0; k < 30; k++) {
+    const a = Math.random() * TAU, r = Math.sqrt(Math.random()) * (zone.r - 4);
+    const x = zone.x + Math.cos(a) * r, z = zone.z + Math.sin(a) * r;
+    if (!blocked(x, z, 1.2)) return new V3(x, 0, z);
+  }
+  return new V3(zone.x, 0, zone.z);
+}
+function blocked(x, z, pad) {
+  for (const c of circles) if (Math.hypot(x - c.x, z - c.z) < c.r + pad) return true;
+  for (const b of boxes) if (x > b.x0 - pad && x < b.x1 + pad && z > b.z0 - pad && z < b.z1 + pad) return true;
+  return false;
+}
+for (const z of ZONES) {
+  if (!z.enemy) continue;
+  for (let i = 0; i < z.count; i++) {
+    const m = makeEnemyMesh(z.enemy);
+    scene.add(m.g);
+    const e = { type: z.enemy, d: ENEMIES[z.enemy], zone: z, ...m, pos: spawnPoint(z), kb: new V3(), hp: ENEMIES[z.enemy].hp, atkT: rand(0, 1), dead: false, respawnAt: 0,
+      slowUntil: 0, frozenUntil: 0, burnUntil: 0, burnDps: 0, wander: null, wanderT: 0, bob: Math.random() * 10, flash: 0 };
+    e.home = e.pos.clone();
+    e.g.position.copy(e.pos);
+    enemies.push(e);
+  }
+}
+
+/* =====================================================================
+   LOOT NODES
+   ===================================================================== */
+const nodes = [];
+function makeNodeMesh(kind) {
+  const g = new THREE.Group();
+  if (kind === "crate") {
+    sized("box", M(0x9a6a3c), 1, 0.8, 0.8, 0, 0.4, 0, g);
+    sized("box", M(0x6b4a2f), 1.04, 0.1, 0.84, 0, 0.6, 0, g);
+    sized("box", M(0x6b4a2f), 1.04, 0.1, 0.84, 0, 0.2, 0, g);
+  } else if (kind === "ore") {
+    sized("dode", M(0x6f6c68, { flat: true }), 0.9, 0.75, 0.9, 0, 0.55, 0, g);
+    for (let i = 0; i < 4; i++) {
+      const a = i * 1.7;
+      sized("oct", M([0xe0a050, 0x5aa7f0, 0xb07cf2, 0xd8d8e0][i], { em: 0x222222, sh: 80 }), 0.16, 0.24, 0.16, Math.cos(a) * 0.6, 0.65 + (i % 2) * 0.3, Math.sin(a) * 0.6, g);
+    }
+  } else if (kind === "shelf") {
+    sized("box", M(0x5b3e28), 1.6, 1.9, 0.5, 0, 0.95, 0, g);
+    for (let r = 0; r < 3; r++) for (let b = 0; b < 6; b++) sized("box", M([0xb0563f, 0x4f7ab0, 0x6fbf73, 0xe3b45a, 0x7a5fa8][(r * 6 + b) % 5]), 0.16, 0.42, 0.34, -0.6 + b * 0.24, 0.42 + r * 0.56, 0.08, g);
+  } else {
+    sized("box", M(0x5b3e28), 1.6, 0.12, 0.3, 0, 1.4, 0, g);
+    sized("box", M(0x5b3e28), 0.12, 1.4, 0.3, -0.75, 0.7, 0, g);
+    sized("box", M(0x5b3e28), 0.12, 1.4, 0.3, 0.75, 0.7, 0, g);
+    for (const x of [-0.4, 0, 0.4]) sized("box", M(0xb8bcc6, { sh: 60 }), 0.06, 1.2, 0.03, x, 0.75, 0.18, g);
+  }
+  const glow = mesh(new THREE.RingGeometry(0.9, 1.05, 28), M(0xe3b45a, { basic: true, op: 0.55, ds: true }), 0, 0.05, 0, g);
+  glow.rotation.x = -Math.PI / 2;
+  return g;
+}
+for (const z of ZONES) {
+  if (!z.node) continue;
+  for (let i = 0; i < z.nodes; i++) {
+    const p = spawnPoint(z);
+    const g = makeNodeMesh(z.node);
+    g.position.copy(p); g.rotation.y = Math.random() * TAU; scene.add(g);
+    nodes.push({ zone: z, kind: z.node, pos: p, g, ready: true, respawnAt: 0 });
+    circles.push({ x: p.x, z: p.z, r: 0.6, h: 2 });
+  }
+}
+const NODE_VERB = { crate: "Search crate", ore: "Mine ore rock", shelf: "Search shelf", rack: "Search weapon rack" };
+
+/* =====================================================================
+   EFFECTS
+   ===================================================================== */
+const effects = [];
+function addEffect(obj, life, update) { scene.add(obj); effects.push({ obj, t: 0, life, update }); }
+function ringFx(pos, radius, color, life = 0.45, y = 0.15) {
+  const m = mesh(new THREE.RingGeometry(0.85, 1, 40), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthWrite: false }), pos.x, pos.y + y, pos.z, null);
+  m.rotation.x = -Math.PI / 2;
+  addEffect(m, life, (o, k) => { const s = 0.2 + k * radius; o.scale.set(s, s, s); o.material.opacity = 0.9 * (1 - k); });
+}
+function beamFx(pos, rarity) {
+  const big = RANK[rarity] >= 3;
+  const m = mesh(new THREE.CylinderGeometry(big ? 0.3 : 0.18, big ? 0.3 : 0.18, 1, 10, 1, true), new THREE.MeshBasicMaterial({ color: RCOL[rarity], transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }), pos.x, 0, pos.z, null);
+  const H = big ? 40 : 14;
+  addEffect(m, big ? 6 : 2.5, (o, k) => { o.scale.set(1, H * Math.min(1, k * 6), 1); o.position.y = pos.y + (H * Math.min(1, k * 6)) / 2; o.material.opacity = 0.7 * (1 - k * k); });
+}
+function boltFx(a, b, color) {
+  const pts = [];
+  for (let i = 0; i <= 6; i++) { const t = i / 6; pts.push(new V3(lerp(a.x, b.x, t) + (i && i < 6 ? rand(-0.3, 0.3) : 0), lerp(a.y, b.y, t) + (i && i < 6 ? rand(-0.3, 0.3) : 0), lerp(a.z, b.z, t))); }
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color, transparent: true }));
+  addEffect(line, 0.3, (o, k) => { o.material.opacity = 1 - k; });
+}
+function shotFx(a, b, color) {
+  const m = mesh(G.sph, new THREE.MeshBasicMaterial({ color }), a.x, a.y, a.z, null); m.scale.setScalar(0.15);
+  addEffect(m, 0.16, (o, k) => { o.position.lerpVectors(a, b, k); });
+}
+
+/* floating numbers */
+const floaters = [];
+const flLayer = $("floaters");
+function floatText(pos, text, color) {
+  if (floaters.length > 24) { const o = floaters.shift(); o.el.remove(); }
+  const el = document.createElement("div"); el.className = "fl"; el.textContent = text; el.style.color = color; flLayer.append(el);
+  floaters.push({ el, pos: pos.clone().add(new V3(rand(-0.3, 0.3), 2.2, rand(-0.3, 0.3))), t: 0 });
+}
+
+/* toasts + reveal */
+function toast(html, rarity) {
+  const t = document.createElement("div"); t.className = "toast"; if (rarity) t.style.setProperty("--c", rc(rarity)); t.innerHTML = html;
+  const box = $("toasts"); box.prepend(t);
+  while (box.children.length > 5) box.lastChild.remove();
+  setTimeout(() => t.remove(), 4500);
+}
+const revealQ = [];
+function reveal(it, eyebrow) { revealQ.push({ it, eyebrow }); if ($("reveal").hidden) nextReveal(); }
+function nextReveal() {
+  const n = revealQ.shift();
+  if (!n) { $("reveal").hidden = true; return; }
+  const card = $("revealCard");
+  card.className = "reveal-card" + (n.it.rarity === "vaulted" ? " vaulted" : "");
+  card.style.setProperty("--c", rc(n.it.rarity));
+  $("rvEyebrow").textContent = n.eyebrow;
+  $("rvName").textContent = n.it.name;
+  $("rvDesc").textContent = n.it.desc;
+  $("rvClose").textContent = n.btn || "Into the satchel";
+  $("reveal").hidden = false;
+}
+$("rvClose").addEventListener("click", nextReveal);
+
+/* =====================================================================
+   LOOT
+   ===================================================================== */
+let worldT = 60; // starts part way through the comet cycle so the first comet comes after about three minutes
+const cometLive = () => (worldT % COMET_CYCLE) >= COMET_CYCLE - COMET_LEN;
+function zoneOdds(zone) {
+  const o = { ...(zone.id === "spire" ? SPIRE_ODDS : zone.odds), vaulted: 0 };
+  if (cometLive()) { o.vaulted = COMET_VAULT[zone.id] || 0.5; o.legendary += 3; o.common = Math.max(0, o.common - 3 - o.vaulted); }
+  return o;
+}
+function rollItem(rarity, cats) {
+  const cat = cats ? pickWeighted(cats) : null;
+  let pool = ITEMS.filter(i => i.rarity === rarity && (!cat || i.cat === cat));
+  if (!pool.length) pool = ITEMS.filter(i => i.rarity === rarity);
+  if (rarity === "vaulted") { const un = pool.filter(i => !S.seen[i.id]); if (un.length) pool = un; }
+  return pick(pool);
+}
+function gain(it, where, pos, n = 1) {
+  S.inv[it.id] = (S.inv[it.id] || 0) + n;
+  const first = !S.seen[it.id];
+  S.seen[it.id] = (S.seen[it.id] || 0) + n;
+  toast(`${first ? "New! " : ""}<b>${esc(it.name)}</b> <span class="muted">${RNAME[it.rarity]}${where ? " · " + esc(where) : ""}</span>`, it.rarity);
+  if (pos && RANK[it.rarity] >= 1) beamFx(pos, it.rarity);
+  if (RANK[it.rarity] >= 3) reveal(it, `${first ? "New " : ""}${RNAME[it.rarity]} ${it.cat === "weapon" ? SHAPE_NAME[it.shape].toLowerCase() : CAT_ONE[it.cat]}`);
+  else if (first && RANK[it.rarity] === 2) floatText(P.pos, `New ${RNAME[it.rarity]}!`, "#b07cf2");
+  save();
+}
+function searchNode(n) {
+  if (!n.ready) return;
+  n.ready = false; n.respawnAt = worldT + rand(40, 60); n.g.visible = false;
+  const odds = zoneOdds(n.zone);
+  const finds = 2 + (S.cls === "alchemist" && Math.random() < 0.3 ? 1 : 0);
+  for (let i = 0; i < finds; i++) gain(rollItem(pickWeighted(odds), n.zone.cats), n.zone.name, n.pos);
+  ringFx(n.pos, 2, 0xe3b45a);
+}
+
+/* =====================================================================
+   COMBAT
+   ===================================================================== */
+function damageEnemy(e, amount, dir, kb, opts = {}) {
+  if (e.dead) return;
+  e.hp -= amount; e.flash = 0.12;
+  if (!opts.silent) floatText(e.pos, Math.round(amount), opts.color || "#ffe9a8");
+  if (dir && kb) e.kb.copy(dir).setY(0).normalize().multiplyScalar(kb * 5);
+  if (worldT < P.drainUntil) heal(amount * 0.4, true);
+  if (e.hp <= 0) killEnemy(e);
+}
+function killEnemy(e) {
+  e.dead = true; e.g.visible = false; e.respawnAt = worldT + 22;
+  const coins = Math.round(rand(e.d.coins[0], e.d.coins[1]));
+  S.coins += coins; floatText(e.pos, `+${coins} coins`, "#e3b45a");
+  ringFx(e.pos, 1.6, 0xffffff, 0.35);
+  if (S.cls === "reaper") heal(ST.maxHp * 0.2);
+  if (Math.random() < 0.25) gain(rollItem(pickWeighted(zoneOdds(e.zone)), e.zone.cats), e.d.name, e.pos);
+  save();
+}
+function heal(n, silent) {
+  const before = P.hp; P.hp = Math.min(ST.maxHp, P.hp + n);
+  if (!silent && P.hp - before >= 1) floatText(P.pos, `+${Math.round(P.hp - before)}`, "#7fd69a");
+}
+function hurtPlayer(amount, from) {
+  if (P.dead) return;
+  if (Math.random() < ST.dodge) { floatText(P.pos, "Dodged", "#a3acc3"); return; }
+  const dmg = amount * (1 - ST.def / (ST.def + 100)) * (1 - ST.block);
+  P.hp -= dmg; floatText(P.pos, `-${Math.round(dmg)}`, "#ff6b7d");
+  if (from) {
+    const away = P.pos.clone().sub(from.pos).setY(0).normalize();
+    if (!ST.noKb) P.kb.copy(away).multiplyScalar(6);
+    if (ST.thorns > 0) damageEnemy(from, ST.thorns, away.clone().negate(), ST.thornsKb, { color: "#f0b545" });
+  }
+  if (P.hp <= 0) {
+    if (S.cls === "skeleton" && worldT - P.rattleAt > 60) { P.hp = 1; P.rattleAt = worldT; floatText(P.pos, "Bone Rattle!", "#eae4d0"); toast("<b>Bone Rattle</b> kept you standing. It recharges in 60 seconds.", "common"); }
+    else die();
+  }
+}
+function die() { P.dead = true; P.hp = 0; $("dead").hidden = false; }
+$("deadBtn").addEventListener("click", () => {
+  P.dead = false; P.hp = ST.maxHp; P.pos.set(0, 0, 6); P.vy = 0; P.plat = null; P.kb.set(0, 0, 0);
+  $("dead").hidden = true;
+});
+function forward() { return new V3(Math.sin(P.face), 0, Math.cos(P.face)); }
+function enemiesNear(pos, r) { return enemies.filter(e => !e.dead && e.pos.distanceTo(pos) < r); }
+function nearestEnemy(r, cone) {
+  let best = null, bd = r; const f = forward();
+  for (const e of enemies) {
+    if (e.dead || Math.abs(e.pos.y - P.pos.y) > 3) continue;
+    const d = e.pos.distanceTo(P.pos); if (d >= bd) continue;
+    if (cone) { const to = e.pos.clone().sub(P.pos).setY(0).normalize(); if (to.dot(f) < cone) continue; }
+    best = e; bd = d;
+  }
+  return best;
+}
+function attack() {
+  if (P.atkT > 0 || P.dead) return;
+  P.atkT = 1 / ST.atkSpeed; P.swing = 1;
+  const w = ITEM[S.equip.weapon];
+  const target = nearestEnemy(ST.range + 1.5, -1);
+  if (target) P.face = Math.atan2(target.pos.x - P.pos.x, target.pos.z - P.pos.z);
+  const f = forward();
+  if (ST.ranged) {
+    const e = nearestEnemy(ST.range, 0.55);
+    const from = P.pos.clone().add(new V3(0, 1.3, 0));
+    if (e) { shotFx(from, e.pos.clone().add(new V3(0, 1, 0)), RCOL[w.rarity]); damageEnemy(e, ST.hit, f, w.kb); }
+    else shotFx(from, from.clone().add(f.clone().multiplyScalar(ST.range)), RCOL[w.rarity]);
+  } else {
+    for (const e of enemiesNear(P.pos, ST.range + 0.6)) {
+      const to = e.pos.clone().sub(P.pos).setY(0).normalize();
+      if (to.dot(f) > 0.2 && Math.abs(e.pos.y - P.pos.y) < 2.5) damageEnemy(e, ST.hit, to, w.kb);
+    }
+  }
+}
+function castSpecial() {
+  if (P.specT > 0 || P.dead) return;
+  const w = ITEM[S.equip.weapon], sp = SPECIALS[w.special];
+  P.specT = sp.cd * ST.cdMult;
+  const R = 1 + RANK[w.rarity] * 0.18, base = ST.hit, f = forward(), pos = P.pos;
+  const vaulted = w.rarity === "vaulted";
+  switch (w.special) {
+    case "cleave":
+      for (const e of enemiesNear(pos, 3.6 * R)) damageEnemy(e, base * 2, e.pos.clone().sub(pos), w.kb * 1.5);
+      ringFx(pos, 3.6 * R, RCOL[w.rarity]); P.swing = 1; break;
+    case "dash":
+      if (P.onGround) { P.dashT = 0.24; P.dashHit.clear(); }
+      ringFx(pos, 1.5, 0xffffff, 0.3); P.swing = 1;
+      if (!P.onGround) for (const e of enemiesNear(pos, 3)) damageEnemy(e, base * 1.8, f, w.kb);
+      break;
+    case "ignite":
+      for (const e of enemiesNear(pos, 6.5 * R)) {
+        const to = e.pos.clone().sub(pos).setY(0).normalize();
+        if (to.dot(f) > 0.35) { damageEnemy(e, base, to, w.kb); e.burnUntil = worldT + 4; e.burnDps = base * 0.6; }
+      }
+      ringFx(pos.clone().add(f.clone().multiplyScalar(3)), 3.2 * R, 0xff7a2a); break;
+    case "frost":
+      for (const e of enemiesNear(pos, 5 * R)) { damageEnemy(e, base * 1.2, e.pos.clone().sub(pos), 0.5, { color: "#9fe0ff" }); e.slowUntil = worldT + 4; }
+      ringFx(pos, 5 * R, 0x9fe0ff); break;
+    case "chain": {
+      let from = pos.clone().add(new V3(0, 1.2, 0)), dmg = base * 1.6, hit = new Set();
+      let cur = nearestEnemy(10, -1);
+      for (let k = 0; k < 5 && cur; k++) {
+        hit.add(cur); const to = cur.pos.clone().add(new V3(0, 1, 0));
+        boltFx(from, to, 0xbfe4ff); damageEnemy(cur, dmg, cur.pos.clone().sub(pos), w.kb * 0.5, { color: "#bfe4ff" });
+        from = to; dmg *= 0.85;
+        cur = enemies.filter(e => !e.dead && !hit.has(e) && e.pos.distanceTo(to) < 6).sort((a, b) => a.pos.distanceTo(to) - b.pos.distanceTo(to))[0];
+      }
+      if (!hit.size) floatText(pos, "No target", "#a3acc3");
+      break;
+    }
+    case "drain": P.drainUntil = worldT + 6; ringFx(pos, 2.5, 0x7fd69a, 0.6); floatText(pos, "Soul Drain", "#7fd69a"); break;
+    case "timestop": {
+      const dur = vaulted ? 8 : 4;
+      for (const e of enemiesNear(pos, 18 * R)) e.frozenUntil = worldT + dur;
+      ringFx(pos, 18 * R, 0xffffff, 0.8); floatText(pos, "Time stops", "#ffffff"); break;
+    }
+    case "vortex":
+      for (const e of enemiesNear(pos, 9 * R)) { const to = pos.clone().sub(e.pos).setY(0); const d = to.length(); e.kb.copy(to.normalize().multiplyScalar(Math.min(14, d * 2.2))); damageEnemy(e, base * 1.5, null, 0, { color: "#4fe3d0" }); }
+      ringFx(pos, 9 * R, 0x4fe3d0, 0.6); break;
+    case "meteor": {
+      const at = pos.clone().add(f.clone().multiplyScalar(6));
+      const star = mesh(G.ico, new THREE.MeshBasicMaterial({ color: 0xffa040 }), at.x, at.y + 18, at.z, null); star.scale.setScalar(0.9 * R);
+      addEffect(star, 0.6, (o, k) => { o.position.y = at.y + 18 * (1 - k); o.rotation.x += 0.3; });
+      setTimeout(() => {
+        for (const e of enemiesNear(at, 4 * R)) damageEnemy(e, base * 3, e.pos.clone().sub(at), 4, { color: "#ffa040" });
+        ringFx(at, 4 * R, 0xff7a2a, 0.6);
+      }, 600);
+      break;
+    }
+  }
+}
+function useSupply() {
+  if (P.dead) return;
+  if (P.healT > 0) return;
+  if (P.hp >= ST.maxHp) { floatText(P.pos, "Already at full health", "#a3acc3"); return; }
+  if (S.inv.canteen) { heal(30); P.healT = 3; return; }
+  const missing = ST.maxHp - P.hp;
+  const have = ITEMS.filter(i => i.cat === "necessity" && S.inv[i.id] && i.id !== "canteen").sort((a, b) => a.heal - b.heal);
+  if (!have.length) { floatText(P.pos, "No supplies", "#ff6b7d"); toast("No healing supplies. Buy bread from the Quartermaster in camp.", ""); return; }
+  const it = have.find(i => i.heal >= missing) || have[have.length - 1];
+  take(it.id, 1); heal(it.heal); P.healT = 0.6;
+  toast(`Used <b>${esc(it.name)}</b>`, it.rarity); save();
+}
+function take(id, n) { S.inv[id] -= n; if (S.inv[id] <= 0) delete S.inv[id]; }
+
+/* =====================================================================
+   INTERACTION
+   ===================================================================== */
+function interactables() {
+  const out = [];
+  for (const n of nodes) if (n.ready) out.push({ pos: n.pos, r: 2.3, label: NODE_VERB[n.kind], act: () => searchNode(n) });
+  out.push({ pos: new V3(QM.x, 0, QM.z), r: 3.2, label: "Trade with the Quartermaster", act: () => openModal("shop") });
+  out.push({ pos: new V3(ALTAR.x, 0, ALTAR.z), r: 3.0, label: "Use the Class Altar", act: () => openModal("altar") });
+  if (S.spire.cp) out.push({ pos: new V3(WAY.x, 0, WAY.z), r: 2.6, label: `Return to the floor ${platforms[S.spire.cp].floor} checkpoint`, act: () => teleportTo(platforms[S.spire.cp]) });
+  for (const p of platforms) {
+    if (!p.chest || S.spire.opened[p.i]) continue;
+    out.push({ pos: new V3(p.x, p.top, p.z), r: p.summit ? 3.4 : 2.0, y: true, label: p.summit ? "Open the Vault" : `Open floor ${p.floor} chest`, act: () => openSpireChest(p) });
+  }
+  return out;
+}
+function nearestInteract() {
+  let best = null, bd = Infinity;
+  for (const it of interactables()) {
+    if (Math.abs((it.y ? it.pos.y : 0) - P.pos.y) > (it.y ? 1.2 : 2)) continue;
+    const d = Math.hypot(it.pos.x - P.pos.x, it.pos.z - P.pos.z);
+    if (d < it.r && d < bd) { best = it; bd = d; }
+  }
+  return best;
+}
+function teleportTo(p) {
+  P.pos.set(p.x, p.top + 0.05, p.z); P.vy = 0; P.plat = p; P.onGround = true; ringFx(P.pos, 2, 0x4fe3d0, 0.6);
+}
+function openSpireChest(p) {
+  S.spire.opened[p.i] = true; p.chest.visible = false;
+  const pos = new V3(p.x, p.top, p.z);
+  if (p.summit) {
+    S.spire.summits += 1;
+    gain(rollItem("vaulted"), "Vault Spire summit", pos);
+    gain(ITEM.die, "Vault Spire summit", null);
+    toast(`<b>Summit reached.</b> The Spire resets for your next climb.`, "vaulted");
+    S.spire.cp = 0; S.spire.best = 0; S.spire.opened = {};
+    setTimeout(() => { for (const q of platforms) if (q.chest) q.chest.visible = true; }, 1500);
+  } else {
+    gain(rollItem(pickWeighted(zoneOdds(SP))), `Spire floor ${p.floor}`, pos);
+  }
+  save();
+}
+function onLand(p) {
+  if (!p || p.i <= S.spire.best) return;
+  S.spire.best = p.i;
+  if (p.cp && p.i > S.spire.cp) {
+    S.spire.cp = p.i;
+    toast(`<b>Checkpoint: floor ${p.floor}.</b> The waystone at the base can bring you back here.`, "rare");
+    ringFx(new V3(p.x, p.top, p.z), 3, 0x4fe3d0, 0.8);
+    if (p.i === 30 && !S.spire.dieGiven) { S.spire.dieGiven = true; gain(ITEM.die, "Spire floor 10 checkpoint", new V3(p.x, p.top, p.z)); }
+  }
+  save();
+}
+
+/* =====================================================================
+   INPUT: keyboard, touch joystick, mouse, gamepad, buttons
+   ===================================================================== */
+const keys = new Set();
+const edge = { jump: false, special: false, use: false, heal: false };
+let attackHeld = false, jumpHeld = false, attackTap = false;
+const touchMove = { x: 0, y: 0 };
+const cam = { yaw: 0, pitch: 0.42, dist: 9.5 };
+cam.yaw = P.face + Math.PI;
+
+window.addEventListener("keydown", e => {
+  if (isPaused() && e.key !== "Escape") return;
+  const k = e.key.toLowerCase();
+  if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "tab"].includes(k)) e.preventDefault();
+  if (e.repeat) { keys.add(k); return; }
+  keys.add(k);
+  if (k === " ") edge.jump = true;
+  if (k === "k" || k === "q") edge.special = true;
+  if (k === "e") edge.use = true;
+  if (k === "h") edge.heal = true;
+  if (k === "i" || k === "tab") openModal("satchel");
+});
+window.addEventListener("keydown", e => { if (e.key === "Escape") { if (!$("modal").hidden) closeModal(); } });
+window.addEventListener("keyup", e => keys.delete(e.key.toLowerCase()));
+window.addEventListener("blur", () => { keys.clear(); attackHeld = false; jumpHeld = false; });
+
+const joy = { id: null, ox: 0, oy: 0 };
+const drag = { id: null, x: 0, y: 0, t: 0, moved: 0, type: "" };
+let usedTouch = false;
+stage.addEventListener("pointerdown", e => {
+  if (isPaused()) return;
+  if (e.pointerType !== "mouse") usedTouch = true;
+  if (e.pointerType !== "mouse" && joy.id === null && e.clientX < window.innerWidth * 0.45 && e.clientY > window.innerHeight * 0.3) {
+    joy.id = e.pointerId; joy.ox = e.clientX; joy.oy = e.clientY;
+    const b = $("joyBase"); b.style.left = e.clientX + "px"; b.style.top = e.clientY + "px"; b.hidden = false;
+    $("joyKnob").style.transform = "translate(0,0)"; $("joyHint").hidden = true;
+  } else if (drag.id === null) {
+    Object.assign(drag, { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), moved: 0, type: e.pointerType });
+  }
+  try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+});
+stage.addEventListener("pointermove", e => {
+  if (e.pointerId === joy.id) {
+    let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const d = Math.hypot(dx, dy), max = 55;
+    if (d > max) { dx *= max / d; dy *= max / d; }
+    touchMove.x = dx / max; touchMove.y = dy / max;
+    $("joyKnob").style.transform = `translate(${dx}px, ${dy}px)`;
+  } else if (e.pointerId === drag.id) {
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
+    drag.moved += Math.abs(dx) + Math.abs(dy);
+    cam.yaw -= dx * 0.0065; cam.pitch = clamp(cam.pitch + dy * 0.004, 0.08, 1.25);
+  }
+});
+function endPointer(e) {
+  if (e.pointerId === joy.id) { joy.id = null; touchMove.x = touchMove.y = 0; $("joyBase").hidden = true; }
+  if (e.pointerId === drag.id) {
+    if (drag.type === "mouse" && drag.moved < 6 && performance.now() - drag.t < 300) attackTap = true;
+    drag.id = null;
+  }
+}
+stage.addEventListener("pointerup", endPointer);
+stage.addEventListener("pointercancel", endPointer);
+stage.addEventListener("wheel", e => { cam.dist = clamp(cam.dist + e.deltaY * 0.01, 5, 18); e.preventDefault(); }, { passive: false });
+stage.addEventListener("contextmenu", e => e.preventDefault());
+
+function holdBtn(id, on, off) {
+  const b = $(id);
+  b.addEventListener("pointerdown", e => { e.preventDefault(); e.stopPropagation(); b.classList.add("on"); on(); try { b.setPointerCapture(e.pointerId); } catch (err) {} });
+  const end = e => { b.classList.remove("on"); off && off(); };
+  b.addEventListener("pointerup", end); b.addEventListener("pointercancel", end); b.addEventListener("lostpointercapture", end);
+  b.addEventListener("keydown", e => { if (e.key === "Enter") on(); });
+  b.addEventListener("keyup", e => { if (e.key === "Enter") off && off(); });
+}
+holdBtn("bAttack", () => { attackHeld = true; }, () => { attackHeld = false; });
+holdBtn("bJump", () => { edge.jump = true; jumpHeld = true; }, () => { jumpHeld = false; });
+holdBtn("bSpecial", () => { edge.special = true; });
+holdBtn("bUse", () => { edge.use = true; });
+holdBtn("bHeal", () => { edge.heal = true; });
+$("bSatchel").addEventListener("click", () => openModal("satchel"));
+
+const padPrev = {};
+function readGamepad() {
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  const gp = pads && Array.from(pads).find(p => p && p.connected);
+  if (!gp) return null;
+  const dz = v => Math.abs(v) < 0.18 ? 0 : v;
+  const btn = i => !!(gp.buttons[i] && gp.buttons[i].pressed);
+  const pressed = i => { const now = btn(i), was = padPrev[i]; padPrev[i] = now; return now && !was; };
+  return {
+    mx: dz(gp.axes[0] || 0), my: dz(gp.axes[1] || 0), cx: dz(gp.axes[2] || 0), cy: dz(gp.axes[3] || 0),
+    jump: pressed(0), jumpHeld: btn(0), attack: btn(2) || btn(7), special: pressed(3), use: pressed(1), heal: pressed(4) || pressed(5), menu: pressed(9)
+  };
+}
+
+/* =====================================================================
+   MODALS
+   ===================================================================== */
+let modalKind = null, satTab = "gear", lastRoll = null;
+const isPaused = () => !$("intro").hidden || !$("modal").hidden || !$("reveal").hidden || !$("dead").hidden;
+function openModal(kind) { modalKind = kind; $("modal").hidden = false; renderModal(); keys.clear(); attackHeld = false; }
+function closeModal() { $("modal").hidden = true; modalKind = null; lastRoll = null; }
+$("mClose").addEventListener("click", closeModal);
+$("modal").addEventListener("click", e => { if (e.target === $("modal")) closeModal(); });
+
+function statBox(label, val) { return `<div><small>${label}</small><b>${val}</b></div>`; }
+function gearCard(it, actions) {
+  const sp = it.cat === "weapon" ? SPECIALS[it.special] : ARM_SPECIALS[it.special];
+  const sptext = it.cat === "weapon" ? sp.text + ` Recharges in ${sp.cd}s.` : sp.text(it.sv);
+  const isW = it.cat === "weapon";
+  const equipped = S.equip.weapon === it.id || S.equip.armour === it.id;
+  return `<div class="card ${it.rarity}" style="--c:${rc(it.rarity)}">
+    <div class="t"><b>${esc(it.name)}</b><span class="q">${S.inv[it.id] ? "×" + S.inv[it.id] : ""}</span></div>
+    <div class="row"><span class="tag">${RNAME[it.rarity]} ${isW ? SHAPE_NAME[it.shape] : "Armour"}</span>${equipped ? '<span class="eq">Equipped</span>' : ""}</div>
+    <div class="stats">
+      ${statBox("Attack", "+" + it.atk + "%")}${statBox("Defence", it.def)}${statBox("Damage", it.dmg)}
+      ${statBox("Knockback", it.kb + " m")}${statBox("DPS", Math.round(dpsOf(it)))}${isW ? statBox("Speed", it.spd + "/s") : statBox("Sells for", it.value)}
+    </div>
+    ${isW ? "" : `<span class="note">Armour damage and knockback hit anything that strikes you. Its DPS comes from an aura, if it has one.</span>`}
+    <div class="spec"><b>${esc(sp.name)}.</b> ${esc(sptext)}</div>
+    <p class="desc">${esc(it.desc)}</p>
+    ${actions || ""}
+  </div>`;
+}
+function renderModal() {
+  const B = $("mBody");
+  if (modalKind === "satchel") {
+    $("mTitle").textContent = "Satchel";
+    const tabs = [["gear", "Gear"], ["materials", "Materials"], ["supplies", "Supplies and items"], ["codex", "Codex"], ["class", "Class"]];
+    let html = `<div class="tabs">${tabs.map(([k, n]) => `<button class="tab ${satTab === k ? "on" : ""}" data-tab="${k}">${n}</button>`).join("")}</div>`;
+    const owned = cat => Object.keys(S.inv).map(id => ITEM[id]).filter(i => i.cat === cat).sort((a, b) => RANK[b.rarity] - RANK[a.rarity] || a.name.localeCompare(b.name));
+    if (satTab === "gear") {
+      html += `<p class="muted">Your hits deal <b class="num">${Math.round(ST.hit)}</b> damage, <b class="num">${Math.round(ST.dps)}</b> per second. Defence <b class="num">${Math.round(ST.def)}</b> blocks <b class="num">${Math.round(100 * (1 - (1 - ST.def / (ST.def + 100)) * (1 - ST.block)))}%</b> of incoming damage.</p>`;
+      for (const cat of ["weapon", "armour"]) {
+        html += `<h3 class="sec">${CAT_NAME[cat]}</h3><div class="cards">`;
+        for (const it of owned(cat)) {
+          const eq = S.equip.weapon === it.id || S.equip.armour === it.id;
+          html += gearCard(it, `<div class="row"><button class="btn ${eq ? "" : "primary"}" data-equip="${it.id}" ${eq ? "disabled" : ""}>${eq ? "Equipped" : "Equip"}</button><span class="muted">Sells for ${it.value}</span></div>`);
+        }
+        html += `</div>`;
+      }
+    } else if (satTab === "materials" || satTab === "supplies") {
+      const cats = satTab === "materials" ? ["ore", "building"] : ["necessity", "everyday"];
+      for (const cat of cats) {
+        const list = owned(cat);
+        html += `<h3 class="sec">${CAT_NAME[cat]}</h3>`;
+        if (!list.length) { html += `<p class="muted">None yet.</p>`; continue; }
+        html += `<div class="mini">${list.map(it => `<div class="mi ${it.rarity}" style="--c:${rc(it.rarity)}"><b>${esc(it.name)} <span class="muted num">×${S.inv[it.id]}</span></b><span class="tag">${RNAME[it.rarity]} · sells ${it.value}</span><span class="muted" style="font-size:12.5px">${esc(it.desc)}</span>${it.cat === "necessity" ? `<div><button class="btn" data-eat="${it.id}">Use</button></div>` : ""}</div>`).join("")}</div>`;
+      }
+    } else if (satTab === "codex") {
+      const total = ITEMS.length, found = ITEMS.filter(i => S.seen[i.id]).length;
+      html += `<p class="muted">${found} of ${total} items discovered. Unfound items show only their rarity.</p>`;
+      for (const c of CATS) {
+        const list = ITEMS.filter(i => i.cat === c.id).sort((a, b) => RANK[a.rarity] - RANK[b.rarity]);
+        html += `<h3 class="sec">${c.name} <span class="muted num" style="font-size:14px">${list.filter(i => S.seen[i.id]).length}/${list.length}</span></h3><div class="mini">`;
+        html += list.map(it => S.seen[it.id]
+          ? `<div class="mi ${it.rarity}" style="--c:${rc(it.rarity)}"><b>${esc(it.name)}</b><span class="tag">${RNAME[it.rarity]}</span></div>`
+          : `<div class="mi unknown" style="--c:${rc(it.rarity)}"><b>???</b><span class="tag">${RNAME[it.rarity]}</span></div>`).join("");
+        html += `</div>`;
+      }
+    } else if (satTab === "class") {
+      html += classSection(false);
+    }
+    B.innerHTML = html;
+  } else if (modalKind === "shop") {
+    $("mTitle").textContent = "Quartermaster";
+    const mult = S.cls === "alchemist" ? 1.25 : 1;
+    let html = `<p class="muted">You have <b class="num" style="color:var(--accent)">${S.coins}</b> coins. ${mult > 1 ? "Your Alchemist perk adds 25% to every sale." : ""}</p><h3 class="sec">Buy supplies</h3><div class="row">`;
+    for (const s of SHOP) html += `<button class="btn" data-buy="${s.id}" ${S.coins < s.price ? "disabled" : ""}>${esc(ITEM[s.id].name)} · ${s.price}c</button>`;
+    html += `</div><h3 class="sec">Sell</h3><div class="row"><button class="btn" data-sellcommon="1">Sell all common materials and everyday items</button></div><div class="list">`;
+    const list = Object.keys(S.inv).map(id => ITEM[id]).sort((a, b) => RANK[b.rarity] - RANK[a.rarity] || a.name.localeCompare(b.name));
+    for (const it of list) {
+      const n = S.inv[it.id], eq = S.equip.weapon === it.id || S.equip.armour === it.id, can = eq ? n - 1 : n, price = Math.round(it.value * mult);
+      html += `<div class="li" style="--c:${rc(it.rarity)}"><span><b>${esc(it.name)}</b> <span class="muted num">×${n}</span><br><span class="tag">${RNAME[it.rarity]} ${it.cat === "weapon" ? SHAPE_NAME[it.shape] : CAT_NAME[it.cat]}${eq ? " · equipped" : ""}</span></span>
+        <button class="btn" data-sell="${it.id}" data-n="1" ${can < 1 ? "disabled" : ""}>Sell 1 · ${price}</button>
+        <button class="btn" data-sell="${it.id}" data-n="${can}" ${can < 2 ? "disabled" : ""}>All ${can > 1 ? can : ""}</button></div>`;
+    }
+    html += `</div>`;
+    B.innerHTML = html;
+  } else if (modalKind === "altar") {
+    $("mTitle").textContent = "Class Altar";
+    B.innerHTML = classSection(true);
+  }
+}
+function classSection(canRoll) {
+  const cur = CLASS[S.cls], dice = S.inv.die || 0;
+  let html = "";
+  if (lastRoll) {
+    const c = CLASS[lastRoll];
+    html += `<div class="banner" style="--c:${rc(c.rarity)}"><span class="tag" style="color:${rc(c.rarity)}">${RNAME[c.rarity]} class</span><b>You are now ${article(c.name)} ${esc(c.name)}</b><span>${esc(c.perk)}</span></div>`;
+  }
+  html += `<p>Current class: <b style="color:${cur.rarity ? rc(cur.rarity) : "var(--fg)"}">${esc(cur.name)}</b>. ${esc(cur.perk)}</p>`;
+  if (canRoll) {
+    html += `<div class="row"><button class="btn primary" data-roll="die" ${dice < 1 ? "disabled" : ""}>Roll with a Fortune Die (you have ${dice})</button>
+      <button class="btn" data-roll="coins" ${S.coins < ROLL_COINS ? "disabled" : ""}>Roll for 10,000 coins (you have ${S.coins.toLocaleString("en-GB")})</button></div>
+      <p class="muted">Fortune Dice are Legendary items. Look for them in Legendary drops, at the floor 10 checkpoint of the Vault Spire (once), and at every Spire summit.</p>`;
+  } else {
+    html += `<p class="muted">Roll for a new class at the Class Altar in camp.</p>`;
+  }
+  for (const r of ["legendary", "epic", "rare", "common"]) {
+    html += `<h3 class="sec" style="color:${rc(r)}">${RNAME[r]} classes</h3><div class="cards">`;
+    for (const c of CLASS_LIST.filter(x => x.rarity === r)) {
+      html += `<div class="cls-card ${S.cls === c.id ? "cur" : ""}" style="--c:${rc(r)}"><b>${esc(c.name)}</b><span class="perk">${esc(c.perk)}</span><span class="odds">${classOdds(c).toFixed(2)}% per roll${S.cls === c.id ? " · your class" : ""}</span></div>`;
+    }
+    html += `</div>`;
+  }
+  return html;
+}
+$("mBody").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return;
+  const d = b.dataset;
+  if (d.tab) { satTab = d.tab; }
+  else if (d.equip) { const it = ITEM[d.equip]; S.equip[it.cat === "weapon" ? "weapon" : "armour"] = it.id; rebuildPlayer(); toast(`Equipped <b>${esc(it.name)}</b>`, it.rarity); save(); }
+  else if (d.eat) { const it = ITEM[d.eat]; if (P.hp >= ST.maxHp) toast("You are already at full health.", ""); else { if (it.id !== "canteen") take(it.id, 1); heal(it.heal); toast(`Used <b>${esc(it.name)}</b>`, it.rarity); save(); } }
+  else if (d.buy) { const s = SHOP.find(x => x.id === d.buy); if (S.coins >= s.price) { S.coins -= s.price; S.inv[s.id] = (S.inv[s.id] || 0) + 1; S.seen[s.id] = S.seen[s.id] || 1; save(); } }
+  else if (d.sell) { sell(d.sell, +d.n); }
+  else if (d.sellcommon) {
+    let total = 0, count = 0; const mult = S.cls === "alchemist" ? 1.25 : 1;
+    for (const id of Object.keys(S.inv)) { const it = ITEM[id]; if (it.rarity === "common" && ["ore", "building", "everyday"].includes(it.cat)) { total += Math.round(it.value * mult) * S.inv[id]; count += S.inv[id]; delete S.inv[id]; } }
+    S.coins += total; if (count) toast(`Sold ${count} items for <b>${total}</b> coins`, "common"); save();
+  }
+  else if (d.roll) { rollClass(d.roll); }
+  renderModal();
+});
+function sell(id, n) {
+  const it = ITEM[id], eq = S.equip.weapon === id || S.equip.armour === id, can = (S.inv[id] || 0) - (eq ? 1 : 0);
+  n = Math.min(n, can); if (n < 1) return;
+  const price = Math.round(it.value * (S.cls === "alchemist" ? 1.25 : 1));
+  take(id, n); S.coins += n * price; toast(`Sold ${n} <b>${esc(it.name)}</b> for ${n * price} coins`, it.rarity); save();
+}
+function rollClass(how) {
+  if (how === "die") { if (!S.inv.die) return; take("die", 1); }
+  else { if (S.coins < ROLL_COINS) return; S.coins -= ROLL_COINS; }
+  const r = pickWeighted(CLASS_ODDS_BY_RARITY);
+  const c = pick(CLASS_LIST.filter(x => x.rarity === r));
+  S.cls = c.id; S.rolls += 1; lastRoll = c.id;
+  rebuildPlayer(); P.hp = ST.maxHp;
+  ringFx(new V3(ALTAR.x, 0, ALTAR.z), 5, RCOL[r], 0.9);
+  toast(`You are now ${article(c.name)} <b>${esc(c.name)}</b>`, r);
+  save();
+}
+
+/* =====================================================================
+   MINIMAP
+   ===================================================================== */
+const mm = $("minimap"), mx = mm.getContext("2d");
+function drawMinimap() {
+  const W = mm.width, s = W / (WORLD_HALF * 2 + 10), cx = W / 2;
+  const toM = (x, z) => [cx + x * s, cx + z * s];
+  mx.clearRect(0, 0, W, W);
+  mx.fillStyle = cometLive() ? "#2a2440" : "#2d4a2a"; mx.beginPath(); mx.arc(cx, cx, cx, 0, TAU); mx.fill();
+  for (const z of ZONES) {
+    const [x, y] = toM(z.x, z.z);
+    mx.fillStyle = "#" + z.col.toString(16).padStart(6, "0"); mx.beginPath(); mx.arc(x, y, z.r * s, 0, TAU); mx.fill();
+  }
+  const [sx, sy] = toM(SP.x, SP.z); mx.fillStyle = "#ff5f8f"; mx.beginPath(); mx.arc(sx, sy, 7, 0, TAU); mx.fill();
+  mx.fillStyle = "#e3b45a"; mx.beginPath(); mx.arc(...toM(0, 0), 5, 0, TAU); mx.fill();
+  const [px, py] = toM(P.pos.x, P.pos.z);
+  mx.save(); mx.translate(px, py); mx.rotate(-P.face + Math.PI);
+  mx.fillStyle = "#fff"; mx.beginPath(); mx.moveTo(0, -11); mx.lineTo(7, 8); mx.lineTo(-7, 8); mx.closePath(); mx.fill(); mx.restore();
+}
+
+/* =====================================================================
+   MAIN LOOP
+   ===================================================================== */
+const GRAV = 22;
+let last = performance.now(), saveT = 0;
+const camTarget = new V3();
+const tmp = new V3();
+let currentZone = null;
+
+function zoneAt(x, z) {
+  for (const zz of [ZONE.spire, ...ZONES]) if (Math.hypot(x - zz.x, z - zz.z) < zz.r + (zz.id === "spire" ? 2 : 0)) return zz;
+  return null;
+}
+function collide(pos, rad, y) {
+  for (const c of circles) {
+    if (y > c.h) continue;
+    const dx = pos.x - c.x, dz = pos.z - c.z, d = Math.hypot(dx, dz), m = c.r + rad;
+    if (d < m && d > 0.0001) { pos.x = c.x + dx / d * m; pos.z = c.z + dz / d * m; }
+  }
+  for (const b of boxes) {
+    if (y > b.h) continue;
+    if (pos.x > b.x0 - rad && pos.x < b.x1 + rad && pos.z > b.z0 - rad && pos.z < b.z1 + rad) {
+      const pl = pos.x - (b.x0 - rad), pr = (b.x1 + rad) - pos.x, pt = pos.z - (b.z0 - rad), pb = (b.z1 + rad) - pos.z;
+      const m = Math.min(pl, pr, pt, pb);
+      if (m === pl) pos.x = b.x0 - rad; else if (m === pr) pos.x = b.x1 + rad; else if (m === pt) pos.z = b.z0 - rad; else pos.z = b.z1 + rad;
+    }
+  }
+  const lim = WORLD_HALF - 1, d = Math.hypot(pos.x, pos.z);
+  if (d > lim) { pos.x *= lim / d; pos.z *= lim / d; }
+}
+
+function update(dt) {
+  worldT += dt;
+  const gp = readGamepad();
+  if (gp && gp.menu) { openModal("satchel"); return; }
+
+  // platforms move
+  for (const p of platforms) if (p.move) {
+    const ox = p.x, oz = p.z; placePlatform(p, worldT);
+    if (P.plat === p) { P.pos.x += p.x - ox; P.pos.z += p.z - oz; }
+  }
+
+  /* ---------- input to movement ---------- */
+  let ix = 0, iy = 0;
+  if (keys.has("w") || keys.has("arrowup")) iy -= 1;
+  if (keys.has("s") || keys.has("arrowdown")) iy += 1;
+  if (keys.has("a") || keys.has("arrowleft")) ix -= 1;
+  if (keys.has("d") || keys.has("arrowright")) ix += 1;
+  ix += touchMove.x; iy += touchMove.y;
+  if (gp) { ix += gp.mx; iy += gp.my; cam.yaw -= gp.cx * 2.6 * dt; cam.pitch = clamp(cam.pitch + gp.cy * 1.6 * dt, 0.08, 1.25); }
+  const mag = Math.min(1, Math.hypot(ix, iy));
+  const fwd = new V3(-Math.sin(cam.yaw), 0, -Math.cos(cam.yaw)), right = new V3(Math.cos(cam.yaw), 0, -Math.sin(cam.yaw));
+  const move = new V3().addScaledVector(fwd, -iy).addScaledVector(right, ix);
+  if (move.lengthSq() > 0.0001) move.normalize().multiplyScalar(mag);
+  const jumpPressed = edge.jump || (gp && gp.jump);
+  const jumpDown = jumpHeld || keys.has(" ") || (gp && gp.jumpHeld);
+  if (attackHeld || keys.has("j") || attackTap || (gp && gp.attack)) attack();
+  attackTap = false;
+  if (edge.special || (gp && gp.special)) castSpecial();
+  if (edge.heal || (gp && gp.heal)) useSupply();
+  if (edge.use || (gp && gp.use)) { const it = nearestInteract(); if (it) it.act(); }
+  edge.jump = edge.special = edge.use = edge.heal = false;
+
+  if (P.dead) return;
+  P.atkT = Math.max(0, P.atkT - dt); P.specT = Math.max(0, P.specT - dt); P.healT = Math.max(0, P.healT - dt);
+  if (ST.regen && P.hp < ST.maxHp) heal(ST.regen * dt, true);
+
+  /* ---------- horizontal ---------- */
+  const speed = ST.move;
+  if (P.dashT > 0) {
+    P.dashT -= dt;
+    const f = forward();
+    P.pos.addScaledVector(f, 24 * dt);
+    for (const e of enemiesNear(P.pos, 1.9)) if (!P.dashHit.has(e)) { P.dashHit.add(e); damageEnemy(e, ST.hit * 1.8, f, ITEM[S.equip.weapon].kb); }
+  } else {
+    const ctrl = P.onGround ? 1 : 0.85;
+    P.pos.addScaledVector(move, speed * ctrl * dt);
+    if (mag > 0.05) {
+      const target = Math.atan2(move.x, move.z);
+      let d = target - P.face; d = Math.atan2(Math.sin(d), Math.cos(d));
+      if (P.swing <= 0) P.face += d * Math.min(1, dt * 12);
+    }
+  }
+  P.pos.addScaledVector(P.kb, dt); P.kb.multiplyScalar(Math.exp(-7 * dt));
+  collide(P.pos, 0.4, P.pos.y);
+
+  /* ---------- vertical ---------- */
+  P.coyote = P.onGround ? 0.1 : Math.max(0, P.coyote - dt);
+  if (jumpPressed) {
+    if (P.onGround || P.coyote > 0) { P.vy = ST.jump; P.onGround = false; P.plat = null; P.coyote = 0; P.jumps = 1; }
+    else if (ST.wings && P.jumps < 2) { P.vy = ST.jump * 0.92; P.jumps = 2; ringFx(P.pos, 1.2, 0xffffff, 0.3); }
+  }
+  if (!P.onGround) {
+    let g = GRAV;
+    if (P.vy < 0 && ST.feather) g *= 0.55;
+    P.vy -= g * dt;
+    if (ST.wings && jumpDown && P.vy < -2.2) P.vy = -2.2;
+    if (ST.feather && P.vy < -7) P.vy = -7;
+    const prevY = P.pos.y;
+    P.pos.y += P.vy * dt;
+    if (P.vy <= 0) {
+      for (const p of platforms) {
+        if (prevY >= p.top - 0.05 && P.pos.y <= p.top && Math.hypot(P.pos.x - p.x, P.pos.z - p.z) <= p.r + 0.25) {
+          P.pos.y = p.top; P.vy = 0; P.onGround = true; P.plat = p; P.jumps = 0; onLand(p); break;
+        }
+      }
+      if (!P.onGround && P.pos.y <= 0) { P.pos.y = 0; P.vy = 0; P.onGround = true; P.plat = null; P.jumps = 0; }
+    }
+  } else if (P.plat) {
+    if (Math.hypot(P.pos.x - P.plat.x, P.pos.z - P.plat.z) > P.plat.r + 0.25) { P.onGround = false; P.plat = null; P.vy = 0; }
+  }
+
+  /* ---------- enemies ---------- */
+  for (const e of enemies) {
+    if (e.dead) {
+      if (worldT > e.respawnAt) { e.dead = false; e.hp = e.d.hp; e.pos.copy(spawnPoint(e.zone)); e.g.visible = true; e.kb.set(0, 0, 0); }
+      continue;
+    }
+    const frozen = worldT < e.frozenUntil;
+    if (worldT < e.burnUntil) damageEnemy(e, e.burnDps * dt, null, 0, { silent: true });
+    if (ST.aura && e.pos.distanceTo(P.pos) < 3.5) damageEnemy(e, ST.aura * dt, null, 0, { silent: true });
+    if (e.dead) continue;
+    e.pos.addScaledVector(e.kb, dt); e.kb.multiplyScalar(Math.exp(-6 * dt));
+    const toP = tmp.copy(P.pos).sub(e.pos).setY(0), dist = toP.length();
+    const inZone = Math.hypot(P.pos.x - e.zone.x, P.pos.z - e.zone.z) < e.zone.r + 10 && P.pos.y < 3;
+    let goal = null;
+    if (!frozen) {
+      if (dist < 11 && inZone) goal = P.pos;
+      else {
+        if (!e.wander || worldT > e.wanderT) { e.wander = spawnPoint(e.zone); e.wanderT = worldT + rand(3, 7); }
+        goal = e.wander;
+      }
+      const dir = goal.clone().sub(e.pos).setY(0); const dl = dir.length();
+      const sp = e.d.spd * (worldT < e.slowUntil ? 0.4 : 1) * (goal === P.pos ? 1 : 0.4);
+      if (dl > (goal === P.pos ? 1.3 : 0.5)) { dir.multiplyScalar(1 / dl); e.pos.addScaledVector(dir, sp * dt); e.g.rotation.y = Math.atan2(dir.x, dir.z); }
+      e.atkT -= dt;
+      if (goal === P.pos && dist < 1.7 && e.atkT <= 0) { e.atkT = e.d.cd; hurtPlayer(e.d.dmg, e); e.lunge = 0.2; }
+    }
+    collide(e.pos, 0.5, 0);
+    if (Math.hypot(e.pos.x - e.zone.x, e.pos.z - e.zone.z) > e.zone.r + 14) e.pos.copy(spawnPoint(e.zone));
+    // visuals
+    e.bob += dt * (frozen ? 0 : 4);
+    e.g.position.x = e.pos.x; e.g.position.z = e.pos.z;
+    if (e.type === "slime" && !frozen) { const q = Math.sin(e.bob * 1.5) * 0.08; e.g.scale.set(1 + q, 1 - q, 1 + q); }
+    e.flash = Math.max(0, e.flash - dt);
+  }
+}
+
+/* animation + camera, run every frame even when paused */
+function animate(dt, paused) {
+  // nodes respawn
+  if (!paused) for (const n of nodes) if (!n.ready && worldT > n.respawnAt) { n.ready = true; n.g.visible = true; }
+  // player model
+  const moving = !paused && P.onGround && (Math.abs(touchMove.x) + Math.abs(touchMove.y) > 0.1 || ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].some(k => keys.has(k)));
+  P.walk += dt * (moving ? 10 : 0);
+  const sw = moving ? Math.sin(P.walk) * 0.7 : 0;
+  model.legL.rotation.x = sw; model.legR.rotation.x = -sw; model.armL.rotation.x = -sw * 0.6;
+  if (P.swing > 0) { P.swing = Math.max(0, P.swing - dt * 4.5); model.armR.rotation.x = lerp(-0.3, -2.6, P.swing); }
+  else model.armR.rotation.x = -0.5 + sw * 0.3;
+  if (!P.onGround) { model.legL.rotation.x = -0.5; model.legR.rotation.x = 0.3; }
+  if (model.wingL) { const fl = P.onGround ? Math.sin(worldT * 2) * 0.1 : Math.sin(worldT * 14) * 0.5; model.wingL.rotation.y = 0.4 + fl; model.wingR.rotation.y = -0.4 - fl; }
+  model.g.position.copy(P.pos); model.g.rotation.y = P.face;
+  const groundY = P.plat ? P.plat.top : 0;
+  shadow.position.set(P.pos.x, groundY + 0.03, P.pos.z);
+  const hs = clamp(1 - (P.pos.y - groundY) / 8, 0.3, 1); shadow.scale.setScalar(hs);
+
+  // camera
+  camTarget.lerp(new V3(P.pos.x, P.pos.y + 1.6, P.pos.z), 1 - Math.exp(-12 * dt));
+  const cp = Math.cos(cam.pitch);
+  camera.position.set(camTarget.x + Math.sin(cam.yaw) * cp * cam.dist, camTarget.y + Math.sin(cam.pitch) * cam.dist, camTarget.z + Math.cos(cam.yaw) * cp * cam.dist);
+  if (camera.position.y < 0.6) camera.position.y = 0.6;
+  camera.lookAt(camTarget);
+  // fade the spire pillar when it blocks the view
+  {
+    const ax = camera.position.x - SP.x, az = camera.position.z - SP.z, bx = P.pos.x - SP.x, bz = P.pos.z - SP.z;
+    const dx = bx - ax, dz = bz - az, L = dx * dx + dz * dz;
+    const t = L > 0 ? clamp(-(ax * dx + az * dz) / L, 0, 1) : 0;
+    const d = Math.hypot(ax + dx * t, az + dz * t);
+    spirePillar.material.opacity = lerp(spirePillar.material.opacity, d < 3.4 ? 0.22 : 1, 1 - Math.exp(-10 * dt));
+    spirePillar.material.depthWrite = spirePillar.material.opacity > 0.95;
+  }
+  // world bits
+  altarDie.rotation.y += dt * 1.2; altarDie.rotation.x += dt * 0.7; altarDie.position.y = 2.2 + Math.sin(worldT * 2) * 0.12;
+  fire1.scale.y = 1.2 + Math.sin(worldT * 13) * 0.15; fire2.scale.y = 0.8 + Math.sin(worldT * 17) * 0.12;
+  campfireLight.intensity = 1.1 + Math.sin(worldT * 11) * 0.15;
+  wayGlow.visible = !!S.spire.cp;
+  for (const n of nodes) if (n.ready) n.g.children[n.g.children.length - 1].material.opacity = 0.35 + Math.sin(worldT * 3) * 0.2;
+  // enemy hp bars and frozen tint
+  for (const e of enemies) {
+    if (e.dead) continue;
+    e.hpBar.visible = e.hp < e.d.hp;
+    e.fg.scale.x = Math.max(0.001, e.hp / e.d.hp); e.fg.position.x = -(1 - e.fg.scale.x) / 2;
+    e.hpBar.quaternion.copy(e.g.quaternion).invert().multiply(camera.quaternion);
+    const frozen = worldT < e.frozenUntil;
+    e.g.position.y = (e.type === "wisp" ? Math.sin(e.bob) * 0.25 + 0.2 : 0) + (e.flash > 0 ? 0.08 : 0);
+    if (frozen !== e.wasFrozen) { e.wasFrozen = frozen; e.g.traverse(o => { if (o.isMesh && o.parent !== e.hpBar) { if (frozen) { o.userData.m = o.material; o.material = M(0xcfefff, { op: 0.8 }); } else if (o.userData.m) o.material = o.userData.m; } }); }
+  }
+  // effects
+  for (let i = effects.length - 1; i >= 0; i--) {
+    const fx = effects[i]; fx.t += dt; const k = Math.min(1, fx.t / fx.life);
+    fx.update(fx.obj, k);
+    if (k >= 1) { scene.remove(fx.obj); if (fx.obj.geometry && fx.obj.geometry !== G.sph && fx.obj.geometry !== G.ico) fx.obj.geometry.dispose(); if (fx.obj.material && !Object.values(MC).includes(fx.obj.material)) fx.obj.material.dispose(); effects.splice(i, 1); }
+  }
+  // floaters
+  for (let i = floaters.length - 1; i >= 0; i--) {
+    const f = floaters[i]; f.t += dt; f.pos.y += dt * 1.2;
+    const v = f.pos.clone().project(camera);
+    if (f.t > 1.1 || v.z > 1) { f.el.remove(); floaters.splice(i, 1); continue; }
+    f.el.style.left = ((v.x + 1) / 2 * window.innerWidth) + "px"; f.el.style.top = ((1 - v.y) / 2 * window.innerHeight) + "px"; f.el.style.opacity = String(1 - Math.max(0, f.t - 0.6) / 0.5);
+  }
+  // sky for Comet Night
+  const live = cometLive();
+  const want = live ? 1 : 0;
+  skyMix = lerp(skyMix, want, 1 - Math.exp(-1.5 * dt));
+  scene.background.copy(DAY_SKY).lerp(NIGHT_SKY, skyMix); scene.fog.color.copy(scene.background);
+  hemi.intensity = 0.9 - skyMix * 0.35; sun.intensity = 0.75 - skyMix * 0.45;
+  comet.visible = skyMix > 0.3;
+  if (comet.visible) { const ct = (worldT % 20) / 20; comet.position.set(-150 + ct * 300, 90 - ct * 20, -120 + ct * 60); }
+}
+let skyMix = 0;
+const comet = new THREE.Group();
+sized("sph", M(0xffe0f0, { basic: true }), 2.2, 2.2, 2.2, 0, 0, 0, comet);
+{ const tail = sized("cone", M(0xff5f8f, { basic: true, op: 0.5 }), 2, 30, 2, -16, 4, -3, comet); tail.rotation.z = Math.PI / 2 + 0.25; }
+scene.add(comet);
+
+/* HUD */
+function updateHud() {
+  const c = CLASS[S.cls];
+  $("hCls").textContent = c.name;
+  $("hClsR").textContent = c.rarity ? RNAME[c.rarity] : "No class";
+  $("hClsR").style.setProperty("--c", c.rarity ? rc(c.rarity) : "var(--muted)");
+  $("hHp").style.width = (100 * Math.max(0, P.hp) / ST.maxHp) + "%";
+  $("hHpTxt").textContent = `${Math.ceil(Math.max(0, P.hp))} / ${ST.maxHp}`;
+  $("hCoins").textContent = S.coins.toLocaleString("en-GB");
+  $("hDie").textContent = S.inv.die ? `Fortune Dice ${S.inv.die}` : "";
+  const z = zoneAt(P.pos.x, P.pos.z);
+  const zn = z ? z.name : "The Wilds";
+  if (zn !== currentZone) { currentZone = zn; $("hZone").textContent = zn; }
+  const phase = worldT % COMET_CYCLE, live = cometLive();
+  const secs = Math.ceil(live ? COMET_CYCLE - phase : COMET_CYCLE - COMET_LEN - phase);
+  const mmss = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+  const ev = $("hEvent"); ev.className = "pill" + (live ? " live" : "");
+  ev.textContent = live ? `Comet Night: Vaulted drops possible · ${mmss} left` : `Comet Night in ${mmss}`;
+  const inSpire = z && z.id === "spire" || P.pos.y > 1;
+  const hs = $("hSpire"); hs.hidden = !inSpire;
+  if (inSpire) {
+    const fl = P.plat && P.plat.i ? P.plat.floor : 0;
+    hs.textContent = `Spire floor ${fl} of 15 · checkpoint ${S.spire.cp ? platforms[S.spire.cp].floor : "none"} · summits ${S.spire.summits}`;
+  }
+  const w = ITEM[S.equip.weapon], sp = SPECIALS[w.special];
+  $("bSpecialTxt").textContent = sp.name;
+  $("bSpecialCd").style.height = (P.specT > 0 ? 100 * P.specT / (sp.cd * ST.cdMult) : 0) + "%";
+  const it = isPaused() ? null : nearestInteract();
+  const pr = $("prompt");
+  if (it) { pr.hidden = false; pr.innerHTML = `<kbd>E</kbd>${esc(it.label)}`; $("bUse").textContent = "Use"; $("bUse").style.borderColor = "var(--accent)"; }
+  else { pr.hidden = true; $("bUse").style.borderColor = ""; }
+}
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const paused = isPaused();
+  if (!paused) update(dt);
+  animate(dt, paused);
+  updateHud();
+  drawMinimap();
+  renderer.render(scene, camera);
+  saveT += dt; if (saveT > 5) { saveT = 0; save(); }
+  requestAnimationFrame(frame);
+}
+$("startBtn").addEventListener("click", () => {
+  $("intro").hidden = true;
+  if (window.matchMedia("(pointer: coarse)").matches || usedTouch) $("joyHint").hidden = false;
+});
+window.__game = { S, P, platforms, enemies, nodes, teleportTo, ITEMS, get worldT() { return worldT; }, set worldT(v) { worldT = v; } };
+requestAnimationFrame(frame);
+})();
+</script>

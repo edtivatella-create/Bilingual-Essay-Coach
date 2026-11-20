@@ -1,0 +1,693 @@
+<title>Satchel and Spire</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a map table at night. Expeditions on the left, the satchel on the right; rarity colour carries all the excitement. */
+:root {
+  color-scheme: dark;
+  --bg: #12161f;
+  --panel: #1a2030;
+  --panel-2: #222a3d;
+  --line: #313b55;
+  --fg: #e6e9f2;
+  --muted: #9aa3bb;
+  --accent: #e3b45a;
+  --danger: #e2707a;
+  --good: #7fcf9a;
+
+  --r-common: #a9b0bf;
+  --r-rare: #5aa7f0;
+  --r-epic: #b07cf2;
+  --r-legendary: #f0b545;
+  --r-vaulted: #ff5f8f;
+  --r-vaulted-2: #4fe3d0;
+
+  --f-display: "Alegreya SC", "Palatino Linotype", Georgia, serif;
+  --f-body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  --f-data: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { min-height: 100%; }
+body {
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 0) 0 0 / 22px 22px,
+    var(--bg);
+  color: var(--fg);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-block: 18px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 16px;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+
+/* header */
+header.top { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(28px, 4.4vw, 40px); margin: 0; letter-spacing: 0.01em; line-height: 1; text-wrap: balance; }
+h1 span { color: var(--accent); }
+.tagline { margin: 6px 0 0; color: var(--muted); max-width: 60ch; }
+.stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; min-width: 88px; }
+.stat b { display: block; font-family: var(--f-data); font-size: 18px; font-variant-numeric: tabular-nums; }
+.stat small { color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; }
+
+/* rarity ladder */
+.ladder { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.rung { border-radius: 6px; padding: 8px 10px; background: var(--panel); border-top: 3px solid var(--c); min-width: 0; }
+.rung .nm { font-family: var(--f-display); font-weight: 700; color: var(--c); font-size: 16px; }
+.rung .ct { font-family: var(--f-data); font-size: 12px; color: var(--muted); }
+.rung.vaulted { background: linear-gradient(135deg, rgba(255,95,143,0.12), rgba(79,227,208,0.10)), var(--panel); }
+
+/* event banner */
+.event { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 14px; border-radius: 8px; background: var(--panel); border: 1px dashed var(--line); color: var(--muted); }
+.event.live { border: 1px solid var(--r-vaulted); color: var(--fg); background: linear-gradient(90deg, rgba(255,95,143,0.16), rgba(79,227,208,0.12)), var(--panel); }
+.event strong { font-family: var(--f-display); font-size: 17px; color: var(--fg); }
+.event.live strong { color: var(--r-vaulted); }
+
+/* main grid */
+.main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .main { grid-template-columns: minmax(0, 1fr); } }
+h2 { font-family: var(--f-display); font-weight: 700; font-size: 22px; margin: 0 0 8px; }
+.col { display: grid; gap: 10px; min-width: 0; }
+
+/* areas */
+.area { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 8px; }
+.area-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.area-head h3 { margin: 0; font-family: var(--f-display); font-size: 19px; }
+.area-head .meta { font-size: 12px; color: var(--muted); font-family: var(--f-data); }
+.area p { margin: 0; color: var(--muted); font-size: 14px; }
+.odds { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--panel-2); }
+.odds i { display: block; height: 100%; }
+.odds-legend { display: flex; flex-wrap: wrap; gap: 4px 10px; font-family: var(--f-data); font-size: 11.5px; color: var(--muted); }
+.odds-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--c); margin-right: 4px; vertical-align: 0; }
+.btn { background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 7px 14px; font-weight: 700; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: #1b1408; border-color: var(--accent); }
+.btn.primary:hover:not(:disabled) { filter: brightness(1.08); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* spire */
+.spire { border-color: rgba(255,95,143,0.55); background: linear-gradient(160deg, rgba(255,95,143,0.08), rgba(79,227,208,0.06) 60%, transparent), var(--panel); }
+.spire h3 { color: var(--r-vaulted); }
+.floors { display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); gap: 3px; }
+.floors i { height: 14px; border-radius: 3px; background: var(--panel-2); border: 1px solid var(--line); }
+.floors i.done { background: var(--r-vaulted-2); border-color: var(--r-vaulted-2); }
+.floors i.cp { border-color: var(--accent); }
+.floors i.top { background: var(--panel-2); border-color: var(--r-vaulted); }
+.floors i.top.done { background: var(--r-vaulted); }
+.spire-note { font-size: 13px; color: var(--muted); }
+.spire-note b { color: var(--fg); }
+
+/* shop */
+.shop .row .btn { font-weight: 500; }
+
+/* tabs + satchel */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 6px 12px; font-family: var(--f-display); font-size: 18px; color: var(--muted); margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; font-size: 13px; }
+.chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.item {
+  position: relative; text-align: left; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c);
+  border-radius: 8px; padding: 8px 10px; display: grid; gap: 2px; min-width: 0;
+}
+.item:hover { background: var(--panel-2); }
+.item .nm { font-weight: 700; font-size: 14px; line-height: 1.2; }
+.item .rr { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--c); font-weight: 700; }
+.item .qty { position: absolute; top: 6px; right: 8px; font-family: var(--f-data); font-size: 12px; color: var(--muted); }
+.item.sel { outline: 2px solid var(--c); outline-offset: 1px; }
+.item.vaulted { background: linear-gradient(135deg, rgba(255,95,143,0.18), rgba(79,227,208,0.14)), var(--panel); border-left-color: var(--r-vaulted); }
+.item.unknown { color: var(--muted); border-style: dashed; border-left-style: solid; }
+.item.unknown .nm { letter-spacing: 0.2em; }
+.detail { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; }
+.detail h4 { margin: 0; font-family: var(--f-display); font-size: 20px; color: var(--c); }
+.detail p { margin: 0; color: var(--muted); }
+.detail .kv { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; }
+.detail .kv b { font-family: var(--f-data); }
+.empty { color: var(--muted); padding: 16px 0; }
+.sum { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--muted); }
+
+/* log */
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; max-height: 220px; overflow-y: auto; font-size: 13.5px; }
+.log li { padding: 4px 8px; border-radius: 5px; background: var(--panel); border-left: 3px solid var(--c, var(--line)); }
+.log li .w { color: var(--muted); font-family: var(--f-data); font-size: 11.5px; margin-right: 6px; }
+.log li b { color: var(--c); }
+
+/* reveal overlay */
+.reveal { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(8,10,16,0.82); z-index: 50; padding: 24px; }
+.reveal-card {
+  max-width: 420px; width: 100%; text-align: center; border-radius: 14px; padding: 28px 24px; display: grid; gap: 10px;
+  background: var(--panel); border: 2px solid var(--c);
+  box-shadow: 0 0 60px -10px var(--c);
+}
+.reveal-card.vaulted { border-image: linear-gradient(135deg, var(--r-vaulted), var(--r-vaulted-2)) 1; border-radius: 0; animation: glow 2.4s ease-in-out infinite alternate; }
+@keyframes glow { from { box-shadow: 0 0 40px -10px var(--r-vaulted); } to { box-shadow: 0 0 70px -6px var(--r-vaulted-2); } }
+.reveal-card .eyebrow { text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; color: var(--c); font-weight: 700; }
+.reveal-card h3 { margin: 0; font-family: var(--f-display); font-size: 30px; line-height: 1.1; }
+.reveal-card p { margin: 0; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .reveal-card.vaulted { animation: none; } }
+
+footer { color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.linkish { background: none; border: 0; color: var(--muted); text-decoration: underline; padding: 0; }
+.linkish.armed { color: var(--danger); }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Satchel <span>&amp;</span> Spire</h1>
+      <p class="tagline">Go on trips, fill your satchel, sell what you do not need, and save up supplies for the long climb to a Vaulted item.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><small>Day</small><b id="sDay">1</b></div>
+      <div class="stat"><small>Coins</small><b id="sCoins">0</b></div>
+      <div class="stat"><small>Satchel value</small><b id="sValue">0</b></div>
+    </div>
+  </header>
+
+  <section class="ladder" id="ladder" aria-label="Rarity ladder"></section>
+  <div class="event" id="event" role="status"></div>
+
+  <div class="main">
+    <div class="col">
+      <h2>Expeditions</h2>
+      <div id="areas" class="col"></div>
+      <div class="area shop">
+        <div class="area-head"><h3>Quartermaster</h3><span class="meta">Spend your coins</span></div>
+        <p>The Spire eats supplies. Every floor attempt uses one necessity, and a Rope Coil saves you from one slip.</p>
+        <div class="row" id="shop"></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tabSatchel" aria-selected="true">Satchel</button>
+        <button class="tab" role="tab" id="tabCodex" aria-selected="false">Codex</button>
+        <button class="tab" role="tab" id="tabLog" aria-selected="false">Trip log</button>
+      </div>
+      <div class="chips" id="catChips"></div>
+      <div class="chips" id="rarChips"></div>
+      <div class="sum" id="sum"></div>
+      <div class="grid" id="grid"></div>
+      <div class="detail" id="detail" hidden></div>
+      <ul class="log" id="log" hidden></ul>
+    </div>
+  </div>
+
+  <footer>
+    <span>Prototype. Progress saves in this browser only.</span>
+    <button class="linkish" id="reset">Start a new satchel</button>
+  </footer>
+</div>
+
+<div class="reveal" id="reveal" hidden>
+  <div class="reveal-card" id="revealCard">
+    <div class="eyebrow" id="rvEyebrow"></div>
+    <h3 id="rvName"></h3>
+    <p id="rvDesc"></p>
+    <div><button class="btn primary" id="rvClose">Into the satchel</button></div>
+  </div>
+</div>
+
+<script>
+(function () {
+"use strict";
+
+/* ---------- rarity ladder ---------- */
+const RARITIES = [
+  { id: "common",    name: "Common" },
+  { id: "rare",      name: "Rare" },
+  { id: "epic",      name: "Epic" },
+  { id: "legendary", name: "Legendary" },
+  { id: "vaulted",   name: "Vaulted" }
+];
+const RANK = Object.fromEntries(RARITIES.map((r, i) => [r.id, i]));
+const rc = id => `var(--r-${id})`;
+
+const CATS = [
+  { id: "weapon",    name: "Weapons" },
+  { id: "armour",    name: "Armour" },
+  { id: "everyday",  name: "Everyday items" },
+  { id: "ore",       name: "Ores" },
+  { id: "building",  name: "Building materials" },
+  { id: "necessity", name: "Necessities" }
+];
+const CAT_NAME = Object.fromEntries(CATS.map(c => [c.id, c.name]));
+
+/* ---------- item catalogue: every item has one fixed rarity ---------- */
+const ITEMS = [
+  // weapons
+  ["club",      "Wooden Club",            "weapon", "common",      4, "A stout branch with a leather grip. It does the job."],
+  ["shortsword","Iron Shortsword",        "weapon", "rare",       20, "Plain, balanced and honest iron."],
+  ["spear",     "Bronze Spear",           "weapon", "rare",       18, "Long reach, green with age at the socket."],
+  ["longsword", "Steel Longsword",        "weapon", "epic",       70, "Folded steel that still holds a mirror edge."],
+  ["daggers",   "Twinfang Daggers",       "weapon", "epic",       65, "A matched pair. Nobody remembers who the other owner was."],
+  ["greatsword","Emberforged Greatsword", "weapon", "legendary", 300, "Warm to the touch, even in the rain."],
+  ["bow",       "Stormcaller Bow",        "weapon", "legendary", 280, "The string hums before thunder."],
+  ["oath",      "Oathbreaker",            "weapon", "vaulted",  2000, "The blade that ended the Long War. It has never needed sharpening."],
+  // armour
+  ["tunic",     "Padded Tunic",           "armour", "common",      3, "Quilted cloth. Better than nothing, just."],
+  ["cap",       "Leather Cap",            "armour", "common",      3, "Smells of rain and old campfires."],
+  ["breastplate","Bronze Breastplate",    "armour", "rare",       22, "Dented in exactly one place."],
+  ["hauberk",   "Chainmail Hauberk",      "armour", "epic",       80, "Ten thousand rings, every one riveted by hand."],
+  ["aegis",     "Gilded Aegis",           "armour", "legendary", 320, "A shield that turns arrows the way a stone turns water."],
+  ["mantle",    "Mantle of the Last Watch","armour","vaulted",  1800, "Worn by the final sentry of the Spire. It is never cold inside."],
+  // everyday
+  ["book",      "Worn Book",              "everyday", "common",    2, "Half the pages are stuck together. The other half are about turnips."],
+  ["quill",     "Quill Pen",              "everyday", "common",    1, "Needs ink. Always needs ink."],
+  ["notebook",  "Leather Notebook",       "everyday", "common",    2, "Bound with a cord. A few pages of someone's shopping lists."],
+  ["candle",    "Tallow Candle",          "everyday", "common",    1, "Burns for an evening, smokes for a week."],
+  ["pouch",     "Cloth Pouch",            "everyday", "common",    2, "Drawstring bag. Empty, sadly."],
+  ["compass",   "Brass Compass",          "everyday", "rare",     12, "Points north. Mostly."],
+  ["watch",     "Pocket Watch",           "everyday", "epic",     55, "Still ticking after a century at the bottom of a lake."],
+  ["atlas",     "Cartographer's Atlas",   "everyday", "legendary",240, "Maps of places that have not been found yet."],
+  ["ledger",    "The First Ledger",       "everyday", "vaulted", 1500, "The first record of every trade ever made in the valley. Your name is on the last page."],
+  // ores
+  ["copper",    "Copper Ore",             "ore", "common",         3, "Streaked green and orange."],
+  ["tin",       "Tin Ore",                "ore", "common",         3, "Dull and grey. Useful for bronze."],
+  ["iron",      "Iron Ore",               "ore", "common",         4, "Heavy, rusty, everywhere."],
+  ["bronze",    "Bronze Ingot",           "ore", "rare",          15, "Copper and tin, already smelted. Someone did you a favour."],
+  ["silver",    "Silver Ore",             "ore", "rare",          18, "Bright seams in black rock."],
+  ["gold",      "Gold Ore",               "ore", "epic",          60, "Small nuggets, very heavy for their size."],
+  ["starsteel", "Starsteel Ore",          "ore", "legendary",    260, "Fell from the sky. Rings like a bell when struck."],
+  ["heartstone","Heartstone",             "ore", "vaulted",     2200, "A red stone with a slow pulse, found only at the heart of the Spire."],
+  // building
+  ["plank",     "Wood Plank",             "building", "common",    2, "Pine. Slightly warped."],
+  ["plastic",   "Plastic Sheet",          "building", "common",    2, "Light, waterproof, ugly."],
+  ["wire",      "Copper Wire",            "building", "common",    3, "A tangled coil of it."],
+  ["brick",     "Clay Brick",             "building", "common",    2, "Fired red. Stacks nicely."],
+  ["beam",      "Steel Beam",             "building", "rare",     16, "Holds up a roof, or a bridge, or a grudge."],
+  ["glass",     "Glass Pane",             "building", "rare",     12, "Clear and unbroken, which is the rare part."],
+  ["ironwood",  "Ironwood Log",           "building", "epic",     50, "Sinks in water. Blunts axes."],
+  ["livingstone","Living Stone",          "building", "legendary",220, "Masonry that slowly mends its own cracks."],
+  ["worldroot", "Worldroot Timber",       "building", "vaulted", 1600, "Cut from a root older than the valley. Nothing built from it has ever fallen."],
+  // necessities
+  ["bread",     "Bread Loaf",             "necessity", "common",   2, "A day's food. Spire supply."],
+  ["water",     "Water Flask",            "necessity", "common",   2, "A day's water. Spire supply."],
+  ["bandage",   "Bandage",                "necessity", "common",   2, "Clean linen strips. Spire supply."],
+  ["rope",      "Rope Coil",              "necessity", "common",   3, "Saves you from one slip on the Spire."],
+  ["oil",       "Lantern Oil",            "necessity", "rare",    10, "Burns clean for a whole night. Spire supply."],
+  ["draught",   "Healing Draught",        "necessity", "epic",    45, "Tastes of mint and iron. Spire supply."],
+  ["everflame", "Everflame Lantern",      "necessity", "legendary",200, "Never needs oil. Never goes out."],
+  ["canteen",   "Bottomless Canteen",     "necessity", "vaulted", 1400, "Always full of cold, clean water. You will never run short of supplies again."]
+].map(([id, name, cat, rarity, value, desc]) => ({ id, name, cat, rarity, value, desc }));
+const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+const SUPPLY_ORDER = ["bread", "water", "bandage", "oil", "draught"]; // used cheapest first; rope is kept for slips
+
+/* ---------- areas ---------- */
+const AREAS = [
+  { id: "market", name: "Market Road", days: 1, drops: 3,
+    desc: "Busy stalls and dropped bags. Mostly everyday odds and ends.",
+    odds: { common: 80, rare: 17, epic: 3, legendary: 0 },
+    cats: { everyday: 4, necessity: 4, building: 2, ore: 1, weapon: 1, armour: 1 } },
+  { id: "quarry", name: "Old Quarry", days: 2, drops: 3,
+    desc: "Abandoned workings. Ores and building stock, with the odd glint of gold.",
+    odds: { common: 58, rare: 28, epic: 11, legendary: 3 },
+    cats: { ore: 6, building: 4, necessity: 1, weapon: 1 } },
+  { id: "library", name: "Drowned Library", days: 3, drops: 2,
+    desc: "Flooded halls of shelves. Everyday treasures and supplies.",
+    odds: { common: 42, rare: 32, epic: 19, legendary: 7 },
+    cats: { everyday: 6, necessity: 3, building: 1 } },
+  { id: "barracks", name: "Ruined Barracks", days: 3, drops: 2,
+    desc: "A fort nobody guards any more. Weapons and armour, if you dig.",
+    odds: { common: 42, rare: 32, epic: 19, legendary: 7 },
+    cats: { weapon: 5, armour: 5, ore: 1 } }
+];
+const AREA = Object.fromEntries(AREAS.map(a => [a.id, a]));
+
+/* ---------- Comet Night event ---------- */
+const EVENT_EVERY = 12;   // trips between events
+const EVENT_LENGTH = 4;   // trips the event lasts
+const EVENT_VAULT_CHANCE = { market: 0.5, quarry: 1, library: 1.5, barracks: 1.5 }; // percent per drop
+const EVENT_LEGENDARY_BONUS = 3;
+
+/* ---------- the Vault Spire ---------- */
+const FLOORS = 15;
+const CHECKPOINTS = [5, 10];
+const SPIRE_ODDS = { common: 20, rare: 40, epic: 30, legendary: 10 };
+const floorChance = f => 0.78 - (0.26 * f) / (FLOORS - 1); // f = floors already climbed
+
+const SHOP = [ { id: "bread", price: 5 }, { id: "water", price: 5 }, { id: "rope", price: 9 } ];
+
+/* ---------- state ---------- */
+const KEY = "satchel-and-spire-v1";
+function fresh() {
+  return {
+    day: 1, coins: 15, trips: 0,
+    inv: { bread: 3, water: 2, book: 1, quill: 1 },
+    seen: { bread: 1, water: 1, book: 1, quill: 1 },
+    floor: 0, climbs: 0, attempts: 0,
+    log: [{ w: "Day 1", t: "You set out with a few loaves, a flask, an old book and a pen.", r: "common" }]
+  };
+}
+let S = fresh();
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(fresh(), JSON.parse(raw)); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const el = (tag, attrs = {}, kids = []) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "style") n.style.cssText = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (k === "text") n.textContent = v;
+    else n.setAttribute(k, v);
+  }
+  for (const k of [].concat(kids)) if (k != null) n.append(k);
+  return n;
+};
+function pickWeighted(weights) {
+  const entries = Object.entries(weights).filter(([, w]) => w > 0);
+  let total = entries.reduce((s, [, w]) => s + w, 0), roll = Math.random() * total;
+  for (const [k, w] of entries) { if ((roll -= w) < 0) return k; }
+  return entries[entries.length - 1][0];
+}
+const pickOne = arr => arr[Math.floor(Math.random() * arr.length)];
+const eventPhase = () => S.trips % EVENT_EVERY; // live when phase >= EVENT_EVERY - EVENT_LENGTH
+const eventLive = () => eventPhase() >= EVENT_EVERY - EVENT_LENGTH;
+const tripsToEvent = () => EVENT_EVERY - EVENT_LENGTH - eventPhase();
+const tripsLeftInEvent = () => EVENT_EVERY - eventPhase();
+
+function areaOdds(area) {
+  const o = { ...area.odds, vaulted: 0 };
+  if (eventLive()) {
+    o.legendary += EVENT_LEGENDARY_BONUS;
+    o.vaulted = EVENT_VAULT_CHANCE[area.id];
+    o.common = Math.max(0, o.common - EVENT_LEGENDARY_BONUS - o.vaulted);
+  }
+  return o;
+}
+
+function rollItem(rarity, catWeights) {
+  const cat = catWeights ? pickWeighted(catWeights) : null;
+  let pool = ITEMS.filter(i => i.rarity === rarity && (!cat || i.cat === cat));
+  if (!pool.length) pool = ITEMS.filter(i => i.rarity === rarity);
+  if (rarity === "vaulted") { // prefer a Vaulted item you do not own yet
+    const unseen = pool.filter(i => !S.seen[i.id]);
+    if (unseen.length) pool = unseen;
+  }
+  return pickOne(pool);
+}
+
+function gain(item, where) {
+  S.inv[item.id] = (S.inv[item.id] || 0) + 1;
+  const first = !S.seen[item.id];
+  S.seen[item.id] = (S.seen[item.id] || 0) + 1;
+  addLog(where, `${first ? "New! " : ""}<b>${item.name}</b> (${rName(item.rarity)})`, item.rarity);
+  if (RANK[item.rarity] >= RANK.legendary || (first && RANK[item.rarity] >= RANK.epic)) showReveal(item, first);
+}
+const rName = id => RARITIES[RANK[id]].name;
+function addLog(where, html, rarity) {
+  S.log.unshift({ w: `Day ${S.day}`, t: `${where}: ${html}`, r: rarity || "" });
+  S.log = S.log.slice(0, 80);
+}
+
+/* ---------- actions ---------- */
+let revealQueue = [];
+function goTrip(id) {
+  const a = AREA[id];
+  const odds = areaOdds(a);
+  S.day += a.days; S.trips += 1;
+  for (let n = 0; n < a.drops; n++) {
+    const rar = pickWeighted(odds);
+    gain(rollItem(rar, a.cats), a.name);
+  }
+  if (eventPhase() === EVENT_EVERY - EVENT_LENGTH) addLog("Sky", "<b>Comet Night</b> has begun. Vaulted items can now drop on ordinary trips.", "vaulted");
+  if (eventPhase() === 0 && S.trips > 0) addLog("Sky", "The comet has passed.", "");
+  commit();
+}
+
+function supplyCount() { return SUPPLY_ORDER.reduce((s, id) => s + (S.inv[id] || 0), 0) + (S.inv.canteen ? Infinity : 0); }
+function useSupply() {
+  if (S.inv.canteen) return "Bottomless Canteen";
+  for (const id of SUPPLY_ORDER) if (S.inv[id] > 0) { take(id, 1); return ITEM[id].name; }
+  return null;
+}
+function take(id, n) { S.inv[id] -= n; if (S.inv[id] <= 0) delete S.inv[id]; }
+
+function climb() {
+  if (!(supplyCount() > 0)) return;
+  const used = useSupply();
+  S.day += 1; S.attempts += 1;
+  const chance = floorChance(S.floor);
+  if (Math.random() < chance) {
+    S.floor += 1;
+    if (S.floor >= FLOORS) {
+      S.climbs += 1;
+      addLog("Vault Spire", `You reach the top after ${S.attempts} attempts.`, "vaulted");
+      gain(rollItem("vaulted"), "Vault Spire summit");
+      S.floor = 0; S.attempts = 0;
+    } else {
+      const rar = pickWeighted(SPIRE_ODDS);
+      addLog("Vault Spire", `Climbed to floor ${S.floor} (used ${used}).`, "");
+      gain(rollItem(rar), `Spire floor ${S.floor}`);
+    }
+  } else if (S.inv.rope) {
+    take("rope", 1);
+    addLog("Vault Spire", `You slip on floor ${S.floor + 1}, but your rope holds. Rope Coil used.`, "");
+  } else {
+    const cp = Math.max(0, ...CHECKPOINTS.filter(c => c <= S.floor));
+    if (S.floor > cp) { S.floor -= 1; addLog("Vault Spire", `You slip and fall back to floor ${S.floor}.`, ""); }
+    else addLog("Vault Spire", `You slip, but the checkpoint at floor ${cp} holds you.`, "");
+  }
+  commit();
+}
+
+function buy(id, price) { if (S.coins < price) return; S.coins -= price; S.inv[id] = (S.inv[id] || 0) + 1; S.seen[id] = S.seen[id] || 1; commit(); }
+function sell(id, n) {
+  const have = S.inv[id] || 0; n = Math.min(n, have); if (!n) return;
+  take(id, n); S.coins += n * ITEM[id].value;
+  addLog("Market", `Sold ${n} ${ITEM[id].name} for ${n * ITEM[id].value} coins.`, ITEM[id].rarity);
+  if (!S.inv[id]) selected = null;
+  commit();
+}
+function sellCommons() {
+  let total = 0, count = 0;
+  for (const [id, n] of Object.entries(S.inv)) {
+    const it = ITEM[id];
+    if (it.rarity === "common" && it.cat !== "necessity") { total += n * it.value; count += n; delete S.inv[id]; }
+  }
+  if (!count) return;
+  S.coins += total; selected = null;
+  addLog("Market", `Sold ${count} common items for ${total} coins. Supplies kept.`, "common");
+  commit();
+}
+
+/* ---------- reveal ---------- */
+function showReveal(item, first) { revealQueue.push({ item, first }); if ($("reveal").hidden) nextReveal(); }
+function nextReveal() {
+  const next = revealQueue.shift();
+  if (!next) { $("reveal").hidden = true; return; }
+  const { item, first } = next;
+  const card = $("revealCard");
+  card.className = "reveal-card" + (item.rarity === "vaulted" ? " vaulted" : "");
+  card.style.setProperty("--c", rc(item.rarity));
+  $("rvEyebrow").textContent = `${first ? "New " : ""}${rName(item.rarity)} ${CAT_NAME[item.cat].replace(/s$/, "").toLowerCase()}`;
+  $("rvName").textContent = item.name;
+  $("rvDesc").textContent = item.desc;
+  $("reveal").hidden = false;
+  $("rvClose").focus();
+}
+$("rvClose").addEventListener("click", nextReveal);
+
+/* ---------- view state ---------- */
+let tab = "satchel", catFilter = "all", rarFilter = "all", selected = null;
+
+function commit() { save(); render(); }
+
+function render() {
+  $("sDay").textContent = S.day;
+  $("sCoins").textContent = S.coins;
+  $("sValue").textContent = Object.entries(S.inv).reduce((s, [id, n]) => s + ITEM[id].value * n, 0);
+  renderLadder(); renderEvent(); renderAreas(); renderShop(); renderRight();
+}
+
+function renderLadder() {
+  const L = $("ladder"); L.textContent = "";
+  for (const r of RARITIES) {
+    const total = ITEMS.filter(i => i.rarity === r.id).length;
+    const found = ITEMS.filter(i => i.rarity === r.id && S.seen[i.id]).length;
+    L.append(el("div", { class: `rung ${r.id}`, style: `--c:${rc(r.id)}` }, [
+      el("div", { class: "nm", text: r.name }),
+      el("div", { class: "ct", text: `${found} / ${total} found` })
+    ]));
+  }
+}
+
+function renderEvent() {
+  const E = $("event"); E.textContent = "";
+  if (eventLive()) {
+    E.className = "event live";
+    const n = tripsLeftInEvent();
+    E.append(el("strong", { text: "Comet Night" }),
+      el("span", { text: `Vaulted items can drop on any trip, and Legendary odds are up. Ends after ${n} more trip${n === 1 ? "" : "s"}.` }));
+  } else {
+    E.className = "event";
+    const n = tripsToEvent();
+    E.append(el("strong", { text: "Comet Night" }),
+      el("span", { text: `The next comet passes in ${n} trip${n === 1 ? "" : "s"}. For ${EVENT_LENGTH} trips, Vaulted items can drop anywhere.` }));
+  }
+}
+
+function oddsBar(odds) {
+  const bar = el("div", { class: "odds", role: "img", "aria-label": "Drop odds" });
+  const leg = el("div", { class: "odds-legend" });
+  for (const r of RARITIES) {
+    const v = odds[r.id] || 0; if (!v) continue;
+    bar.append(el("i", { style: `width:${v}%;background:${rc(r.id)}` }));
+    leg.append(el("span", { style: `--c:${rc(r.id)}`, text: `${r.name} ${+v.toFixed(1)}%` }));
+  }
+  return [bar, leg];
+}
+
+function renderAreas() {
+  const A = $("areas"); A.textContent = "";
+  for (const a of AREAS) {
+    const odds = areaOdds(a);
+    A.append(el("div", { class: "area" }, [
+      el("div", { class: "area-head" }, [ el("h3", { text: a.name }), el("span", { class: "meta", text: `${a.days} day${a.days > 1 ? "s" : ""} · ${a.drops} finds` }) ]),
+      el("p", { text: a.desc }),
+      ...oddsBar(odds),
+      el("div", { class: "row" }, [ el("button", { class: "btn primary", onclick: () => goTrip(a.id), text: "Go" }) ])
+    ]));
+  }
+  // spire
+  const floors = el("div", { class: "floors", "aria-label": `Floor ${S.floor} of ${FLOORS}` });
+  for (let f = 1; f <= FLOORS; f++) {
+    floors.append(el("i", { class: [f <= S.floor ? "done" : "", CHECKPOINTS.includes(f) ? "cp" : "", f === FLOORS ? "top" : ""].join(" "), title: f === FLOORS ? "Summit: Vaulted item" : CHECKPOINTS.includes(f) ? `Floor ${f}: checkpoint` : `Floor ${f}` }));
+  }
+  const sup = supplyCount();
+  const chance = Math.round(floorChance(S.floor) * 100);
+  const climbBtn = el("button", { class: "btn primary", onclick: climb, text: sup > 0 ? `Climb to floor ${S.floor + 1}` : "Out of supplies: buy or find some" });
+  climbBtn.disabled = !(sup > 0);
+  const note = el("div", { class: "spire-note" });
+  note.innerHTML = `Floor <b>${S.floor}</b> of ${FLOORS}. Next floor: <b>${chance}%</b> to climb. ` +
+    `Supplies: <b>${sup === Infinity ? "endless" : sup}</b>. Ropes: <b>${S.inv.rope || 0}</b>. ` +
+    (S.climbs ? `Summits reached: <b>${S.climbs}</b>.` : `Checkpoints at floors ${CHECKPOINTS.join(" and ")} stop you falling further.`);
+  A.append(el("div", { class: "area spire" }, [
+    el("div", { class: "area-head" }, [ el("h3", { text: "The Vault Spire" }), el("span", { class: "meta", text: "1 day + 1 supply per floor" }) ]),
+    el("p", { text: "Fifteen floors. Each floor is harder than the last, and a slip drops you one floor. Every floor climbed finds something; the summit always holds a Vaulted item. It takes a long time, but anyone with enough supplies gets there." }),
+    floors, note,
+    el("div", { class: "row" }, [ climbBtn ])
+  ]));
+}
+
+function renderShop() {
+  const sh = $("shop"); sh.textContent = "";
+  for (const s of SHOP) {
+    const b = el("button", { class: "btn", onclick: () => buy(s.id, s.price), text: `${ITEM[s.id].name} · ${s.price}c` });
+    if (S.coins < s.price) b.disabled = true;
+    sh.append(b);
+  }
+  const sc = el("button", { class: "btn", onclick: sellCommons, text: "Sell all common items (keeps supplies)" });
+  if (!Object.keys(S.inv).some(id => ITEM[id].rarity === "common" && ITEM[id].cat !== "necessity")) sc.disabled = true;
+  sh.append(sc);
+}
+
+function chip(label, pressed, onclick, colour) {
+  return el("button", { class: "chip", "aria-pressed": String(pressed), onclick, style: colour ? `color:${pressed ? "" : colour}` : "", text: label });
+}
+
+function renderRight() {
+  for (const [t, id] of [["satchel", "tabSatchel"], ["codex", "tabCodex"], ["log", "tabLog"]]) $(id).setAttribute("aria-selected", String(tab === t));
+  const isLog = tab === "log";
+  $("log").hidden = !isLog;
+  for (const id of ["catChips", "rarChips", "sum", "grid"]) $(id).hidden = isLog;
+  if (isLog) { $("detail").hidden = true; renderLog(); return; }
+
+  const cc = $("catChips"); cc.textContent = "";
+  cc.append(chip("All", catFilter === "all", () => { catFilter = "all"; render(); }));
+  for (const c of CATS) cc.append(chip(c.name, catFilter === c.id, () => { catFilter = c.id; render(); }));
+  const rr = $("rarChips"); rr.textContent = "";
+  rr.append(chip("Any rarity", rarFilter === "all", () => { rarFilter = "all"; render(); }));
+  for (const r of RARITIES) rr.append(chip(r.name, rarFilter === r.id, () => { rarFilter = r.id; render(); }, rc(r.id)));
+
+  const pass = it => (catFilter === "all" || it.cat === catFilter) && (rarFilter === "all" || it.rarity === rarFilter);
+  const byRarity = (a, b) => RANK[b.rarity] - RANK[a.rarity] || a.name.localeCompare(b.name);
+  const G = $("grid"); G.textContent = "";
+
+  if (tab === "satchel") {
+    const list = Object.keys(S.inv).map(id => ITEM[id]).filter(pass).sort(byRarity);
+    const count = list.reduce((s, it) => s + S.inv[it.id], 0);
+    $("sum").innerHTML = `<span>${count} item${count === 1 ? "" : "s"} shown</span><span>Tap an item to inspect or sell it</span>`;
+    if (!list.length) G.append(el("div", { class: "empty", text: "Nothing here yet. Go on a trip to find some." }));
+    for (const it of list) G.append(itemCard(it, S.inv[it.id], false));
+  } else {
+    const list = ITEMS.filter(pass).sort(byRarity);
+    const found = list.filter(i => S.seen[i.id]).length;
+    $("sum").innerHTML = `<span>${found} of ${list.length} discovered</span><span>Unfound items show their rarity only</span>`;
+    for (const it of list) G.append(itemCard(it, null, !S.seen[it.id]));
+  }
+  renderDetail();
+}
+
+function itemCard(it, qty, unknown) {
+  const card = el("button", {
+    class: `item ${it.rarity}${unknown ? " unknown" : ""}${selected === it.id ? " sel" : ""}`,
+    style: `--c:${rc(it.rarity)}`,
+    onclick: () => { if (unknown) return; selected = selected === it.id ? null : it.id; render(); }
+  }, [
+    el("span", { class: "nm", text: unknown ? "???" : it.name }),
+    el("span", { class: "rr", text: `${rName(it.rarity)} · ${CAT_NAME[it.cat]}` })
+  ]);
+  if (qty) card.append(el("span", { class: "qty", text: `×${qty}` }));
+  return card;
+}
+
+function renderDetail() {
+  const D = $("detail");
+  const it = selected && ITEM[selected];
+  if (!it || (tab === "satchel" && !S.inv[it.id])) { D.hidden = true; return; }
+  D.hidden = false; D.textContent = ""; D.style.setProperty("--c", rc(it.rarity));
+  D.append(el("h4", { text: it.name }), el("p", { text: it.desc }));
+  const kv = el("div", { class: "kv" });
+  kv.innerHTML = `<span>Rarity <b style="color:${rc(it.rarity)}">${rName(it.rarity)}</b></span><span>Type <b>${CAT_NAME[it.cat]}</b></span><span>Sells for <b>${it.value}c</b></span>` +
+    (tab === "codex" ? `<span>Found <b>${S.seen[it.id]}×</b></span>` : `<span>Holding <b>${S.inv[it.id]}</b></span>`);
+  D.append(kv);
+  if (tab === "satchel") {
+    const n = S.inv[it.id];
+    const row = el("div", { class: "row" }, [ el("button", { class: "btn", onclick: () => sell(it.id, 1), text: `Sell 1 for ${it.value}c` }) ]);
+    if (n > 1) row.append(el("button", { class: "btn", onclick: () => sell(it.id, n), text: `Sell all ${n} for ${it.value * n}c` }));
+    D.append(row);
+  }
+}
+
+function renderLog() {
+  const L = $("log"); L.textContent = "";
+  for (const e of S.log) {
+    const li = el("li", { style: e.r ? `--c:${rc(e.r)}` : "" });
+    li.innerHTML = `<span class="w">${e.w}</span>${e.t}`;
+    L.append(li);
+  }
+}
+
+$("tabSatchel").addEventListener("click", () => { tab = "satchel"; selected = null; render(); });
+$("tabCodex").addEventListener("click", () => { tab = "codex"; selected = null; render(); });
+$("tabLog").addEventListener("click", () => { tab = "log"; render(); });
+
+let armed = false;
+$("reset").addEventListener("click", () => {
+  const b = $("reset");
+  if (!armed) { armed = true; b.classList.add("armed"); b.textContent = "Tap again to wipe this satchel"; setTimeout(() => { armed = false; b.classList.remove("armed"); b.textContent = "Start a new satchel"; }, 3000); return; }
+  armed = false; b.classList.remove("armed"); b.textContent = "Start a new satchel";
+  S = fresh(); selected = null; commit();
+});
+
+render();
+})();
+</script>
